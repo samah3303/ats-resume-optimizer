@@ -1,9 +1,6 @@
 # ─── Build stage ───────────────────────────────────────────────
-FROM node:22-alpine AS builder
+FROM node:22-slim AS builder
 WORKDIR /app
-
-# Prisma needs OpenSSL for its query engine
-RUN apk add --no-cache openssl1.1-compat
 
 # Install dependencies needed for Prisma and build
 COPY package.json package-lock.json ./
@@ -18,11 +15,11 @@ COPY . .
 RUN npm run build
 
 # ─── Production stage ──────────────────────────────────────────
-FROM node:22-alpine AS runner
+FROM node:22-slim AS runner
 WORKDIR /app
 
 # Prisma needs OpenSSL for its query engine
-RUN apk add --no-cache openssl1.1-compat
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
 ENV NODE_ENV=production
 ENV PORT=3000
