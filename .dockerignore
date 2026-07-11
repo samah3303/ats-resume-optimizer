@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+
+# Build output
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# Local storage (will be on Fly volume)
+.storage/
+dev.db
+
+# Git
+.git/
+.gitignore
+
+# Dev config
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Tests
+coverage/
+test-*.ts
+
+# Fly.io local
+fly.toml.bak
+
+# Misc
+README.md
+AGENTS.md
+CLAUDE.md
+.prettierrc*
+.eslintrc*
+eslint.config.mjs

@@ -1,0 +1,111 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String   @id @default(uuid())
+  name            String?
+  email           String   @unique
+  passwordHash    String?
+  image           String?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  resumes          Resume[]
+  positionProfiles PositionProfile[]
+  jobDescriptions  JobDescription[]
+  analyses         Analysis[]
+
+  @@map("users")
+}
+
+model Resume {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  name       String
+  filePath   String?  @map("file_path")
+  parsedText String   @map("parsed_text")
+  isPrimary  Boolean  @default(false) @map("is_primary")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  analyses Analysis[]
+
+  @@map("resumes")
+}
+
+model PositionProfile {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  title      String
+  targetRole String   @map("target_role")
+  industry   String?
+  notes      String?
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobDescriptions JobDescription[]
+
+  @@map("position_profiles")
+}
+
+model JobDescription {
+  id                 String   @id @default(uuid())
+  userId             String   @map("user_id")
+  positionProfileId  String?  @map("position_profile_id")
+  title              String
+  company            String?
+  rawText            String   @map("raw_text")
+  sourceUrl          String?  @map("source_url")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  positionProfile PositionProfile? @relation(fields: [positionProfileId], references: [id], onDelete: SetNull)
+  analyses        Analysis[]
+
+  @@map("job_descriptions")
+}
+
+model Analysis {
+  id               String   @id @default(uuid())
+  userId           String   @map("user_id")
+  resumeId         String   @map("resume_id")
+  jobDescriptionId String   @map("job_description_id")
+  overallScore     Int?     @map("overall_score")
+  keywordsMatchPct Float?   @map("keywords_match_pct")
+  skillsGapJson    String?  @map("skills_gap_json")
+  formatScore      Int?     @map("format_score")
+  impactScore      Int?     @map("impact_score")
+  summaryText      String?  @map("summary_text")
+  rawAiResponse    String   @map("raw_ai_response")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resume         Resume         @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  jobDescription JobDescription @relation(fields: [jobDescriptionId], references: [id], onDelete: Cascade)
+  suggestions    Suggestion[]
+
+  @@map("analyses")
+}
+
+model Suggestion {
+  id            String   @id @default(uuid())
+  analysisId    String   @map("analysis_id")
+  section       String
+  originalText  String   @map("original_text")
+  suggestedText String   @map("suggested_text")
+  rationale     String
+  accepted      Boolean  @default(false)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  analysis Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+
+  @@map("suggestions")
+}

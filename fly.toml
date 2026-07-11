@@ -1,0 +1,41 @@
+# fly.toml app configuration file generated for ats-resume-optimizer on 2026-07-11T14:15:56+05:30
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'ats-resume-optimizer'
+primary_region = 'iad'
+
+[build]
+  dockerfile = 'Dockerfile'
+
+[env]
+  DATABASE_URL = 'file:/data/dev.db'
+  DEEPSEEK_BASE_URL = 'https://api.deepseek.com'
+  NEXTAUTH_URL = 'https://ats-resume-optimizer.fly.dev'
+
+[[mounts]]
+  source = 'data'
+  destination = '/data'
+
+[[services]]
+  protocol = 'tcp'
+  internal_port = 3000
+
+  [[services.ports]]
+    port = 80
+    handlers = ['http']
+
+  [[services.ports]]
+    port = 443
+    handlers = ['tls', 'http']
+
+  [services.concurrency]
+    type = 'connections'
+    hard_limit = 25
+    soft_limit = 20
+
+[[vm]]
+  cpu_kind = 'shared'
+  cpus = 1
+  memory_mb = 256
