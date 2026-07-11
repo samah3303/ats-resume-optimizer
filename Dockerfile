@@ -2,6 +2,9 @@
 FROM node:22-slim AS builder
 WORKDIR /app
 
+# Prisma needs OpenSSL for its query engine
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
 # Install dependencies needed for Prisma and build
 COPY package.json package-lock.json ./
 RUN npm ci
