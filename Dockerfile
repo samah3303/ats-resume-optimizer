@@ -6,9 +6,9 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 
-# Generate Prisma client
+# Generate Prisma client for Debian (glibc, not musl)
 COPY prisma/schema.prisma ./prisma/
-RUN npx prisma generate
+RUN echo "platform: glibc" && npx prisma generate
 
 # Copy source and build
 COPY . .
