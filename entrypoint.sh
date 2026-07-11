@@ -15,7 +15,7 @@ fi
 # Run Prisma database push — creates tables if they don't exist
 echo "Running database setup (prisma db push)..."
 cd /app
-npx prisma db push --skip-generate --accept-data-loss 2>&1
+node node_modules/prisma/build/index.js db push --skip-generate --accept-data-loss 2>&1
 echo "Database ready"
 
 echo "Starting server on port ${PORT:-3000}..."
