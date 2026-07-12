@@ -66,6 +66,13 @@ export async function POST(req: NextRequest) {
       description: string;
     }>;
 
+    if (!profile.resume) {
+      return NextResponse.json(
+        { error: "Original resume was deleted. Please upload a new resume first." },
+        { status: 400 }
+      );
+    }
+
     const result = await mode2GenerateRoadmap(
       profile.resume.parsedText,
       coreSkills,

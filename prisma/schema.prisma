@@ -94,7 +94,7 @@ model JobDescription {
 model Analysis {
   id               String   @id @default(uuid())
   userId           String   @map("user_id")
-  resumeId         String   @map("resume_id")
+  resumeId         String?  @map("resume_id")
   jobDescriptionId String   @map("job_description_id")
   overallScore     Int?     @map("overall_score")
   keywordsMatchPct Float?   @map("keywords_match_pct")
@@ -106,7 +106,7 @@ model Analysis {
   createdAt        DateTime @default(now()) @map("created_at")
 
   user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  resume           Resume           @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  resume           Resume?          @relation(fields: [resumeId], references: [id], onDelete: SetNull)
   jobDescription   JobDescription   @relation(fields: [jobDescriptionId], references: [id], onDelete: Cascade)
   suggestions      Suggestion[]
   sharedAnalyses   SharedAnalysis[]
@@ -143,7 +143,7 @@ model SharedAnalysis {
 model OnboardingProfile {
   id              String   @id @default(uuid())
   userId          String   @unique @map("user_id")
-  resumeId        String   @map("resume_id")
+  resumeId        String?  @map("resume_id")
   targetPositions String   @map("target_positions") @db.Text
   targetCountry   String   @map("target_country")
   linkedinUrl     String?  @map("linkedin_url")
@@ -162,7 +162,7 @@ model OnboardingProfile {
   updatedAt       DateTime @updatedAt @map("updated_at")
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  resume Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  resume Resume? @relation(fields: [resumeId], references: [id], onDelete: SetNull)
 
   @@map("onboarding_profiles")
 }

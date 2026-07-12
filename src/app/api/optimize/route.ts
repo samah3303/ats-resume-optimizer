@@ -53,6 +53,13 @@ export async function POST(req: NextRequest) {
 
     const resume = analysis.resume;
 
+    if (!resume) {
+      return NextResponse.json(
+        { error: "Original resume was deleted." },
+        { status: 404 }
+      );
+    }
+
     let originalFormat: string | null = null;
     try {
       originalFormat = await getOriginalFormat(resume.id);

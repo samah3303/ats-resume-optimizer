@@ -58,7 +58,7 @@ export async function GET(
         summaryText: analysis.summaryText,
         createdAt: analysis.createdAt,
         suggestions: analysis.suggestions,
-        resumeName: analysis.resume.name,
+        resumeName: analysis.resume?.name || "Unknown Resume",
         jdTitle: analysis.jobDescription.title,
       },
     });

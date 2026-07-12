@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
       }
 
       skillsGapJson = analysis.skillsGapJson || undefined;
-      resumeText = analysis.resume.parsedText;
+      resumeText = analysis.resume?.parsedText || "";
       jobDescriptionText = analysis.jobDescription.rawText;
       jobTitle = analysis.jobDescription.title;
     } else if (resumeId && jdId) {
