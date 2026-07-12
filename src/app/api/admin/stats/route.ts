@@ -55,6 +55,60 @@ export async function GET(req: NextRequest) {
       where: { createdAt: { gte: weekAgo } },
     });
 
+    // Daily trend (last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const allRecentAnalyses = await prisma.analysis.findMany({
+      where: { createdAt: { gte: thirtyDaysAgo } },
+      select: { createdAt: true },
+      orderBy: { createdAt: "asc" },
+    });
+    const dailyTrend: Record<string, number> = {};
+    for (let i = 0; i < 30; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      dailyTrend[d.toISOString().split("T")[0]] = 0;
+    }
+    allRecentAnalyses.forEach((a) => {
+      const day = a.createdAt.toISOString().split("T")[0];
+      if (dailyTrend[day] !== undefined) dailyTrend[day]++;
+    });
+
+    // Top users
+    const topUsers = await prisma.analysis.groupBy({
+      by: ["userId"],
+      _count: { id: true },
+      orderBy: { _count: { id: "desc" } },
+      take: 10,
+    });
+    const topUserDetails = await Promise.all(
+      topUsers.map(async (u) => {
+        const user = await prisma.user.findUnique({
+          where: { id: u.userId },
+          select: { email: true, name: true, createdAt: true },
+        });
+        return {
+          email: user?.email || "unknown",
+          name: user?.name || "—",
+          analysisCount: u._count.id,
+          joined: user?.createdAt,
+        };
+      })
+    );
+
+    // Recent users
+    const recentUsers = await prisma.user.findMany({
+      take: 20,
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        createdAt: true,
+        _count: { select: { analyses: true } },
+      },
+    });
+
     return NextResponse.json({
       stats: {
         users,
@@ -67,7 +121,15 @@ export async function GET(req: NextRequest) {
         sharedLinks: shared,
         averageScore: Math.round(avgScoreResult._avg.overallScore || 0),
         scoreDistribution: { high, medium, low },
+        dailyTrend,
       },
+      topUsers: topUserDetails,
+      recentUsers: recentUsers.map((u) => ({
+        email: u.email,
+        name: u.name || "—",
+        joined: u.createdAt,
+        analysisCount: u._count.analyses,
+      })),
       recentAnalyses: recentAnalyses.map((a) => ({
         id: a.id,
         score: a.overallScore,

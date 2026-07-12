@@ -16,6 +16,7 @@ interface Stats {
     sharedLinks: number;
     averageScore: number;
     scoreDistribution: { high: number; medium: number; low: number };
+    dailyTrend: Record<string, number>;
   };
   recentAnalyses: Array<{
     id: string;
@@ -24,6 +25,18 @@ interface Stats {
     resume: string;
     jd: string;
     user: string;
+  }>;
+  topUsers: Array<{
+    email: string;
+    name: string;
+    analysisCount: number;
+    joined: string;
+  }>;
+  recentUsers: Array<{
+    email: string;
+    name: string;
+    joined: string;
+    analysisCount: number;
   }>;
 }
 
@@ -124,6 +137,72 @@ function AdminContent() {
               {stats.scoreDistribution.low} &lt;40%
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Daily Trend */}
+      <div className="bg-white rounded-xl border border-gray-200 p-4 mb-8">
+        <h2 className="text-lg font-semibold mb-3">📈 Daily Analyses (30 days)</h2>
+        <div className="flex items-end gap-0.5 h-32">
+          {Object.entries(stats.dailyTrend).reverse().map(([day, count]) => {
+            const maxVal = Math.max(...Object.values(stats.dailyTrend), 1);
+            const pct = (count / maxVal) * 100;
+            return (
+              <div key={day} className="flex-1 flex flex-col items-center gap-1" title={`${day}: ${count} analyses`}>
+                <span className="text-[10px] text-gray-400">{count || ""}</span>
+                <div
+                  className="w-full rounded-t bg-indigo-500 hover:bg-indigo-600 transition-colors min-h-[2px]"
+                  style={{ height: `${Math.max(pct, 2)}%` }}
+                />
+              </div>
+            );
+          })}
+        </div>
+        <div className="flex gap-0.5 mt-1">
+          {Object.entries(stats.dailyTrend).reverse().slice(0, 30).map(([day]) => (
+            <span key={day} className="flex-1 text-[8px] text-gray-300 text-center">
+              {day.slice(5)}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Top Users + Recent Users */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <h2 className="text-lg font-semibold mb-3">🏆 Top Users</h2>
+          {data.topUsers.map((u) => (
+            <div key={u.email} className="flex items-center justify-between py-2 border-b border-gray-50">
+              <div>
+                <p className="text-sm font-medium">{u.name}</p>
+                <p className="text-xs text-gray-400">{u.email}</p>
+              </div>
+              <span className="font-bold text-indigo-600">{u.analysisCount}</span>
+            </div>
+          ))}
+        </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-semibold">👥 Recent Users</h2>
+            <button
+              onClick={() => {
+                const csv = ["Email,Name,Joined,Analyses", ...data.recentUsers.map(u => `${u.email},"${u.name}",${new Date(u.joined).toLocaleDateString()},${u.analysisCount}`)].join("\n");
+                const blob = new Blob([csv], { type: "text/csv" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url; a.download = "resumatch-users.csv"; a.click(); URL.revokeObjectURL(url);
+              }}
+              className="text-xs text-indigo-600 hover:text-indigo-700 font-medium"
+            >
+              📥 Export CSV
+            </button>
+          </div>
+          {data.recentUsers.slice(0, 10).map((u) => (
+            <div key={u.email} className="flex items-center justify-between py-2 border-b border-gray-50 text-sm">
+              <span className="truncate max-w-[180px] text-gray-600">{u.email}</span>
+              <span className="text-gray-400 text-xs">{new Date(u.joined).toLocaleDateString()}</span>
+            </div>
+          ))}
         </div>
       </div>
 
