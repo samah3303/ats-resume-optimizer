@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, type ChangeEvent } from "react";
 import ResumeUploader from "@/components/ResumeUploader";
 
 interface Resume {
@@ -95,6 +95,25 @@ export default function ResumesPage() {
     fetchResumes();
   };
 
+  const [compactUploading, setCompactUploading] = useState(false);
+  const handleCompactUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCompactUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/resumes", { method: "POST", body: formData });
+      if (res.ok) {
+        fetchResumes();
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setCompactUploading(false);
+    }
+  };
+
   if (status === "loading" || loading) {
     return (
       <div className="flex items-center justify-center min-h-[80vh]">
@@ -116,10 +135,42 @@ export default function ResumesPage() {
         </div>
       </div>
 
-      {/* Upload Area */}
-      <div className="mb-8">
-        <ResumeUploader onUploaded={handleUploaded} />
-      </div>
+      {/* Upload Area — full when empty, compact when resumes exist */}
+      {resumes.length === 0 ? (
+        <div className="mb-8">
+          <ResumeUploader onUploaded={handleUploaded} />
+        </div>
+      ) : (
+        <div className="mb-4 flex items-center gap-3">
+          <input
+            type="file"
+            accept=".pdf,.docx,.doc"
+            onChange={handleCompactUpload}
+            className="hidden"
+            id="resume-upload"
+            disabled={compactUploading}
+          />
+          <label
+            htmlFor="resume-upload"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors cursor-pointer disabled:opacity-50"
+          >
+            {compactUploading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Uploading...
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                Browse Files
+              </>
+            )}
+          </label>
+          <span className="text-xs text-gray-400">PDF, DOC, or DOCX, up to 5MB</span>
+        </div>
+      )}
 
       {/* Resume Cards */}
       {resumes.length === 0 ? (

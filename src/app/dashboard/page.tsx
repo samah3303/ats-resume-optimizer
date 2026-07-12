@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import ScoreGauge from "@/components/ScoreGauge";
+import { SkeletonGrid } from "@/components/SkeletonCard";
 
 interface Resume {
   id: string;
@@ -136,8 +137,29 @@ export default function DashboardPage() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="flex items-center justify-center min-h-[80vh]">
-        <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header skeleton */}
+        <div className="mb-8">
+          <div className="h-8 bg-gray-200 rounded w-48 animate-pulse" />
+          <div className="h-4 bg-gray-200 rounded w-64 mt-2 animate-pulse" />
+        </div>
+        {/* Stat cards skeleton */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="bg-white rounded-xl border border-gray-200 p-4 animate-pulse">
+              <div className="h-3 bg-gray-200 rounded w-16 mb-2" />
+              <div className="h-8 bg-gray-200 rounded w-12" />
+            </div>
+          ))}
+        </div>
+        {/* Tab skeleton */}
+        <div className="flex gap-2 mb-6">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-9 bg-gray-200 rounded w-24 animate-pulse" />
+          ))}
+        </div>
+        {/* Content skeleton */}
+        <SkeletonGrid count={6} />
       </div>
     );
   }

@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback, type FormEvent } from "react";
 import Link from "next/link";
+import { SkeletonGrid } from "@/components/SkeletonCard";
 
 interface JD {
   id: string;
@@ -15,16 +16,10 @@ interface JD {
   createdAt: string;
 }
 
-interface Position {
-  id: string;
-  title: string;
-}
-
 export default function JDsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [jds, setJds] = useState<JD[]>([]);
-  const [positions, setPositions] = useState<Position[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -34,8 +29,8 @@ export default function JDsPage() {
   const [company, setCompany] = useState("");
   const [rawText, setRawText] = useState("");
   const [sourceUrl, setSourceUrl] = useState("");
-  const [positionProfileId, setPositionProfileId] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [fetchingUrl, setFetchingUrl] = useState(false);
   const [error, setError] = useState("");
 
   // AI recommendations
@@ -57,41 +52,26 @@ export default function JDsPage() {
     }
   }, []);
 
-  const fetchPositions = useCallback(async () => {
-    try {
-      const res = await fetch("/api/positions");
-      if (res.ok) {
-        const data = await res.json();
-        setPositions(data.positions || []);
-      }
-    } catch {
-      // silently fail
-    }
-  }, []);
-
   useEffect(() => {
     if (status === "unauthenticated") {
       router.replace("/login");
       return;
     }
     if (status === "authenticated") {
-      Promise.all([fetchJDs(), fetchPositions()]).finally(() =>
-        setLoading(false)
-      );
+      fetchJDs().finally(() => setLoading(false));
       // Fetch country for recommendation subtext
       fetch("/api/onboarding")
         .then((r) => r.ok ? r.json() : null)
         .then((d) => d?.country && setOnboardingCountry(d.country))
         .catch(() => {});
     }
-  }, [status, router, fetchJDs, fetchPositions]);
+  }, [status, router, fetchJDs]);
 
   const resetForm = () => {
     setTitle("");
     setCompany("");
     setRawText("");
     setSourceUrl("");
-    setPositionProfileId("");
     setError("");
     setShowForm(false);
   };
@@ -99,7 +79,7 @@ export default function JDsPage() {
   const loadRecommendations = async () => {
     setLoadingRecs(true);
     try {
-      const res = await fetch("/api/recommendations?type=jds");
+      const res = await fetch(`/api/recommendations?type=jds&_t=${Date.now()}`);
       if (res.ok) {
         const data = await res.json();
         setRecommended(data.jds || []);
@@ -132,6 +112,34 @@ export default function JDsPage() {
     }
   };
 
+  const fetchFromUrl = async () => {
+    if (!sourceUrl) {
+      setError("Please enter a URL first.");
+      return;
+    }
+    setFetchingUrl(true);
+    setError("");
+    try {
+      const res = await fetch("/api/jds/fetch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: sourceUrl }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to fetch URL");
+      }
+      const data = await res.json();
+      if (data.title) setTitle(data.title);
+      if (data.company) setCompany(data.company);
+      if (data.rawText) setRawText(data.rawText);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to fetch URL");
+    } finally {
+      setFetchingUrl(false);
+    }
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
@@ -152,7 +160,6 @@ export default function JDsPage() {
           company: company || null,
           rawText,
           sourceUrl: sourceUrl || null,
-          positionProfileId: positionProfileId || null,
         }),
       });
 
@@ -187,8 +194,15 @@ export default function JDsPage() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="flex items-center justify-center min-h-[80vh]">
-        <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <div className="h-8 bg-gray-200 rounded w-24 animate-pulse" />
+            <div className="h-4 bg-gray-200 rounded w-16 mt-2 animate-pulse" />
+          </div>
+          <div className="h-9 bg-gray-200 rounded w-24 animate-pulse" />
+        </div>
+        <SkeletonGrid count={6} />
       </div>
     );
   }
@@ -267,33 +281,25 @@ export default function JDsPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Position Profile
-                </label>
-                <select
-                  value={positionProfileId}
-                  onChange={(e) => setPositionProfileId(e.target.value)}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
-                >
-                  <option value="">None</option>
-                  {positions.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Source URL
                 </label>
-                <input
-                  type="url"
-                  value={sourceUrl}
-                  onChange={(e) => setSourceUrl(e.target.value)}
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
-                  placeholder="https://..."
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="url"
+                    value={sourceUrl}
+                    onChange={(e) => setSourceUrl(e.target.value)}
+                    className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                    placeholder="https://..."
+                  />
+                  <button
+                    type="button"
+                    onClick={fetchFromUrl}
+                    disabled={fetchingUrl || !sourceUrl}
+                    className="px-3 py-2 text-sm font-medium text-indigo-700 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors disabled:opacity-50 whitespace-nowrap"
+                  >
+                    {fetchingUrl ? "Fetching..." : "Fetch from URL"}
+                  </button>
+                </div>
               </div>
 
               <div>
