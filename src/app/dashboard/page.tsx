@@ -21,13 +21,6 @@ interface Analysis {
   jobDescription?: { title: string };
 }
 
-interface Position {
-  id: string;
-  title: string;
-  targetRole: string;
-  createdAt: string;
-}
-
 interface WeekTask {
   id: string;
   weekNumber: number;
@@ -66,7 +59,6 @@ export default function DashboardPage() {
   const router = useRouter();
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [analyses, setAnalyses] = useState<Analysis[]>([]);
-  const [positions, setPositions] = useState<Position[]>([]);
   const [loading, setLoading] = useState(true);
   const [roadmap, setRoadmap] = useState<Roadmap | null>(null);
   const [roadmapLoading, setRoadmapLoading] = useState(false);
@@ -75,17 +67,15 @@ export default function DashboardPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      const [resRes, anaRes, posRes, roadmapRes, onboardRes] = await Promise.all([
+      const [resRes, anaRes, roadmapRes, onboardRes] = await Promise.all([
         fetch("/api/resumes"),
         fetch("/api/analyze"),
-        fetch("/api/positions"),
         fetch("/api/roadmap"),
         fetch("/api/onboarding"),
       ]);
 
       if (resRes.ok) setResumes((await resRes.json()).resumes || []);
       if (anaRes.ok) setAnalyses((await anaRes.json()).analyses || []);
-      if (posRes.ok) setPositions((await posRes.json()).positions || []);
       if (roadmapRes.ok) setRoadmap((await roadmapRes.json()).roadmap || null);
       if (onboardRes.ok) {
         const onboardData = await onboardRes.json();
@@ -223,13 +213,6 @@ export default function DashboardPage() {
             icon: "⭐",
             color: "bg-amber-50 text-amber-700",
             href: null,
-          },
-          {
-            label: "Active Positions",
-            value: positions.length,
-            icon: "🎯",
-            color: "bg-green-50 text-green-700",
-            href: "/dashboard/positions",
           },
         ].map((stat) => (
           <div
@@ -391,7 +374,8 @@ export default function DashboardPage() {
                         {analyses.slice(0, 10).map((analysis) => (
                           <tr
                             key={analysis.id}
-                            className="border-b border-slate-50 hover:bg-slate-50 transition-colors"
+                            onClick={() => router.push(`/dashboard/analyze/${analysis.id}`)}
+                            className="border-b border-slate-50 hover:bg-slate-50 transition-colors cursor-pointer"
                           >
                             <td className="px-6 py-4">
                               {analysis.overallScore !== null ? (

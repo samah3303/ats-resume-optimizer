@@ -200,7 +200,7 @@ export default function JDsPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
-            Job Descriptions
+            Jobs
           </h1>
           <p className="text-sm text-gray-500 mt-1">
             {jds.length} JD{jds.length !== 1 ? "s" : ""} saved
@@ -213,16 +213,16 @@ export default function JDsPage() {
           }}
           className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
         >
-          Add JD
+          Add Job
         </button>
       </div>
 
-      {/* Add JD Form Modal */}
+      {/* Add Job Modal */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-black/40">
           <div className="bg-white sm:rounded-2xl shadow-xl w-full sm:max-w-lg p-4 sm:p-6 max-h-screen sm:max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">New Job Description</h2>
+              <h2 className="text-lg font-semibold">New Job</h2>
               <button
                 onClick={resetForm}
                 className="text-gray-400 hover:text-gray-600"
@@ -298,7 +298,7 @@ export default function JDsPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Job Description Text *
+                  Job Details *
                 </label>
                 <textarea
                   required
@@ -323,7 +323,7 @@ export default function JDsPage() {
                   disabled={submitting}
                   className="flex-1 py-2 min-h-[44px] sm:min-h-0 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
                 >
-                  {submitting ? "Saving..." : "Save JD"}
+                  {submitting ? "Saving..." : "Save Job"}
                 </button>
               </div>
             </form>
@@ -347,7 +347,7 @@ export default function JDsPage() {
             disabled={loadingRecs}
             className="px-4 py-2 bg-indigo-100 text-indigo-700 text-sm font-medium rounded-lg hover:bg-indigo-200 transition-colors disabled:opacity-50"
           >
-            {loadingRecs ? "Generating..." : recommended.length > 0 ? "Regenerate" : "Generate Recommendations"}
+            {loadingRecs ? "Finding..." : recommended.length > 0 ? "Find More" : "Find Matching Jobs"}
           </button>
         </div>
         {loadingRecs && (
@@ -375,7 +375,7 @@ export default function JDsPage() {
                   onClick={() => addRecommendedJD(rec)}
                   className="mt-3 px-3 py-1.5 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition-colors"
                 >
-                  + Add JD
+                  + Add Job
                 </button>
               </div>
             ))}
