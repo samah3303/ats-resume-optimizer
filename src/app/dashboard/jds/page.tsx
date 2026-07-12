@@ -43,6 +43,7 @@ export default function JDsPage() {
     Array<{ title: string; company: string; rawText: string; matchReason: string }>
   >([]);
   const [loadingRecs, setLoadingRecs] = useState(false);
+  const [onboardingCountry, setOnboardingCountry] = useState<string | null>(null);
 
   const fetchJDs = useCallback(async () => {
     try {
@@ -77,6 +78,11 @@ export default function JDsPage() {
       Promise.all([fetchJDs(), fetchPositions()]).finally(() =>
         setLoading(false)
       );
+      // Fetch country for recommendation subtext
+      fetch("/api/onboarding")
+        .then((r) => r.ok ? r.json() : null)
+        .then((d) => d?.country && setOnboardingCountry(d.country))
+        .catch(() => {});
     }
   }, [status, router, fetchJDs, fetchPositions]);
 
@@ -213,8 +219,8 @@ export default function JDsPage() {
 
       {/* Add JD Form Modal */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-black/40">
+          <div className="bg-white sm:rounded-2xl shadow-xl w-full sm:max-w-lg p-4 sm:p-6 max-h-screen sm:max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">New Job Description</h2>
               <button
@@ -308,14 +314,14 @@ export default function JDsPage() {
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="flex-1 py-2 border border-gray-300 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex-1 py-2 min-h-[44px] sm:min-h-0 border border-gray-300 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="flex-1 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                  className="flex-1 py-2 min-h-[44px] sm:min-h-0 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
                 >
                   {submitting ? "Saving..." : "Save JD"}
                 </button>
@@ -328,9 +334,14 @@ export default function JDsPage() {
       {/* AI Recommended JDs */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-semibold text-gray-900">
-            🤖 AI-Recommended JDs
-          </h2>
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">
+              🤖 AI-Recommended JDs
+            </h2>
+            <p className="text-xs text-gray-500 mt-1">
+              🎯 Based on your resume skills + target country{onboardingCountry ? ` (${onboardingCountry})` : ""}. These are practice job descriptions tailored to your profile.
+            </p>
+          </div>
           <button
             onClick={loadRecommendations}
             disabled={loadingRecs}
@@ -346,7 +357,7 @@ export default function JDsPage() {
           </div>
         )}
         {!loadingRecs && recommended.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {recommended.map((rec, i) => (
               <div
                 key={i}
@@ -385,11 +396,11 @@ export default function JDsPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {jds.map((jd) => (
             <div
               key={jd.id}
-              className="bg-white rounded-xl border border-gray-200 p-5 card-hover flex flex-col"
+              className="bg-white rounded-xl border border-gray-200 px-4 py-3 sm:px-6 sm:py-5 card-hover flex flex-col"
             >
               <div className="flex items-start justify-between mb-3">
                 <div>
@@ -421,14 +432,14 @@ export default function JDsPage() {
               <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
                 <Link
                   href={`/dashboard/analyze?jdId=${jd.id}`}
-                  className="px-3 py-1.5 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+                  className="px-3 py-1.5 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition-colors min-h-[44px] sm:min-h-0 flex items-center"
                 >
                   Analyze
                 </Link>
                 <button
                   onClick={() => handleDelete(jd.id)}
                   disabled={deletingId === jd.id}
-                  className="px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                  className="px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 min-h-[44px] sm:min-h-0"
                 >
                   {deletingId === jd.id ? "Deleting..." : "Delete"}
                 </button>

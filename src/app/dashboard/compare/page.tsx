@@ -131,8 +131,8 @@ function ComparePageContent() {
       </div>
 
       {/* Selection */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="bg-white rounded-2xl border border-gray-200 px-4 py-3 sm:p-6 shadow-sm mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Resume A
@@ -179,7 +179,7 @@ function ComparePageContent() {
         <button
           onClick={handleCompare}
           disabled={comparing || !resume1Id || !resume2Id}
-          className="mt-6 w-full py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="mt-6 w-full py-3 min-h-[44px] bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {comparing ? (
             <>
@@ -194,7 +194,7 @@ function ComparePageContent() {
 
       {/* Comparison Results */}
       {comparisonResult && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {/* Resume 1 */}
           <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">

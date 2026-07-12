@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import {
   mode1OnboardingAnalysis,
   mode2GenerateRoadmap,
+  generateRecommendedPositions,
+  generateRecommendedJDs,
 } from "@/lib/deepseek";
 
 export async function POST(req: NextRequest) {
@@ -17,7 +19,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { resumeId, targetPositions, targetCountry, linkedinUrl, portfolioUrl, githubUrl, industry } = body;
+    const { resumeId, targetPositions, targetCountry, linkedinUrl, portfolioUrl, githubUrl, industry, jobType } = body;
 
     if (!resumeId) {
       return NextResponse.json(
@@ -89,6 +91,7 @@ export async function POST(req: NextRequest) {
         portfolioUrl: portfolioUrl || null,
         githubUrl: githubUrl || null,
         industry: industry || null,
+        jobType: jobType || null,
         profileSummary: mode1Result.profileSummary,
         coreSkills: JSON.stringify(mode1Result.detectedCoreSkills),
         marketGaps: JSON.stringify(mode1Result.marketGaps),
@@ -131,6 +134,51 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Step 5: Generate recommendations in background (don't block onboarding)
+    let recommendedPositions: Awaited<ReturnType<typeof generateRecommendedPositions>> = [];
+    let recommendedJDs: Awaited<ReturnType<typeof generateRecommendedJDs>> = [];
+    try {
+      const coreSkills = mode1Result.detectedCoreSkills;
+      [recommendedPositions, recommendedJDs] = await Promise.all([
+        generateRecommendedPositions(resume.parsedText, coreSkills, targetCountry),
+        generateRecommendedJDs(resume.parsedText, coreSkills, positions, targetCountry),
+      ]);
+
+      // Create position profiles from recommendations
+      if (recommendedPositions.length > 0) {
+        await prisma.positionProfile.createMany({
+          data: recommendedPositions.map((p) => ({
+            userId,
+            title: p.title,
+            targetRole: p.targetRole,
+            industry: p.industry || null,
+            notes: `🤖 AI Recommended based on your profile — ${p.matchReason}`,
+          })),
+        });
+      }
+
+      // Create JDs from recommendations
+      if (recommendedJDs.length > 0) {
+        await Promise.all(
+          recommendedJDs.map((jd) =>
+            prisma.jobDescription.create({
+              data: {
+                userId,
+                title: jd.title,
+                company: jd.company || null,
+                rawText: jd.rawText,
+                notes: `🤖 AI Recommended based on your profile — ${jd.matchReason}`,
+                positionProfileId: null,
+              },
+            })
+          )
+        );
+      }
+    } catch (recErr) {
+      console.error("Failed to generate recommendations:", recErr);
+      // Non-blocking: onboarding still succeeds
+    }
+
     return NextResponse.json(
       {
         profile,
@@ -146,6 +194,10 @@ export async function POST(req: NextRequest) {
             tasks: JSON.parse(w.tasks),
             milestone: w.milestone,
           })),
+        },
+        recommendations: {
+          positionsCreated: recommendedPositions.length,
+          jdsCreated: recommendedJDs.length,
         },
       },
       { status: 201 }

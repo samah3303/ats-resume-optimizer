@@ -34,6 +34,7 @@ export default function PositionsPage() {
     Array<{ title: string; targetRole: string; industry: string; matchReason: string }>
   >([]);
   const [loadingRecs, setLoadingRecs] = useState(false);
+  const [onboardingCountry, setOnboardingCountry] = useState<string | null>(null);
 
   const fetchPositions = useCallback(async () => {
     try {
@@ -56,6 +57,11 @@ export default function PositionsPage() {
     }
     if (status === "authenticated") {
       fetchPositions();
+      // Fetch country for recommendation subtext
+      fetch("/api/onboarding")
+        .then((r) => r.ok ? r.json() : null)
+        .then((d) => d?.country && setOnboardingCountry(d.country))
+        .catch(() => {});
     }
   }, [status, router, fetchPositions]);
 
@@ -199,8 +205,8 @@ export default function PositionsPage() {
 
       {/* Form Modal */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-black/40">
+          <div className="bg-white sm:rounded-2xl shadow-xl w-full sm:max-w-md p-4 sm:p-6 max-h-screen overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">
                 {editingId ? "Edit Position" : "New Position"}
@@ -278,14 +284,14 @@ export default function PositionsPage() {
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="flex-1 py-2 border border-gray-300 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex-1 py-2 min-h-[44px] sm:min-h-0 border border-gray-300 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="flex-1 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                  className="flex-1 py-2 min-h-[44px] sm:min-h-0 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
                 >
                   {submitting ? "Saving..." : "Save"}
                 </button>
@@ -298,9 +304,14 @@ export default function PositionsPage() {
       {/* AI Recommended Positions */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-semibold text-gray-900">
-            🤖 AI-Recommended Positions
-          </h2>
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">
+              🤖 AI-Recommended Positions
+            </h2>
+            <p className="text-xs text-gray-500 mt-1">
+              🎯 Based on your work experience and target market{onboardingCountry ? ` (${onboardingCountry})` : ""}. Click to add any role you want to pursue.
+            </p>
+          </div>
           <button
             onClick={loadRecommendations}
             disabled={loadingRecs}
@@ -316,7 +327,7 @@ export default function PositionsPage() {
           </div>
         )}
         {!loadingRecs && recommended.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {recommended.map((rec, i) => (
               <div
                 key={i}
@@ -353,11 +364,11 @@ export default function PositionsPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {positions.map((pos) => (
             <div
               key={pos.id}
-              className="bg-white rounded-xl border border-gray-200 p-5 card-hover"
+              className="bg-white rounded-xl border border-gray-200 px-4 py-3 sm:px-6 sm:py-5 card-hover"
             >
               <div className="flex items-start justify-between mb-3">
                 <div>
@@ -384,13 +395,13 @@ export default function PositionsPage() {
               <div className="flex items-center gap-2 mt-4 pt-3 border-t border-gray-100">
                 <button
                   onClick={() => handleEdit(pos)}
-                  className="px-3 py-1 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="px-3 py-1 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors min-h-[44px] sm:min-h-0"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => handleDelete(pos.id)}
-                  className="px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  className="px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors min-h-[44px] sm:min-h-0"
                 >
                   Delete
                 </button>

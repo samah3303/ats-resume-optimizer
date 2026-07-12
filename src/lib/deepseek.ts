@@ -34,12 +34,14 @@ interface AnalyzeResumeParams {
   resumeText: string;
   jobDescriptionText: string;
   positionTitle?: string;
+  jobType?: string;
 }
 
 export async function analyzeResumeAgainstJD({
   resumeText,
   jobDescriptionText,
   positionTitle,
+  jobType,
 }: AnalyzeResumeParams): Promise<{
   overallScore: number;
   keywordsMatchPct: number;
@@ -59,6 +61,7 @@ export async function analyzeResumeAgainstJD({
 Your task is to analyze a resume against a job description and provide detailed, actionable feedback.
 
 ${positionTitle ? `The candidate is targeting a "${positionTitle}" role.` : ""}
+${jobType ? `The candidate is looking for ${jobType} positions.` : ""}
 
 ## Job Description:
 ${jobDescriptionText}

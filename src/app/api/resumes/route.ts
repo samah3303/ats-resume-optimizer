@@ -5,6 +5,22 @@ import { prisma } from "@/lib/prisma";
 import { parseResumeFile } from "@/lib/resume-parser";
 import { saveOriginalFile, renameOriginalFile } from "@/lib/storage";
 
+function detectDocType(mimeType: string, fileName: string): string | null {
+  // Check MIME type first
+  const mimeMap: Record<string, string> = {
+    "application/pdf": "pdf",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
+    "application/msword": "doc",
+  };
+  if (mimeMap[mimeType]) return mimeMap[mimeType];
+
+  // Fallback to file extension
+  const ext = fileName.split(".").pop()?.toLowerCase();
+  if (ext === "pdf" || ext === "docx" || ext === "doc") return ext;
+
+  return null;
+}
+
 export async function GET() {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
@@ -45,6 +61,9 @@ export async function POST(req: NextRequest) {
 
       const buffer = Buffer.from(await file.arrayBuffer());
       const rawText = await parseResumeFile(buffer, file.type, file.name);
+
+      // Detect docType from file.type or file.name extension
+      const docType = detectDocType(file.type, file.name);
       // Sanitize: remove control chars, null bytes, and non-printable characters
       const parsedText = rawText
         .replace(/\x00/g, "")           // null bytes
@@ -68,6 +87,7 @@ export async function POST(req: NextRequest) {
           name: file.name.replace(/\.[^.]+$/, ""),
           parsedText: parsedText.slice(0, 50000),
           filePath,
+          docType,
         },
       });
 

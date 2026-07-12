@@ -10,7 +10,16 @@ interface Resume {
   name: string;
   parsedText: string;
   isPrimary: boolean;
+  docType: string | null;
   createdAt: string;
+}
+
+function getDocTypeBadge(docType: string | null, name: string) {
+  const type = docType || name.split(".").pop()?.toLowerCase() || null;
+  if (type === "pdf") return { label: "PDF", color: "bg-red-100 text-red-700" };
+  if (type === "docx") return { label: "DOCX", color: "bg-blue-100 text-blue-700" };
+  if (type === "doc") return { label: "DOC", color: "bg-amber-100 text-amber-700" };
+  return null;
 }
 
 export default function ResumesPage() {
@@ -120,13 +129,15 @@ export default function ResumesPage() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {resumes.map((resume) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+          {resumes.map((resume) => {
+            const badge = getDocTypeBadge(resume.docType, resume.name);
+            return (
             <div
               key={resume.id}
               className="bg-white rounded-xl border border-gray-200 overflow-hidden card-hover"
             >
-              <div className="p-5">
+              <div className="px-4 py-3 sm:px-5 sm:py-5">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <span className="text-xl">📄</span>
@@ -134,9 +145,16 @@ export default function ResumesPage() {
                       <h3 className="font-semibold text-gray-900 truncate max-w-[180px]">
                         {resume.name}
                       </h3>
-                      <p className="text-xs text-gray-500">
-                        {new Date(resume.createdAt).toLocaleDateString()}
-                      </p>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        {badge && (
+                          <span className={`px-1.5 py-0.5 text-[10px] font-semibold rounded ${badge.color}`}>
+                            {badge.label}
+                          </span>
+                        )}
+                        <p className="text-xs text-gray-500">
+                          {new Date(resume.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
                     </div>
                   </div>
                   {resume.isPrimary && (
@@ -165,14 +183,22 @@ export default function ResumesPage() {
                   <button
                     onClick={() => handleDelete(resume.id)}
                     disabled={deletingId === resume.id}
-                    className="ml-auto px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                    className="ml-auto px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 min-h-[44px] sm:min-h-0"
                   >
                     {deletingId === resume.id ? "Deleting..." : "Delete"}
                   </button>
                 </div>
               </div>
             </div>
-          ))}
+          )})}
+          {/* Inline Add Card */}
+          <label
+            htmlFor="resume-upload"
+            className="bg-white rounded-xl border-2 border-dashed border-gray-300 overflow-hidden card-hover flex flex-col items-center justify-center px-4 py-3 sm:px-5 sm:py-5 min-h-[200px] text-gray-400 hover:text-indigo-500 hover:border-indigo-300 transition-colors cursor-pointer"
+          >
+            <span className="text-3xl mb-2">+</span>
+            <span className="text-sm font-medium">Add Resume</span>
+          </label>
         </div>
       )}
     </div>

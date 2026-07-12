@@ -34,6 +34,7 @@ model Resume {
   filePath   String?  @map("file_path")
   parsedText String   @map("parsed_text")
   isPrimary  Boolean  @default(false) @map("is_primary")
+  docType    String?  @map("doc_type")
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
@@ -68,6 +69,7 @@ model JobDescription {
   company            String?
   rawText            String   @map("raw_text")
   sourceUrl          String?  @map("source_url")
+  notes              String?  @map("notes")
   createdAt          DateTime @default(now()) @map("created_at")
 
   user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -136,6 +138,7 @@ model OnboardingProfile {
   portfolioUrl    String?  @map("portfolio_url")
   githubUrl       String?  @map("github_url")
   industry        String?  @map("industry")
+  jobType         String?  @map("job_type")
   profileSummary  String?  @map("profile_summary")
   coreSkills      String?  @map("core_skills")
   marketGaps      String?  @map("market_gaps")

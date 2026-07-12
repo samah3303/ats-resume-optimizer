@@ -80,6 +80,18 @@ function AnalyzePageContent() {
   const [batchResults, setBatchResults] = useState<BatchResult[] | null>(null);
   const [batchInProgress, setBatchInProgress] = useState(false);
 
+  // Onboarding profile
+  const [onboardingProfile, setOnboardingProfile] = useState<{
+    targetPositions: string[] | null;
+    country: string | null;
+    jobType: string | null;
+    industry: string | null;
+  } | null>(null);
+  const [selectedTargetPositions, setSelectedTargetPositions] = useState<string[]>([]);
+  const [selectedJobType, setSelectedJobType] = useState<string>("");
+
+  const JOB_TYPES = ["Full-time", "Part-time", "Contract", "Remote", "Hybrid"] as const;
+
   const fetchData = useCallback(async () => {
     try {
       const [rRes, jRes, pRes] = await Promise.all([
@@ -90,6 +102,25 @@ function AnalyzePageContent() {
       if (rRes.ok) setResumes((await rRes.json()).resumes || []);
       if (jRes.ok) setJds((await jRes.json()).jds || []);
       if (pRes.ok) setPositions((await pRes.json()).positions || []);
+
+      // Fetch onboarding profile
+      try {
+        const oRes = await fetch("/api/onboarding");
+        if (oRes.ok) {
+          const oData = await oRes.json();
+          if (oData.completed) {
+            setOnboardingProfile({
+              targetPositions: oData.targetPositions,
+              country: oData.country,
+              jobType: oData.jobType,
+              industry: oData.industry,
+            });
+            if (oData.jobType) setSelectedJobType(oData.jobType);
+          }
+        }
+      } catch {
+        // silently fail
+      }
     } catch {
       // silently fail
     } finally {
@@ -174,6 +205,8 @@ function AnalyzePageContent() {
               pasteJdTitle: usePastedJd ? pasteJdTitle : undefined,
               pasteJdText: usePastedJd ? pasteJdText : undefined,
               atsPlatform,
+              targetPositions: selectedTargetPositions.length > 0 ? selectedTargetPositions : undefined,
+              jobType: selectedJobType || undefined,
             }),
           });
 
@@ -205,6 +238,8 @@ function AnalyzePageContent() {
             pasteJdTitle: usePastedJd ? pasteJdTitle : undefined,
             pasteJdText: usePastedJd ? pasteJdText : undefined,
             atsPlatform,
+            targetPositions: selectedTargetPositions.length > 0 ? selectedTargetPositions : undefined,
+            jobType: selectedJobType || undefined,
           }),
         });
 
@@ -253,6 +288,108 @@ function AnalyzePageContent() {
           {error && (
             <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
               {error}
+            </div>
+          )}
+
+          {/* Step 0: Profile & Onboarding Info */}
+          {onboardingProfile && (
+            <div className="p-4 bg-gradient-to-r from-indigo-50 to-white rounded-xl border border-indigo-100 space-y-4">
+              <h3 className="text-sm font-semibold text-indigo-900">📋 Your Profile</h3>
+
+              {/* Multi-select Target Positions */}
+              {onboardingProfile.targetPositions && onboardingProfile.targetPositions.length > 0 && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1.5">
+                    Target Positions
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {onboardingProfile.targetPositions.map((pos) => {
+                      const isChecked = selectedTargetPositions.includes(pos);
+                      return (
+                        <label
+                          key={pos}
+                          className={`px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-colors border ${
+                            isChecked
+                              ? "bg-indigo-600 text-white border-indigo-600"
+                              : "bg-white text-gray-600 border-gray-300 hover:border-indigo-300"
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={() =>
+                              setSelectedTargetPositions((prev) =>
+                                prev.includes(pos)
+                                  ? prev.filter((p) => p !== pos)
+                                  : [...prev, pos]
+                              )
+                            }
+                            className="sr-only"
+                          />
+                          {pos}
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Country Badge */}
+              {onboardingProfile.country && (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-gray-500">Target Country:</span>
+                  <span className="px-2.5 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
+                    {onboardingProfile.country}
+                  </span>
+                </div>
+              )}
+
+              {/* Job Type Radio */}
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1.5">
+                  Job Type
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {JOB_TYPES.map((jt) => (
+                    <label
+                      key={jt}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-colors border ${
+                        selectedJobType === jt
+                          ? "bg-indigo-600 text-white border-indigo-600"
+                          : "bg-white text-gray-600 border-gray-300 hover:border-indigo-300"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="jobType"
+                        value={jt}
+                        checked={selectedJobType === jt}
+                        onChange={() => setSelectedJobType(jt)}
+                        className="sr-only"
+                      />
+                      {jt}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* ATS Platform (moved here) */}
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1.5">
+                  Target ATS Platform
+                </label>
+                <select
+                  value={atsPlatform}
+                  onChange={(e) => setAtsPlatform(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none text-sm"
+                >
+                  {ATS_PLATFORMS.map((p) => (
+                    <option key={p} value={p}>
+                      {p}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           )}
 
@@ -402,24 +539,6 @@ function AnalyzePageContent() {
             </select>
           </div>
 
-          {/* ATS Platform Tailoring */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Step 4: Target ATS Platform
-            </label>
-            <select
-              value={atsPlatform}
-              onChange={(e) => setAtsPlatform(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
-            >
-              {ATS_PLATFORMS.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
-          </div>
-
           {/* Summary */}
           {selectedResume && (
             <div className="p-4 bg-indigo-50 rounded-xl border border-indigo-100">
@@ -444,7 +563,7 @@ function AnalyzePageContent() {
           <button
             type="submit"
             disabled={submitting || batchInProgress}
-            className="w-full py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full py-3 min-h-[44px] bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {submitting || batchInProgress ? (
               <>

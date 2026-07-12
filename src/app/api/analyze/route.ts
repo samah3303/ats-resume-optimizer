@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { resumeId, jdId, positionProfileId, pasteJdTitle, pasteJdText } =
+    const { resumeId, jdId, positionProfileId, pasteJdTitle, pasteJdText, jobType } =
       body;
 
     if (!resumeId) {
@@ -119,6 +119,7 @@ export async function POST(req: NextRequest) {
         resumeText: resume.parsedText,
         jobDescriptionText,
         positionTitle,
+        jobType: jobType || undefined,
       });
 
       // Update analysis with results

@@ -53,6 +53,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [roadmap, setRoadmap] = useState<Roadmap | null>(null);
   const [roadmapLoading, setRoadmapLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<"analyses" | "roadmap">("analyses");
 
   const fetchData = useCallback(async () => {
     try {
@@ -142,17 +143,17 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-slate-900">
             Welcome{", "}
             {session?.user?.name?.split(" ")[0] || "back"}!
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-slate-500 mt-1">
             Here&apos;s your resume optimization overview
           </p>
         </div>
         <Link
           href="/dashboard/analyze"
-          className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
+          className="btn-primary-gradient px-4 py-2 text-sm font-medium inline-flex items-center min-h-[44px] sm:min-h-0"
         >
           New Analysis
         </Link>
@@ -166,316 +167,328 @@ export default function DashboardPage() {
             value: resumes.length,
             icon: "📄",
             color: "bg-blue-50 text-blue-700",
+            href: "/dashboard/resumes",
           },
           {
             label: "Analyses Run",
             value: analyses.length,
             icon: "🔍",
             color: "bg-purple-50 text-purple-700",
+            href: "/dashboard/analyze",
           },
           {
             label: "Avg ATS Score",
             value: avgScore > 0 ? `${avgScore}%` : "N/A",
             icon: "⭐",
-            color: "bg-yellow-50 text-yellow-700",
+            color: "bg-amber-50 text-amber-700",
+            href: null,
           },
           {
             label: "Active Positions",
             value: positions.length,
             icon: "🎯",
             color: "bg-green-50 text-green-700",
+            href: "/dashboard/positions",
           },
         ].map((stat) => (
           <div
             key={stat.label}
-            className="bg-white rounded-xl border border-gray-200 p-5 card-hover"
+            className="card-premium px-4 py-3 sm:p-5 relative group"
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500">{stat.label}</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">
+                <p className="text-sm text-slate-500">{stat.label}</p>
+                <p className="text-2xl font-bold text-slate-900 mt-1">
                   {stat.value}
                 </p>
               </div>
               <div
-                className={`w-10 h-10 rounded-lg flex items-center justify-center text-lg ${stat.color}`}
+                className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${stat.color}`}
               >
                 {stat.icon}
               </div>
             </div>
+            {stat.href && (
+              <Link
+                href={stat.href}
+                className="absolute bottom-3 right-3 w-7 h-7 rounded-full bg-gradient-to-r from-indigo-800 to-indigo-600 text-white flex items-center justify-center text-sm font-bold shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:shadow-lg hover:scale-110"
+                title={`Add ${stat.label}`}
+              >
+                +
+              </Link>
+            )}
           </div>
         ))}
       </div>
 
-      {/* ATS Score Trend */}
-      {scoredAnalyses.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            ATS Score History
-          </h2>
-          <ScoreTrendChart analyses={scoredAnalyses.slice(0, 10).reverse()} />
-        </div>
-      )}
-
-      {/* Recent Analyses */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">
+      {/* Tabs */}
+      <div className="card-premium overflow-hidden">
+        {/* Tab bar */}
+        <div className="flex border-b border-slate-200/60 px-2 pt-2">
+          <button
+            onClick={() => setActiveTab("analyses")}
+            className={`px-4 sm:px-5 py-2.5 text-sm font-medium rounded-t-xl transition-all duration-200 min-h-[44px] sm:min-h-0 ${
+              activeTab === "analyses"
+                ? "bg-white text-indigo-700 shadow-sm"
+                : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+            }`}
+          >
             Recent Analyses
-          </h2>
-          {analyses.length > 0 && (
-            <Link
-              href="/dashboard/analyze"
-              className="text-sm text-indigo-600 hover:text-indigo-700"
-            >
-              View all
-            </Link>
+          </button>
+          <button
+            onClick={() => setActiveTab("roadmap")}
+            className={`px-4 sm:px-5 py-2.5 text-sm font-medium rounded-t-xl transition-all duration-200 min-h-[44px] sm:min-h-0 ${
+              activeTab === "roadmap"
+                ? "bg-white text-indigo-700 shadow-sm"
+                : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+            }`}
+          >
+            Career Roadmap
+          </button>
+        </div>
+
+        {/* Tab content */}
+        <div className="p-6">
+          {activeTab === "analyses" && (
+            <>
+              {/* ATS Score Trend */}
+              {scoredAnalyses.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="text-base font-semibold text-slate-800 mb-4">
+                    ATS Score History
+                  </h3>
+                  <ScoreTrendChart analyses={scoredAnalyses.slice(0, 10).reverse()} />
+                </div>
+              )}
+
+              {/* Analyses table */}
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-base font-semibold text-slate-800">
+                    All Analyses
+                  </h3>
+                  {analyses.length > 0 && (
+                    <Link
+                      href="/dashboard/analyze"
+                      className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+                    >
+                      View all
+                    </Link>
+                  )}
+                </div>
+                {analyses.length === 0 ? (
+                  <div className="py-12 text-center">
+                    <p className="text-slate-500 mb-3">
+                      No analyses yet. Upload a resume and compare it against a job description.
+                    </p>
+                    <Link
+                      href="/dashboard/analyze"
+                      className="btn-primary-gradient inline-block px-4 py-2 text-sm font-medium"
+                    >
+                      Run Your First Analysis
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto -mx-6">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-slate-100">
+                          <th className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider px-6 py-3">
+                            Score
+                          </th>
+                          <th className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider px-6 py-3">
+                            Resume
+                          </th>
+                          <th className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider px-6 py-3">
+                            Job Description
+                          </th>
+                          <th className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider px-6 py-3">
+                            Date
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {analyses.slice(0, 10).map((analysis) => (
+                          <tr
+                            key={analysis.id}
+                            className="border-b border-slate-50 hover:bg-slate-50 transition-colors"
+                          >
+                            <td className="px-6 py-4">
+                              {analysis.overallScore !== null ? (
+                                <span
+                                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
+                                    analysis.overallScore >= 70
+                                      ? "bg-green-100 text-green-800"
+                                      : analysis.overallScore >= 50
+                                        ? "bg-amber-100 text-amber-800"
+                                        : "bg-red-100 text-red-800"
+                                  }`}
+                                >
+                                  {analysis.overallScore}%
+                                </span>
+                              ) : (
+                                <span className="text-xs text-slate-400">Pending</span>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-slate-700">
+                              {analysis.resume?.name || "—"}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-slate-700">
+                              {analysis.jobDescription?.title || "—"}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-slate-500">
+                              {new Date(analysis.createdAt).toLocaleDateString()}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
+          {activeTab === "roadmap" && (
+            <>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-base font-semibold text-slate-800">
+                  🗺️ Career Roadmap
+                </h3>
+                <div className="flex items-center gap-2">
+                  {roadmap && (
+                    <>
+                      <button
+                        onClick={handleRegenRoadmap}
+                        disabled={roadmapLoading}
+                        className="px-3 py-1.5 text-xs font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 rounded-md transition-colors disabled:opacity-50"
+                      >
+                        {roadmapLoading ? "Generating..." : "Regenerate"}
+                      </button>
+                      <button
+                        onClick={handleResetOnboarding}
+                        className="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
+                      >
+                        Reset
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {!roadmap ? (
+                <div className="py-12 text-center">
+                  <p className="text-slate-500 mb-3">
+                    Complete your onboarding to get a personalized 8-week career roadmap.
+                  </p>
+                  <Link
+                    href="/"
+                    className="btn-primary-gradient inline-block px-4 py-2 text-sm font-medium"
+                  >
+                    Complete Your Onboarding
+                  </Link>
+                </div>
+              ) : (
+                <>
+                  {/* Strategy Overview */}
+                  {roadmap.strategyOverview && (
+                    <p className="text-sm text-slate-600 mb-6 leading-relaxed">
+                      {roadmap.strategyOverview}
+                    </p>
+                  )}
+
+                  {/* Timeline */}
+                  <div className="space-y-0">
+                    {roadmap.weeks.map((week, i) => {
+                      const phaseBorder =
+                        week.phase === "Foundation"
+                          ? "border-l-blue-500"
+                          : week.phase === "High Velocity"
+                            ? "border-l-amber-500"
+                            : "border-l-green-500";
+                      const phaseBg =
+                        week.phase === "Foundation"
+                          ? "bg-blue-50 text-blue-700"
+                          : week.phase === "High Velocity"
+                            ? "bg-amber-50 text-amber-700"
+                            : "bg-green-50 text-green-700";
+
+                      return (
+                        <div
+                          key={week.id}
+                          className={`relative pl-6 pb-6 border-l-2 ${phaseBorder} ${i === roadmap.weeks.length - 1 ? "border-l-transparent" : ""} last:pb-0`}
+                        >
+                          {/* Dot */}
+                          <div
+                            className={`absolute left-0 top-0 -translate-x-1/2 w-3 h-3 rounded-full border-2 border-white ${
+                              week.phase === "Foundation"
+                                ? "bg-blue-500"
+                                : week.phase === "High Velocity"
+                                  ? "bg-amber-500"
+                                  : "bg-green-500"
+                            }`}
+                          />
+
+                          {/* Card */}
+                          <div className="bg-slate-50 rounded-xl p-4">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="text-xs font-bold text-slate-900">
+                                Week {week.weekNumber}
+                              </span>
+                              <span
+                                className={`px-2 py-0.5 rounded-full text-xs font-medium ${phaseBg}`}
+                              >
+                                {week.phase}
+                              </span>
+                            </div>
+
+                            <h4 className="text-sm font-semibold text-slate-800 mb-2">
+                              {week.focusTitle}
+                            </h4>
+
+                            {/* Tasks */}
+                            <ul className="space-y-1.5 mb-3">
+                              {week.tasks.map((task, ti) => (
+                                <li
+                                  key={ti}
+                                  className="flex items-start gap-2 text-sm text-slate-600"
+                                >
+                                  <input
+                                    type="checkbox"
+                                    className="mt-0.5 h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                                    readOnly
+                                  />
+                                  <span>{task}</span>
+                                </li>
+                              ))}
+                            </ul>
+
+                            {/* Milestone */}
+                            <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                              <span>🏁</span>
+                              <span className="font-medium">Milestone:</span>
+                              <span>{week.milestone}</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Generated date */}
+                  <p className="text-xs text-slate-400 mt-6 text-center">
+                    Generated{" "}
+                    {new Date(roadmap.generatedAt).toLocaleDateString("en-US", {
+                      month: "long",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </p>
+                </>
+              )}
+            </>
           )}
         </div>
-        {analyses.length === 0 ? (
-          <div className="px-6 py-12 text-center">
-            <p className="text-gray-500 mb-3">
-              No analyses yet. Upload a resume and compare it against a job
-              description.
-            </p>
-            <Link
-              href="/dashboard/analyze"
-              className="inline-block px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
-            >
-              Run Your First Analysis
-            </Link>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-100">
-                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-3">
-                    Score
-                  </th>
-                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-3">
-                    Resume
-                  </th>
-                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-3">
-                    Job Description
-                  </th>
-                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-3">
-                    Date
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {analyses.slice(0, 10).map((analysis) => (
-                  <tr
-                    key={analysis.id}
-                    className="border-b border-gray-50 hover:bg-gray-50 transition-colors"
-                  >
-                    <td className="px-6 py-4">
-                      {analysis.overallScore !== null ? (
-                        <span
-                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
-                            analysis.overallScore >= 70
-                              ? "bg-green-100 text-green-800"
-                              : analysis.overallScore >= 50
-                                ? "bg-yellow-100 text-yellow-800"
-                                : "bg-red-100 text-red-800"
-                          }`}
-                        >
-                          {analysis.overallScore}%
-                        </span>
-                      ) : (
-                        <span className="text-xs text-gray-400">Pending</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-700">
-                      {analysis.resume?.name || "—"}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-700">
-                      {analysis.jobDescription?.title || "—"}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {new Date(analysis.createdAt).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-
-      {/* Career Roadmap */}
-      <div className="mt-8 bg-white rounded-xl border border-gray-200 overflow-hidden" id="roadmap">
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">
-            🗺️ Career Roadmap
-          </h2>
-          <div className="flex items-center gap-2">
-            {roadmap && (
-              <>
-                <button
-                  onClick={handleRegenRoadmap}
-                  disabled={roadmapLoading}
-                  className="px-3 py-1.5 text-xs font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 rounded-md transition-colors disabled:opacity-50"
-                >
-                  {roadmapLoading ? "Generating..." : "Regenerate"}
-                </button>
-                <button
-                  onClick={handleResetOnboarding}
-                  className="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
-                >
-                  Reset
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-
-        {!roadmap ? (
-          <div className="px-6 py-12 text-center">
-            <p className="text-gray-500 mb-3">
-              Complete your onboarding to get a personalized 8-week career
-              roadmap.
-            </p>
-            <Link
-              href="/"
-              className="inline-block px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
-            >
-              Complete Your Onboarding
-            </Link>
-          </div>
-        ) : (
-          <div className="px-6 py-6">
-            {/* Strategy Overview */}
-            {roadmap.strategyOverview && (
-              <p className="text-sm text-gray-600 mb-6 leading-relaxed">
-                {roadmap.strategyOverview}
-              </p>
-            )}
-
-            {/* Timeline */}
-            <div className="space-y-0">
-              {roadmap.weeks.map((week, i) => {
-                const phaseBorder =
-                  week.phase === "Foundation"
-                    ? "border-l-blue-500"
-                    : week.phase === "High Velocity"
-                      ? "border-l-amber-500"
-                      : "border-l-green-500";
-                const phaseBg =
-                  week.phase === "Foundation"
-                    ? "bg-blue-50 text-blue-700"
-                    : week.phase === "High Velocity"
-                      ? "bg-amber-50 text-amber-700"
-                      : "bg-green-50 text-green-700";
-
-                return (
-                  <div
-                    key={week.id}
-                    className={`relative pl-6 pb-6 border-l-2 ${phaseBorder} ${i === roadmap.weeks.length - 1 ? "border-l-transparent" : ""} last:pb-0`}
-                  >
-                    {/* Dot */}
-                    <div
-                      className={`absolute left-0 top-0 -translate-x-1/2 w-3 h-3 rounded-full border-2 border-white ${
-                        week.phase === "Foundation"
-                          ? "bg-blue-500"
-                          : week.phase === "High Velocity"
-                            ? "bg-amber-500"
-                            : "bg-green-500"
-                      }`}
-                    />
-
-                    {/* Card */}
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-xs font-bold text-gray-900">
-                          Week {week.weekNumber}
-                        </span>
-                        <span
-                          className={`px-2 py-0.5 rounded-full text-xs font-medium ${phaseBg}`}
-                        >
-                          {week.phase}
-                        </span>
-                      </div>
-
-                      <h4 className="text-sm font-semibold text-gray-800 mb-2">
-                        {week.focusTitle}
-                      </h4>
-
-                      {/* Tasks */}
-                      <ul className="space-y-1.5 mb-3">
-                        {week.tasks.map((task, ti) => (
-                          <li
-                            key={ti}
-                            className="flex items-start gap-2 text-sm text-gray-600"
-                          >
-                            <input
-                              type="checkbox"
-                              className="mt-0.5 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                              readOnly
-                            />
-                            <span>{task}</span>
-                          </li>
-                        ))}
-                      </ul>
-
-                      {/* Milestone */}
-                      <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                        <span>🏁</span>
-                        <span className="font-medium">Milestone:</span>
-                        <span>{week.milestone}</span>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Generated date */}
-            <p className="text-xs text-gray-400 mt-6 text-center">
-              Generated{" "}
-              {new Date(roadmap.generatedAt).toLocaleDateString("en-US", {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              })}
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
-        <Link
-          href="/dashboard/resumes"
-          className="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200 hover:border-indigo-300 hover:shadow-md transition-all"
-        >
-          <span className="text-2xl">📤</span>
-          <div>
-            <p className="font-medium text-gray-900">Upload Resume</p>
-            <p className="text-xs text-gray-500">PDF or DOCX</p>
-          </div>
-        </Link>
-        <Link
-          href="/dashboard/analyze"
-          className="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200 hover:border-indigo-300 hover:shadow-md transition-all"
-        >
-          <span className="text-2xl">🔍</span>
-          <div>
-            <p className="font-medium text-gray-900">New Analysis</p>
-            <p className="text-xs text-gray-500">Match vs job description</p>
-          </div>
-        </Link>
-        <Link
-          href="/dashboard/positions"
-          className="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200 hover:border-indigo-300 hover:shadow-md transition-all"
-        >
-          <span className="text-2xl">🎯</span>
-          <div>
-            <p className="font-medium text-gray-900">Add Position</p>
-            <p className="text-xs text-gray-500">Target roles & profiles</p>
-          </div>
-        </Link>
       </div>
     </div>
   );

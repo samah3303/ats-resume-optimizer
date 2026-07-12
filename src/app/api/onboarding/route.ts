@@ -18,6 +18,11 @@ export async function GET() {
   return NextResponse.json({
     completed: !!profile,
     profile,
+    // Convenience flat fields for the analyze page
+    targetPositions: profile?.targetPositions ?? null,
+    country: profile?.targetCountry ?? null,
+    jobType: profile?.jobType ?? null,
+    industry: profile?.industry ?? null,
   });
 }
 

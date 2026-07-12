@@ -377,7 +377,7 @@ export default function AnalysisDetailPage() {
           <button
             onClick={handleDownloadOptimized}
             disabled={downloading || acceptedCount === 0}
-            className="px-6 py-2.5 bg-green-600 text-white text-sm font-semibold rounded-xl hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shrink-0"
+            className="px-6 py-2.5 min-h-[44px] sm:min-h-0 bg-green-600 text-white text-sm font-semibold rounded-xl hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shrink-0"
           >
             {downloading ? (
               <>
@@ -397,11 +397,11 @@ export default function AnalysisDetailPage() {
       </div>
 
       {/* Section Scores */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
         {sections.map((section) => (
           <div
             key={section.label}
-            className="bg-white rounded-xl border border-gray-200 p-5"
+            className="bg-white rounded-xl border border-gray-200 px-4 py-3 sm:p-5"
           >
             <p className="text-sm text-gray-500 mb-1">{section.label}</p>
             <p className="text-2xl font-bold text-gray-900">

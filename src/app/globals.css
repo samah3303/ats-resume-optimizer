@@ -1,21 +1,68 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F8FAFC;
+  --foreground: #0F172A;
+  --primary: #312E81;
+  --primary-light: #4338CA;
+  --accent: #F59E0B;
+  --card-bg: #ffffff;
+  --card-border: #E2E8F0;
+  --text-heading: #0F172A;
+  --text-body: #475569;
+  --text-muted: #94A3B8;
+  --surface: #F1F5F9;
+  /* Mobile bottom nav safe area */
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-light: var(--primary-light);
+  --color-accent: var(--accent);
+  --color-card: var(--card-bg);
+  --color-surface: var(--surface);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
-  background: var(--background);
+  background: linear-gradient(180deg, var(--background) 0%, var(--surface) 100%);
   color: var(--foreground);
   font-family: var(--font-sans, Arial, Helvetica, sans-serif);
+  min-height: 100vh;
+}
+
+/* Card base style */
+.card-premium {
+  background: var(--card-bg);
+  border-radius: 16px;
+  border: 1px solid var(--card-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  transition: all 200ms ease;
+}
+.card-premium:hover {
+  box-shadow: 0 4px 16px rgba(49, 46, 129, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+  border-color: #C7D2FE;
+}
+
+/* Gradient button */
+.btn-primary-gradient {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: white;
+  border-radius: 12px;
+  font-weight: 500;
+  transition: all 200ms ease;
+  box-shadow: 0 2px 8px rgba(49, 46, 129, 0.25);
+}
+.btn-primary-gradient:hover {
+  box-shadow: 0 4px 16px rgba(49, 46, 129, 0.35);
+  transform: translateY(-1px);
+}
+.btn-primary-gradient:active {
+  transform: translateY(0);
 }
 
 /* Score gauge animation */
@@ -28,14 +75,21 @@ body {
   }
 }
 
-/* Card hover effects */
+/* Card hover effects — legacy compat, use card-premium for new cards */
 .card-hover {
-  @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5;
+  transition: all 200ms ease;
+}
+.card-hover:hover {
+  box-shadow: 0 4px 16px rgba(49, 46, 129, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+  transform: translateY(-1px);
 }
 
 /* Gradient text */
 .text-gradient {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-500;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-image: linear-gradient(135deg, #312E81 0%, #4338CA 100%);
 }
 
 /* Shimmer loading */
@@ -49,7 +103,9 @@ body {
 }
 
 .skeleton {
-  @apply bg-gray-200 rounded animate-pulse;
+  background-color: #E2E8F0;
+  border-radius: 8px;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 /* Scrollbar styling */
@@ -58,13 +114,19 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100;
+  background: var(--surface);
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 rounded-full;
+  background: #CBD5E1;
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-400;
+  background: #94A3B8;
+}
+
+/* Bottom nav safe area */
+.pb-safe {
+  padding-bottom: calc(64px + var(--safe-area-bottom));
 }
