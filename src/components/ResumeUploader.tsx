@@ -4,6 +4,7 @@ import { useState, useCallback, type DragEvent, type ChangeEvent } from "react";
 
 interface ResumeUploaderProps {
   onUploaded: (resume: { id: string; name: string }) => void;
+  onFormatDetected?: (format: "pdf" | "doc" | "docx") => void;
 }
 
 const ALLOWED_TYPES = [
@@ -12,9 +13,28 @@ const ALLOWED_TYPES = [
   "application/msword",
 ];
 
+const ALLOWED_EXTENSIONS = [".pdf", ".docx", ".doc"];
+
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 
-export default function ResumeUploader({ onUploaded }: ResumeUploaderProps) {
+function detectFormat(file: File): "pdf" | "doc" | "docx" | null {
+  if (file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")) {
+    return "pdf";
+  }
+  if (
+    file.type ===
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+    file.name.toLowerCase().endsWith(".docx")
+  ) {
+    return "docx";
+  }
+  if (file.type === "application/msword" || file.name.toLowerCase().endsWith(".doc")) {
+    return "doc";
+  }
+  return null;
+}
+
+export default function ResumeUploader({ onUploaded, onFormatDetected }: ResumeUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,6 +57,13 @@ export default function ResumeUploader({ onUploaded }: ResumeUploaderProps) {
         return;
       }
       setError(null);
+
+      // Detect format and notify parent
+      const format = detectFormat(file);
+      if (format && onFormatDetected) {
+        onFormatDetected(format);
+      }
+
       setUploading(true);
 
       try {
@@ -61,7 +88,7 @@ export default function ResumeUploader({ onUploaded }: ResumeUploaderProps) {
         setUploading(false);
       }
     },
-    [onUploaded]
+    [onUploaded, onFormatDetected]
   );
 
   const handleDrop = useCallback(

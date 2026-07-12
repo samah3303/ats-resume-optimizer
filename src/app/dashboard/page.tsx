@@ -28,6 +28,22 @@ interface Position {
   createdAt: string;
 }
 
+interface WeekTask {
+  id: string;
+  weekNumber: number;
+  phase: string;
+  focusTitle: string;
+  tasks: string[];
+  milestone: string;
+}
+
+interface Roadmap {
+  id: string;
+  strategyOverview: string | null;
+  generatedAt: string;
+  weeks: WeekTask[];
+}
+
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -35,18 +51,22 @@ export default function DashboardPage() {
   const [analyses, setAnalyses] = useState<Analysis[]>([]);
   const [positions, setPositions] = useState<Position[]>([]);
   const [loading, setLoading] = useState(true);
+  const [roadmap, setRoadmap] = useState<Roadmap | null>(null);
+  const [roadmapLoading, setRoadmapLoading] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
-      const [resRes, anaRes, posRes] = await Promise.all([
+      const [resRes, anaRes, posRes, roadmapRes] = await Promise.all([
         fetch("/api/resumes"),
         fetch("/api/analyze"),
         fetch("/api/positions"),
+        fetch("/api/roadmap"),
       ]);
 
       if (resRes.ok) setResumes((await resRes.json()).resumes || []);
       if (anaRes.ok) setAnalyses((await anaRes.json()).analyses || []);
       if (posRes.ok) setPositions((await posRes.json()).positions || []);
+      if (roadmapRes.ok) setRoadmap((await roadmapRes.json()).roadmap || null);
     } catch {
       // silently fail, show empty state
     } finally {
@@ -63,6 +83,40 @@ export default function DashboardPage() {
       fetchData();
     }
   }, [status, router, fetchData]);
+
+  // Scroll to hash on mount
+  useEffect(() => {
+    if (window.location.hash === "#roadmap") {
+      setTimeout(() => {
+        document.getElementById("roadmap")?.scrollIntoView({ behavior: "smooth" });
+      }, 200);
+    }
+  }, [loading]);
+
+  const handleRegenRoadmap = async () => {
+    setRoadmapLoading(true);
+    try {
+      const res = await fetch("/api/roadmap", { method: "POST" });
+      if (res.ok) {
+        const data = await res.json();
+        setRoadmap(data.roadmap);
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setRoadmapLoading(false);
+    }
+  };
+
+  const handleResetOnboarding = async () => {
+    if (!confirm("Reset all onboarding data? This cannot be undone.")) return;
+    try {
+      await fetch("/api/onboarding", { method: "DELETE" });
+      router.push("/");
+    } catch {
+      // silently fail
+    }
+  };
 
   if (status === "loading" || loading) {
     return (
@@ -246,6 +300,146 @@ export default function DashboardPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+      </div>
+
+      {/* Career Roadmap */}
+      <div className="mt-8 bg-white rounded-xl border border-gray-200 overflow-hidden" id="roadmap">
+        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-900">
+            🗺️ Career Roadmap
+          </h2>
+          <div className="flex items-center gap-2">
+            {roadmap && (
+              <>
+                <button
+                  onClick={handleRegenRoadmap}
+                  disabled={roadmapLoading}
+                  className="px-3 py-1.5 text-xs font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 rounded-md transition-colors disabled:opacity-50"
+                >
+                  {roadmapLoading ? "Generating..." : "Regenerate"}
+                </button>
+                <button
+                  onClick={handleResetOnboarding}
+                  className="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
+                >
+                  Reset
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+
+        {!roadmap ? (
+          <div className="px-6 py-12 text-center">
+            <p className="text-gray-500 mb-3">
+              Complete your onboarding to get a personalized 8-week career
+              roadmap.
+            </p>
+            <Link
+              href="/"
+              className="inline-block px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              Complete Your Onboarding
+            </Link>
+          </div>
+        ) : (
+          <div className="px-6 py-6">
+            {/* Strategy Overview */}
+            {roadmap.strategyOverview && (
+              <p className="text-sm text-gray-600 mb-6 leading-relaxed">
+                {roadmap.strategyOverview}
+              </p>
+            )}
+
+            {/* Timeline */}
+            <div className="space-y-0">
+              {roadmap.weeks.map((week, i) => {
+                const phaseBorder =
+                  week.phase === "Foundation"
+                    ? "border-l-blue-500"
+                    : week.phase === "High Velocity"
+                      ? "border-l-amber-500"
+                      : "border-l-green-500";
+                const phaseBg =
+                  week.phase === "Foundation"
+                    ? "bg-blue-50 text-blue-700"
+                    : week.phase === "High Velocity"
+                      ? "bg-amber-50 text-amber-700"
+                      : "bg-green-50 text-green-700";
+
+                return (
+                  <div
+                    key={week.id}
+                    className={`relative pl-6 pb-6 border-l-2 ${phaseBorder} ${i === roadmap.weeks.length - 1 ? "border-l-transparent" : ""} last:pb-0`}
+                  >
+                    {/* Dot */}
+                    <div
+                      className={`absolute left-0 top-0 -translate-x-1/2 w-3 h-3 rounded-full border-2 border-white ${
+                        week.phase === "Foundation"
+                          ? "bg-blue-500"
+                          : week.phase === "High Velocity"
+                            ? "bg-amber-500"
+                            : "bg-green-500"
+                      }`}
+                    />
+
+                    {/* Card */}
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-xs font-bold text-gray-900">
+                          Week {week.weekNumber}
+                        </span>
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-xs font-medium ${phaseBg}`}
+                        >
+                          {week.phase}
+                        </span>
+                      </div>
+
+                      <h4 className="text-sm font-semibold text-gray-800 mb-2">
+                        {week.focusTitle}
+                      </h4>
+
+                      {/* Tasks */}
+                      <ul className="space-y-1.5 mb-3">
+                        {week.tasks.map((task, ti) => (
+                          <li
+                            key={ti}
+                            className="flex items-start gap-2 text-sm text-gray-600"
+                          >
+                            <input
+                              type="checkbox"
+                              className="mt-0.5 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                              readOnly
+                            />
+                            <span>{task}</span>
+                          </li>
+                        ))}
+                      </ul>
+
+                      {/* Milestone */}
+                      <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                        <span>🏁</span>
+                        <span className="font-medium">Milestone:</span>
+                        <span>{week.milestone}</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Generated date */}
+            <p className="text-xs text-gray-400 mt-6 text-center">
+              Generated{" "}
+              {new Date(roadmap.generatedAt).toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </p>
           </div>
         )}
       </div>
