@@ -52,6 +52,7 @@ export default function HomePage() {
   const [onboardingDone, setOnboardingDone] = useState<boolean | null>(null);
   const [checkingOnboarding, setCheckingOnboarding] = useState(false);
   const [autoFilling, setAutoFilling] = useState(false);
+  const [suggestedPositions, setSuggestedPositions] = useState<string[]>([]);
 
   // ─── Check onboarding status when authenticated ──────────────────────────
   const checkOnboarding = useCallback(async () => {
@@ -78,6 +79,19 @@ export default function HomePage() {
     }
   }, [status, checkOnboarding]);
 
+  // ─── Toggle a suggested position in/out of the positions field ──────
+  const togglePosition = (pos: string) => {
+    const current = positions
+      .split(",")
+      .map((p) => p.trim())
+      .filter(Boolean);
+    if (current.includes(pos)) {
+      setPositions(current.filter((p) => p !== pos).join(", "));
+    } else {
+      setPositions([...current, pos].join(", "));
+    }
+  };
+
   // ─── Handle resume uploaded ─────────────────────────────────────────────
   const handleResumeUploaded = useCallback(
     (resume: { id: string; name: string }) => {
@@ -97,6 +111,7 @@ export default function HomePage() {
         .then((res) => res.json())
         .then((data) => {
           if (data.suggestedPositions?.length > 0) {
+            setSuggestedPositions(data.suggestedPositions);
             setPositions(data.suggestedPositions.join(", "));
           }
           if (data.suggestedIndustry) {
@@ -404,6 +419,37 @@ export default function HomePage() {
                 <p className="text-xs text-gray-400 mt-1">
                   💡 We already extracted what you&apos;ve done. Tell us where you want to go — this helps find gaps between your current profile and your dream roles.
                 </p>
+                {/* Suggested position chips */}
+                {suggestedPositions.length > 0 && (
+                  <div className="mt-2">
+                    <p className="text-xs text-gray-500 mb-1.5">
+                      🤖 AI-suggested from your resume — click to add/remove:
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {suggestedPositions.map((pos) => {
+                        const isSelected = positions
+                          .split(",")
+                          .map((p) => p.trim())
+                          .includes(pos);
+                        return (
+                          <button
+                            key={pos}
+                            type="button"
+                            onClick={() => togglePosition(pos)}
+                            className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+                              isSelected
+                                ? "bg-indigo-600 text-white border-indigo-600"
+                                : "bg-white text-gray-700 border-gray-300 hover:border-indigo-400 hover:text-indigo-600"
+                            }`}
+                          >
+                            {isSelected ? "✓ " : "+ "}
+                            {pos}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Industry + Country row */}
