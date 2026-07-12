@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { parseResumeFile } from "@/lib/resume-parser";
-import { saveOriginalFile, renameOriginalFile } from "@/lib/storage";
+import { saveOriginalFile } from "@/lib/storage";
 
 function detectDocType(mimeType: string, fileName: string): string | null {
   // Check MIME type first
@@ -73,36 +73,21 @@ export async function POST(req: NextRequest) {
         .replace(/\uFEFF/g, "")          // BOM
         .trim();
 
-      // Save original file to disk so we can modify it later (e.g., DOCX in-place editing)
-      let filePath: string | null = null;
-      try {
-        filePath = await saveOriginalFile("temp", buffer, file.type);
-      } catch {
-        console.warn("Failed to save original file, continuing without it");
-      }
-
       const resume = await prisma.resume.create({
         data: {
           userId,
           name: file.name.replace(/\.[^.]+$/, ""),
           parsedText: parsedText.slice(0, 50000),
-          filePath,
+          filePath: null,
           docType,
         },
       });
 
-      // Rename the file to use the actual resume ID
-      if (filePath) {
-        try {
-          const finalPath = await renameOriginalFile(filePath, resume.id, file.type);
-          await prisma.resume.update({
-            where: { id: resume.id },
-            data: { filePath: finalPath },
-          });
-          resume.filePath = finalPath;
-        } catch {
-          console.warn("Failed to rename original file, continuing");
-        }
+      // Save original file to DB so we can modify it later (e.g., DOCX in-place editing)
+      try {
+        await saveOriginalFile(resume.id, buffer, file.type);
+      } catch {
+        console.warn("Failed to save original file, continuing without it");
       }
 
       return NextResponse.json({ resume }, { status: 201 });
@@ -122,7 +107,7 @@ export async function POST(req: NextRequest) {
         userId,
         name: body.name,
         parsedText: body.parsedText,
-        filePath: body.filePath || null,
+        filePath: null,
         isPrimary: body.isPrimary || false,
       },
     });

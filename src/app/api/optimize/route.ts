@@ -52,18 +52,22 @@ export async function POST(req: NextRequest) {
     }
 
     const resume = analysis.resume;
-    const originalFormat = resume.filePath
-      ? getOriginalFormat(resume.filePath)
-      : null;
+
+    let originalFormat: string | null = null;
+    try {
+      originalFormat = await getOriginalFormat(resume.id);
+    } catch {
+      // original file not stored — will fall through to PDF path
+    }
 
     const isDocx =
       originalFormat ===
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
-    if (isDocx && resume.filePath) {
+    if (isDocx) {
       // ── DOCX path: modify the original file in-place ──
       try {
-        const docxBuffer = await loadOriginalFile(resume.filePath);
+        const docxBuffer = await loadOriginalFile(resume.id);
         const modifiedBuffer = await modifyDocxText(
           docxBuffer,
           analysis.suggestions.map((s) => ({
@@ -74,7 +78,7 @@ export async function POST(req: NextRequest) {
 
         return new NextResponse(new Uint8Array(modifiedBuffer), {
           headers: {
-            "Content-Type": originalFormat,
+            "Content-Type": originalFormat ?? "application/octet-stream",
             "Content-Disposition": `attachment; filename="optimized-${sanitizeFilename(resume.name)}.docx"`,
           },
         });

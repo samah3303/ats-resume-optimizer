@@ -1,10 +1,9 @@
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-3.0.x"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -32,7 +31,7 @@ model Resume {
   userId     String   @map("user_id")
   name       String
   filePath   String?  @map("file_path")
-  parsedText String   @map("parsed_text")
+  parsedText String   @map("parsed_text") @db.Text
   isPrimary  Boolean  @default(false) @map("is_primary")
   docType    String?  @map("doc_type")
   createdAt  DateTime @default(now()) @map("created_at")
@@ -41,8 +40,21 @@ model Resume {
   user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   analyses           Analysis[]
   onboardingProfiles OnboardingProfile[]
+  originalFile       OriginalFile?
 
   @@map("resumes")
+}
+
+model OriginalFile {
+  id        String   @id @default(uuid())
+  resumeId  String   @unique @map("resume_id")
+  data      String   @db.Text
+  mimeType  String   @map("mime_type")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  resume Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+
+  @@map("original_files")
 }
 
 model PositionProfile {
@@ -67,7 +79,7 @@ model JobDescription {
   positionProfileId  String?  @map("position_profile_id")
   title              String
   company            String?
-  rawText            String   @map("raw_text")
+  rawText            String   @map("raw_text") @db.Text
   sourceUrl          String?  @map("source_url")
   notes              String?  @map("notes")
   createdAt          DateTime @default(now()) @map("created_at")
@@ -86,11 +98,11 @@ model Analysis {
   jobDescriptionId String   @map("job_description_id")
   overallScore     Int?     @map("overall_score")
   keywordsMatchPct Float?   @map("keywords_match_pct")
-  skillsGapJson    String?  @map("skills_gap_json")
+  skillsGapJson    String?  @map("skills_gap_json") @db.Text
   formatScore      Int?     @map("format_score")
   impactScore      Int?     @map("impact_score")
-  summaryText      String?  @map("summary_text")
-  rawAiResponse    String   @map("raw_ai_response")
+  summaryText      String?  @map("summary_text") @db.Text
+  rawAiResponse    String   @map("raw_ai_response") @db.Text
   createdAt        DateTime @default(now()) @map("created_at")
 
   user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -106,9 +118,9 @@ model Suggestion {
   id            String   @id @default(uuid())
   analysisId    String   @map("analysis_id")
   section       String
-  originalText  String   @map("original_text")
-  suggestedText String   @map("suggested_text")
-  rationale     String
+  originalText  String   @map("original_text") @db.Text
+  suggestedText String   @map("suggested_text") @db.Text
+  rationale     String   @db.Text
   accepted      Boolean  @default(false)
   createdAt     DateTime @default(now()) @map("created_at")
 
@@ -132,20 +144,20 @@ model OnboardingProfile {
   id              String   @id @default(uuid())
   userId          String   @unique @map("user_id")
   resumeId        String   @map("resume_id")
-  targetPositions String   @map("target_positions")
+  targetPositions String   @map("target_positions") @db.Text
   targetCountry   String   @map("target_country")
   linkedinUrl     String?  @map("linkedin_url")
   portfolioUrl    String?  @map("portfolio_url")
   githubUrl       String?  @map("github_url")
   industry        String?  @map("industry")
   jobType         String?  @map("job_type")
-  profileSummary  String?  @map("profile_summary")
-  coreSkills      String?  @map("core_skills")
-  marketGaps      String?  @map("market_gaps")
-  aiSuggestions   String?  @map("ai_suggestions")
-  linkedinOpts        String?  @map("linkedin_optimizations")
+  profileSummary  String?  @map("profile_summary") @db.Text
+  coreSkills      String?  @map("core_skills") @db.Text
+  marketGaps      String?  @map("market_gaps") @db.Text
+  aiSuggestions   String?  @map("ai_suggestions") @db.Text
+  linkedinOpts        String?  @map("linkedin_optimizations") @db.Text
   generalAtsScore     Int?     @map("general_ats_score")
-  resumeImprovements  String?  @map("resume_improvements")
+  resumeImprovements  String?  @map("resume_improvements") @db.Text
   createdAt           DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
@@ -158,7 +170,7 @@ model OnboardingProfile {
 model Roadmap {
   id               String   @id @default(uuid())
   userId           String   @map("user_id")
-  strategyOverview String?  @map("strategy_overview")
+  strategyOverview String?  @map("strategy_overview") @db.Text
   generatedAt      DateTime @default(now()) @map("generated_at")
   createdAt        DateTime @default(now()) @map("created_at")
 
@@ -174,7 +186,7 @@ model WeekTask {
   weekNumber Int    @map("week_number")
   phase      String
   focusTitle String @map("focus_title")
-  tasks      String
+  tasks      String   @db.Text
   milestone  String
 
   roadmap Roadmap @relation(fields: [roadmapId], references: [id], onDelete: Cascade)

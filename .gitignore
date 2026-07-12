@@ -51,3 +51,6 @@ dev.db
 
 # pi agent
 .pi/
+
+.vercel
+.env*
