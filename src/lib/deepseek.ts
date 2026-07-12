@@ -2,7 +2,7 @@ import OpenAI from "openai";
 
 let _deepseek: OpenAI | null = null;
 
-function getDeepSeek(): OpenAI {
+export function getDeepSeek(): OpenAI {
   if (!_deepseek) {
     const apiKey = process.env.DEEPSEEK_API_KEY;
     if (!apiKey) {
@@ -19,7 +19,7 @@ function getDeepSeek(): OpenAI {
 /**
  * Helper: extract JSON from LLM response, handling markdown code blocks.
  */
-function extractJson(content: string): string {
+export function extractJson(content: string): string {
   let jsonStr = content.trim();
   const jsonMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
   if (jsonMatch) {

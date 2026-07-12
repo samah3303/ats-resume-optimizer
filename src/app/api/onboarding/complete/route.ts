@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { resumeId, targetPositions, targetCountry, linkedinUrl } = body;
+    const { resumeId, targetPositions, targetCountry, linkedinUrl, portfolioUrl, githubUrl, industry } = body;
 
     if (!resumeId) {
       return NextResponse.json(
@@ -86,6 +86,9 @@ export async function POST(req: NextRequest) {
         targetPositions: positions.join(", "),
         targetCountry,
         linkedinUrl: linkedinUrl || null,
+        portfolioUrl: portfolioUrl || null,
+        githubUrl: githubUrl || null,
+        industry: industry || null,
         profileSummary: mode1Result.profileSummary,
         coreSkills: JSON.stringify(mode1Result.detectedCoreSkills),
         marketGaps: JSON.stringify(mode1Result.marketGaps),

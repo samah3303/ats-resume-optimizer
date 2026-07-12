@@ -18,7 +18,7 @@ export default function RegisterPage() {
 
   useEffect(() => {
     if (status === "authenticated") {
-      router.replace("/dashboard");
+      router.replace("/");
     }
   }, [status, router]);
 
@@ -59,7 +59,7 @@ export default function RegisterPage() {
       });
 
       if (result?.ok) {
-        router.push("/dashboard");
+        router.push("/");
       } else {
         router.push("/login");
       }

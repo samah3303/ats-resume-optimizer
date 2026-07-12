@@ -9,29 +9,20 @@ import ResumeUploader from "@/components/ResumeUploader";
 // ─── Country list ────────────────────────────────────────────────────────────
 
 const COUNTRIES = [
-  "United States",
-  "United Kingdom",
-  "United Arab Emirates",
-  "Canada",
-  "Germany",
-  "Australia",
-  "India",
-  "Singapore",
-  "Netherlands",
-  "Ireland",
-  "Switzerland",
-  "Sweden",
-  "New Zealand",
-  "Japan",
-  "South Korea",
-  "France",
-  "Brazil",
-  "Mexico",
-  "South Africa",
-  "Saudi Arabia",
-  "Qatar",
-  "Malaysia",
-  "Other",
+  "United States", "United Kingdom", "United Arab Emirates", "Canada",
+  "Germany", "Australia", "India", "Singapore", "Netherlands",
+  "Ireland", "Switzerland", "Sweden", "New Zealand", "Japan",
+  "South Korea", "France", "Brazil", "Mexico", "South Africa",
+  "Saudi Arabia", "Qatar", "Malaysia", "Other",
+];
+
+const INDUSTRIES = [
+  "Technology / SaaS", "Finance / FinTech", "Healthcare / HealthTech",
+  "E-Commerce / Retail", "Education / EdTech", "Media / Entertainment",
+  "Manufacturing", "Energy / Utilities", "Consulting",
+  "Government / Public Sector", "Real Estate / PropTech",
+  "Telecommunications", "Transportation / Logistics", "Gaming",
+  "Cybersecurity", "AI / Machine Learning", "Other",
 ];
 
 // ─── Step definitions ────────────────────────────────────────────────────────
@@ -52,11 +43,15 @@ export default function HomePage() {
   const [resumeFormat, setResumeFormat] = useState<"pdf" | "doc" | "docx" | null>(null);
   const [positions, setPositions] = useState("");
   const [country, setCountry] = useState("");
+  const [industry, setIndustry] = useState("");
   const [linkedin, setLinkedin] = useState("");
+  const [portfolioUrl, setPortfolioUrl] = useState("");
+  const [githubUrl, setGithubUrl] = useState("");
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [onboardingDone, setOnboardingDone] = useState<boolean | null>(null);
   const [checkingOnboarding, setCheckingOnboarding] = useState(false);
+  const [autoFilling, setAutoFilling] = useState(false);
 
   // ─── Check onboarding status when authenticated ──────────────────────────
   const checkOnboarding = useCallback(async () => {
@@ -89,7 +84,33 @@ export default function HomePage() {
       setResumeId(resume.id);
       setResumeName(resume.name);
       setError(null);
-      // Advance after brief delay so user sees the success
+      // Save progress to localStorage
+      localStorage.setItem("onboarding_resumeId", resume.id);
+      localStorage.setItem("onboarding_resumeName", resume.name);
+      // Auto-fill from resume
+      setAutoFilling(true);
+      fetch("/api/autofill", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ resumeId: resume.id }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.suggestedPositions?.length > 0) {
+            setPositions(data.suggestedPositions.join(", "));
+          }
+          if (data.suggestedIndustry) {
+            // If industry matches one of our options, set it
+            const match = INDUSTRIES.find(
+              (i) => i.toLowerCase() === data.suggestedIndustry.toLowerCase()
+            ) || data.suggestedIndustry;
+            setIndustry(match);
+          }
+          localStorage.setItem("onboarding_step", "2");
+        })
+        .catch(() => {})
+        .finally(() => setAutoFilling(false));
+      // Advance after auto-fill starts
       setTimeout(() => setStep(2), 600);
     },
     []
@@ -121,6 +142,9 @@ export default function HomePage() {
             .filter(Boolean),
           targetCountry: country,
           linkedinUrl: linkedin.trim() || undefined,
+          portfolioUrl: portfolioUrl.trim() || undefined,
+          githubUrl: githubUrl.trim() || undefined,
+          industry: industry || undefined,
         }),
       });
 
@@ -129,6 +153,10 @@ export default function HomePage() {
         throw new Error(data.error || "Analysis failed");
       }
 
+      // Clear onboarding localStorage on complete
+      localStorage.removeItem("onboarding_resumeId");
+      localStorage.removeItem("onboarding_resumeName");
+      localStorage.removeItem("onboarding_step");
       router.push("/dashboard#roadmap");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
@@ -321,14 +349,22 @@ export default function HomePage() {
             <h2 className="text-xl font-bold text-gray-900 mb-2">
               Tell Us About Your Goals
             </h2>
-            <p className="text-sm text-gray-500 mb-6">
+            <p className="text-sm text-gray-500 mb-4">
               This helps us tailor the analysis and roadmap to your specific
               career ambitions.
             </p>
 
+            {/* Auto-fill indicator */}
+            {autoFilling && (
+              <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg mb-4 text-sm text-blue-700">
+                <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                AI is extracting details from your resume...
+              </div>
+            )}
+
             {/* Uploaded resume info */}
             {resumeName && (
-              <div className="flex items-center gap-2 p-3 bg-indigo-50 border border-indigo-100 rounded-lg mb-6">
+              <div className="flex items-center gap-2 p-3 bg-indigo-50 border border-indigo-100 rounded-lg mb-4">
                 <span className="text-indigo-600">📄</span>
                 <span className="text-sm font-medium text-indigo-700">
                   {resumeName}
@@ -347,7 +383,7 @@ export default function HomePage() {
               </div>
             )}
 
-            <div className="space-y-5">
+            <div className="space-y-4">
               {/* Target Positions */}
               <div>
                 <label
@@ -366,61 +402,128 @@ export default function HomePage() {
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none transition-colors"
                 />
                 <p className="text-xs text-gray-400 mt-1">
-                  Comma-separated. Be specific — each role gets its own
-                  analysis.
+                  💡 We already extracted what you&apos;ve done. Tell us where you want to go — this helps find gaps between your current profile and your dream roles.
                 </p>
               </div>
 
-              {/* Target Country */}
-              <div>
-                <label
-                  htmlFor="country"
-                  className="block text-sm font-medium text-gray-700 mb-1.5"
-                >
-                  Target Country <span className="text-red-500">*</span>
-                </label>
-                <select
-                  id="country"
-                  value={country}
-                  onChange={(e) => setCountry(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none bg-white transition-colors"
-                >
-                  <option value="">Select a country...</option>
-                  {COUNTRIES.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
+              {/* Industry + Country row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label
+                    htmlFor="industry"
+                    className="block text-sm font-medium text-gray-700 mb-1.5"
+                  >
+                    Target Industry{" "}
+                    <span className="text-gray-400">(optional)</span>
+                  </label>
+                  <select
+                    id="industry"
+                    value={industry}
+                    onChange={(e) => setIndustry(e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none bg-white transition-colors"
+                  >
+                    <option value="">Select industry...</option>
+                    {INDUSTRIES.map((i) => (
+                      <option key={i} value={i}>
+                        {i}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label
+                    htmlFor="country"
+                    className="block text-sm font-medium text-gray-700 mb-1.5"
+                  >
+                    Target Country <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    id="country"
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none bg-white transition-colors"
+                  >
+                    <option value="">Select a country...</option>
+                    {COUNTRIES.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
-              {/* LinkedIn */}
-              <div>
-                <label
-                  htmlFor="linkedin"
-                  className="block text-sm font-medium text-gray-700 mb-1.5"
-                >
-                  LinkedIn Profile URL{" "}
-                  <span className="text-gray-400">(optional)</span>
-                </label>
-                <input
-                  id="linkedin"
-                  type="url"
-                  value={linkedin}
-                  onChange={(e) => setLinkedin(e.target.value)}
-                  placeholder="https://linkedin.com/in/yourprofile"
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none transition-colors"
-                />
+              {/* LinkedIn, Portfolio, GitHub */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label
+                    htmlFor="linkedin"
+                    className="block text-sm font-medium text-gray-700 mb-1.5"
+                  >
+                    LinkedIn URL{" "}
+                    <span className="text-gray-400">(optional)</span>
+                  </label>
+                  <input
+                    id="linkedin"
+                    type="url"
+                    value={linkedin}
+                    onChange={(e) => setLinkedin(e.target.value)}
+                    placeholder="linkedin.com/in/..."
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none transition-colors"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="portfolio"
+                    className="block text-sm font-medium text-gray-700 mb-1.5"
+                  >
+                    Portfolio URL{" "}
+                    <span className="text-gray-400">(optional)</span>
+                  </label>
+                  <input
+                    id="portfolio"
+                    type="url"
+                    value={portfolioUrl}
+                    onChange={(e) => setPortfolioUrl(e.target.value)}
+                    placeholder="yourportfolio.com"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none transition-colors"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="github"
+                    className="block text-sm font-medium text-gray-700 mb-1.5"
+                  >
+                    GitHub URL{" "}
+                    <span className="text-gray-400">(optional)</span>
+                  </label>
+                  <input
+                    id="github"
+                    type="url"
+                    value={githubUrl}
+                    onChange={(e) => setGithubUrl(e.target.value)}
+                    placeholder="github.com/username"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none transition-colors"
+                  />
+                </div>
               </div>
             </div>
 
             <div className="flex items-center justify-between mt-8">
-              <button
-                onClick={() => setStep(1)}
-                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                ← Back
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setStep(1)}
+                  className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  ← Back
+                </button>
+                <button
+                  onClick={() => router.push("/dashboard")}
+                  className="px-4 py-2 text-sm font-medium text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  Skip for now
+                </button>
+              </div>
               <button
                 onClick={() => setStep(3)}
                 disabled={!positions.trim() || !country}
