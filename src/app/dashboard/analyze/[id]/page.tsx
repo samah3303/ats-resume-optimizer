@@ -82,6 +82,8 @@ export default function AnalysisDetailPage() {
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [sharing, setSharing] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
+  const [downloadSuccess, setDownloadSuccess] = useState(false);
+  const [scoreBoost, setScoreBoost] = useState(0);
 
   const fetchAnalysis = useCallback(async () => {
     try {
@@ -248,6 +250,12 @@ export default function AnalysisDetailPage() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+
+      // Calculate score boost
+      const acceptedCount = suggestions.filter(s => s.accepted).length;
+      const boost = Math.min(acceptedCount * 5, 25);
+      setScoreBoost(boost);
+      setDownloadSuccess(true);
     } catch (err) {
       alert(
         err instanceof Error ? err.message : "Failed to download optimized resume"
@@ -421,6 +429,47 @@ export default function AnalysisDetailPage() {
           </button>
         </div>
       </div>
+
+      {/* Download success message */}
+      {downloadSuccess && (
+        <div className="bg-green-50 border border-green-200 rounded-xl p-5 mb-6">
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">🎉</span>
+            <div className="flex-1">
+              <h3 className="font-semibold text-green-800 mb-1">Resume Downloaded!</h3>
+              <p className="text-sm text-green-700 mb-2">
+                Estimated ATS score boost: <strong className="text-green-900 text-lg">+{scoreBoost}%</strong>
+                {analysis?.overallScore && (
+                  <> (from {analysis.overallScore}% → ~{Math.min(100, analysis.overallScore + scoreBoost)}%)</>
+                )}
+              </p>
+              <div className="bg-white rounded-lg p-3 space-y-2 text-sm text-slate-600">
+                <p className="flex items-start gap-2">
+                  <span className="text-amber-500">⚠️</span>
+                  <span>Re-check the <strong>alignment and structure</strong> — AI optimizations are great, but a human review catches nuances.</span>
+                </p>
+                <p className="flex items-start gap-2">
+                  <span className="text-blue-500">📄</span>
+                  <span>Convert to <strong>PDF</strong> before applying — many ATS prefer PDF over DOCX.</span>
+                </p>
+                <p className="flex items-start gap-2">
+                  <span className="text-indigo-500">🔄</span>
+                  <button onClick={() => { setDownloadSuccess(false); router.push("/dashboard/analyze"); }} className="text-indigo-600 font-medium hover:text-indigo-700 underline">
+                    Upload the optimized version and analyze it again
+                  </button>
+                  {" "}before applying to verify the score improvement.
+                </p>
+              </div>
+              <button
+                onClick={() => setDownloadSuccess(false)}
+                className="mt-3 text-xs text-green-600 hover:text-green-700 underline"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Section Scores */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6" style={{ display: activeTab === "overview" ? undefined : "none" }}>

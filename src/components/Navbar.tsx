@@ -1,8 +1,9 @@
 "use client";
 
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import ProfileDropdown from "./ProfileDropdown";
 
 const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
@@ -81,22 +82,13 @@ export default function Navbar() {
           <div className="flex items-center gap-3">
             {session ? (
               <div className="flex items-center gap-3">
-                {/* Mobile nav */}
                 <Link
                   href="/dashboard/analyze"
-                  className="md:hidden px-3 py-2 rounded-md text-sm font-medium bg-gradient-to-r from-indigo-800 to-indigo-600 text-white hover:from-indigo-900 hover:to-indigo-700 transition-all shadow-sm"
+                  className="md:hidden px-3 py-2 rounded-md text-sm font-medium bg-gradient-to-r from-indigo-800 to-indigo-600 text-white"
                 >
                   Analyze
                 </Link>
-                <span className="text-sm text-slate-600 hidden sm:block">
-                  {session.user?.name || session.user?.email}
-                </span>
-                <button
-                  onClick={() => signOut({ callbackUrl: "/" })}
-                  className="px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
-                >
-                  Logout
-                </button>
+                <ProfileDropdown />
               </div>
             ) : (
               <button

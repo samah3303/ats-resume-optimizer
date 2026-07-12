@@ -581,25 +581,49 @@ export default function DashboardPage() {
                 💼 LinkedIn Profile Optimizations
               </h3>
               {linkedinTips.length === 0 ? (
-                <div className="py-12 text-center">
-                  <p className="text-slate-500">
-                    Complete your onboarding with a LinkedIn URL to get profile optimization tips.
+                <div className="py-8 text-center">
+                  <p className="text-slate-500 mb-2">
+                    Complete your onboarding with a LinkedIn URL to get AI-powered profile tips.
                   </p>
+                  <button onClick={() => router.push("/")} className="text-sm text-indigo-600 font-medium hover:text-indigo-700">
+                    Set up onboarding →
+                  </button>
                 </div>
               ) : (
-                <ul className="space-y-3">
-                  {linkedinTips.map((tip, i) => (
-                    <li
-                      key={i}
-                      className="flex items-start gap-3 p-3 bg-indigo-50 rounded-lg"
-                    >
-                      <span className="text-indigo-600 font-bold shrink-0 mt-0.5">
-                        {i + 1}.
-                      </span>
-                      <p className="text-sm text-slate-700">{tip}</p>
+                <>
+                  <ul className="space-y-3 mb-6">
+                    {linkedinTips.map((tip, i) => (
+                      <li key={i} className="flex items-start gap-3 p-3 bg-indigo-50 rounded-lg">
+                        <span className="text-indigo-600 font-bold shrink-0 mt-0.5">{i + 1}.</span>
+                        <p className="text-sm text-slate-700">{tip}</p>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <h4 className="text-sm font-semibold text-slate-700 mb-3">⚡ Quick Wins to Boost Visibility</h4>
+                  <ul className="space-y-2 text-sm text-slate-600">
+                    <li className="flex items-start gap-2">
+                      <span className="text-amber-500">⭐</span>
+                      Try <strong>LinkedIn Premium</strong> free trial — unlocks InMail, profile views, and applicant insights
                     </li>
-                  ))}
-                </ul>
+                    <li className="flex items-start gap-2">
+                      <span className="text-amber-500">🔗</span>
+                      Connect with <strong>3-5 recruiters per day</strong> in your target industry — personalized invites get 3x response
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-amber-500">🔔</span>
+                      Set up <strong>job alerts</strong> for your target roles — filter by <strong>posted in last 24 hours</strong> or <strong>last week</strong>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-amber-500">📊</span>
+                      Enable <strong>Open to Work</strong> (recruiters only) to appear in recruiter searches — 40% more InMail
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-amber-500">✍️</span>
+                      Post <strong>1 industry insight per week</strong> — profile views increase 6x with consistent posting
+                    </li>
+                  </ul>
+                </>
               )}
             </>
           )}

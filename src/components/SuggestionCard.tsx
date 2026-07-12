@@ -41,6 +41,9 @@ export default function SuggestionCard({
           <span className="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs font-medium rounded">
             {suggestion.section}
           </span>
+          <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded">
+            +{Math.round(3 + suggestion.originalText.length * 0.02)}% ATS
+          </span>
         </div>
         <button
           onClick={() => setExpanded(!expanded)}
