@@ -423,7 +423,7 @@ export default function AnalysisDetailPage() {
       </div>
 
       {/* Section Scores */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6" style={{ display: activeTab === "overview" ? undefined : "none" }}>
         {sections.map((section) => (
           <div
             key={section.label}
@@ -443,7 +443,7 @@ export default function AnalysisDetailPage() {
 
       {/* Keywords Section */}
       {(keywords.matched.length > 0 || keywords.missing.length > 0) && (
-        <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6 shadow-sm">
+        <div className={`bg-white rounded-2xl border border-gray-200 p-6 mb-6 shadow-sm ${activeTab !== "overview" ? "hidden" : ""}`}>
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
             Keyword Match
           </h2>
@@ -481,7 +481,7 @@ export default function AnalysisDetailPage() {
 
       {/* Skills Gap */}
       {(skillsGap.present.length > 0 || skillsGap.missing.length > 0) && (
-        <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6 shadow-sm">
+        <div className={`bg-white rounded-2xl border border-gray-200 p-6 mb-6 shadow-sm ${activeTab !== "overview" ? "hidden" : ""}`}>
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
             Skills Gap Analysis
           </h2>
@@ -522,7 +522,7 @@ export default function AnalysisDetailPage() {
 
       {/* Keyword Density Heatmap */}
       {keywordFrequencies.length > 0 && (
-        <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6 shadow-sm">
+        <div className={`bg-white rounded-2xl border border-gray-200 p-6 mb-6 shadow-sm ${activeTab !== "overview" ? "hidden" : ""}`}>
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
             Keyword Density Heatmap
           </h2>
@@ -570,7 +570,7 @@ export default function AnalysisDetailPage() {
       )}
 
       {/* Cover Letter Generator */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6 shadow-sm">
+      <div className={`bg-white rounded-2xl border border-gray-200 p-6 mb-6 shadow-sm ${activeTab !== "coverletter" ? "hidden" : ""}`}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900">
             Cover Letter Generator
@@ -644,7 +644,7 @@ export default function AnalysisDetailPage() {
       </div>
 
       {/* Interview Questions */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6 shadow-sm">
+      <div className={`bg-white rounded-2xl border border-gray-200 p-6 mb-6 shadow-sm ${activeTab !== "interview" ? "hidden" : ""}`}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900">
             Interview Questions
@@ -736,7 +736,7 @@ export default function AnalysisDetailPage() {
       </div>
 
       {/* Suggestions */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+      <div className={`bg-white rounded-2xl border border-gray-200 p-6 shadow-sm ${activeTab !== "suggestions" ? "hidden" : ""}`}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900">
             Suggestions ({suggestions.length})
@@ -764,7 +764,7 @@ export default function AnalysisDetailPage() {
       </div>
 
       {/* Shareable Link */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6 mt-6 shadow-sm">
+      <div className={`bg-white rounded-2xl border border-gray-200 p-6 mt-6 shadow-sm ${activeTab !== "share" ? "hidden" : ""}`}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900">
             Share Analysis

@@ -192,7 +192,6 @@ function AnalyzePageContent() {
             body: JSON.stringify({
               resumeId,
               jdId: usePastedJd ? undefined : jd.id,
-              positionProfileId: positionProfileId || undefined,
               pasteJdTitle: usePastedJd ? pasteJdTitle : undefined,
               pasteJdText: usePastedJd ? pasteJdText : undefined,
               targetPositions: selectedTargetPositions.length > 0 ? selectedTargetPositions : undefined,
@@ -224,7 +223,6 @@ function AnalyzePageContent() {
           body: JSON.stringify({
             resumeId,
             jdId: usePastedJd ? undefined : jdsToAnalyze[0].id,
-            positionProfileId: positionProfileId || undefined,
             pasteJdTitle: usePastedJd ? pasteJdTitle : undefined,
             pasteJdText: usePastedJd ? pasteJdText : undefined,
             targetPositions: selectedTargetPositions.length > 0 ? selectedTargetPositions : undefined,
@@ -490,25 +488,6 @@ function AnalyzePageContent() {
                 />
               </div>
             )}
-          </div>
-
-          {/* Step 3: Position Profile (optional) */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Step 3: Position Profile (optional)
-            </label>
-            <select
-              value={positionProfileId}
-              onChange={(e) => setPositionProfileId(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
-            >
-              <option value="">None</option>
-              {positions.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.title} — {p.targetRole}
-                </option>
-              ))}
-            </select>
           </div>
 
           {/* Summary */}
