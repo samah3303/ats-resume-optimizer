@@ -710,3 +710,85 @@ Other Guidelines:
     atsRedFlags: result.atsRedFlags,
   };
 }
+
+// ─── Job & Position Recommendations ──────────────────────────────────────────
+
+export async function generateRecommendedPositions(
+  resumeText: string,
+  coreSkills: string[],
+  targetCountry: string
+): Promise<
+  Array<{
+    title: string;
+    targetRole: string;
+    industry: string;
+    matchReason: string;
+  }>
+> {
+  const prompt = `You are an expert career strategist. Based on the candidate's resume, skills, and target country, recommend 5-8 highly relevant job positions they should target.
+
+## Candidate Skills:
+${coreSkills.join(", ")}
+
+## Target Country:
+${targetCountry}
+
+## Resume Excerpt:
+${resumeText.slice(0, 2000)}
+
+## Instructions:
+Output a JSON array of recommended positions. Each object must have: "title" (job title, e.g. "Senior Full-Stack Developer"), "targetRole" (specific role, e.g. "Node.js + React Developer"), "industry" (industry domain), "matchReason" (1 sentence why this is a great fit based on their skills). Return ONLY the JSON array, no markdown.`;
+
+  const response = await getDeepSeek().chat.completions.create({
+    model: "deepseek-chat",
+    messages: [{ role: "user", content: prompt }],
+    temperature: 0.5,
+    max_tokens: 4096,
+  });
+
+  const content = response.choices[0]?.message?.content || "[]";
+  const jsonStr = extractJson(content);
+  return JSON.parse(jsonStr);
+}
+
+export async function generateRecommendedJDs(
+  resumeText: string,
+  coreSkills: string[],
+  targetPositions: string[],
+  targetCountry: string
+): Promise<
+  Array<{
+    title: string;
+    company: string;
+    rawText: string;
+    matchReason: string;
+  }>
+> {
+  const prompt = `You are an expert recruiter. Based on the candidate's profile and target country, generate 4-6 realistic, detailed job descriptions that would be great matches. These are AI-generated practice JDs for targeting purposes - not real postings.
+
+## Target Positions:
+${targetPositions.join(", ")}
+
+## Candidate Skills:
+${coreSkills.join(", ")}
+
+## Target Country:
+${targetCountry}
+
+## Resume Excerpt:
+${resumeText.slice(0, 2000)}
+
+## Instructions:
+Output a JSON array of realistic job descriptions. Each object must have: "title" (job title), "company" (realistic company name for ${targetCountry}), "rawText" (full JD with requirements, responsibilities, qualifications, nice-to-haves - make it detailed like a real posting), "matchReason" (1 sentence explaining why this JD aligns with the candidate's profile). Return ONLY the JSON array, no markdown.`;
+
+  const response = await getDeepSeek().chat.completions.create({
+    model: "deepseek-chat",
+    messages: [{ role: "user", content: prompt }],
+    temperature: 0.5,
+    max_tokens: 4096,
+  });
+
+  const content = response.choices[0]?.message?.content || "[]";
+  const jsonStr = extractJson(content);
+  return JSON.parse(jsonStr);
+}
