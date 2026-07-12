@@ -44,14 +44,23 @@ export async function POST(req: NextRequest) {
       }
 
       const buffer = Buffer.from(await file.arrayBuffer());
-      const parsedText = await parseResumeFile(buffer, file.type);
+      const rawText = await parseResumeFile(buffer, file.type, file.name);
+      // Sanitize: remove control chars, null bytes, and non-printable characters
+      const parsedText = rawText
+        .replace(/\x00/g, "")           // null bytes
+        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, "") // other control chars (keep tab, newline, carriage return)
+        .replace(/\uFFFD/g, "")          // replacement chars
+        .replace(/\u200B/g, "")          // zero-width space
+        .replace(/\uFEFF/g, "")          // BOM
+        .trim();
 
       // Save original file to disk so we can modify it later (e.g., DOCX in-place editing)
-      const filePath = await saveOriginalFile(
-        "temp", // placeholder, will update after we have the id
-        buffer,
-        file.type
-      );
+      let filePath: string | null = null;
+      try {
+        filePath = await saveOriginalFile("temp", buffer, file.type);
+      } catch {
+        console.warn("Failed to save original file, continuing without it");
+      }
 
       const resume = await prisma.resume.create({
         data: {
@@ -63,12 +72,18 @@ export async function POST(req: NextRequest) {
       });
 
       // Rename the file to use the actual resume ID
-      const finalPath = await renameOriginalFile(filePath, resume.id, file.type);
-      await prisma.resume.update({
-        where: { id: resume.id },
-        data: { filePath: finalPath },
-      });
-      resume.filePath = finalPath;
+      if (filePath) {
+        try {
+          const finalPath = await renameOriginalFile(filePath, resume.id, file.type);
+          await prisma.resume.update({
+            where: { id: resume.id },
+            data: { filePath: finalPath },
+          });
+          resume.filePath = finalPath;
+        } catch {
+          console.warn("Failed to rename original file, continuing");
+        }
+      }
 
       return NextResponse.json({ resume }, { status: 201 });
     }

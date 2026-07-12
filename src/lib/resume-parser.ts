@@ -1,38 +1,49 @@
 import mammoth from "mammoth";
-import { PDFParse as pdfParse } from "pdf-parse";
 
 async function parsePdf(buffer: Buffer): Promise<string> {
-  const parser = new pdfParse(new Uint8Array(buffer));
+  // Dynamic import to avoid issues if pdf-parse's native deps aren't available
+  const { PDFParse } = await import("pdf-parse");
+  const parser = new PDFParse(new Uint8Array(buffer));
   const result = await parser.getText();
-  // pdf-parse getText() returns { text: string, pages: ... }
   const extractedText = typeof result === "string" ? result : (result as { text: string }).text;
-  return extractedText.trim();
+  return extractedText.trim() || "[No extractable text found in PDF]";
 }
 
 export async function parseResumeFile(
   buffer: Buffer,
-  mimeType: string
+  mimeType: string,
+  fileName?: string
 ): Promise<string> {
   try {
-    if (mimeType === "application/pdf") {
+    // Normalize: some browsers send empty or generic MIME types
+    let effectiveType = mimeType;
+    if (!effectiveType || effectiveType === "application/octet-stream") {
+      const ext = fileName?.toLowerCase().split(".").pop() || "";
+      if (ext === "pdf") effectiveType = "application/pdf";
+      else if (ext === "docx") effectiveType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+      else if (ext === "doc") effectiveType = "application/msword";
+      else if (ext === "txt") effectiveType = "text/plain";
+    }
+
+    if (effectiveType === "application/pdf") {
       return await parsePdf(buffer);
     }
 
     if (
-      mimeType ===
+      effectiveType ===
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-      mimeType === "application/msword"
+      effectiveType === "application/msword"
     ) {
       const result = await mammoth.extractRawText({ buffer });
       return result.value;
     }
 
-    if (mimeType === "text/plain") {
+    if (effectiveType === "text/plain") {
       return buffer.toString("utf-8");
     }
 
     throw new Error(
-      `Unsupported file type: ${mimeType}. Please upload a PDF, DOC, DOCX, or TXT file.`
+      `Unsupported file type: ${effectiveType || mimeType}. Please upload a PDF, DOC, DOCX, or TXT file.`
     );
   } catch (error) {
     if (error instanceof Error) {

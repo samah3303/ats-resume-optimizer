@@ -76,8 +76,14 @@ export default function ResumeUploader({ onUploaded, onFormatDetected }: ResumeU
         });
 
         if (!res.ok) {
-          const data = await res.json();
-          throw new Error(data.error || "Upload failed");
+          let errorMsg = "Upload failed";
+          try {
+            const data = await res.json();
+            errorMsg = data.error || errorMsg;
+          } catch {
+            errorMsg = `Server error (${res.status}). Please try again.`;
+          }
+          throw new Error(errorMsg);
         }
 
         const data = await res.json();
