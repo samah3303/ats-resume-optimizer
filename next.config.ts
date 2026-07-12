@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
-  serverExternalPackages: ["pdfjs-dist", "pdfkit"],
+  serverExternalPackages: ["pdfkit"],
 };
 
 export default nextConfig;
