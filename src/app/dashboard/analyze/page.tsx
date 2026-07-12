@@ -40,16 +40,6 @@ interface BatchResult {
   error?: string;
 }
 
-const ATS_PLATFORMS = [
-  "General ATS",
-  "Workday",
-  "Greenhouse",
-  "Lever",
-  "Taleo",
-  "iCIMS",
-  "SmartRecruiters",
-] as const;
-
 function AnalyzePageContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -73,7 +63,6 @@ function AnalyzePageContent() {
   const [usePastedJd, setUsePastedJd] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [atsPlatform, setAtsPlatform] = useState<string>("General ATS");
 
   // Result state
   const [result, setResult] = useState<AnalysisResult | null>(null);
@@ -206,7 +195,6 @@ function AnalyzePageContent() {
               positionProfileId: positionProfileId || undefined,
               pasteJdTitle: usePastedJd ? pasteJdTitle : undefined,
               pasteJdText: usePastedJd ? pasteJdText : undefined,
-              atsPlatform,
               targetPositions: selectedTargetPositions.length > 0 ? selectedTargetPositions : undefined,
               jobType: selectedJobType || undefined,
             }),
@@ -239,7 +227,6 @@ function AnalyzePageContent() {
             positionProfileId: positionProfileId || undefined,
             pasteJdTitle: usePastedJd ? pasteJdTitle : undefined,
             pasteJdText: usePastedJd ? pasteJdText : undefined,
-            atsPlatform,
             targetPositions: selectedTargetPositions.length > 0 ? selectedTargetPositions : undefined,
             jobType: selectedJobType || undefined,
           }),
@@ -375,23 +362,6 @@ function AnalyzePageContent() {
                 </div>
               </div>
 
-              {/* ATS Platform (moved here) */}
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">
-                  Target ATS Platform
-                </label>
-                <select
-                  value={atsPlatform}
-                  onChange={(e) => setAtsPlatform(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none text-sm"
-                >
-                  {ATS_PLATFORMS.map((p) => (
-                    <option key={p} value={p}>
-                      {p}
-                    </option>
-                  ))}
-                </select>
-              </div>
             </div>
           )}
 
@@ -555,8 +525,7 @@ function AnalyzePageContent() {
                     {jds.find((j) => j.id === selectedJdIds[0])?.title ||
                       "(select a JD)"}
                   </strong>
-                )}{" "}
-                for <strong>{atsPlatform}</strong>
+                )}
               </p>
             </div>
           )}
