@@ -44,6 +44,23 @@ interface Roadmap {
   weeks: WeekTask[];
 }
 
+interface OnboardingProfileData {
+  targetPositions: string;
+  targetCountry: string;
+  linkedinUrl: string | null;
+  generalAtsScore: number | null;
+  linkedinOpts: string | null;
+  resumeImprovements: string | null;
+  coreSkills: string | null;
+}
+
+interface ResumeImprovement {
+  section: string;
+  current: string;
+  suggested: string;
+  reason: string;
+}
+
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -53,21 +70,29 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [roadmap, setRoadmap] = useState<Roadmap | null>(null);
   const [roadmapLoading, setRoadmapLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<"analyses" | "roadmap">("analyses");
+  const [onboardingProfile, setOnboardingProfile] = useState<OnboardingProfileData | null>(null);
+  const [activeTab, setActiveTab] = useState<"analyses" | "roadmap" | "linkedin" | "improvements">("analyses");
 
   const fetchData = useCallback(async () => {
     try {
-      const [resRes, anaRes, posRes, roadmapRes] = await Promise.all([
+      const [resRes, anaRes, posRes, roadmapRes, onboardRes] = await Promise.all([
         fetch("/api/resumes"),
         fetch("/api/analyze"),
         fetch("/api/positions"),
         fetch("/api/roadmap"),
+        fetch("/api/onboarding"),
       ]);
 
       if (resRes.ok) setResumes((await resRes.json()).resumes || []);
       if (anaRes.ok) setAnalyses((await anaRes.json()).analyses || []);
       if (posRes.ok) setPositions((await posRes.json()).positions || []);
       if (roadmapRes.ok) setRoadmap((await roadmapRes.json()).roadmap || null);
+      if (onboardRes.ok) {
+        const onboardData = await onboardRes.json();
+        if (onboardData.profile) {
+          setOnboardingProfile(onboardData.profile);
+        }
+      }
     } catch {
       // silently fail, show empty state
     } finally {
@@ -137,6 +162,22 @@ export default function DashboardPage() {
             scoredAnalyses.length
         )
       : 0;
+
+  const generalAtsScore = onboardingProfile?.generalAtsScore ?? null;
+  const linkedinTips: string[] = (() => {
+    try {
+      return onboardingProfile?.linkedinOpts ? JSON.parse(onboardingProfile.linkedinOpts) : [];
+    } catch {
+      return [];
+    }
+  })();
+  const resumeImprovements: ResumeImprovement[] = (() => {
+    try {
+      return onboardingProfile?.resumeImprovements ? JSON.parse(onboardingProfile.resumeImprovements) : [];
+    } catch {
+      return [];
+    }
+  })();
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -221,6 +262,25 @@ export default function DashboardPage() {
         ))}
       </div>
 
+      {/* General ATS Score (from onboarding) */}
+      {generalAtsScore !== null && (
+        <div className="card-premium p-5 mb-8 flex flex-col sm:flex-row items-center gap-6">
+          <div className="shrink-0">
+            <ScoreGauge score={generalAtsScore} size={100} />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-slate-800 mb-1">
+              Resume ATS Compatibility
+            </h3>
+            <p className="text-sm text-slate-500 leading-relaxed">
+              This score reflects how well your resume is structured for applicant
+              tracking systems — based on format, keywords, action verbs, and
+              quantifiable results. Generated during onboarding.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Tabs */}
       <div className="card-premium overflow-hidden">
         {/* Tab bar */}
@@ -244,6 +304,26 @@ export default function DashboardPage() {
             }`}
           >
             Career Roadmap
+          </button>
+          <button
+            onClick={() => setActiveTab("linkedin")}
+            className={`px-4 sm:px-5 py-2.5 text-sm font-medium rounded-t-xl transition-all duration-200 min-h-[44px] sm:min-h-0 ${
+              activeTab === "linkedin"
+                ? "bg-white text-indigo-700 shadow-sm"
+                : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+            }`}
+          >
+            LinkedIn Tips
+          </button>
+          <button
+            onClick={() => setActiveTab("improvements")}
+            className={`px-4 sm:px-5 py-2.5 text-sm font-medium rounded-t-xl transition-all duration-200 min-h-[44px] sm:min-h-0 ${
+              activeTab === "improvements"
+                ? "bg-white text-indigo-700 shadow-sm"
+                : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+            }`}
+          >
+            Resume Improvements
           </button>
         </div>
 
@@ -485,6 +565,86 @@ export default function DashboardPage() {
                     })}
                   </p>
                 </>
+              )}
+            </>
+          )}
+
+          {activeTab === "linkedin" && (
+            <>
+              <h3 className="text-base font-semibold text-slate-800 mb-4">
+                💼 LinkedIn Profile Optimizations
+              </h3>
+              {linkedinTips.length === 0 ? (
+                <div className="py-12 text-center">
+                  <p className="text-slate-500">
+                    Complete your onboarding with a LinkedIn URL to get profile optimization tips.
+                  </p>
+                </div>
+              ) : (
+                <ul className="space-y-3">
+                  {linkedinTips.map((tip, i) => (
+                    <li
+                      key={i}
+                      className="flex items-start gap-3 p-3 bg-indigo-50 rounded-lg"
+                    >
+                      <span className="text-indigo-600 font-bold shrink-0 mt-0.5">
+                        {i + 1}.
+                      </span>
+                      <p className="text-sm text-slate-700">{tip}</p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
+          )}
+
+          {activeTab === "improvements" && (
+            <>
+              <h3 className="text-base font-semibold text-slate-800 mb-4">
+                📝 Resume Improvements
+              </h3>
+              {resumeImprovements.length === 0 ? (
+                <div className="py-12 text-center">
+                  <p className="text-slate-500">
+                    Complete your onboarding to get AI-powered resume improvement suggestions.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {resumeImprovements.map((imp, i) => (
+                    <div
+                      key={i}
+                      className="border border-slate-200 rounded-xl overflow-hidden"
+                    >
+                      <div className="bg-slate-50 px-4 py-2 border-b border-slate-200">
+                        <span className="text-sm font-semibold text-slate-700">
+                          {imp.section}
+                        </span>
+                      </div>
+                      <div className="p-4 space-y-3">
+                        <div>
+                          <p className="text-xs font-semibold text-red-600 uppercase tracking-wide mb-1">
+                            Current
+                          </p>
+                          <p className="text-sm text-slate-600 bg-red-50 p-2 rounded">
+                            {imp.current}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-green-600 uppercase tracking-wide mb-1">
+                            Suggested
+                          </p>
+                          <p className="text-sm text-slate-700 bg-green-50 p-2 rounded">
+                            {imp.suggested}
+                          </p>
+                        </div>
+                        <p className="text-xs text-slate-500 italic">
+                          💡 {imp.reason}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
             </>
           )}

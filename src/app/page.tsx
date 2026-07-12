@@ -25,6 +25,11 @@ const INDUSTRIES = [
   "Cybersecurity", "AI / Machine Learning", "Other",
 ];
 
+const JOB_TYPES = [
+  "Full-time", "Part-time", "Contract",
+  "Freelance", "Remote", "Hybrid", "On-site",
+];
+
 // ─── Step definitions ────────────────────────────────────────────────────────
 
 const STEPS = [
@@ -47,6 +52,7 @@ export default function HomePage() {
   const [linkedin, setLinkedin] = useState("");
   const [portfolioUrl, setPortfolioUrl] = useState("");
   const [githubUrl, setGithubUrl] = useState("");
+  const [jobType, setJobType] = useState("");
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [onboardingDone, setOnboardingDone] = useState<boolean | null>(null);
@@ -160,6 +166,7 @@ export default function HomePage() {
           portfolioUrl: portfolioUrl.trim() || undefined,
           githubUrl: githubUrl.trim() || undefined,
           industry: industry || undefined,
+          jobType: jobType || undefined,
         }),
       });
 
@@ -496,6 +503,44 @@ export default function HomePage() {
                       </option>
                     ))}
                   </select>
+                </div>
+              </div>
+
+              {/* Job Type (multi-select checkboxes) */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Job Type Preferences{" "}
+                  <span className="text-gray-400">(optional)</span>
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {JOB_TYPES.map((jt) => {
+                    const selected = jobType.split(",").map((j) => j.trim()).includes(jt);
+                    return (
+                      <button
+                        key={jt}
+                        type="button"
+                        onClick={() => {
+                          const current = jobType
+                            .split(",")
+                            .map((j) => j.trim())
+                            .filter(Boolean);
+                          if (current.includes(jt)) {
+                            setJobType(current.filter((j) => j !== jt).join(", "));
+                          } else {
+                            setJobType([...current, jt].join(", "));
+                          }
+                        }}
+                        className={`px-3 py-1.5 text-xs rounded-full border transition-colors ${
+                          selected
+                            ? "bg-indigo-600 text-white border-indigo-600"
+                            : "bg-white text-gray-700 border-gray-300 hover:border-indigo-400 hover:text-indigo-600"
+                        }`}
+                      >
+                        {selected ? "✓ " : "+ "}
+                        {jt}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 

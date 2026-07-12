@@ -464,6 +464,13 @@ export async function mode1OnboardingAnalysis(
   marketGaps: Array<{ type: string; description: string }>;
   aiSuggestions: string[];
   linkedinOptimizations: string[];
+  generalAtsScore: number;
+  resumeImprovements: Array<{
+    section: string;
+    current: string;
+    suggested: string;
+    reason: string;
+  }>;
 }> {
   const prompt = `You are an expert career coach and ATS analyst.
 
@@ -497,6 +504,15 @@ Parse the resume and produce a JSON response with EXACTLY this structure. Do NOT
   "linkedinOptimizations": [
     "<LinkedIn profile optimization tip>",
     "<LinkedIn headline or summary improvement>"
+  ],
+  "generalAtsScore": <integer 0-100 rating the resume's standalone ATS compatibility — format, keywords, structure, readability>,
+  "resumeImprovements": [
+    {
+      "section": "<resume section name e.g. Summary, Experience, Skills, Education>",
+      "current": "<brief excerpt or description of what's currently lacking>",
+      "suggested": "<specific improvement suggestion>",
+      "reason": "<why this change improves ATS performance>"
+    }
   ]
 }
 
@@ -505,6 +521,8 @@ Guidelines:
 - Identify 3-6 market gaps specific to the target positions and country
 - Provide 4-8 actionable AI suggestions
 - Provide 3-5 LinkedIn optimization tips
+- Provide 3-6 resume improvements with specific current vs suggested comparisons
+- Rate the general ATS score holistically based on format, keyword density, action verbs, quantifiable results, and structure
 - Be honest and constructive; focus on what will actually help the candidate
 - Consider country-specific requirements (visa, language, certifications, local market norms)
 - For LinkedIn tips, focus on discoverability by recruiters and ATS alignment`;
@@ -526,6 +544,8 @@ Guidelines:
     marketGaps: result.marketGaps,
     aiSuggestions: result.aiSuggestions,
     linkedinOptimizations: result.linkedinOptimizations,
+    generalAtsScore: result.generalAtsScore ?? 0,
+    resumeImprovements: result.resumeImprovements ?? [],
   };
 }
 
@@ -728,7 +748,7 @@ export async function generateRecommendedPositions(
     matchReason: string;
   }>
 > {
-  const prompt = `You are an expert career strategist. Based on the candidate's resume, skills, and target country, recommend 5-8 highly relevant job positions they should target.
+  const prompt = `You are an expert career coach and strategist. Based on the candidate's resume, skills, and target country, recommend 5-8 career path positions they should pursue. These are career development suggestions based on their profile — NOT current internet job listings.
 
 ## Candidate Skills:
 ${coreSkills.join(", ")}
@@ -740,7 +760,7 @@ ${targetCountry}
 ${resumeText.slice(0, 2000)}
 
 ## Instructions:
-Output a JSON array of recommended positions. Each object must have: "title" (job title, e.g. "Senior Full-Stack Developer"), "targetRole" (specific role, e.g. "Node.js + React Developer"), "industry" (industry domain), "matchReason" (1 sentence why this is a great fit based on their skills). Return ONLY the JSON array, no markdown.`;
+Output a JSON array of recommended career positions. Each object must have: "title" (career role title, e.g. "Senior Full-Stack Developer"), "targetRole" (specific specialization, e.g. "Node.js + React Developer"), "industry" (suitable industry domain), "matchReason" (1 sentence explaining career fit based on their skills and trajectory). Return ONLY the JSON array, no markdown.`;
 
   const response = await getDeepSeek().chat.completions.create({
     model: "deepseek-chat",

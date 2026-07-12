@@ -97,6 +97,8 @@ export async function POST(req: NextRequest) {
         marketGaps: JSON.stringify(mode1Result.marketGaps),
         aiSuggestions: JSON.stringify(mode1Result.aiSuggestions),
         linkedinOpts: JSON.stringify(mode1Result.linkedinOptimizations),
+        generalAtsScore: mode1Result.generalAtsScore,
+        resumeImprovements: JSON.stringify(mode1Result.resumeImprovements),
       },
     });
 

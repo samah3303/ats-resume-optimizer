@@ -143,8 +143,10 @@ model OnboardingProfile {
   coreSkills      String?  @map("core_skills")
   marketGaps      String?  @map("market_gaps")
   aiSuggestions   String?  @map("ai_suggestions")
-  linkedinOpts    String?  @map("linkedin_optimizations")
-  createdAt       DateTime @default(now()) @map("created_at")
+  linkedinOpts        String?  @map("linkedin_optimizations")
+  generalAtsScore     Int?     @map("general_ats_score")
+  resumeImprovements  String?  @map("resume_improvements")
+  createdAt           DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
