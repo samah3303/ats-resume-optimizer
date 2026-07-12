@@ -13,33 +13,12 @@ interface Resume {
   createdAt: string;
 }
 
-interface JD {
-  id: string;
-  title: string;
-  company: string | null;
-}
-
-interface LinkedInResult {
-  overallScore: number;
-  keywordsMatchPct: number;
-  summaryText: string;
-  skillsGapJson: string;
-}
-
 export default function ResumesPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-
-  // LinkedIn import state
-  const [linkedInText, setLinkedInText] = useState("");
-  const [linkedInJdId, setLinkedInJdId] = useState("");
-  const [jds, setJds] = useState<JD[]>([]);
-  const [linkedInSubmitting, setLinkedInSubmitting] = useState(false);
-  const [linkedInResult, setLinkedInResult] = useState<LinkedInResult | null>(null);
-  const [linkedInError, setLinkedInError] = useState("");
 
   const fetchResumes = useCallback(async () => {
     try {
@@ -55,18 +34,6 @@ export default function ResumesPage() {
     }
   }, []);
 
-  const fetchJds = useCallback(async () => {
-    try {
-      const res = await fetch("/api/jds");
-      if (res.ok) {
-        const data = await res.json();
-        setJds(data.jds || []);
-      }
-    } catch {
-      // silently fail
-    }
-  }, []);
-
   useEffect(() => {
     if (status === "unauthenticated") {
       router.replace("/login");
@@ -74,9 +41,8 @@ export default function ResumesPage() {
     }
     if (status === "authenticated") {
       fetchResumes();
-      fetchJds();
     }
-  }, [status, router, fetchResumes, fetchJds]);
+  }, [status, router, fetchResumes]);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this resume?")) return;
@@ -120,56 +86,6 @@ export default function ResumesPage() {
     fetchResumes();
   };
 
-  const handleLinkedInAnalyze = async () => {
-    if (!linkedInText.trim()) {
-      setLinkedInError("Please paste your LinkedIn profile text.");
-      return;
-    }
-
-    setLinkedInError("");
-    setLinkedInResult(null);
-    setLinkedInSubmitting(true);
-
-    try {
-      const res = await fetch("/api/linkedin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          profileText: linkedInText,
-          jdId: linkedInJdId || undefined,
-        }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Analysis failed");
-      }
-
-      const data = await res.json();
-      if (data.analysis) {
-        setLinkedInResult({
-          overallScore: data.analysis.overallScore,
-          keywordsMatchPct: data.analysis.keywordsMatchPct,
-          summaryText: data.analysis.summaryText,
-          skillsGapJson: data.analysis.skillsGapJson,
-        });
-      } else {
-        setLinkedInResult({
-          overallScore: 0,
-          keywordsMatchPct: 0,
-          summaryText: "Profile imported. Select a JD to get a score.",
-          skillsGapJson: "{}",
-        });
-      }
-
-      fetchResumes();
-    } catch (err) {
-      setLinkedInError(err instanceof Error ? err.message : "Analysis failed");
-    } finally {
-      setLinkedInSubmitting(false);
-    }
-  };
-
   if (status === "loading" || loading) {
     return (
       <div className="flex items-center justify-center min-h-[80vh]">
@@ -194,88 +110,6 @@ export default function ResumesPage() {
       {/* Upload Area */}
       <div className="mb-8">
         <ResumeUploader onUploaded={handleUploaded} />
-      </div>
-
-      {/* LinkedIn Profile Import */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-8 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Import LinkedIn Profile
-        </h2>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Paste LinkedIn Profile Text
-            </label>
-            <textarea
-              value={linkedInText}
-              onChange={(e) => setLinkedInText(e.target.value)}
-              rows={6}
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none resize-y"
-              placeholder="Paste your LinkedIn profile text (About, Experience, Skills, etc.)..."
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              JD (optional)
-            </label>
-            <select
-              value={linkedInJdId}
-              onChange={(e) => setLinkedInJdId(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
-            >
-              <option value="">No JD (import profile only)</option>
-              {jds.map((jd) => (
-                <option key={jd.id} value={jd.id}>
-                  {jd.title}
-                  {jd.company ? ` — ${jd.company}` : ""}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {linkedInError && (
-            <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
-              {linkedInError}
-            </div>
-          )}
-
-          <button
-            onClick={handleLinkedInAnalyze}
-            disabled={linkedInSubmitting}
-            className="w-full py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          >
-            {linkedInSubmitting ? (
-              <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Analyzing LinkedIn Profile...
-              </>
-            ) : (
-              "Analyze LinkedIn Profile"
-            )}
-          </button>
-
-          {linkedInResult && (
-            <div className="p-4 bg-green-50 rounded-xl border border-green-200 mt-4">
-              <p className="text-sm font-semibold text-green-800 mb-2">
-                LinkedIn Profile Analyzed
-              </p>
-              {linkedInResult.overallScore > 0 && (
-                <div className="flex flex-wrap gap-4 text-sm">
-                  <span className="font-bold text-green-700">
-                    Score: {linkedInResult.overallScore}%
-                  </span>
-                  <span className="text-green-700">
-                    Keywords: {Math.round(linkedInResult.keywordsMatchPct)}%
-                  </span>
-                </div>
-              )}
-              <p className="text-xs text-green-700 mt-1">
-                {linkedInResult.summaryText}
-              </p>
-            </div>
-          )}
-        </div>
       </div>
 
       {/* Resume Cards */}
