@@ -86,7 +86,7 @@ export default function SharedAnalysisPage() {
               <span className="text-white font-bold text-sm">ATS</span>
             </div>
             <span className="text-lg font-bold text-gray-900">
-              ATS Optimizer
+              ResuMatch
             </span>
           </div>
           <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
@@ -192,7 +192,7 @@ export default function SharedAnalysisPage() {
               href="/"
               className="text-indigo-600 hover:text-indigo-700 font-medium"
             >
-              ATS Resume Optimizer
+              ResuMatch
             </Link>
           </p>
         </div>

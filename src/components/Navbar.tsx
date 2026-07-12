@@ -49,7 +49,7 @@ export default function Navbar() {
               <path d="M252 258 L266 272 L294 240" stroke="white" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
             </svg>
             <span className="text-lg font-bold text-slate-900 hidden sm:block">
-              ATS Optimizer
+              ResuMatch
             </span>
           </Link>
 

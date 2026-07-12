@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ATS Resume Optimizer",
+  title: "ResuMatch — ATS Resume Optimizer",
   description:
     "Make your resume ATS-proof. Analyze and optimize your resume for Applicant Tracking Systems using AI.",
   icons: {

@@ -276,7 +276,7 @@ export default function HomePage() {
         </section>
 
         <footer className="py-8 px-4 text-center text-sm text-gray-500 border-t border-gray-200">
-          &copy; {new Date().getFullYear()} ATS Resume Optimizer. All rights
+          &copy; {new Date().getFullYear()} ResuMatch. All rights
           reserved.
         </footer>
       </div>
