@@ -22,11 +22,32 @@ export default function Navbar() {
           {/* Logo */}
           <Link
             href={session ? "/dashboard" : "/"}
-            className="flex items-center gap-2 shrink-0"
+            className="flex items-center gap-2.5 shrink-0"
           >
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-gradient-to-r from-indigo-800 to-indigo-600">
-              <span className="text-white font-bold text-sm">ATS</span>
-            </div>
+            <svg className="w-8 h-8" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="256" cy="256" r="256" fill="url(#nav-gradient)"/>
+              <defs>
+                <linearGradient id="nav-gradient" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stopColor="#312E81"/>
+                  <stop offset="100%" stopColor="#4338CA"/>
+                </linearGradient>
+              </defs>
+              <rect x="136" y="110" width="200" height="265" rx="22" fill="white" opacity="0.92"/>
+              <rect x="162" y="150" width="128" height="9" rx="4.5" fill="#312E81" opacity="0.12"/>
+              <rect x="162" y="170" width="100" height="9" rx="4.5" fill="#312E81" opacity="0.12"/>
+              <rect x="162" y="200" width="146" height="9" rx="4.5" fill="#312E81" opacity="0.12"/>
+              <rect x="162" y="220" width="118" height="9" rx="4.5" fill="#312E81" opacity="0.12"/>
+              <rect x="162" y="250" width="136" height="9" rx="4.5" fill="#312E81" opacity="0.12"/>
+              <rect x="162" y="270" width="92" height="9" rx="4.5" fill="#312E81" opacity="0.12"/>
+              <path d="M282 150 L322 168 L322 242 Q322 316 282 344 Q242 316 242 242 L242 168 Z" fill="url(#nav-shield)"/>
+              <defs>
+                <linearGradient id="nav-shield" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stopColor="#6366F1"/>
+                  <stop offset="100%" stopColor="#8B5CF6"/>
+                </linearGradient>
+              </defs>
+              <path d="M252 258 L266 272 L294 240" stroke="white" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+            </svg>
             <span className="text-lg font-bold text-slate-900 hidden sm:block">
               ATS Optimizer
             </span>

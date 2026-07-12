@@ -19,6 +19,10 @@ export const metadata: Metadata = {
   title: "ATS Resume Optimizer",
   description:
     "Make your resume ATS-proof. Analyze and optimize your resume for Applicant Tracking Systems using AI.",
+  icons: {
+    icon: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
