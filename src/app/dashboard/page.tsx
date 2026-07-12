@@ -153,6 +153,16 @@ export default function DashboardPage() {
         ))}
       </div>
 
+      {/* ATS Score Trend */}
+      {scoredAnalyses.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            ATS Score History
+          </h2>
+          <ScoreTrendChart analyses={scoredAnalyses.slice(0, 10).reverse()} />
+        </div>
+      )}
+
       {/* Recent Analyses */}
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
@@ -273,6 +283,119 @@ export default function DashboardPage() {
           </div>
         </Link>
       </div>
+    </div>
+  );
+}
+
+function ScoreTrendChart({
+  analyses,
+}: {
+  analyses: { overallScore: number | null; createdAt: string; jobDescription?: { title: string } }[];
+}) {
+  if (analyses.length === 0) {
+    return (
+      <p className="text-sm text-gray-500 py-4 text-center">No scored analyses yet.</p>
+    );
+  }
+
+  const width = 600;
+  const height = 200;
+  const padding = { top: 20, right: 20, bottom: 40, left: 40 };
+  const chartWidth = width - padding.left - padding.right;
+  const chartHeight = height - padding.top - padding.bottom;
+
+  const scores = analyses.map((a) => a.overallScore ?? 0);
+  const maxScore = Math.max(100, ...scores);
+  const barWidth = Math.max(8, (chartWidth / analyses.length) * 0.6);
+  const gap = chartWidth / analyses.length;
+
+  const colorForScore = (score: number) => {
+    if (score >= 70) return "#22c55e";
+    if (score >= 50) return "#eab308";
+    return "#ef4444";
+  };
+
+  return (
+    <div className="overflow-x-auto">
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        className="w-full"
+        style={{ maxHeight: 220 }}
+      >
+        {/* Y axis grid lines */}
+        {[0, 25, 50, 75, 100].map((val) => {
+          const y = padding.top + chartHeight - (val / maxScore) * chartHeight;
+          return (
+            <g key={val}>
+              <line
+                x1={padding.left}
+                y1={y}
+                x2={width - padding.right}
+                y2={y}
+                stroke="#e5e7eb"
+                strokeDasharray={val === 0 ? undefined : "4,4"}
+              />
+              <text
+                x={padding.left - 8}
+                y={y + 4}
+                textAnchor="end"
+                className="text-[10px] fill-gray-400"
+              >
+                {val}
+              </text>
+            </g>
+          );
+        })}
+
+        {/* Bars */}
+        {analyses.map((a, i) => {
+          const score = a.overallScore ?? 0;
+          const barHeight = (score / maxScore) * chartHeight;
+          const x = padding.left + i * gap + (gap - barWidth) / 2;
+          const y = padding.top + chartHeight - barHeight;
+          const color = colorForScore(score);
+          const date = new Date(a.createdAt).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+          });
+
+          return (
+            <g key={i}>
+              <rect
+                x={x}
+                y={y}
+                width={barWidth}
+                height={barHeight}
+                rx={3}
+                fill={color}
+                opacity={0.85}
+              >
+                <title>
+                  {a.jobDescription?.title}: {score}% on {date}
+                </title>
+              </rect>
+              <text
+                x={x + barWidth / 2}
+                y={y - 6}
+                textAnchor="middle"
+                className="text-[10px] font-semibold"
+                fill={color}
+              >
+                {score}%
+              </text>
+              {/* Date label */}
+              <text
+                x={x + barWidth / 2}
+                y={height - 8}
+                textAnchor="middle"
+                className="text-[9px] fill-gray-400"
+              >
+                {date}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
     </div>
   );
 }

@@ -88,10 +88,11 @@ model Analysis {
   rawAiResponse    String   @map("raw_ai_response")
   createdAt        DateTime @default(now()) @map("created_at")
 
-  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  resume         Resume         @relation(fields: [resumeId], references: [id], onDelete: Cascade)
-  jobDescription JobDescription @relation(fields: [jobDescriptionId], references: [id], onDelete: Cascade)
-  suggestions    Suggestion[]
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resume           Resume           @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  jobDescription   JobDescription   @relation(fields: [jobDescriptionId], references: [id], onDelete: Cascade)
+  suggestions      Suggestion[]
+  sharedAnalyses   SharedAnalysis[]
 
   @@map("analyses")
 }
@@ -109,4 +110,15 @@ model Suggestion {
   analysis Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
 
   @@map("suggestions")
+}
+
+model SharedAnalysis {
+  id         String   @id @default(uuid())
+  analysisId String   @map("analysis_id")
+  token      String   @unique
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  analysis Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+
+  @@map("shared_analyses")
 }
