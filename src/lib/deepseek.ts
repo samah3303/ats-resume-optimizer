@@ -748,19 +748,27 @@ export async function generateRecommendedPositions(
     matchReason: string;
   }>
 > {
-  const prompt = `You are an expert career coach and strategist. Based on the candidate's resume, skills, and target country, recommend 5-8 career path positions they should pursue. These are career development suggestions based on their profile — NOT current internet job listings.
+  const prompt = `You are a senior career development coach (not a recruiter). Based on the candidate's resume, skills, and experience level, suggest 5-8 career path roles that logically fit their trajectory.
+
+IMPORTANT: These are CAREER PROGRESSION SUGGESTIONS built from their experience, education, and skills. They are NOT scraped from the internet and should NOT look like job postings. Think "what should this person aim for next in their career" not "what jobs are available right now."
 
 ## Candidate Skills:
 ${coreSkills.join(", ")}
 
-## Target Country:
+## Target Country (for market context):
 ${targetCountry}
 
 ## Resume Excerpt:
 ${resumeText.slice(0, 2000)}
 
 ## Instructions:
-Output a JSON array of recommended career positions. Each object must have: "title" (career role title, e.g. "Senior Full-Stack Developer"), "targetRole" (specific specialization, e.g. "Node.js + React Developer"), "industry" (suitable industry domain), "matchReason" (1 sentence explaining career fit based on their skills and trajectory). Return ONLY the JSON array, no markdown.`;
+Output a JSON array of career path roles. Each object must have:
+- "title": Role title that reflects career level (e.g. "Senior Full-Stack Developer" not "Full-Stack Developer (React/Node)")
+- "targetRole": Specific space/domain they'd focus on (e.g. "Cloud-Native Application Engineering")
+- "industry": Industry domain where this role is common
+- "matchReason": 1 sentence explaining WHY their experience and skills make this a logical career step (e.g. "Your 5 years of backend experience naturally leads to this senior role").
+
+Return ONLY the JSON array, no markdown. Choose realistic, aspirational career titles — not internet job listing titles.`;
 
   const response = await getDeepSeek().chat.completions.create({
     model: "deepseek-chat",

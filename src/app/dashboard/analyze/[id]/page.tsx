@@ -64,6 +64,9 @@ export default function AnalysisDetailPage() {
   const [suggestions, setSuggestions] = useState<SuggestionItem[]>([]);
   const [downloading, setDownloading] = useState(false);
 
+  // Tab state
+  const [activeTab, setActiveTab] = useState("overview");
+
   // Cover letter state
   const [coverLetterText, setCoverLetterText] = useState<string | null>(null);
   const [generatingCoverLetter, setGeneratingCoverLetter] = useState(false);
@@ -349,6 +352,29 @@ export default function AnalysisDetailPage() {
         <span className="text-gray-900 font-medium truncate max-w-[200px]">
           {analysis.resume?.name} vs {analysis.jobDescription?.title}
         </span>
+      </div>
+
+      {/* Tab Navigation */}
+      <div className="flex gap-1 bg-white rounded-xl border border-gray-200 p-1 mb-6 overflow-x-auto">
+        {[
+          { id: "overview", label: "Overview" },
+          { id: "suggestions", label: "Suggestions" },
+          { id: "coverletter", label: "Cover Letter" },
+          { id: "interview", label: "Interview Qs" },
+          { id: "share", label: "Share" },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex-1 min-w-fit px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${
+              activeTab === tab.id
+                ? "bg-indigo-600 text-white shadow-sm"
+                : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {/* Header */}
