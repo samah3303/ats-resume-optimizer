@@ -110,7 +110,9 @@ function AnalyzePageContent() {
           const oData = await oRes.json();
           if (oData.completed) {
             setOnboardingProfile({
-              targetPositions: oData.targetPositions,
+              targetPositions: typeof oData.targetPositions === "string"
+                ? oData.targetPositions.split(",").map((s: string) => s.trim()).filter(Boolean)
+                : (oData.targetPositions || []),
               country: oData.country,
               jobType: oData.jobType,
               industry: oData.industry,
