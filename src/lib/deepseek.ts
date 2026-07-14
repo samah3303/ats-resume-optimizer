@@ -795,7 +795,7 @@ export async function generateRecommendedJDs(
     matchReason: string;
   }>
 > {
-  const prompt = `You are an expert recruiter. Based on the candidate's profile and target country, generate 4-6 realistic, detailed job descriptions that would be great matches. These are AI-generated practice JDs for targeting purposes - not real postings.
+  const prompt = `You are an expert job market analyst. Based on this candidate's profile, target country, and skills, find 4-6 real job roles they should apply for. Think like you're searching job boards.
 
 ## Target Positions:
 ${targetPositions.join(", ")}
@@ -810,7 +810,15 @@ ${targetCountry}
 ${resumeText.slice(0, 2000)}
 
 ## Instructions:
-Output a JSON array of realistic job descriptions. Each object must have: "title" (job title), "company" (realistic company name for ${targetCountry}), "rawText" (full JD with requirements, responsibilities, qualifications, nice-to-haves - make it detailed like a real posting), "matchReason" (1 sentence explaining why this JD aligns with the candidate's profile). Return ONLY the JSON array, no markdown.`;
+Output a JSON array of job matches. Each object must have:
+- "title": Specific job title to search for (e.g. "Senior React Frontend Developer")
+- "company": A plausible company name hiring for this role in ${targetCountry}
+- "searchQuery": URL-encoded search string for job boards (e.g. "Senior+React+Developer+remote")
+- "rawText": Write a realistic but brief job description summary (requirements, nice-to-haves, 3-4 sentences, as if from a real posting)
+- "matchReason": 1 sentence on why this fits their profile
+- "location": City or "Remote" in ${targetCountry}
+
+Return ONLY the JSON array, no markdown.`;
 
   const response = await getDeepSeek().chat.completions.create({
     model: "deepseek-chat",
@@ -821,5 +829,19 @@ Output a JSON array of realistic job descriptions. Each object must have: "title
 
   const content = response.choices[0]?.message?.content || "[]";
   const jsonStr = extractJson(content);
-  return JSON.parse(jsonStr);
+  const raw = JSON.parse(jsonStr);
+
+  // Attach real job search URLs
+  return raw.map((job: Record<string, string>) => {
+    const query = job.searchQuery || encodeURIComponent(job.title || "");
+    const loc = job.location || targetCountry;
+    const locEnc = encodeURIComponent(loc);
+    return {
+      title: job.title,
+      company: job.company || "Various Employers",
+      rawText: job.rawText || "",
+      matchReason: job.matchReason || "",
+      sourceUrl: `https://www.google.com/search?q=${query}+jobs+${locEnc}&ibp=htl;jobs&tbs=qdr:w2`,
+    };
+  });
 }

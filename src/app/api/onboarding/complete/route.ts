@@ -169,6 +169,7 @@ export async function POST(req: NextRequest) {
                 title: jd.title,
                 company: jd.company || null,
                 rawText: jd.rawText,
+                sourceUrl: (jd as unknown as Record<string,string>)?.sourceUrl || null,
                 notes: `🤖 AI Recommended based on your profile — ${jd.matchReason}`,
                 positionProfileId: null,
               },
