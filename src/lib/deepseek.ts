@@ -879,3 +879,4 @@ Return ONLY the JSON array, no markdown.`;
     matchReason: string;
     sourceUrl: string;
   }>;
+}
