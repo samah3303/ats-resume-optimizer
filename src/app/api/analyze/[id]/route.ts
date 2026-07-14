@@ -20,7 +20,7 @@ export async function GET(
     include: {
       resume: { select: { id: true, name: true } },
       jobDescription: {
-        select: { id: true, title: true, company: true },
+        select: { id: true, title: true, company: true, sourceUrl: true },
       },
       suggestions: {
         orderBy: { createdAt: "asc" },
