@@ -831,17 +831,51 @@ Return ONLY the JSON array, no markdown.`;
   const jsonStr = extractJson(content);
   const raw = JSON.parse(jsonStr);
 
-  // Attach real job search URLs
-  return raw.map((job: Record<string, string>) => {
+  // Attach real job board search URLs (Indeed, LinkedIn, Glassdoor)
+  const platforms = targetCountry === "India"
+    ? [
+        { name: "LinkedIn", url: (q: string, l: string) => `https://www.linkedin.com/jobs/search?keywords=${q}&location=${l}&f_TPR=r1209600` },
+        { name: "Indeed", url: (q: string, l: string) => `https://in.indeed.com/jobs?q=${q}&l=${l}&fromage=14` },
+      ]
+    : targetCountry === "United Arab Emirates"
+    ? [
+        { name: "LinkedIn", url: (q: string, l: string) => `https://www.linkedin.com/jobs/search?keywords=${q}&location=${l}&f_TPR=r1209600` },
+        { name: "Naukrigulf", url: (q: string, l: string) => `https://www.naukrigulf.com/${q.toLowerCase().replace(/\s+/g,"-")}-jobs-in-${l.toLowerCase().replace(/\s+/g,"-")}` },
+      ]
+    : [
+        { name: "LinkedIn", url: (q: string, l: string) => `https://www.linkedin.com/jobs/search?keywords=${q}&location=${l}&f_TPR=r1209600` },
+        { name: "Indeed", url: (q: string, l: string) => `https://www.indeed.com/jobs?q=${q}&l=${l}&fromage=14` },
+        { name: "Glassdoor", url: (q: string, l: string) => `https://www.glassdoor.com/Job/jobs.htm?sc.keyword=${q}&sc.location=${l}&fromage=14` },
+      ];
+
+  const withSearchQueries = raw.map((job: Record<string, string>) => {
     const query = job.searchQuery || encodeURIComponent(job.title || "");
-    const loc = job.location || targetCountry;
-    const locEnc = encodeURIComponent(loc);
+    const loc = encodeURIComponent(job.location || targetCountry);
+    const board = platforms[0]; // Primary: LinkedIn
+    const urls = platforms.map(p => ({
+      label: p.name,
+      url: p.url(query, loc),
+    }));
     return {
       title: job.title,
       company: job.company || "Various Employers",
       rawText: job.rawText || "",
       matchReason: job.matchReason || "",
-      sourceUrl: `https://www.google.com/search?q=${query}+jobs+${locEnc}&ibp=htl;jobs&tbs=qdr:w2`,
+      sourceUrl: board.url(query, loc),
+      applyUrls: urls,
     };
   });
-}
+
+  // Store additional apply URLs in rawText as metadata
+  const enriched = withSearchQueries.map((j: Record<string, unknown>) => ({
+    ...j,
+    rawText: `${j.rawText}\n\n🔗 Apply on: ${(j.applyUrls as Array<{label:string,url:string}>).map((u: {label:string,url:string}) => `${u.label}: ${u.url}`).join(" | ")}`,
+  }));
+
+  return enriched.map(({ applyUrls, ...rest }: Record<string, unknown>) => rest) as Array<{
+    title: string;
+    company: string;
+    rawText: string;
+    matchReason: string;
+    sourceUrl: string;
+  }>;
