@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #F8FAFC;
   --foreground: #0F172A;
@@ -14,6 +16,20 @@
   --surface: #F1F5F9;
   /* Mobile bottom nav safe area */
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.dark {
+  --background: #0F172A;
+  --foreground: #F1F5F9;
+  --primary: #6366F1;
+  --primary-light: #818CF8;
+  --accent: #FBBF24;
+  --card-bg: #1E293B;
+  --card-border: #334155;
+  --text-heading: #F8FAFC;
+  --text-body: #CBD5E1;
+  --text-muted: #64748B;
+  --surface: #1E293B;
 }
 
 @theme inline {
@@ -90,6 +106,25 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-image: linear-gradient(135deg, #312E81 0%, #4338CA 100%);
+}
+
+.dark .card-premium:hover {
+  border-color: #4338CA;
+}
+
+.dark .btn-primary-gradient {
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+.dark .skeleton {
+  background-color: #334155;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #1E293B;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
 }
 
 /* Shimmer loading */
