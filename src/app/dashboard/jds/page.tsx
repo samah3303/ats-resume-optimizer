@@ -28,17 +28,13 @@ export default function JDsPage() {
   const [title, setTitle] = useState("");
   const [company, setCompany] = useState("");
   const [rawText, setRawText] = useState("");
-  const [sourceUrl, setSourceUrl] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [fetchingUrl, setFetchingUrl] = useState(false);
   const [error, setError] = useState("");
 
-  // AI recommendations
-  const [recommended, setRecommended] = useState<
-    Array<{ title: string; company: string; rawText: string; matchReason: string }>
-  >([]);
-  const [loadingRecs, setLoadingRecs] = useState(false);
-  const [onboardingCountry, setOnboardingCountry] = useState<string | null>(null);
+  // Quick URL add
+  const [quickUrl, setQuickUrl] = useState("");
+  const [quickFetching, setQuickFetching] = useState(false);
+  const [quickError, setQuickError] = useState("");
 
   const fetchJDs = useCallback(async () => {
     try {
@@ -59,11 +55,6 @@ export default function JDsPage() {
     }
     if (status === "authenticated") {
       fetchJDs().finally(() => setLoading(false));
-      // Fetch country for recommendation subtext
-      fetch("/api/onboarding")
-        .then((r) => r.ok ? r.json() : null)
-        .then((d) => d?.country && setOnboardingCountry(d.country))
-        .catch(() => {});
     }
   }, [status, router, fetchJDs]);
 
@@ -71,72 +62,58 @@ export default function JDsPage() {
     setTitle("");
     setCompany("");
     setRawText("");
-    setSourceUrl("");
     setError("");
     setShowForm(false);
   };
 
-  const loadRecommendations = async () => {
-    setLoadingRecs(true);
-    try {
-      const res = await fetch(`/api/recommendations?type=jds&_t=${Date.now()}`);
-      if (res.ok) {
-        const data = await res.json();
-        setRecommended(data.jds || []);
-      }
-    } catch {
-      // silently fail
-    } finally {
-      setLoadingRecs(false);
+  const handleQuickAdd = async () => {
+    if (!quickUrl.trim()) {
+      setQuickError("Please enter a URL first.");
+      return;
     }
-  };
 
-  const addRecommendedJD = async (rec: typeof recommended[0]) => {
+    setQuickFetching(true);
+    setQuickError("");
+
     try {
-      const res = await fetch("/api/jds", {
+      // Step 1: Fetch the URL to extract job details
+      const fetchRes = await fetch("/api/jds/fetch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: quickUrl.trim() }),
+      });
+
+      if (!fetchRes.ok) {
+        const data = await fetchRes.json();
+        throw new Error(data.error || "Failed to fetch URL");
+      }
+
+      const fetchData = await fetchRes.json();
+
+      // Step 2: Auto-create the job
+      const createRes = await fetch("/api/jds", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: rec.title,
-          company: rec.company,
-          rawText: rec.rawText,
+          title: fetchData.title || "Untitled Job",
+          company: fetchData.company || null,
+          rawText: fetchData.rawText || "",
+          sourceUrl: quickUrl.trim(),
         }),
       });
-      if (res.ok) {
-        fetchJDs();
-        // Remove from recommendations
-        setRecommended((prev) => prev.filter((r) => r.title !== rec.title));
-      }
-    } catch {
-      // silently fail
-    }
-  };
 
-  const fetchFromUrl = async () => {
-    if (!sourceUrl) {
-      setError("Please enter a URL first.");
-      return;
-    }
-    setFetchingUrl(true);
-    setError("");
-    try {
-      const res = await fetch("/api/jds/fetch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: sourceUrl }),
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Failed to fetch URL");
+      if (!createRes.ok) {
+        const data = await createRes.json();
+        throw new Error(data.error || "Failed to save job");
       }
-      const data = await res.json();
-      if (data.title) setTitle(data.title);
-      if (data.company) setCompany(data.company);
-      if (data.rawText) setRawText(data.rawText);
+
+      // Step 3: Refresh list and clear input
+      setQuickUrl("");
+      fetchJDs();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to fetch URL");
+      setQuickError(err instanceof Error ? err.message : "Failed to fetch & add job");
     } finally {
-      setFetchingUrl(false);
+      setQuickFetching(false);
     }
   };
 
@@ -145,7 +122,7 @@ export default function JDsPage() {
     setError("");
 
     if (!title || !rawText) {
-      setError("Title and job description text are required.");
+      setError("Title and job details are required.");
       return;
     }
 
@@ -159,13 +136,13 @@ export default function JDsPage() {
           title,
           company: company || null,
           rawText,
-          sourceUrl: sourceUrl || null,
+          sourceUrl: null,
         }),
       });
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || "Failed to save JD");
+        throw new Error(data.error || "Failed to save job");
       }
 
       resetForm();
@@ -213,9 +190,7 @@ export default function JDsPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Jobs
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-900">Jobs</h1>
           <p className="text-sm text-gray-500 mt-1">
             {jds.length} JD{jds.length !== 1 ? "s" : ""} saved
           </p>
@@ -229,6 +204,35 @@ export default function JDsPage() {
         >
           Add Job
         </button>
+      </div>
+
+      {/* URL Quick Add Bar */}
+      <div className="mb-6">
+        <div className="flex gap-2">
+          <input
+            type="url"
+            value={quickUrl}
+            onChange={(e) => {
+              setQuickUrl(e.target.value);
+              setQuickError("");
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleQuickAdd();
+            }}
+            placeholder="Paste job URL to fetch & add instantly..."
+            className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none text-sm"
+          />
+          <button
+            onClick={handleQuickAdd}
+            disabled={quickFetching || !quickUrl.trim()}
+            className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 whitespace-nowrap"
+          >
+            {quickFetching ? "Fetching..." : "Fetch & Add Job"}
+          </button>
+        </div>
+        {quickError && (
+          <p className="mt-2 text-sm text-red-600">{quickError}</p>
+        )}
       </div>
 
       {/* Add Job Modal */}
@@ -281,29 +285,6 @@ export default function JDsPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Source URL
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="url"
-                    value={sourceUrl}
-                    onChange={(e) => setSourceUrl(e.target.value)}
-                    className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
-                    placeholder="https://..."
-                  />
-                  <button
-                    type="button"
-                    onClick={fetchFromUrl}
-                    disabled={fetchingUrl || !sourceUrl}
-                    className="px-3 py-2 text-sm font-medium text-indigo-700 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors disabled:opacity-50 whitespace-nowrap"
-                  >
-                    {fetchingUrl ? "Fetching..." : "Fetch from URL"}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Job Details *
                 </label>
                 <textarea
@@ -337,59 +318,7 @@ export default function JDsPage() {
         </div>
       )}
 
-      {/* AI Recommended JDs */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900">
-              🤖 AI-Recommended JDs
-            </h2>
-            <p className="text-xs text-gray-500 mt-1">
-              🎯 Based on your resume skills + target country{onboardingCountry ? ` (${onboardingCountry})` : ""}. These are practice job descriptions tailored to your profile.
-            </p>
-          </div>
-          <button
-            onClick={loadRecommendations}
-            disabled={loadingRecs}
-            className="px-4 py-2 bg-indigo-100 text-indigo-700 text-sm font-medium rounded-lg hover:bg-indigo-200 transition-colors disabled:opacity-50"
-          >
-            {loadingRecs ? "Finding..." : recommended.length > 0 ? "Find More" : "Find Matching Jobs"}
-          </button>
-        </div>
-        {loadingRecs && (
-          <div className="flex items-center justify-center py-8">
-            <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-            <span className="ml-3 text-sm text-gray-500">AI is analyzing your profile...</span>
-          </div>
-        )}
-        {!loadingRecs && recommended.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {recommended.map((rec, i) => (
-              <div
-                key={i}
-                className="bg-gradient-to-r from-indigo-50 to-white rounded-xl border border-indigo-200 p-4"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">{rec.title}</h3>
-                    <p className="text-sm text-indigo-600">{rec.company}</p>
-                    <p className="text-xs text-gray-500 mt-1 line-clamp-2">{rec.rawText.slice(0, 150)}...</p>
-                    <p className="text-xs text-green-600 mt-2 italic">🎯 {rec.matchReason}</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => addRecommendedJD(rec)}
-                  className="mt-3 px-3 py-1.5 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition-colors"
-                >
-                  + Add Job
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* JD Cards */}
+      {/* Empty state */}
       {jds.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
           <span className="text-4xl block mb-3">📋</span>

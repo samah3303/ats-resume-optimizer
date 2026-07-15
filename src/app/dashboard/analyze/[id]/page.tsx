@@ -212,6 +212,17 @@ export default function AnalysisDetailPage() {
     setTimeout(() => setShareCopied(false), 2000);
   };
 
+  const handleNegotiate = async () => {
+    if (!targetSalary.trim()) return;
+    setNegotiating(true);
+    setNegotiationResult(null);
+    try {
+      const res = await fetch("/api/negotiate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ analysisId: id, targetSalary }) });
+      if (res.ok) setNegotiationResult(await res.json());
+    } catch {}
+    finally { setNegotiating(false); }
+  };
+
   const handleDownloadOptimized = async () => {
     const acceptedIds = suggestions
       .filter((s) => s.accepted)
@@ -374,6 +385,7 @@ export default function AnalysisDetailPage() {
           { id: "coverletter", label: "Cover Letter" },
           { id: "interview", label: "Interview Qs" },
           { id: "share", label: "Share" },
+          { id: "salary", label: "Salary" },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -485,6 +497,10 @@ export default function AnalysisDetailPage() {
           </div>
         </div>
       )}
+
+      <div style={{ display: activeTab === "overview" ? undefined : "none" }}>
+        {analysis?.resume?.id && <AtsXray resumeId={analysis.resume.id} resumeName={analysis.resume.name || "Resume"} />}
+      </div>
 
       {/* Section Scores */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6" style={{ display: activeTab === "overview" ? undefined : "none" }}>
@@ -875,6 +891,16 @@ export default function AnalysisDetailPage() {
             </button>
           </div>
         )}
+      </div>
+
+      <div style={{ display: activeTab === "salary" ? undefined : "none" }} className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">💰 Salary Negotiation Guide</h2>
+        <div className="flex gap-3 mb-4">
+          <input value={targetSalary} onChange={e => setTargetSalary(e.target.value)} placeholder="Target salary (e.g. $120,000)" className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-200 outline-none" />
+          <button onClick={handleNegotiate} disabled={negotiating || !targetSalary.trim()} className="px-6 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50">{negotiating ? "..." : "Generate"}</button>
+        </div>
+        {negotiationResult?.marketRange && <div className="p-4 bg-blue-50 rounded-lg mb-3"><p className="text-sm font-semibold text-blue-800">📊 Market Range</p><p className="text-sm text-blue-700">{negotiationResult.marketRange}</p></div>}
+        {negotiationResult?.negotiationScript && <div className="p-4 bg-green-50 rounded-lg mb-3"><p className="text-sm font-semibold text-green-800">🎙️ Script</p><p className="text-sm text-green-700 whitespace-pre-wrap">{negotiationResult.negotiationScript}</p></div>}
       </div>
     </div>
   );
