@@ -89,6 +89,7 @@ export default function ProfileDropdown() {
               className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-indigo-900 transition-colors"
             >
               {dark ? "☀️ Light Mode" : "🌙 Dark Mode"}
+            </button>
             <button
               onClick={() => { setOpen(false); router.push("/dashboard"); }}
               className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors"
