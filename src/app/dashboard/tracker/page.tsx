@@ -135,7 +135,7 @@ export default function TrackerPage() {
       <div className="overflow-x-auto pb-4 md:overflow-visible">
         <div className="flex gap-4 min-w-[900px] md:min-w-0 md:grid md:grid-cols-6">
           {STATUSES.map((statusCol) => {
-            const apps = getAppsBy(statusCol.key);
+            const apps = getAppsByStatus(statusCol.key);
             const idx = statusIndex(statusCol.key);
 
             return (

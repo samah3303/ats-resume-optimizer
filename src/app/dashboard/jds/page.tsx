@@ -23,6 +23,8 @@ export default function JDsPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [trackingId, setTrackingId] = useState<string | null>(null);
+  const [trackedIds, setTrackedIds] = useState<Set<string>>(new Set());
 
   // Form state
   const [title, setTitle] = useState("");
@@ -151,6 +153,32 @@ export default function JDsPage() {
       setError(err instanceof Error ? err.message : "Failed to save");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleAddToTracker = async (jdId: string) => {
+    setTrackingId(jdId);
+    try {
+      const res = await fetch("/api/tracker", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jdId }),
+      });
+      if (res.ok) {
+        setTrackedIds((prev) => new Set(prev).add(jdId));
+        setTimeout(() => {
+          setTrackedIds((prev) => {
+            const next = new Set(prev);
+            next.delete(jdId);
+            return next;
+          });
+        }, 2000);
+      }
+    } catch (err) {
+      console.error("Tracker add failed:", err);
+      // silently fail
+    } finally {
+      setTrackingId(null);
     }
   };
 
@@ -372,6 +400,21 @@ export default function JDsPage() {
                 >
                   Analyze
                 </Link>
+                <button
+                  onClick={() => handleAddToTracker(jd.id)}
+                  disabled={trackingId === jd.id}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors min-h-[44px] sm:min-h-0 ${
+                    trackedIds.has(jd.id)
+                      ? "bg-green-100 text-green-700"
+                      : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                  } disabled:opacity-50`}
+                >
+                  {trackingId === jd.id
+                    ? "..."
+                    : trackedIds.has(jd.id)
+                    ? "✓ Added"
+                    : "+ Tracker"}
+                </button>
                 <button
                   onClick={() => handleDelete(jd.id)}
                   disabled={deletingId === jd.id}

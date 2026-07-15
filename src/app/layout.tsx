@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import SessionProvider from "@/components/SessionProvider";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import Navbar from "@/components/Navbar";
 import MobileNav from "@/components/MobileNav";
 import "./globals.css";
@@ -51,12 +52,14 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col text-slate-900">
+      <body className="min-h-full flex flex-col bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+        <ThemeProvider>
         <SessionProvider>
           <Navbar />
           <main className="flex-1 pb-safe">{children}</main>
           <MobileNav />
         </SessionProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

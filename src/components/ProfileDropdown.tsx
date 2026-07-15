@@ -3,9 +3,11 @@
 import { useState, useEffect, useRef } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useTheme } from "./ThemeProvider";
 
 export default function ProfileDropdown() {
   const { data: session } = useSession();
+  const { dark, toggle } = useTheme();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [resumeCount, setResumeCount] = useState(0);
@@ -78,10 +80,15 @@ export default function ProfileDropdown() {
           <div className="py-1">
             <button
               onClick={() => { setOpen(false); router.push("/"); }}
-              className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors"
+              className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-indigo-900 transition-colors"
             >
               ✏️ Edit Onboarding
             </button>
+            <button
+              onClick={() => { setOpen(false); toggle(); }}
+              className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-indigo-900 transition-colors"
+            >
+              {dark ? "☀️ Light Mode" : "🌙 Dark Mode"}
             <button
               onClick={() => { setOpen(false); router.push("/dashboard"); }}
               className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors"
