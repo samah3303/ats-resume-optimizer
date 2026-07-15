@@ -22,6 +22,7 @@ model User {
   analyses         Analysis[]
   onboardingProfile OnboardingProfile?
   roadmaps          Roadmap[]
+  applications     Application[]
 
   @@map("users")
 }
@@ -87,6 +88,7 @@ model JobDescription {
   user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   positionProfile PositionProfile? @relation(fields: [positionProfileId], references: [id], onDelete: SetNull)
   analyses        Analysis[]
+  applications    Application[]
 
   @@map("job_descriptions")
 }
@@ -165,6 +167,22 @@ model OnboardingProfile {
   resume Resume? @relation(fields: [resumeId], references: [id], onDelete: SetNull)
 
   @@map("onboarding_profiles")
+}
+
+model Application {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  jdId        String   @map("jd_id")
+  status      String   @default("wishlist")
+  notes       String?  @db.Text
+  appliedAt   DateTime? @map("applied_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobDescription JobDescription @relation(fields: [jdId], references: [id], onDelete: Cascade)
+
+  @@map("applications")
 }
 
 model Roadmap {

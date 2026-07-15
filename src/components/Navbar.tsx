@@ -9,6 +9,7 @@ const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/dashboard/resumes", label: "Resumes" },
   { href: "/dashboard/jds", label: "Jobs" },
+  { href: "/dashboard/tracker", label: "Tracker" },
 ];
 
 export default function Navbar() {
