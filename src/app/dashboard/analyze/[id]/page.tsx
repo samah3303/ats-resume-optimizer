@@ -7,6 +7,7 @@ import Link from "next/link";
 import ScoreGauge from "@/components/ScoreGauge";
 import KeywordBadge from "@/components/KeywordBadge";
 import SuggestionCard from "@/components/SuggestionCard";
+import AtsXray from "@/components/AtsXray";
 
 interface Analysis {
   id: string;
@@ -84,6 +85,9 @@ export default function AnalysisDetailPage() {
   const [shareCopied, setShareCopied] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
   const [scoreBoost, setScoreBoost] = useState(0);
+  const [targetSalary, setTargetSalary] = useState("");
+  const [negotiationResult, setNegotiationResult] = useState<Record<string,string> | null>(null);
+  const [negotiating, setNegotiating] = useState(false);
 
   const fetchAnalysis = useCallback(async () => {
     try {
