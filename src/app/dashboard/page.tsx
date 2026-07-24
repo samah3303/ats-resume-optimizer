@@ -194,7 +194,7 @@ export default function DashboardPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
             Welcome{", "}
@@ -204,12 +204,20 @@ export default function DashboardPage() {
             Here&apos;s your resume optimization overview
           </p>
         </div>
-        <Link
-          href="/dashboard/analyze"
-          className="btn-primary-gradient px-4 py-2 text-sm font-medium inline-flex items-center min-h-[44px] sm:min-h-0"
-        >
-          New Analysis
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/dashboard/how-to-use"
+            className="px-4 py-2 text-sm font-medium border border-indigo-200 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-all inline-flex items-center gap-1.5"
+          >
+            <span>📖 How to Use</span>
+          </Link>
+          <Link
+            href="/dashboard/analyze"
+            className="btn-primary-gradient px-4 py-2 text-sm font-medium inline-flex items-center min-h-[44px] sm:min-h-0"
+          >
+            New Analysis
+          </Link>
+        </div>
       </div>
 
       {/* Stats Cards */}

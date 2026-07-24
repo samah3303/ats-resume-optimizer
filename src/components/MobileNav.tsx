@@ -7,6 +7,7 @@ const mobileLinks = [
   { href: "/dashboard", label: "Home", emoji: "🏠" },
   { href: "/dashboard/analyze", label: "Analyze", emoji: "🔍" },
   { href: "/dashboard/jds", label: "Jobs", emoji: "💼" },
+  { href: "/dashboard/how-to-use", label: "Guide", emoji: "📖" },
 ];
 
 export default function MobileNav() {
