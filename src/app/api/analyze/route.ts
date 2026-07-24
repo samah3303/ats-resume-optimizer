@@ -161,10 +161,11 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json({ analysis: updatedAnalysis }, { status: 201 });
     } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
       console.error("AI analysis error:", err);
       // Keep the pending analysis but return error
       return NextResponse.json(
-        { error: "AI analysis failed. Please try again.", analysisId: analysis.id },
+        { error: `AI analysis failed: ${message}`, analysisId: analysis.id },
         { status: 500 }
       );
     }

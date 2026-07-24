@@ -105,7 +105,7 @@ Guidelines:
 - Each rationale should explain the ATS or hiring impact`;
 
   const response = await getDeepSeek().chat.completions.create({
-    model: "deepseek-chat",
+    model: "deepseek-v4-flash",
     messages: [{ role: "user", content: prompt }],
     temperature: 0.3,
     max_tokens: 4096,
@@ -166,7 +166,7 @@ ${resumeText}
 - Return ONLY the cover letter text, no additional commentary`;
 
   const response = await getDeepSeek().chat.completions.create({
-    model: "deepseek-chat",
+    model: "deepseek-v4-flash",
     messages: [{ role: "user", content: prompt }],
     temperature: 0.7,
     max_tokens: 2048,
@@ -241,7 +241,7 @@ Guidelines:
 - Return ONLY the JSON array, no other text`;
 
   const response = await getDeepSeek().chat.completions.create({
-    model: "deepseek-chat",
+    model: "deepseek-v4-flash",
     messages: [{ role: "user", content: prompt }],
     temperature: 0.5,
     max_tokens: 2048,
@@ -303,7 +303,7 @@ Guidelines:
 - Return ONLY the JSON array, no other text`;
 
   const response = await getDeepSeek().chat.completions.create({
-    model: "deepseek-chat",
+    model: "deepseek-v4-flash",
     messages: [{ role: "user", content: prompt }],
     temperature: 0.3,
     max_tokens: 4096,
@@ -391,7 +391,7 @@ Guidelines:
 - Return ONLY the JSON, no markdown formatting`;
 
   const response = await getDeepSeek().chat.completions.create({
-    model: "deepseek-chat",
+    model: "deepseek-v4-flash",
     messages: [{ role: "user", content: prompt }],
     temperature: 0.3,
     max_tokens: 4096,
@@ -442,7 +442,7 @@ ${resumeText}
 ## Updated Resume (return ONLY the updated resume text):`;
 
   const response = await getDeepSeek().chat.completions.create({
-    model: "deepseek-chat",
+    model: "deepseek-v4-flash",
     messages: [{ role: "user", content: prompt }],
     temperature: 0.5,
     max_tokens: 4096,
@@ -528,7 +528,7 @@ Guidelines:
 - For LinkedIn tips, focus on discoverability by recruiters and ATS alignment`;
 
   const response = await getDeepSeek().chat.completions.create({
-    model: "deepseek-chat",
+    model: "deepseek-v4-flash",
     messages: [{ role: "user", content: prompt }],
     temperature: 0.3,
     max_tokens: 4096,
@@ -609,7 +609,7 @@ Guidelines:
 - Align the roadmap to the target positions and close the identified market gaps`;
 
   const response = await getDeepSeek().chat.completions.create({
-    model: "deepseek-chat",
+    model: "deepseek-v4-flash",
     messages: [{ role: "user", content: prompt }],
     temperature: 0.3,
     max_tokens: 4096,
@@ -708,7 +708,7 @@ Other Guidelines:
 - For suggestions, quote actual text from the resume as originalText`;
 
   const response = await getDeepSeek().chat.completions.create({
-    model: "deepseek-chat",
+    model: "deepseek-v4-flash",
     messages: [{ role: "user", content: prompt }],
     temperature: 0.3,
     max_tokens: 4096,
@@ -771,7 +771,7 @@ Output a JSON array of career path roles. Each object must have:
 Return ONLY the JSON array, no markdown. Choose realistic, aspirational career titles — not internet job listing titles.`;
 
   const response = await getDeepSeek().chat.completions.create({
-    model: "deepseek-chat",
+    model: "deepseek-v4-flash",
     messages: [{ role: "user", content: prompt }],
     temperature: 0.5,
     max_tokens: 4096,
@@ -821,7 +821,7 @@ Output a JSON array of job matches. Each object must have:
 Return ONLY the JSON array, no markdown.`;
 
   const response = await getDeepSeek().chat.completions.create({
-    model: "deepseek-chat",
+    model: "deepseek-v4-flash",
     messages: [{ role: "user", content: prompt }],
     temperature: 0.5,
     max_tokens: 4096,

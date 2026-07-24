@@ -23,7 +23,7 @@ Resume text:
 ${resumeText.slice(0, 4000)}`;
 
   const response = await getDeepSeek().chat.completions.create({
-    model: "deepseek-chat",
+    model: "deepseek-v4-flash",
     messages: [{ role: "user", content: prompt }],
     temperature: 0.1,
     max_tokens: 1024,
