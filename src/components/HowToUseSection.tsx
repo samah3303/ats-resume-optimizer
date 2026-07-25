@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import StatsAndReviewsSection from "@/components/StatsAndReviewsSection";
 
 interface Step {
   number: string;
@@ -19,418 +20,384 @@ const STEPS: Step[] = [
   {
     number: "01",
     title: "Upload & Parse Resume",
-    subtitle: "Extract structured data instantly",
+    subtitle: "Extract structured data & check formatting",
     description:
-      "Upload your existing resume in PDF or DOCX format. Our parser extracts work history, education, hard skills, soft skills, and contact info while highlighting formatting compatibility.",
+      "Upload your resume in PDF or DOCX format. ResuMatch automatically extracts your work history, education, skills, and contact details while detecting ATS formatting hazards like complex tables or text boxes.",
     actionText: "Upload Resume",
     actionHref: "/dashboard/resumes",
     icon: "📄",
     badge: "Step 1",
     tips: [
       "Use clear, single-column layouts for maximum ATS readability.",
-      "Avoid tables, text boxes, and complex graphics in your uploaded file.",
+      "Avoid tables, text boxes, and background images in your uploaded file.",
       "Ensure text is select-able (not scanned image PDFs).",
     ],
   },
   {
     number: "02",
     title: "Target Job Description",
-    subtitle: "Define your dream role",
+    subtitle: "Define your target position & keywords",
     description:
-      "Paste the full job posting text including title, company name, and requirements. ResuMatch breaks down the target keywords, required technical skills, and experience level expected.",
+      "Paste the target job posting text including title, company name, and core requirements. ResuMatch extracts hard skills, domain keywords, and expected experience levels.",
     actionText: "Add Job Posting",
     actionHref: "/dashboard/jds",
     icon: "🎯",
     badge: "Step 2",
     tips: [
-      "Include both core job requirements and preferred qualifications.",
-      "Keep original formatting or line breaks intact when pasting.",
-      "Add company culture and industry keywords if specified.",
+      "Include both primary qualifications and nice-to-have technical skills.",
+      "Keep original formatting and line breaks intact when pasting.",
+      "Save multiple job postings to run batch ATS comparisons.",
     ],
   },
   {
     number: "03",
-    title: "Run AI ATS Analysis",
-    subtitle: "Calculate score & identify gaps",
+    title: "Run AI ATS Audit & Skill Bridge",
+    subtitle: "Calculate score & close keyword gaps",
     description:
-      "Select your parsed resume and a saved job description to run a comprehensive ATS audit. Get an instant match score (0-100%) along with keyword gap analysis and impact ratings.",
+      "Run a comprehensive ATS scan comparing your resume to the job description. Get an overall match score (0-100%), keyword gap analysis, section completeness scores, and curated free course links for missing skills.",
     actionText: "Run ATS Scan",
     actionHref: "/dashboard/analyze",
     icon: "🔍",
     badge: "Step 3",
     tips: [
-      "Aim for an overall ATS Match Score of 75% or higher before applying.",
-      "Pay special attention to missing hard skills & domain keywords.",
-      "Review the section-by-section breakdown for formatting flags.",
+      "Aim for an overall ATS Match Score of 75%+ before submitting.",
+      "Review the missing skills section for free YouTube course links.",
+      "Check the Keyword Density Heatmap to fix missing term frequencies.",
     ],
   },
   {
     number: "04",
-    title: "Optimize & Track Applications",
-    subtitle: "Apply recommendations & land interviews",
+    title: "Outreach & STAR Rewriter",
+    subtitle: "Generate cover letters, cold emails & STAR bullets",
     description:
-      "Incorporate suggested rewrites and missing keywords into your bullet points. Save customized resume versions, export analysis reports, and track application stages in your kanban board.",
-    actionText: "Open Tracker",
-    actionHref: "/dashboard/tracker",
-    icon: "📈",
+      "Generate 1-click tailored cover letters, 250-character LinkedIn connection notes, recruiter cold emails, and transform weak resume lines into high-impact STAR achievement metrics.",
+    actionText: "Open Outreach Studio",
+    actionHref: "/dashboard/outreach",
+    icon: "✉️",
     badge: "Step 4",
     tips: [
-      "Quantify achievements using metrics and metrics-driven action verbs.",
-      "Tailor your resume for each unique job application.",
-      "Keep track of application deadlines, interview dates, and contacts.",
+      "Send a 2-sentence LinkedIn note to a recruiter within 24 hours of applying.",
+      "Use quantified STAR metrics (%, $, time saved) in every resume bullet.",
+      "Use follow-up scripts 5 days post-application to stay top of mind.",
+    ],
+  },
+  {
+    number: "05",
+    title: "AI Interview Question Predictor",
+    subtitle: "Practice top predicted questions & STAR feedback",
+    description:
+      "Predict high-probability technical, behavioral, and skills gap interview questions generated specifically from the job description and your resume gaps. Practice your answers with real-time AI feedback.",
+    actionText: "Start Interview Prep",
+    actionHref: "/dashboard/interview",
+    icon: "🎙️",
+    badge: "Step 5",
+    tips: [
+      "Review the recruiter rationale behind every question to understand what they test.",
+      "Structure all behavioral answers using Situation, Task, Action, Result.",
+      "Practice your 60-second elevator pitch for 'Tell me about yourself'.",
+    ],
+  },
+  {
+    number: "06",
+    title: "ATS PDF Export & Daily Search Sprint",
+    subtitle: "Download 100% ATS PDF & track daily routine",
+    description:
+      "Export your optimized resume text into a clean single-column PDF engineered for 100% ATS readability. Track your daily search goals (applications, outreaches, prep) and active applications on your kanban board.",
+    actionText: "Open ATS Builder",
+    actionHref: "/dashboard/builder",
+    icon: "📥",
+    badge: "Step 6",
+    tips: [
+      "Hit your daily targets: 3 applications, 2 cold outreaches, 1 prep session.",
+      "Maintain your daily streak to stay consistent and avoid job search burnout.",
+      "Export clean PDFs directly without re-typing into Word or Canva.",
     ],
   },
 ];
 
 const FEATURE_TABS = [
   {
-    id: "resume",
-    name: "Resume Scanner",
-    icon: "📄",
-    title: "Intelligent Resume Parsing & Formatting Check",
+    id: "outreach",
+    name: "Outreach Studio",
+    icon: "✉️",
+    title: "Application Booster & Cold Outreach Studio",
     description:
-      "Upload resumes in PDF/DOCX. Our AI engine parses structured sections, detects table or text-box hazards, flags missing contact info, and organizes skills into categorized taxonomies.",
+      "Generate job-tailored cover letters, 250-character LinkedIn connection notes, recruiter cold emails, 5-day follow-up scripts, and 60-second elevator pitches in seconds.",
     highlights: [
-      "Multi-format support (PDF, DOCX)",
-      "Section detection (Experience, Education, Skills)",
-      "ATS formatting hazard warnings",
-      "Parsed skill taxonomy extraction",
+      "1-Click Cover Letter tailored to JD & Resume",
+      "LinkedIn Connection Request Note (<300 chars)",
+      "Recruiter Cold Email & Subject Line Pitch",
+      "STAR Method Bullet Point Rewriter",
     ],
   },
   {
-    id: "matcher",
-    name: "ATS JD Matcher",
-    icon: "🎯",
-    title: "Deep Keyword & Experience Gap Analysis",
+    id: "interview",
+    name: "Interview Studio",
+    icon: "🎙️",
+    title: "AI Interview Question Predictor & STAR Practice",
     description:
-      "Compare your resume directly against real job postings. Uncover missing technical terms, soft skills, required certifications, and experience level mismatches.",
+      "Predict high-probability interview questions customized to the target JD and candidate background with real-time STAR framework evaluation.",
     highlights: [
-      "Overall ATS Score (0-100%)",
-      "Missing vs Matching hard & soft skills",
-      "Action verb frequency audit",
-      "Contextual bullet point rewrite recommendations",
+      "Technical, Behavioral & Gap Questions",
+      "Recruiter Intent & Rationale Explanations",
+      "Interactive STAR Answer Practice Box",
+      "Real-time AI Feedback & Score Improvement",
     ],
   },
   {
-    id: "roadmap",
-    name: "AI Career Roadmap",
-    icon: "🛣️",
-    title: "Personalized Weekly Action Strategy",
+    id: "builder",
+    name: "ATS PDF Builder",
+    icon: "📥",
+    title: "One-Click ATS-Friendly PDF Resume Generator",
     description:
-      "Get a customized weekly game plan aligned with your target country, industry, and role. Learn what skills to sharpen and how to structure your LinkedIn profile.",
+      "Edit and export single-column ATS-friendly PDF resumes directly without complex formatting tools breaking ATS scannability.",
     highlights: [
-      "Weekly milestone action checklists",
-      "LinkedIn summary & headline suggestions",
-      "Regional market skill priorities",
-      "Core competencies gap closure",
+      "100% ATS-readable single-column layout",
+      "Plain text / Markdown inline editor",
+      "Instant PDF download via PDFKit engine",
+      "Pre-loaded from parsed resume data",
     ],
   },
   {
-    id: "tracker",
-    name: "Application Tracker",
-    icon: "💼",
-    title: "Kanban Job Application Pipeline",
+    id: "skillbridge",
+    name: "Skill-Bridging",
+    icon: "🎓",
+    title: "Free Course Links & Micro-Project Blueprints",
     description:
-      "Organize all your job applications in one central dashboard. Track stages from Applied to Interviewing, Offer, and Rejected while keeping detailed notes.",
+      "Automatically maps missing hard skills from ATS audits to free learning resources and 48-hour weekend portfolio project ideas.",
     highlights: [
-      "Drag-and-drop status stages",
-      "Linked resume versions per application",
-      "Interview dates & follow-up notes",
-      "Success rate analytics",
+      "Free YouTube & FreeCodeCamp crash course links",
+      "Weekend portfolio project blueprints",
+      "GitHub starter repo search shortcuts",
+      "Remediates missing keyword gaps fast",
     ],
   },
-];
-
-const FAQS = [
   {
-    question: "What is an ATS (Applicant Tracking System)?",
-    answer:
-      "An Applicant Tracking System (ATS) is software used by employers to collect, scan, score, and rank job applications. Over 90% of Fortune 500 companies use ATS tools (like Greenhouse, Lever, Workday) to filter out resumes that lack required keywords or proper formatting before a human recruiter ever sees them.",
-  },
-  {
-    question: "What is a good ATS Match Score?",
-    answer:
-      "We recommend aiming for a match score of 75% or higher. A score above 75% indicates strong keyword alignment, clear section organization, and high probability of passing automated screening filters.",
-  },
-  {
-    question: "Can I upload multiple versions of my resume?",
-    answer:
-      "Yes! You can upload and store multiple resume variations (e.g. Frontend Developer, Full-Stack Engineer, Technical Lead) in your account and test each against different job descriptions.",
-  },
-  {
-    question: "How does the AI generate resume rewrite suggestions?",
-    answer:
-      "Our AI analyzes the job description's key requirements and evaluates how your resume phrases accomplishments. It then suggests bullet point improvements incorporating missing keywords while retaining your original experience.",
-  },
-  {
-    question: "Are my uploaded resumes and job descriptions kept secure?",
-    answer:
-      "Yes. Your data is stored securely and is only accessible through your authenticated account. We do not sell or publicly share your resume data.",
+    id: "sprint",
+    name: "Daily Sprint",
+    icon: "🔥",
+    title: "Daily Job Search Discipline & Accountability",
+    description:
+      "Gamify your daily job search routine with structured target counters, streak milestones, and follow-up reminders.",
+    highlights: [
+      "Daily targets: 3 Apps, 2 Outreaches, 1 Prep",
+      "Streak counter & streak protection",
+      "Integrated into the main dashboard",
+      "Prevents job hunter fatigue & burnout",
+    ],
   },
 ];
 
 export default function HowToUseSection() {
-  const [activeTab, setActiveTab] = useState("resume");
-  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+  const [activeStep, setActiveStep] = useState(0);
+  const [activeFeatureTab, setActiveFeatureTab] = useState(0);
+
+  const currentStep = STEPS[activeStep];
+  const currentFeature = FEATURE_TABS[activeFeatureTab];
 
   return (
     <div className="space-y-16 py-4">
-      {/* Hero Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-900 via-indigo-800 to-purple-900 text-white p-8 md:p-12 shadow-xl">
-        <div className="absolute -right-12 -bottom-12 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -left-12 -top-12 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl pointer-events-none" />
+      {/* Hero Header */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white p-8 sm:p-12 border border-indigo-500/20 shadow-xl">
+        <div className="absolute top-0 right-0 -mt-12 -mr-12 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 -mb-12 -ml-12 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative max-w-3xl space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-indigo-200 text-xs font-semibold uppercase tracking-wider border border-white/15">
-            ✨ Quick Start & User Guide
+        <div className="relative z-10 max-w-3xl space-y-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 backdrop-blur-md text-xs font-semibold text-indigo-300">
+            <span>🚀 Complete Job Search Acceleration Playbook</span>
           </div>
-          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight leading-tight">
-            How to Use <span className="text-indigo-300">ResuMatch</span> ATS Optimizer
+
+          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight text-white">
+            How to Master <span className="bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 bg-clip-text text-transparent">ResuMatch</span> to Land Your Dream Job
           </h1>
-          <p className="text-indigo-100/90 text-base md:text-lg leading-relaxed max-w-2xl">
-            Master the step-by-step process of parsing your resume, matching against job postings, fixing ATS keyword gaps, and tracking your job search success.
+
+          <p className="text-base sm:text-lg text-slate-300 leading-relaxed">
+            Follow our 6-step system engineered to optimize your resume for ATS bots, boost recruiter outreach response rates, master interview prep, and maintain daily search discipline.
           </p>
 
-          <div className="pt-2 flex flex-wrap items-center gap-4">
+          <div className="flex flex-wrap gap-4 pt-2">
             <Link
               href="/dashboard/analyze"
-              className="px-6 py-3 rounded-xl bg-white text-indigo-950 font-semibold hover:bg-indigo-50 transition-all shadow-md flex items-center gap-2 text-sm"
+              className="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 font-bold text-sm text-white shadow-lg shadow-indigo-500/25 transition-all hover:scale-[1.02]"
             >
-              <span>⚡ Start ATS Analysis</span>
+              Start Free ATS Scan →
             </Link>
             <Link
-              href="/dashboard/resumes"
-              className="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-medium border border-white/20 transition-all text-sm"
+              href="/dashboard/outreach"
+              className="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 backdrop-blur-md font-bold text-sm text-white transition-all"
             >
-              📄 Upload Resume
+              Open Outreach Studio ✉️
             </Link>
           </div>
         </div>
       </div>
 
-      {/* 4-Step Workflow Section */}
+      {/* Interactive 6-Step Guide */}
       <div className="space-y-8">
         <div className="text-center max-w-2xl mx-auto space-y-2">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
-            4-Step Optimization Workflow
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+            The 6-Step Job Landing Workflow
           </h2>
-          <p className="text-slate-600 dark:text-slate-400 text-sm md:text-base">
-            Follow these four simple steps to convert any resume into an ATS-proof application.
+          <p className="text-sm text-slate-500">
+            Click through each step to understand how to turn applications into interview calls.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {STEPS.map((step) => (
-            <div
-              key={step.number}
-              className="group relative flex flex-col justify-between rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 md:p-8 hover:shadow-lg transition-all duration-200"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-2xl">
-                    {step.icon}
+        {/* Step Numbers Bar */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          {STEPS.map((step, idx) => {
+            const isActive = activeStep === idx;
+            return (
+              <button
+                key={step.number}
+                onClick={() => setActiveStep(idx)}
+                className={`p-3.5 rounded-2xl text-left border transition-all relative overflow-hidden ${
+                  isActive
+                    ? "bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-500/20 scale-[1.02]"
+                    : "bg-white text-slate-700 border-slate-200/80 hover:border-indigo-300 hover:bg-indigo-50/50"
+                }`}
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className={`text-lg font-bold ${isActive ? "text-white" : "text-slate-400"}`}>
+                    {step.number}
                   </span>
-                  <span className="text-xs font-bold px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                    {step.badge}
-                  </span>
+                  <span className="text-lg">{step.icon}</span>
                 </div>
+                <p className={`text-xs font-bold line-clamp-1 ${isActive ? "text-white" : "text-slate-900"}`}>
+                  {step.title}
+                </p>
+              </button>
+            );
+          })}
+        </div>
 
-                <div className="space-y-2 mb-4">
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                    {step.title}
-                  </h3>
-                  <p className="text-xs font-medium text-indigo-600 dark:text-indigo-400">
-                    {step.subtitle}
-                  </p>
-                  <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                    {step.description}
-                  </p>
-                </div>
-
-                {/* Tips */}
-                <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800/80 space-y-2">
-                  <span className="text-xs font-semibold text-slate-900 dark:text-slate-200 flex items-center gap-1">
-                    💡 Pro Tips:
-                  </span>
-                  <ul className="space-y-1.5">
-                    {step.tips.map((tip, idx) => (
-                      <li
-                        key={idx}
-                        className="text-xs text-slate-500 dark:text-slate-400 flex items-start gap-2"
-                      >
-                        <span className="text-indigo-500 shrink-0">•</span>
-                        <span>{tip}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              <div className="mt-6 pt-4">
-                <Link
-                  href={step.actionHref}
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors"
-                >
-                  <span>{step.actionText}</span>
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </Link>
-              </div>
+        {/* Step Detail Card */}
+        <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-sm grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="lg:col-span-7 space-y-5">
+            <div className="flex items-center gap-3">
+              <span className="px-3 py-1 bg-indigo-100 text-indigo-800 text-xs font-extrabold rounded-full">
+                {currentStep.badge}
+              </span>
+              <span className="text-xs font-semibold text-slate-400">Step {activeStep + 1} of 6</span>
             </div>
-          ))}
+
+            <div className="space-y-1">
+              <h3 className="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+                <span>{currentStep.icon}</span>
+                <span>{currentStep.title}</span>
+              </h3>
+              <p className="text-xs font-semibold text-indigo-600 uppercase tracking-wider">
+                {currentStep.subtitle}
+              </p>
+            </div>
+
+            <p className="text-sm text-slate-600 leading-relaxed">
+              {currentStep.description}
+            </p>
+
+            <div className="pt-2">
+              <Link
+                href={currentStep.actionHref}
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all"
+              >
+                <span>{currentStep.actionText}</span>
+                <span>→</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Pro Tips Box */}
+          <div className="lg:col-span-5 bg-slate-50 border border-slate-200/70 rounded-2xl p-6 space-y-4">
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-900 uppercase tracking-wider">
+              <span>💡 Pro Tips for {currentStep.badge}</span>
+            </div>
+
+            <ul className="space-y-3">
+              {currentStep.tips.map((tip, idx) => (
+                <li key={idx} className="flex items-start gap-2.5 text-xs text-slate-700 leading-relaxed">
+                  <span className="text-emerald-500 font-bold shrink-0 mt-0.5">✓</span>
+                  <span>{tip}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
 
       {/* Feature Deep Dive Tabs */}
-      <div className="space-y-8">
+      <div className="space-y-8 pt-6">
         <div className="text-center max-w-2xl mx-auto space-y-2">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
-            Feature Deep Dive
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+            Platform Feature Deep Dive
           </h2>
-          <p className="text-slate-600 dark:text-slate-400 text-sm md:text-base">
-            Explore the core features designed to accelerate your job search.
+          <p className="text-sm text-slate-500">
+            Explore our specialized AI toolkits built for job seekers.
           </p>
         </div>
 
-        {/* Tab Buttons */}
-        <div className="flex items-center justify-start md:justify-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-          {FEATURE_TABS.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
-                activeTab === tab.id
-                  ? "bg-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-none"
-                  : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
-              }`}
-            >
-              <span>{tab.icon}</span>
-              <span>{tab.name}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Tab Content Display */}
-        {FEATURE_TABS.filter((t) => t.id === activeTab).map((tab) => (
-          <div
-            key={tab.id}
-            className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 shadow-sm"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
-              <div className="md:col-span-2 space-y-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-xs font-semibold">
-                  <span>{tab.icon}</span>
-                  <span>{tab.name} Overview</span>
-                </div>
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
-                  {tab.title}
-                </h3>
-                <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
-                  {tab.description}
-                </p>
-
-                <div className="pt-4">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
-                    Key Highlights & Capabilities
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {tab.highlights.map((item, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 text-xs font-medium text-slate-700 dark:text-slate-200"
-                      >
-                        <span className="flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400 shrink-0 text-xs">
-                          ✓
-                        </span>
-                        <span>{item}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Box */}
-              <div className="rounded-xl bg-gradient-to-br from-slate-50 to-indigo-50/50 dark:from-slate-800/50 dark:to-slate-800/20 p-6 border border-slate-200/80 dark:border-slate-800 space-y-4">
-                <h4 className="text-base font-bold text-slate-900 dark:text-white">
-                  Ready to test {tab.name}?
-                </h4>
-                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                  Jump right into the app and start optimizing your resume and applications today.
-                </p>
-                <Link
-                  href={
-                    tab.id === "resume"
-                      ? "/dashboard/resumes"
-                      : tab.id === "matcher"
-                      ? "/dashboard/analyze"
-                      : tab.id === "roadmap"
-                      ? "/dashboard"
-                      : "/dashboard/tracker"
-                  }
-                  className="block text-center w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition-colors shadow-sm"
-                >
-                  Open {tab.name} →
-                </Link>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Frequently Asked Questions */}
-      <div className="space-y-8 max-w-3xl mx-auto">
-        <div className="text-center space-y-2">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
-            Frequently Asked Questions
-          </h2>
-          <p className="text-slate-600 dark:text-slate-400 text-sm">
-            Everything you need to know about ATS optimization and ResuMatch.
-          </p>
-        </div>
-
-        <div className="space-y-3">
-          {FAQS.map((faq, index) => {
-            const isOpen = openFaqIndex === index;
+        {/* Feature Tab Navigation */}
+        <div className="flex flex-wrap justify-center gap-2">
+          {FEATURE_TABS.map((tab, idx) => {
+            const isActive = activeFeatureTab === idx;
             return (
-              <div
-                key={index}
-                className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden transition-colors"
+              <button
+                key={tab.id}
+                onClick={() => setActiveFeatureTab(idx)}
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+                  isActive
+                    ? "bg-slate-900 text-white shadow-md"
+                    : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
+                }`}
               >
-                <button
-                  onClick={() => setOpenFaqIndex(isOpen ? null : index)}
-                  className="w-full flex items-center justify-between p-5 text-left font-semibold text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 text-sm md:text-base transition-colors"
-                >
-                  <span>{faq.question}</span>
-                  <span
-                    className={`ml-4 transform transition-transform duration-200 text-slate-400 ${
-                      isOpen ? "rotate-180" : ""
-                    }`}
-                  >
-                    ▼
-                  </span>
-                </button>
-
-                {isOpen && (
-                  <div className="px-5 pb-5 pt-0 text-sm text-slate-600 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800/80 pt-4 leading-relaxed">
-                    {faq.answer}
-                  </div>
-                )}
-              </div>
+                <span>{tab.icon}</span>
+                <span>{tab.name}</span>
+              </button>
             );
           })}
         </div>
+
+        {/* Feature Display Card */}
+        <div className="bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-8 shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center border border-indigo-500/20">
+          <div className="lg:col-span-7 space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md text-white flex items-center justify-center font-bold text-2xl border border-white/15">
+              {currentFeature.icon}
+            </div>
+
+            <h3 className="text-2xl font-extrabold text-white">
+              {currentFeature.title}
+            </h3>
+
+            <p className="text-sm text-slate-300 leading-relaxed">
+              {currentFeature.description}
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              {currentFeature.highlights.map((item, idx) => (
+                <div key={idx} className="flex items-center gap-2 text-xs text-indigo-200 bg-white/5 p-2.5 rounded-xl border border-white/10">
+                  <span className="text-indigo-400 font-bold">✦</span>
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="lg:col-span-5 bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/15 space-y-4 text-center">
+            <h4 className="text-sm font-bold text-white uppercase tracking-wider">Ready to Accelerate Your Job Search?</h4>
+            <p className="text-xs text-slate-300">
+              Start optimizing your applications with AI precision today.
+            </p>
+            <Link
+              href="/dashboard/analyze"
+              className="block w-full py-3 bg-white text-indigo-950 font-bold text-xs rounded-xl hover:bg-indigo-50 transition-colors shadow-md"
+            >
+              Get Started Now →
+            </Link>
+          </div>
+        </div>
       </div>
+
+      {/* Numbers & User Reviews */}
+      <StatsAndReviewsSection />
     </div>
   );
 }

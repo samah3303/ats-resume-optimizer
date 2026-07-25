@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import ResumeUploader from "@/components/ResumeUploader";
+import StatsAndReviewsSection from "@/components/StatsAndReviewsSection";
 
 // ─── Country list ────────────────────────────────────────────────────────────
 
@@ -272,6 +273,13 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* Numbers & User Reviews Section */}
+        <section className="bg-slate-50 border-t border-slate-200/80 px-4">
+          <div className="max-w-7xl mx-auto">
+            <StatsAndReviewsSection />
           </div>
         </section>
 

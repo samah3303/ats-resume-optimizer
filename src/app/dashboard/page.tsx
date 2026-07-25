@@ -6,6 +6,7 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import ScoreGauge from "@/components/ScoreGauge";
 import { SkeletonGrid } from "@/components/SkeletonCard";
+import DailySprintWidget from "@/components/DailySprintWidget";
 
 interface Resume {
   id: string;
@@ -216,6 +217,53 @@ export default function DashboardPage() {
             className="btn-primary-gradient px-4 py-2 text-sm font-medium inline-flex items-center min-h-[44px] sm:min-h-0"
           >
             New Analysis
+          </Link>
+        </div>
+      </div>
+
+      {/* Daily Sprint & Accountability Hub */}
+      <div className="mb-8 space-y-4">
+        <DailySprintWidget />
+        
+        {/* Quick Job Search Tools */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <Link
+            href="/dashboard/outreach"
+            className="p-4 bg-white rounded-2xl border border-slate-200/80 hover:border-indigo-300 hover:shadow-sm transition-all flex items-center gap-3 group"
+          >
+            <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-lg group-hover:scale-105 transition-transform">
+              ✉️
+            </div>
+            <div>
+              <h3 className="text-xs font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">Outreach & Cover Studio</h3>
+              <p className="text-[11px] text-slate-500">Cover letters, cold emails & LinkedIn notes</p>
+            </div>
+          </Link>
+
+          <Link
+            href="/dashboard/interview"
+            className="p-4 bg-white rounded-2xl border border-slate-200/80 hover:border-indigo-300 hover:shadow-sm transition-all flex items-center gap-3 group"
+          >
+            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-lg group-hover:scale-105 transition-transform">
+              🎙️
+            </div>
+            <div>
+              <h3 className="text-xs font-bold text-slate-900 group-hover:text-amber-600 transition-colors">Interview Prep Studio</h3>
+              <p className="text-[11px] text-slate-500">Predicted questions & STAR feedback</p>
+            </div>
+          </Link>
+
+          <Link
+            href="/dashboard/builder"
+            className="p-4 bg-white rounded-2xl border border-slate-200/80 hover:border-indigo-300 hover:shadow-sm transition-all flex items-center gap-3 group"
+          >
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-lg group-hover:scale-105 transition-transform">
+              📥
+            </div>
+            <div>
+              <h3 className="text-xs font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">ATS PDF Builder</h3>
+              <p className="text-[11px] text-slate-500">Download 100% scannable ATS PDF</p>
+            </div>
           </Link>
         </div>
       </div>

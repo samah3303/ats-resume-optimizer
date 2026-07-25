@@ -8,6 +8,7 @@ import ScoreGauge from "@/components/ScoreGauge";
 import KeywordBadge from "@/components/KeywordBadge";
 import SuggestionCard from "@/components/SuggestionCard";
 import AtsXray from "@/components/AtsXray";
+import SkillBridgeCard from "@/components/SkillBridgeCard";
 
 interface Analysis {
   id: string;
@@ -597,6 +598,13 @@ export default function AnalysisDetailPage() {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Free Skill-Bridging & Micro-Projects */}
+      {(skillsGap.missing.length > 0 || keywords.missing.length > 0) && (
+        <div className={`mb-6 ${activeTab !== "overview" ? "hidden" : ""}`}>
+          <SkillBridgeCard missingSkills={Array.from(new Set([...skillsGap.missing, ...keywords.missing]))} />
         </div>
       )}
 

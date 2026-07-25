@@ -6,9 +6,9 @@ import { usePathname } from "next/navigation";
 const mobileLinks = [
   { href: "/dashboard", label: "Home", emoji: "🏠" },
   { href: "/dashboard/analyze", label: "Analyze", emoji: "🔍" },
-  { href: "/dashboard/jds", label: "Jobs", emoji: "💼" },
+  { href: "/dashboard/outreach", label: "Outreach", emoji: "✉️" },
+  { href: "/dashboard/interview", label: "Prep", emoji: "🎙️" },
   { href: "/dashboard/tracker", label: "Track", emoji: "📊" },
-  { href: "/dashboard/how-to-use", label: "Guide", emoji: "📖" },
 ];
 
 export default function MobileNav() {
