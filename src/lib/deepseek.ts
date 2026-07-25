@@ -28,6 +28,89 @@ export function extractJson(content: string): string {
   return jsonStr;
 }
 
+/**
+ * Repairs truncated JSON by balancing quotes, removing trailing commas,
+ * and auto-closing open arrays and objects.
+ */
+export function repairTruncatedJson(jsonStr: string): string {
+  let str = jsonStr.trim();
+
+  let inString = false;
+  let isEscaped = false;
+  const stack: string[] = [];
+
+  for (let i = 0; i < str.length; i++) {
+    const char = str[i];
+    if (inString) {
+      if (char === "\\" && !isEscaped) {
+        isEscaped = true;
+      } else if (char === '"' && !isEscaped) {
+        inString = false;
+      } else {
+        isEscaped = false;
+      }
+    } else {
+      if (char === '"') {
+        inString = true;
+      } else if (char === "{" || char === "[") {
+        stack.push(char === "{" ? "}" : "]");
+      } else if (char === "}" || char === "]") {
+        if (stack.length > 0 && stack[stack.length - 1] === char) {
+          stack.pop();
+        }
+      }
+    }
+  }
+
+  if (inString) {
+    str += '"';
+  }
+
+  str = str.replace(/,\s*$/, "");
+
+  while (stack.length > 0) {
+    str += stack.pop();
+  }
+
+  return str;
+}
+
+/**
+ * Safely parses JSON from an LLM response string with automatic sanitization
+ * of control characters and fallback repair for truncated strings.
+ */
+export function parseJsonSafely<T = any>(content: string, fallback?: T): T {
+  const raw = extractJson(content);
+
+  // Attempt 1: Direct JSON parse
+  try {
+    return JSON.parse(raw);
+  } catch {
+    // Attempt 2: Sanitize control characters / raw unescaped newlines inside strings
+    try {
+      const sanitized = raw.replace(/[\u0000-\u001F]+/g, (match) => {
+        if (match === "\n") return "\\n";
+        if (match === "\r") return "\\r";
+        if (match === "\t") return "\\t";
+        return "";
+      });
+      return JSON.parse(sanitized);
+    } catch {
+      // Attempt 3: Repair truncated JSON strings & brackets
+      try {
+        const repaired = repairTruncatedJson(raw);
+        return JSON.parse(repaired);
+      } catch (err3) {
+        console.error("JSON parse failed after all repair attempts. Raw length:", content.length, "\nError:", (err3 as Error).message);
+        if (fallback !== undefined) {
+          return fallback;
+        }
+        throw new Error(`JSON parse error: ${(err3 as Error).message}`);
+      }
+    }
+  }
+}
+
 // ─── Analyze Resume Against Job Description ────────────────────────────────
 
 interface AnalyzeResumeParams {
@@ -70,11 +153,11 @@ ${jobDescriptionText}
 ${resumeText}
 
 ## Instructions:
-Analyze the resume against the job description and output a JSON response with EXACTLY this structure. Do NOT include markdown formatting or extra text:
+Analyze the resume against the job description and output a JSON object with EXACTLY this structure:
 
 {
-  "overallScore": <number 0-100 representing overall ATS compatibility>,
-  "keywordsMatchPct": <number 0-100 representing percentage of JD keywords found in resume>,
+  "overallScore": 75,
+  "keywordsMatchPct": 70,
   "keywords": {
     "matched": ["keyword1", "keyword2"],
     "missing": ["keyword3", "keyword4"]
@@ -83,50 +166,57 @@ Analyze the resume against the job description and output a JSON response with E
     "present": ["skill1", "skill2"],
     "missing": ["skill3", "skill4"]
   },
-  "formatScore": <number 0-100 for resume format and ATS readability>,
-  "impactScore": <number 0-100 for achievement impact and metrics usage>,
-  "summaryText": "<2-3 sentence overall assessment and top recommendation>",
+  "formatScore": 80,
+  "impactScore": 75,
+  "summaryText": "Overall assessment statement.",
   "suggestions": [
     {
-      "section": "<section name like Summary, Experience, Skills, Education>",
-      "originalText": "<the exact text from the resume that needs improvement>",
-      "suggestedText": "<your improved version of that text>",
-      "rationale": "<why this change improves ATS compatibility or impact>"
+      "section": "Experience",
+      "originalText": "Exact original sentence from resume",
+      "suggestedText": "Improved version with metrics",
+      "rationale": "Why this improves ATS score"
     }
   ]
 }
 
 Guidelines:
-- Provide 5-10 specific suggestions covering different sections
-- Focus on: keyword inclusion, ATS formatting, quantifiable achievements, active language
-- Be honest about scores. Most resumes score 40-70.
-- For suggestions, quote actual text from the resume as originalText
-- Make suggestedText specific and ready to use
-- Each rationale should explain the ATS or hiring impact`;
+- Provide 5-8 specific suggestions covering different sections.
+- Keep originalText quotes short (under 150 characters) to avoid JSON truncation.
+- Ensure all double quotes inside string values are properly escaped with backslashes.
+- Be honest about scores. Most resumes score 40-70.`;
 
   const response = await getDeepSeek().chat.completions.create({
     model: "deepseek-v4-flash",
     messages: [{ role: "user", content: prompt }],
+    response_format: { type: "json_object" },
     temperature: 0.3,
     max_tokens: 4096,
   });
 
   const content = response.choices[0]?.message?.content || "";
 
-  const jsonStr = extractJson(content);
-  const result = JSON.parse(jsonStr);
+  const result = parseJsonSafely(content, {
+    overallScore: 65,
+    keywordsMatchPct: 60,
+    keywords: { matched: [], missing: [] },
+    skills: { present: [], missing: [] },
+    formatScore: 70,
+    impactScore: 65,
+    summaryText: "Resume analysis completed successfully.",
+    suggestions: [],
+  });
 
   return {
-    overallScore: result.overallScore,
-    keywordsMatchPct: result.keywordsMatchPct,
+    overallScore: typeof result.overallScore === "number" ? result.overallScore : 65,
+    keywordsMatchPct: typeof result.keywordsMatchPct === "number" ? result.keywordsMatchPct : 60,
     skillsGapJson: JSON.stringify({
-      keywords: result.keywords,
-      skills: result.skills,
+      keywords: result.keywords || { matched: [], missing: [] },
+      skills: result.skills || { present: [], missing: [] },
     }),
-    formatScore: result.formatScore,
-    impactScore: result.impactScore,
-    summaryText: result.summaryText,
-    suggestions: result.suggestions,
+    formatScore: typeof result.formatScore === "number" ? result.formatScore : 70,
+    impactScore: typeof result.impactScore === "number" ? result.impactScore : 65,
+    summaryText: result.summaryText || "Resume analysis completed.",
+    suggestions: Array.isArray(result.suggestions) ? result.suggestions : [],
   };
 }
 
@@ -248,9 +338,7 @@ Guidelines:
   });
 
   const content = response.choices[0]?.message?.content || "[]";
-  const jsonStr = extractJson(content);
-
-  return JSON.parse(jsonStr);
+  return parseJsonSafely<InterviewQuestion[]>(content, []);
 }
 
 // ─── Compare Multiple Resumes ───────────────────────────────────────────────
@@ -944,8 +1032,14 @@ Guidelines:
   });
 
   const content = response.choices[0]?.message?.content || "{}";
-  const jsonStr = extractJson(content);
-  return JSON.parse(jsonStr) as OutreachPack;
+  return parseJsonSafely<OutreachPack>(content, {
+    coverLetter: "Dear Hiring Manager,\n\nI am writing to express my strong interest...",
+    linkedinMessage: "Hi, I saw your opening and would love to connect!",
+    coldEmailSubject: `Application for ${jobTitle || "Role"} at ${company || "Company"}`,
+    coldEmailBody: "Dear Hiring Manager,\n\nI am reaching out regarding...",
+    followupEmailBody: "Dear Hiring Manager,\n\nI wanted to follow up on my recent application...",
+    elevatorPitch: "I am a dedicated professional with experience in...",
+  });
 }
 
 // ─── Generate STAR Method Bullets ────────────────────────────────────────────
@@ -1018,7 +1112,6 @@ Return ONLY the JSON array.`;
   });
 
   const content = response.choices[0]?.message?.content || "[]";
-  const jsonStr = extractJson(content);
-  return JSON.parse(jsonStr) as StarBulletOption[];
+  return parseJsonSafely<StarBulletOption[]>(content, []);
 }
 

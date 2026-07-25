@@ -21,7 +21,38 @@ export async function GET(req: NextRequest) {
         prisma.sharedAnalysis.count(),
       ]);
 
-    // Recent analyses with scores
+    // Calculate AI Token Spend & Estimated Costs in INR (₹)
+    // DeepSeek V3/V4 API Rates (~$0.27/1M input, ~$1.10/1M output = ~₹0.05 per 1,000 tokens)
+    const avgTokensPerAnalysis = 2500;
+    const avgTokensPerRoadmap = 1800;
+    const avgTokensPerOnboarding = 1500;
+    const avgTokensPerJobFetch = 800;
+
+    const estimatedAnalysisTokens = analyses * avgTokensPerAnalysis;
+    const estimatedRoadmapTokens = roadmaps * avgTokensPerRoadmap;
+    const estimatedOnboardingTokens = onboardingProfiles * avgTokensPerOnboarding;
+    const estimatedJobTokens = jds * avgTokensPerJobFetch;
+
+    const totalTokens =
+      estimatedAnalysisTokens +
+      estimatedRoadmapTokens +
+      estimatedOnboardingTokens +
+      estimatedJobTokens;
+
+    // Blended rate: ₹0.052 per 1,000 tokens (at ₹83 / USD)
+    const costPer1kTokensINR = 0.052;
+    const totalSpendINR = Math.round(totalTokens * (costPer1kTokensINR / 1000) * 100) / 100;
+    const totalSpendUSD = Math.round((totalSpendINR / 83) * 100) / 100;
+    const avgSpendPerUserINR = users > 0 ? (totalSpendINR / users).toFixed(2) : "0.00";
+
+    const spendByFeatureINR = {
+      analyses: Math.round(estimatedAnalysisTokens * (costPer1kTokensINR / 1000) * 100) / 100,
+      roadmaps: Math.round(estimatedRoadmapTokens * (costPer1kTokensINR / 1000) * 100) / 100,
+      onboarding: Math.round(estimatedOnboardingTokens * (costPer1kTokensINR / 1000) * 100) / 100,
+      jobFetches: Math.round(estimatedJobTokens * (costPer1kTokensINR / 1000) * 100) / 100,
+    };
+
+    // Recent analyses with details
     const recentAnalyses = await prisma.analysis.findMany({
       take: 20,
       orderBy: { createdAt: "desc" },
@@ -30,8 +61,8 @@ export async function GET(req: NextRequest) {
         overallScore: true,
         createdAt: true,
         resume: { select: { name: true } },
-        jobDescription: { select: { title: true } },
-        user: { select: { email: true } },
+        jobDescription: { select: { title: true, company: true } },
+        user: { select: { email: true, name: true } },
       },
     });
 
@@ -74,13 +105,46 @@ export async function GET(req: NextRequest) {
       if (dailyTrend[day] !== undefined) dailyTrend[day]++;
     });
 
-    // Top users
+    // Target Country Distribution from Onboarding Profiles
+    const onboardingData = await prisma.onboardingProfile.findMany({
+      select: { targetCountry: true, targetPositions: true, industry: true },
+    });
+
+    const countryCounts: Record<string, number> = {};
+    const positionCounts: Record<string, number> = {};
+
+    onboardingData.forEach((p) => {
+      if (p.targetCountry) {
+        countryCounts[p.targetCountry] = (countryCounts[p.targetCountry] || 0) + 1;
+      }
+      if (p.targetPositions) {
+        p.targetPositions.split(",").forEach((pos) => {
+          const trimmed = pos.trim();
+          if (trimmed) {
+            positionCounts[trimmed] = (positionCounts[trimmed] || 0) + 1;
+          }
+        });
+      }
+    });
+
+    const topCountries = Object.entries(countryCounts)
+      .map(([country, count]) => ({ country, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+
+    const topPositions = Object.entries(positionCounts)
+      .map(([position, count]) => ({ position, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+
+    // Top users by analysis count
     const topUsers = await prisma.analysis.groupBy({
       by: ["userId"],
       _count: { id: true },
       orderBy: { _count: { id: "desc" } },
       take: 10,
     });
+
     const topUserDetails = await Promise.all(
       topUsers.map(async (u) => {
         const user = await prisma.user.findUnique({
@@ -105,7 +169,7 @@ export async function GET(req: NextRequest) {
         email: true,
         name: true,
         createdAt: true,
-        _count: { select: { analyses: true } },
+        _count: { select: { analyses: true, resumes: true } },
       },
     });
 
@@ -122,6 +186,18 @@ export async function GET(req: NextRequest) {
         averageScore: Math.round(avgScoreResult._avg.overallScore || 0),
         scoreDistribution: { high, medium, low },
         dailyTrend,
+        // AI Token & Spend Metrics
+        aiTokenSpend: {
+          totalTokens,
+          totalSpendINR,
+          totalSpendUSD,
+          avgSpendPerUserINR,
+          spendByFeatureINR,
+        },
+        marketInsights: {
+          topCountries,
+          topPositions,
+        },
       },
       topUsers: topUserDetails,
       recentUsers: recentUsers.map((u) => ({
@@ -129,13 +205,14 @@ export async function GET(req: NextRequest) {
         name: u.name || "—",
         joined: u.createdAt,
         analysisCount: u._count.analyses,
+        resumeCount: u._count.resumes,
       })),
       recentAnalyses: recentAnalyses.map((a) => ({
         id: a.id,
         score: a.overallScore,
         date: a.createdAt,
         resume: a.resume?.name || "—",
-        jd: a.jobDescription?.title || "—",
+        jd: `${a.jobDescription?.title || "Untitled"}${a.jobDescription?.company ? ` (${a.jobDescription.company})` : ""}`,
         user: a.user.email,
       })),
     });
