@@ -40,7 +40,11 @@ export default function ResumeUploader({ onUploaded, onFormatDetected }: ResumeU
   const [error, setError] = useState<string | null>(null);
 
   const validateFile = (file: File): string | null => {
-    if (!ALLOWED_TYPES.includes(file.type)) {
+    const typeAllowed = ALLOWED_TYPES.includes(file.type);
+    const extAllowed = ALLOWED_EXTENSIONS.some((ext) =>
+      file.name.toLowerCase().endsWith(ext)
+    );
+    if (!typeAllowed && !extAllowed) {
       return "Only PDF, DOC, and DOCX files are supported.";
     }
     if (file.size > MAX_SIZE) {
@@ -126,8 +130,8 @@ export default function ResumeUploader({ onUploaded, onFormatDetected }: ResumeU
         onDrop={handleDrop}
         className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors cursor-pointer ${
           isDragging
-            ? "border-indigo-500 bg-indigo-50"
-            : "border-gray-300 hover:border-indigo-400 bg-gray-50"
+            ? "border-indigo-500 bg-indigo-50 dark:border-indigo-400 dark:bg-indigo-900/20"
+            : "border-gray-300 hover:border-indigo-400 bg-gray-50 dark:border-slate-600 dark:bg-slate-800/50"
         }`}
       >
         <input
@@ -138,15 +142,26 @@ export default function ResumeUploader({ onUploaded, onFormatDetected }: ResumeU
           id="resume-upload"
           disabled={uploading}
         />
-        <label htmlFor="resume-upload" className="cursor-pointer block">
+        <label
+          htmlFor="resume-upload"
+          className="cursor-pointer block"
+          tabIndex={0}
+          role="button"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              document.getElementById('resume-upload')?.click();
+            }
+          }}
+        >
           {uploading ? (
             <div className="flex flex-col items-center gap-2">
               <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-              <p className="text-sm text-gray-600">Uploading...</p>
+              <p className="text-sm text-gray-600 dark:text-slate-400">Uploading...</p>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-2">
-              <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center">
                 <svg
                   className="w-6 h-6 text-indigo-600"
                   fill="none"
@@ -161,10 +176,10 @@ export default function ResumeUploader({ onUploaded, onFormatDetected }: ResumeU
                   />
                 </svg>
               </div>
-              <p className="text-sm font-medium text-gray-700">
+              <p className="text-sm font-medium text-gray-700 dark:text-slate-200">
                 Drag & drop your resume here
               </p>
-              <p className="text-xs text-gray-500">PDF, DOC, or DOCX, up to 5MB</p>
+              <p className="text-xs text-gray-500 dark:text-slate-400">PDF, DOC, or DOCX, up to 5MB</p>
               <span className="mt-2 px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors">
                 Browse Files
               </span>
@@ -173,7 +188,7 @@ export default function ResumeUploader({ onUploaded, onFormatDetected }: ResumeU
         </label>
       </div>
       {error && (
-        <p className="mt-2 text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">
+        <p className="mt-2 text-sm text-red-600 bg-red-50 dark:text-red-300 dark:bg-red-900/30 px-3 py-2 rounded-lg">
           {error}
         </p>
       )}

@@ -73,14 +73,14 @@ export default function DailySprintWidget() {
     <div className="bg-gradient-to-br from-indigo-900 via-indigo-800 to-slate-900 text-white rounded-2xl p-6 shadow-md space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <span className="text-xl">🔥</span>
+          <span className="text-xl" aria-hidden="true">🔥</span>
           <div>
             <h3 className="text-base font-bold">Daily Job Search Sprint</h3>
             <p className="text-xs text-indigo-200">Consistency beats luck. Hit your daily target!</p>
           </div>
         </div>
         <div className="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-xs font-bold text-amber-300 flex items-center gap-1">
-          <span>⚡ {streak} Day Streak</span>
+          <span><span aria-hidden="true">⚡ </span>{streak} Day Streak</span>
         </div>
       </div>
 
@@ -99,7 +99,7 @@ export default function DailySprintWidget() {
           </div>
           <button
             onClick={incrementApps}
-            className="w-full py-1 text-[11px] font-bold bg-white/15 hover:bg-white/25 rounded-lg transition-colors"
+            className="w-full min-h-[44px] min-w-[44px] py-1 text-[11px] font-bold bg-white/15 hover:bg-white/25 rounded-lg transition-colors"
           >
             + Log Application
           </button>
@@ -119,7 +119,7 @@ export default function DailySprintWidget() {
           </div>
           <button
             onClick={incrementOutreach}
-            className="w-full py-1 text-[11px] font-bold bg-white/15 hover:bg-white/25 rounded-lg transition-colors"
+            className="w-full min-h-[44px] min-w-[44px] py-1 text-[11px] font-bold bg-white/15 hover:bg-white/25 rounded-lg transition-colors"
           >
             + Log Cold Outreach
           </button>
@@ -139,7 +139,7 @@ export default function DailySprintWidget() {
           </div>
           <button
             onClick={togglePrep}
-            className={`w-full py-1 text-[11px] font-bold rounded-lg transition-colors ${
+            className={`w-full min-h-[44px] min-w-[44px] py-1 text-[11px] font-bold rounded-lg transition-colors ${
               prepDone ? "bg-emerald-500/80 text-white" : "bg-white/15 hover:bg-white/25"
             }`}
           >

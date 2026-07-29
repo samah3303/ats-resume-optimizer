@@ -1,14 +1,15 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useRouter, useParams } from "next/navigation";
-import { useEffect, useState, useCallback } from "react";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
+import { useEffect, useState, useCallback, Suspense } from "react";
 import Link from "next/link";
 import ScoreGauge from "@/components/ScoreGauge";
 import KeywordBadge from "@/components/KeywordBadge";
 import SuggestionCard from "@/components/SuggestionCard";
 import AtsXray from "@/components/AtsXray";
 import SkillBridgeCard from "@/components/SkillBridgeCard";
+import { useToast } from "@/components/Toast";
 
 interface Analysis {
   id: string;
@@ -55,19 +56,35 @@ interface KeywordFrequency {
   matched: boolean;
 }
 
-export default function AnalysisDetailPage() {
+type TabId = "overview" | "suggestions" | "coverletter" | "interview" | "share" | "salary";
+
+const TABS: { id: TabId; label: string }[] = [
+  { id: "overview", label: "Overview" },
+  { id: "suggestions", label: "Suggestions" },
+  { id: "coverletter", label: "Cover Letter" },
+  { id: "interview", label: "Interview Qs" },
+  { id: "share", label: "Share" },
+  { id: "salary", label: "Salary" },
+];
+
+function AnalysisDetailContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
+  const { toast } = useToast();
   const id = params.id as string;
+
+  const tabFromUrl = searchParams.get("tab") as TabId | null;
+  const activeTab: TabId = tabFromUrl && TABS.some((t) => t.id === tabFromUrl)
+    ? tabFromUrl
+    : "overview";
 
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [suggestions, setSuggestions] = useState<SuggestionItem[]>([]);
   const [downloading, setDownloading] = useState(false);
-
-  // Tab state
-  const [activeTab, setActiveTab] = useState("overview");
 
   // Cover letter state
   const [coverLetterText, setCoverLetterText] = useState<string | null>(null);
@@ -87,23 +104,37 @@ export default function AnalysisDetailPage() {
   const [downloadSuccess, setDownloadSuccess] = useState(false);
   const [scoreBoost, setScoreBoost] = useState(0);
   const [targetSalary, setTargetSalary] = useState("");
-  const [negotiationResult, setNegotiationResult] = useState<Record<string,string> | null>(null);
+  const [negotiationResult, setNegotiationResult] = useState<Record<string, string> | null>(null);
   const [negotiating, setNegotiating] = useState(false);
 
+  // Sync tab to URL
+  const setActiveTab = (tab: TabId) => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("tab", tab);
+    window.history.replaceState({}, "", url.toString());
+    // Force re-render by navigating (shallow)
+    router.replace(`/dashboard/analyze/${id}?tab=${tab}`, { scroll: false });
+  };
+
   const fetchAnalysis = useCallback(async () => {
+    setFetchError(null);
     try {
       const res = await fetch(`/api/analyze/${id}`);
       if (res.ok) {
         const data = await res.json();
         setAnalysis(data.analysis);
         setSuggestions(data.analysis?.suggestions || []);
+      } else {
+        setFetchError("Failed to load analysis. Please try again.");
+        toast("Failed to load analysis", "error");
       }
     } catch {
-      // silently fail
+      setFetchError("Network error. Please check your connection and try again.");
+      toast("Failed to load analysis", "error");
     } finally {
       setLoading(false);
     }
-  }, [id]);
+  }, [id, toast]);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -120,7 +151,6 @@ export default function AnalysisDetailPage() {
       prev.map((s) => (s.id === sugId ? { ...s, accepted } : s))
     );
 
-    // Persist to API (fire and forget)
     try {
       await fetch(`/api/analyze/${id}/suggestions`, {
         method: "PUT",
@@ -128,7 +158,7 @@ export default function AnalysisDetailPage() {
         body: JSON.stringify({ suggestionId: sugId, accepted }),
       });
     } catch {
-      // silently fail, UI is optimistic
+      toast("Failed to save suggestion state", "error");
     }
   };
 
@@ -150,9 +180,11 @@ export default function AnalysisDetailPage() {
         setCoverLetterText(data.coverLetter);
       } else {
         setCoverLetterText("Failed to generate cover letter. Please try again.");
+        toast("Failed to generate cover letter", "error");
       }
     } catch {
       setCoverLetterText("Failed to generate cover letter. Please try again.");
+      toast("Failed to generate cover letter", "error");
     } finally {
       setGeneratingCoverLetter(false);
     }
@@ -178,9 +210,11 @@ export default function AnalysisDetailPage() {
       if (res.ok) {
         const data = await res.json();
         setInterviewQuestions(data.questions);
+      } else {
+        toast("Failed to generate interview questions", "error");
       }
     } catch {
-      // silently fail
+      toast("Failed to generate interview questions", "error");
     } finally {
       setGeneratingQuestions(false);
     }
@@ -198,9 +232,11 @@ export default function AnalysisDetailPage() {
       if (res.ok) {
         const data = await res.json();
         setShareUrl(data.shareUrl);
+      } else {
+        toast("Failed to create share link", "error");
       }
     } catch {
-      // silently fail
+      toast("Failed to create share link", "error");
     } finally {
       setSharing(false);
     }
@@ -218,26 +254,29 @@ export default function AnalysisDetailPage() {
     setNegotiating(true);
     setNegotiationResult(null);
     try {
-      const res = await fetch("/api/negotiate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ analysisId: id, targetSalary }) });
+      const res = await fetch("/api/negotiate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ analysisId: id, targetSalary }),
+      });
       if (res.ok) setNegotiationResult(await res.json());
-    } catch {}
-    finally { setNegotiating(false); }
+      else toast("Failed to generate negotiation guide", "error");
+    } catch {
+      toast("Failed to generate negotiation guide", "error");
+    } finally {
+      setNegotiating(false);
+    }
   };
 
   const handleDownloadOptimized = async () => {
-    const acceptedIds = suggestions
-      .filter((s) => s.accepted)
-      .map((s) => s.id);
+    const acceptedIds = suggestions.filter((s) => s.accepted).map((s) => s.id);
 
     if (acceptedIds.length === 0) {
-      alert(
-        "Please accept at least one suggestion before downloading the optimized resume."
-      );
+      toast("Please accept at least one suggestion before downloading", "info");
       return;
     }
 
     setDownloading(true);
-
     try {
       const res = await fetch("/api/optimize", {
         method: "POST",
@@ -256,31 +295,34 @@ export default function AnalysisDetailPage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      // Use extension matching the actual content type returned by the server
       const contentType = res.headers.get("Content-Type") || "";
-      const ext = contentType.includes("docx") || contentType.includes("vnd.openxmlformats")
-        ? ".docx"
-        : ".pdf";
+      const ext =
+        contentType.includes("docx") ||
+        contentType.includes("vnd.openxmlformats")
+          ? ".docx"
+          : ".pdf";
       a.download = `optimized-resume-${analysis?.resume?.name || "resume"}${ext}`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      // Calculate score boost
-      const acceptedCount = suggestions.filter(s => s.accepted).length;
+      const acceptedCount = suggestions.filter((s) => s.accepted).length;
       const boost = Math.min(acceptedCount * 5, 25);
       setScoreBoost(boost);
       setDownloadSuccess(true);
+      toast("Resume downloaded successfully!", "success");
     } catch (err) {
-      alert(
-        err instanceof Error ? err.message : "Failed to download optimized resume"
+      toast(
+        err instanceof Error ? err.message : "Failed to download optimized resume",
+        "error"
       );
     } finally {
       setDownloading(false);
     }
   };
 
+  // --- Loading state ---
   if (status === "loading" || loading) {
     return (
       <div className="flex items-center justify-center min-h-[80vh]">
@@ -291,13 +333,30 @@ export default function AnalysisDetailPage() {
 
   if (status === "unauthenticated") return null;
 
+  // --- Error state ---
+  if (fetchError) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-8 max-w-md mx-auto">
+          <p className="text-red-700 dark:text-red-300 mb-4">{fetchError}</p>
+          <button
+            onClick={fetchAnalysis}
+            className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (!analysis) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
-        <p className="text-gray-500">Analysis not found.</p>
+        <p className="text-gray-500 dark:text-slate-400">Analysis not found.</p>
         <Link
           href="/dashboard/analyze"
-          className="text-indigo-600 mt-2 inline-block"
+          className="text-indigo-600 dark:text-indigo-400 mt-2 inline-block"
         >
           Run a new analysis →
         </Link>
@@ -325,16 +384,18 @@ export default function AnalysisDetailPage() {
       };
     }
   } catch {
-    // invalid JSON
+    // invalid JSON — already defaulted
   }
 
-  // Build keyword frequencies by counting occurrences in resume text
   const resumeText = analysis.resume?.name || "";
   const allKeywords = [...keywords.matched, ...keywords.missing];
   const matchedSet = new Set(keywords.matched.map((k) => k.toLowerCase()));
 
   keywordFrequencies = allKeywords.map((word) => {
-    const regex = new RegExp(word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi");
+    const regex = new RegExp(
+      word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+      "gi"
+    );
     const matches = resumeText.match(regex);
     return {
       word,
@@ -343,9 +404,10 @@ export default function AnalysisDetailPage() {
     };
   });
 
-  const maxFreq = keywordFrequencies.length > 0
-    ? Math.max(...keywordFrequencies.map((k) => k.count), 1)
-    : 1;
+  const maxFreq =
+    keywordFrequencies.length > 0
+      ? Math.max(...keywordFrequencies.map((k) => k.count), 1)
+      : 1;
 
   const sections = [
     { label: "Format Score", value: analysis.formatScore },
@@ -356,45 +418,45 @@ export default function AnalysisDetailPage() {
   const acceptedCount = suggestions.filter((s) => s.accepted).length;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-[76px] md:pb-8">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
+      <nav className="flex items-center gap-2 text-sm text-gray-500 dark:text-slate-400 mb-6" aria-label="Breadcrumb">
         <Link
           href="/dashboard"
-          className="hover:text-gray-700 transition-colors"
+          className="hover:text-gray-700 dark:hover:text-slate-300 transition-colors"
         >
           Dashboard
         </Link>
-        <span>/</span>
+        <span aria-hidden="true">/</span>
         <Link
           href="/dashboard/analyze"
-          className="hover:text-gray-700 transition-colors"
+          className="hover:text-gray-700 dark:hover:text-slate-300 transition-colors"
         >
           Analyses
         </Link>
-        <span>/</span>
-        <span className="text-gray-900 font-medium truncate max-w-[200px]">
+        <span aria-hidden="true">/</span>
+        <span className="text-gray-900 dark:text-slate-100 font-medium truncate max-w-[200px]">
           {analysis.resume?.name} vs {analysis.jobDescription?.title}
         </span>
-      </div>
+      </nav>
 
       {/* Tab Navigation */}
-      <div className="flex gap-1 bg-white rounded-xl border border-gray-200 p-1 mb-6 overflow-x-auto">
-        {[
-          { id: "overview", label: "Overview" },
-          { id: "suggestions", label: "Suggestions" },
-          { id: "coverletter", label: "Cover Letter" },
-          { id: "interview", label: "Interview Qs" },
-          { id: "share", label: "Share" },
-          { id: "salary", label: "Salary" },
-        ].map((tab) => (
+      <div
+        className="flex gap-1 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-1 mb-6 overflow-x-auto"
+        role="tablist"
+        aria-label="Analysis sections"
+      >
+        {TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 min-w-fit px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${
+            role="tab"
+            aria-selected={activeTab === tab.id}
+            aria-controls={`panel-${tab.id}`}
+            className={`flex-1 min-w-fit px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap min-h-[44px] sm:min-h-0 ${
               activeTab === tab.id
                 ? "bg-indigo-600 text-white shadow-sm"
-                : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                : "text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700"
             }`}
           >
             {tab.label}
@@ -403,14 +465,14 @@ export default function AnalysisDetailPage() {
       </div>
 
       {/* Header */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6 shadow-sm">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 mb-6 shadow-sm">
         <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
           <ScoreGauge score={analysis.overallScore ?? 0} size={140} />
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-gray-900 mb-1">
+            <h1 className="text-xl font-bold text-gray-900 dark:text-slate-100 mb-1">
               Analysis Report
             </h1>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-slate-400">
               {analysis.resume?.name} vs{" "}
               {analysis.jobDescription?.title}
               {analysis.jobDescription?.company &&
@@ -423,16 +485,18 @@ export default function AnalysisDetailPage() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 mt-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
                 Apply for this Position
               </a>
             )}
             {analysis.summaryText && (
-              <p className="text-sm text-gray-700 mt-3 leading-relaxed">
+              <p className="text-sm text-gray-700 dark:text-slate-300 mt-3 leading-relaxed">
                 {analysis.summaryText}
               </p>
             )}
-            <p className="text-xs text-gray-400 mt-2">
+            <p className="text-xs text-gray-400 dark:text-slate-500 mt-2">
               {new Date(analysis.createdAt).toLocaleString()}
             </p>
           </div>
@@ -448,7 +512,7 @@ export default function AnalysisDetailPage() {
               </>
             ) : (
               <>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
                 Download Optimized ({acceptedCount})
@@ -460,37 +524,58 @@ export default function AnalysisDetailPage() {
 
       {/* Download success message */}
       {downloadSuccess && (
-        <div className="bg-green-50 border border-green-200 rounded-xl p-5 mb-6">
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-5 mb-6">
           <div className="flex items-start gap-3">
-            <span className="text-2xl">🎉</span>
+            <span aria-hidden="true" className="text-2xl">🎉</span>
             <div className="flex-1">
-              <h3 className="font-semibold text-green-800 mb-1">Resume Downloaded!</h3>
-              <p className="text-sm text-green-700 mb-2">
-                Estimated ATS score boost: <strong className="text-green-900 text-lg">+{scoreBoost}%</strong>
+              <h3 className="font-semibold text-green-800 dark:text-green-300 mb-1">
+                Resume Downloaded!
+              </h3>
+              <p className="text-sm text-green-700 dark:text-green-300 mb-2">
+                Estimated ATS score boost:{" "}
+                <strong className="text-green-900 dark:text-green-200 text-lg">
+                  +{scoreBoost}%
+                </strong>
                 {analysis?.overallScore && (
-                  <> (from {analysis.overallScore}% → ~{Math.min(100, analysis.overallScore + scoreBoost)}%)</>
+                  <>
+                    {" "}
+                    (from {analysis.overallScore}% → ~
+                    {Math.min(100, analysis.overallScore + scoreBoost)}%)
+                  </>
                 )}
               </p>
-              <div className="bg-white rounded-lg p-3 space-y-2 text-sm text-slate-600">
+              <div className="bg-white dark:bg-slate-800 rounded-lg p-3 space-y-2 text-sm text-slate-600 dark:text-slate-400">
                 <p className="flex items-start gap-2">
-                  <span className="text-amber-500">⚠️</span>
-                  <span>Re-check the <strong>alignment and structure</strong> — AI optimizations are great, but a human review catches nuances.</span>
+                  <span aria-hidden="true" className="text-amber-500">⚠️</span>
+                  <span>
+                    Re-check the <strong>alignment and structure</strong> — AI
+                    optimizations are great, but a human review catches nuances.
+                  </span>
                 </p>
                 <p className="flex items-start gap-2">
-                  <span className="text-blue-500">📄</span>
-                  <span>Convert to <strong>PDF</strong> before applying — many ATS prefer PDF over DOCX.</span>
+                  <span aria-hidden="true" className="text-blue-500">📄</span>
+                  <span>
+                    Convert to <strong>PDF</strong> before applying — many ATS
+                    prefer PDF over DOCX.
+                  </span>
                 </p>
                 <p className="flex items-start gap-2">
-                  <span className="text-indigo-500">🔄</span>
-                  <button onClick={() => { setDownloadSuccess(false); router.push("/dashboard/analyze"); }} className="text-indigo-600 font-medium hover:text-indigo-700 underline">
+                  <span aria-hidden="true" className="text-indigo-500">🔄</span>
+                  <button
+                    onClick={() => {
+                      setDownloadSuccess(false);
+                      router.push("/dashboard/analyze");
+                    }}
+                    className="text-indigo-600 dark:text-indigo-400 font-medium hover:text-indigo-700 dark:hover:text-indigo-300 underline"
+                  >
                     Upload the optimized version and analyze it again
-                  </button>
-                  {" "}before applying to verify the score improvement.
+                  </button>{" "}
+                  before applying to verify the score improvement.
                 </p>
               </div>
               <button
                 onClick={() => setDownloadSuccess(false)}
-                className="mt-3 text-xs text-green-600 hover:text-green-700 underline"
+                className="mt-3 text-xs text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 underline"
               >
                 Dismiss
               </button>
@@ -499,273 +584,308 @@ export default function AnalysisDetailPage() {
         </div>
       )}
 
-      <div style={{ display: activeTab === "overview" ? undefined : "none" }}>
-        {analysis?.resume?.id && <AtsXray resumeId={analysis.resume.id} resumeName={analysis.resume.name || "Resume"} />}
-      </div>
-
-      {/* Section Scores */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6" style={{ display: activeTab === "overview" ? undefined : "none" }}>
-        {sections.map((section) => (
-          <div
-            key={section.label}
-            className="bg-white rounded-xl border border-gray-200 px-4 py-3 sm:p-5"
-          >
-            <p className="text-sm text-gray-500 mb-1">{section.label}</p>
-            <p className="text-2xl font-bold text-gray-900">
-              {section.value !== null && section.value !== undefined
-                ? section.isPct
-                  ? `${Math.round(section.value)}%`
-                  : `${section.value}/100`
-                : "—"}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      {/* Keywords Section */}
-      {(keywords.matched.length > 0 || keywords.missing.length > 0) && (
-        <div className={`bg-white rounded-2xl border border-gray-200 p-6 mb-6 shadow-sm ${activeTab !== "overview" ? "hidden" : ""}`}>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Keyword Match
-          </h2>
-          {keywords.matched.length > 0 && (
-            <div className="mb-4">
-              <p className="text-sm font-medium text-green-700 mb-2">
-                ✅ Matched ({keywords.matched.length})
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {keywords.matched.map((kw) => (
-                  <KeywordBadge key={kw} keyword={kw} matched />
-                ))}
-              </div>
-            </div>
+      {/* ============ OVERVIEW TAB ============ */}
+      {activeTab === "overview" && (
+        <div id="panel-overview" role="tabpanel" aria-labelledby="tab-overview">
+          {analysis?.resume?.id && (
+            <AtsXray
+              resumeId={analysis.resume.id}
+              resumeName={analysis.resume.name || "Resume"}
+            />
           )}
-          {keywords.missing.length > 0 && (
-            <div>
-              <p className="text-sm font-medium text-red-700 mb-2">
-                ❌ Missing ({keywords.missing.length})
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {keywords.missing.map((kw) => (
-                  <KeywordBadge key={kw} keyword={kw} matched={false} />
-                ))}
-              </div>
-            </div>
-          )}
-          {keywords.matched.length === 0 && keywords.missing.length === 0 && (
-            <p className="text-sm text-gray-500">
-              No keyword data available.
-            </p>
-          )}
-        </div>
-      )}
 
-      {/* Skills Gap */}
-      {(skillsGap.present.length > 0 || skillsGap.missing.length > 0) && (
-        <div className={`bg-white rounded-2xl border border-gray-200 p-6 mb-6 shadow-sm ${activeTab !== "overview" ? "hidden" : ""}`}>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Skills Gap Analysis
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 bg-green-50 rounded-xl border border-green-200">
-              <p className="text-sm font-semibold text-green-800 mb-2">
-                Skills You Have
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {skillsGap.present.map((s) => (
-                  <span
-                    key={s}
-                    className="px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded-md"
-                  >
-                    {s}
-                  </span>
-                ))}
+          {/* Section Scores */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
+            {sections.map((section) => (
+              <div
+                key={section.label}
+                className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 px-4 py-3 sm:p-5"
+              >
+                <p className="text-sm text-gray-500 dark:text-slate-400 mb-1">
+                  {section.label}
+                </p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-slate-100">
+                  {section.value !== null && section.value !== undefined
+                    ? section.isPct
+                      ? `${Math.round(section.value)}%`
+                      : `${section.value}/100`
+                    : "—"}
+                </p>
               </div>
-            </div>
-            <div className="p-4 bg-red-50 rounded-xl border border-red-200">
-              <p className="text-sm font-semibold text-red-800 mb-2">
-                Skills to Add
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {skillsGap.missing.map((s) => (
-                  <span
-                    key={s}
-                    className="px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-md"
-                  >
-                    {s}
-                  </span>
-                ))}
-              </div>
-            </div>
+            ))}
           </div>
-        </div>
-      )}
 
-      {/* Free Skill-Bridging & Micro-Projects */}
-      {(skillsGap.missing.length > 0 || keywords.missing.length > 0) && (
-        <div className={`mb-6 ${activeTab !== "overview" ? "hidden" : ""}`}>
-          <SkillBridgeCard missingSkills={Array.from(new Set([...skillsGap.missing, ...keywords.missing]))} />
-        </div>
-      )}
-
-      {/* Keyword Density Heatmap */}
-      {keywordFrequencies.length > 0 && (
-        <div className={`bg-white rounded-2xl border border-gray-200 p-6 mb-6 shadow-sm ${activeTab !== "overview" ? "hidden" : ""}`}>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Keyword Density Heatmap
-          </h2>
-          <div className="flex flex-wrap gap-1.5">
-            {keywordFrequencies.map((kw) => {
-              const intensity = Math.max(0.25, kw.count / maxFreq);
-              if (kw.matched) {
-                const green = Math.round(200 - intensity * 160);
-                return (
-                  <span
-                    key={kw.word}
-                    className="px-3 py-1 rounded-full text-xs font-medium border"
-                    style={{
-                      backgroundColor: `rgb(220, ${green + 30}, 220)`,
-                      color: `rgb(0, ${Math.round(100 - intensity * 60)}, 0)`,
-                      borderColor: `rgb(150, ${green + 20}, 150)`,
-                      opacity: 0.65 + intensity * 0.35,
-                    }}
-                    title={`${kw.word} (${kw.count}x)`}
-                  >
-                    ✓ {kw.word}
-                    {kw.count > 1 && (
-                      <span className="ml-1 text-[10px] opacity-70">×{kw.count}</span>
-                    )}
-                  </span>
-                );
-              }
-              return (
-                <span
-                  key={kw.word}
-                  className="px-3 py-1 rounded-full text-xs font-medium border"
-                  style={{
-                    backgroundColor: `rgb(255, ${Math.round(230 - intensity * 80)}, ${Math.round(230 - intensity * 80)})`,
-                    color: `rgb(180, ${Math.round(40 - intensity * 30)}, ${Math.round(40 - intensity * 30)})`,
-                    borderColor: `rgb(250, ${Math.round(180 - intensity * 60)}, ${Math.round(180 - intensity * 60)})`,
-                  }}
-                  title={`${kw.word} (missing)`}
-                >
-                  ✗ {kw.word}
-                </span>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Cover Letter Generator */}
-      <div className={`bg-white rounded-2xl border border-gray-200 p-6 mb-6 shadow-sm ${activeTab !== "coverletter" ? "hidden" : ""}`}>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Cover Letter Generator
-          </h2>
-          {!showCoverLetter && (
-            <button
-              onClick={handleGenerateCoverLetter}
-              disabled={generatingCoverLetter}
-              className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-            >
-              {generatingCoverLetter ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                "Generate Cover Letter"
+          {/* Keywords Section */}
+          {(keywords.matched.length > 0 || keywords.missing.length > 0) && (
+            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 mb-6 shadow-sm">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">
+                Keyword Match
+              </h2>
+              {keywords.matched.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-sm font-medium text-green-700 dark:text-green-400 mb-2">
+                    ✅ Matched ({keywords.matched.length})
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {keywords.matched.map((kw) => (
+                      <KeywordBadge key={kw} keyword={kw} matched />
+                    ))}
+                  </div>
+                </div>
               )}
-            </button>
+              {keywords.missing.length > 0 && (
+                <div>
+                  <p className="text-sm font-medium text-red-700 dark:text-red-400 mb-2">
+                    ❌ Missing ({keywords.missing.length})
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {keywords.missing.map((kw) => (
+                      <KeywordBadge key={kw} keyword={kw} matched={false} />
+                    ))}
+                  </div>
+                </div>
+              )}
+              {keywords.matched.length === 0 &&
+                keywords.missing.length === 0 && (
+                  <p className="text-sm text-gray-500 dark:text-slate-400">
+                    No keyword data available.
+                  </p>
+                )}
+            </div>
+          )}
+
+          {/* Skills Gap */}
+          {(skillsGap.present.length > 0 || skillsGap.missing.length > 0) && (
+            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 mb-6 shadow-sm">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">
+                Skills Gap Analysis
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800">
+                  <p className="text-sm font-semibold text-green-800 dark:text-green-300 mb-2">
+                    Skills You Have
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {skillsGap.present.map((s) => (
+                      <span
+                        key={s}
+                        className="px-2 py-0.5 bg-green-100 dark:bg-green-800/50 text-green-800 dark:text-green-300 text-xs rounded-md"
+                      >
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800">
+                  <p className="text-sm font-semibold text-red-800 dark:text-red-300 mb-2">
+                    Skills to Add
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {skillsGap.missing.map((s) => (
+                      <span
+                        key={s}
+                        className="px-2 py-0.5 bg-red-100 dark:bg-red-800/50 text-red-800 dark:text-red-300 text-xs rounded-md"
+                      >
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Skill Bridge */}
+          {(skillsGap.missing.length > 0 || keywords.missing.length > 0) && (
+            <div className="mb-6">
+              <SkillBridgeCard
+                missingSkills={Array.from(
+                  new Set([...skillsGap.missing, ...keywords.missing])
+                )}
+              />
+            </div>
+          )}
+
+          {/* Keyword Density Heatmap */}
+          {keywordFrequencies.length > 0 && (
+            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 mb-6 shadow-sm">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">
+                Keyword Density Heatmap
+              </h2>
+              <div className="flex flex-wrap gap-1.5">
+                {keywordFrequencies.map((kw) => {
+                  const intensity = Math.max(0.25, kw.count / maxFreq);
+                  if (kw.matched) {
+                    const green = Math.round(200 - intensity * 160);
+                    return (
+                      <span
+                        key={kw.word}
+                        className="px-3 py-1 rounded-full text-xs font-medium border"
+                        style={{
+                          backgroundColor: `rgb(220, ${green + 30}, 220)`,
+                          color: `rgb(0, ${Math.round(100 - intensity * 60)}, 0)`,
+                          borderColor: `rgb(150, ${green + 20}, 150)`,
+                          opacity: 0.65 + intensity * 0.35,
+                        }}
+                        title={`${kw.word} (${kw.count}x)`}
+                      >
+                        ✓ {kw.word}
+                        {kw.count > 1 && (
+                          <span className="ml-1 text-[10px] opacity-70">
+                            ×{kw.count}
+                          </span>
+                        )}
+                      </span>
+                    );
+                  }
+                  return (
+                    <span
+                      key={kw.word}
+                      className="px-3 py-1 rounded-full text-xs font-medium border"
+                      style={{
+                        backgroundColor: `rgb(255, ${Math.round(230 - intensity * 80)}, ${Math.round(230 - intensity * 80)})`,
+                        color: `rgb(180, ${Math.round(40 - intensity * 30)}, ${Math.round(40 - intensity * 30)})`,
+                        borderColor: `rgb(250, ${Math.round(180 - intensity * 60)}, ${Math.round(180 - intensity * 60)})`,
+                      }}
+                      title={`${kw.word} (missing)`}
+                    >
+                      ✗ {kw.word}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
           )}
         </div>
+      )}
 
-        {showCoverLetter && (
-          <>
-            {generatingCoverLetter ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-                <span className="ml-3 text-sm text-gray-500">Generating cover letter...</span>
-              </div>
-            ) : coverLetterText ? (
-              <div>
-                <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 max-h-96 overflow-y-auto">
-                  <pre className="text-sm text-gray-700 whitespace-pre-wrap font-sans leading-relaxed">
-                    {coverLetterText}
-                  </pre>
-                </div>
-                <div className="flex items-center gap-3 mt-3">
-                  <button
-                    onClick={handleCopyCoverLetter}
-                    className="px-4 py-1.5 text-sm font-medium text-indigo-600 border border-indigo-300 rounded-lg hover:bg-indigo-50 transition-colors flex items-center gap-1.5"
-                  >
-                    {coverLetterCopied ? (
-                      <>✓ Copied!</>
-                    ) : (
-                      <>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                        </svg>
-                        Copy to Clipboard
-                      </>
-                    )}
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowCoverLetter(false);
-                      setCoverLetterText(null);
-                    }}
-                    className="px-4 py-1.5 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    Regenerate
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <p className="text-sm text-red-600 py-4">
-                Failed to generate cover letter. Please try again.
-              </p>
+      {/* ============ COVER LETTER TAB ============ */}
+      {activeTab === "coverletter" && (
+        <div
+          id="panel-coverletter"
+          role="tabpanel"
+          aria-labelledby="tab-coverletter"
+          className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 mb-6 shadow-sm"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
+              Cover Letter Generator
+            </h2>
+            {!showCoverLetter && (
+              <button
+                onClick={handleGenerateCoverLetter}
+                disabled={generatingCoverLetter}
+                className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {generatingCoverLetter ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  "Generate Cover Letter"
+                )}
+              </button>
             )}
-          </>
-        )}
-      </div>
+          </div>
 
-      {/* Interview Questions */}
-      <div className={`bg-white rounded-2xl border border-gray-200 p-6 mb-6 shadow-sm ${activeTab !== "interview" ? "hidden" : ""}`}>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Interview Questions
-          </h2>
-          {!showQuestions && (
-            <button
-              onClick={handleGenerateQuestions}
-              disabled={generatingQuestions}
-              className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-            >
-              {generatingQuestions ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Generating...
-                </>
+          {showCoverLetter && (
+            <>
+              {generatingCoverLetter ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                  <span className="ml-3 text-sm text-gray-500 dark:text-slate-400">
+                    Generating cover letter...
+                  </span>
+                </div>
+              ) : coverLetterText ? (
+                <div>
+                  <div className="p-4 bg-gray-50 dark:bg-slate-700/50 rounded-xl border border-gray-200 dark:border-slate-600 max-h-96 overflow-y-auto">
+                    <pre className="text-sm text-gray-700 dark:text-slate-300 whitespace-pre-wrap font-sans leading-relaxed">
+                      {coverLetterText}
+                    </pre>
+                  </div>
+                  <div className="flex items-center gap-3 mt-3">
+                    <button
+                      onClick={handleCopyCoverLetter}
+                      className="px-4 py-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 border border-indigo-300 dark:border-indigo-700 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors flex items-center gap-1.5"
+                    >
+                      {coverLetterCopied ? (
+                        <>✓ Copied!</>
+                      ) : (
+                        <>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                          Copy to Clipboard
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowCoverLetter(false);
+                        setCoverLetterText(null);
+                      }}
+                      className="px-4 py-1.5 text-sm font-medium text-gray-600 dark:text-slate-400 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+                    >
+                      Regenerate
+                    </button>
+                  </div>
+                </div>
               ) : (
-                "Generate Interview Questions"
+                <p className="text-sm text-red-600 dark:text-red-400 py-4">
+                  Failed to generate cover letter. Please try again.
+                </p>
               )}
-            </button>
+            </>
           )}
         </div>
+      )}
 
-        {showQuestions && (
-          <>
-            {generatingQuestions ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-                <span className="ml-3 text-sm text-gray-500">Generating interview questions...</span>
-              </div>
-            ) : interviewQuestions && interviewQuestions.length > 0 ? (
-              <div className="space-y-4">
-                {Array.from(new Set(interviewQuestions.map((q) => q.category))).map(
-                  (category) => {
+      {/* ============ INTERVIEW TAB ============ */}
+      {activeTab === "interview" && (
+        <div
+          id="panel-interview"
+          role="tabpanel"
+          aria-labelledby="tab-interview"
+          className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 mb-6 shadow-sm"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
+              Interview Questions
+            </h2>
+            {!showQuestions && (
+              <button
+                onClick={handleGenerateQuestions}
+                disabled={generatingQuestions}
+                className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {generatingQuestions ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  "Generate Interview Questions"
+                )}
+              </button>
+            )}
+          </div>
+
+          {showQuestions && (
+            <>
+              {generatingQuestions ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                  <span className="ml-3 text-sm text-gray-500 dark:text-slate-400">
+                    Generating interview questions...
+                  </span>
+                </div>
+              ) : interviewQuestions && interviewQuestions.length > 0 ? (
+                <div className="space-y-4">
+                  {Array.from(
+                    new Set(interviewQuestions.map((q) => q.category))
+                  ).map((category) => {
                     const catQuestions = interviewQuestions.filter(
                       (q) => q.category === category
                     );
@@ -773,7 +893,7 @@ export default function AnalysisDetailPage() {
                       category.charAt(0).toUpperCase() + category.slice(1);
                     return (
                       <div key={category}>
-                        <h3 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <h3 className="text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2 flex items-center gap-2">
                           <span
                             className={`w-2 h-2 rounded-full ${
                               category === "technical"
@@ -782,6 +902,7 @@ export default function AnalysisDetailPage() {
                                   ? "bg-amber-500"
                                   : "bg-emerald-500"
                             }`}
+                            aria-hidden="true"
                           />
                           {catLabel} ({catQuestions.length})
                         </h3>
@@ -789,12 +910,12 @@ export default function AnalysisDetailPage() {
                           {catQuestions.map((q, idx) => (
                             <div
                               key={idx}
-                              className="p-3 bg-gray-50 rounded-lg border border-gray-100"
+                              className="p-3 bg-gray-50 dark:bg-slate-700/50 rounded-lg border border-gray-100 dark:border-slate-600"
                             >
-                              <p className="text-sm font-medium text-gray-800">
+                              <p className="text-sm font-medium text-gray-800 dark:text-slate-200">
                                 {q.question}
                               </p>
-                              <p className="text-xs text-gray-500 mt-1">
+                              <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
                                 {q.rationale}
                               </p>
                             </div>
@@ -802,114 +923,182 @@ export default function AnalysisDetailPage() {
                         </div>
                       </div>
                     );
-                  }
-                )}
-                <button
-                  onClick={() => {
-                    setShowQuestions(false);
-                    setInterviewQuestions(null);
-                  }}
-                  className="px-4 py-1.5 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  Regenerate
-                </button>
-              </div>
-            ) : (
-              <p className="text-sm text-gray-500 py-4">
-                No questions generated. Please try again.
-              </p>
-            )}
-          </>
-        )}
-      </div>
-
-      {/* Suggestions */}
-      <div className={`bg-white rounded-2xl border border-gray-200 p-6 shadow-sm ${activeTab !== "suggestions" ? "hidden" : ""}`}>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Suggestions ({suggestions.length})
-          </h2>
-          <span className="text-sm text-gray-500">
-            {acceptedCount} accepted
-          </span>
-        </div>
-
-        {suggestions.length === 0 ? (
-          <p className="text-sm text-gray-500 py-4 text-center">
-            No suggestions available for this analysis.
-          </p>
-        ) : (
-          <div className="space-y-3">
-            {suggestions.map((s) => (
-              <SuggestionCard
-                key={s.id}
-                suggestion={s}
-                onChange={handleSuggestionChange}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Shareable Link */}
-      <div className={`bg-white rounded-2xl border border-gray-200 p-6 mt-6 shadow-sm ${activeTab !== "share" ? "hidden" : ""}`}>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Share Analysis
-          </h2>
-          {!shareUrl && (
-            <button
-              onClick={handleShare}
-              disabled={sharing}
-              className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-            >
-              {sharing ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Creating link...
-                </>
+                  })}
+                  <button
+                    onClick={() => {
+                      setShowQuestions(false);
+                      setInterviewQuestions(null);
+                    }}
+                    className="px-4 py-1.5 text-sm font-medium text-gray-600 dark:text-slate-400 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+                  >
+                    Regenerate
+                  </button>
+                </div>
               ) : (
-                "Share Analysis"
+                <p className="text-sm text-gray-500 dark:text-slate-400 py-4">
+                  No questions generated. Please try again.
+                </p>
               )}
-            </button>
+            </>
           )}
         </div>
+      )}
 
-        {shareUrl && (
-          <div className="flex items-center gap-3">
-            <div className="flex-1 p-3 bg-gray-50 rounded-lg border border-gray-200">
-              <p className="text-sm text-gray-700 font-mono break-all">
-                {shareUrl}
-              </p>
+      {/* ============ SUGGESTIONS TAB ============ */}
+      {activeTab === "suggestions" && (
+        <div
+          id="panel-suggestions"
+          role="tabpanel"
+          aria-labelledby="tab-suggestions"
+          className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 shadow-sm"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
+              Suggestions ({suggestions.length})
+            </h2>
+            <span className="text-sm text-gray-500 dark:text-slate-400">
+              {acceptedCount} accepted
+            </span>
+          </div>
+
+          {suggestions.length === 0 ? (
+            <p className="text-sm text-gray-500 dark:text-slate-400 py-4 text-center">
+              No suggestions available for this analysis.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {suggestions.map((s) => (
+                <SuggestionCard
+                  key={s.id}
+                  suggestion={s}
+                  onChange={handleSuggestionChange}
+                />
+              ))}
             </div>
+          )}
+        </div>
+      )}
+
+      {/* ============ SHARE TAB ============ */}
+      {activeTab === "share" && (
+        <div
+          id="panel-share"
+          role="tabpanel"
+          aria-labelledby="tab-share"
+          className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 shadow-sm"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
+              Share Analysis
+            </h2>
+            {!shareUrl && (
+              <button
+                onClick={handleShare}
+                disabled={sharing}
+                className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {sharing ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Creating link...
+                  </>
+                ) : (
+                  "Share Analysis"
+                )}
+              </button>
+            )}
+          </div>
+
+          {shareUrl && (
+            <div className="flex items-center gap-3">
+              <div className="flex-1 p-3 bg-gray-50 dark:bg-slate-700/50 rounded-lg border border-gray-200 dark:border-slate-600">
+                <p className="text-sm text-gray-700 dark:text-slate-300 font-mono break-all">
+                  {shareUrl}
+                </p>
+              </div>
+              <button
+                onClick={handleCopyShareLink}
+                className="px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 border border-indigo-300 dark:border-indigo-700 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors flex items-center gap-1.5 shrink-0"
+              >
+                {shareCopied ? (
+                  <>✓ Copied!</>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    Copy Link
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ============ SALARY TAB ============ */}
+      {activeTab === "salary" && (
+        <div
+          id="panel-salary"
+          role="tabpanel"
+          aria-labelledby="tab-salary"
+          className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 shadow-sm"
+        >
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">
+            💰 Salary Negotiation Guide
+          </h2>
+          <div className="flex gap-3 mb-4">
+            <input
+              value={targetSalary}
+              onChange={(e) => setTargetSalary(e.target.value)}
+              placeholder="Target salary (e.g. $120,000)"
+              className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-700 outline-none"
+              aria-label="Target salary"
+            />
             <button
-              onClick={handleCopyShareLink}
-              className="px-4 py-2 text-sm font-medium text-indigo-600 border border-indigo-300 rounded-lg hover:bg-indigo-50 transition-colors flex items-center gap-1.5 shrink-0"
+              onClick={handleNegotiate}
+              disabled={negotiating || !targetSalary.trim()}
+              className="px-6 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50"
             >
-              {shareCopied ? (
-                <>✓ Copied!</>
-              ) : (
-                <>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                  Copy Link
-                </>
-              )}
+              {negotiating ? "..." : "Generate"}
             </button>
           </div>
-        )}
-      </div>
-
-      <div style={{ display: activeTab === "salary" ? undefined : "none" }} className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">💰 Salary Negotiation Guide</h2>
-        <div className="flex gap-3 mb-4">
-          <input value={targetSalary} onChange={e => setTargetSalary(e.target.value)} placeholder="Target salary (e.g. $120,000)" className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-200 outline-none" />
-          <button onClick={handleNegotiate} disabled={negotiating || !targetSalary.trim()} className="px-6 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50">{negotiating ? "..." : "Generate"}</button>
+          {negotiationResult?.marketRange && (
+            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg mb-3">
+              <p className="text-sm font-semibold text-blue-800 dark:text-blue-300">
+                📊 Market Range
+              </p>
+              <p className="text-sm text-blue-700 dark:text-blue-300">
+                {negotiationResult.marketRange}
+              </p>
+            </div>
+          )}
+          {negotiationResult?.negotiationScript && (
+            <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg mb-3">
+              <p className="text-sm font-semibold text-green-800 dark:text-green-300">
+                🎙️ Script
+              </p>
+              <p className="text-sm text-green-700 dark:text-green-300 whitespace-pre-wrap">
+                {negotiationResult.negotiationScript}
+              </p>
+            </div>
+          )}
         </div>
-        {negotiationResult?.marketRange && <div className="p-4 bg-blue-50 rounded-lg mb-3"><p className="text-sm font-semibold text-blue-800">📊 Market Range</p><p className="text-sm text-blue-700">{negotiationResult.marketRange}</p></div>}
-        {negotiationResult?.negotiationScript && <div className="p-4 bg-green-50 rounded-lg mb-3"><p className="text-sm font-semibold text-green-800">🎙️ Script</p><p className="text-sm text-green-700 whitespace-pre-wrap">{negotiationResult.negotiationScript}</p></div>}
-      </div>
+      )}
     </div>
+  );
+}
+
+export default function AnalysisDetailPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-[80vh]">
+          <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <AnalysisDetailContent />
+    </Suspense>
   );
 }
