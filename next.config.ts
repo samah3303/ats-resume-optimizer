@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
-  serverExternalPackages: ["pdfkit", "pdf-parse"],
+  serverExternalPackages: ["pdfkit", "pdf-parse", "mammoth", "jszip"],
 };
 
 export default nextConfig;
