@@ -4,6 +4,8 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { parseResumeFile } from "@/lib/resume-parser";
 import { saveOriginalFile } from "@/lib/storage";
+import { embedText, chunkText, toPgVector } from "@/lib/embeddings";
+import { neon } from "@neondatabase/serverless";
 
 function detectDocType(mimeType: string, fileName: string): string | null {
   // Check MIME type first
@@ -90,6 +92,9 @@ export async function POST(req: NextRequest) {
         console.warn("Failed to save original file, continuing without it");
       }
 
+      // Fire-and-forget: embed this resume for RAG semantic search
+      embedResumeAsync(resume.id, parsedText);
+
       return NextResponse.json({ resume }, { status: 201 });
     }
 
@@ -119,6 +124,9 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Fire-and-forget: embed this resume for RAG semantic search
+    embedResumeAsync(resume.id, body.parsedText);
+
     return NextResponse.json({ resume }, { status: 201 });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
@@ -127,5 +135,32 @@ export async function POST(req: NextRequest) {
       { error: `Failed to process resume: ${message}` },
       { status: 500 }
     );
+  }
+}
+
+/**
+ * Fire-and-forget: embed a resume's chunks into pgvector for RAG.
+ * Uses Neon HTTP driver (works even when TCP 5432 is blocked).
+ */
+async function embedResumeAsync(resumeId: string, parsedText: string) {
+  try {
+    const dbUrl = process.env.DATABASE_URL;
+    if (!dbUrl) return;
+    const sql = neon(dbUrl);
+
+    // Delete old chunks
+    await sql`DELETE FROM resume_chunks WHERE resume_id = ${resumeId}`;
+
+    const chunks = chunkText(parsedText, 500, 100);
+    for (let i = 0; i < chunks.length; i++) {
+      const embedding = await embedText(chunks[i]);
+      await sql`
+        INSERT INTO resume_chunks (id, resume_id, chunk_text, chunk_index, embedding)
+        VALUES (gen_random_uuid()::text, ${resumeId}, ${chunks[i]}, ${i}, ${toPgVector(embedding)}::vector)
+      `;
+    }
+    console.log(`[embeddings] Auto-embedded resume ${resumeId}: ${chunks.length} chunks`);
+  } catch (err) {
+    console.error(`[embeddings] Failed to auto-embed resume ${resumeId}:`, (err as Error).message);
   }
 }

@@ -1,0 +1,115 @@
+{
+  "name": "ResuMatch — Weekly Job Hunt Automation",
+  "nodes": [
+    {
+      "name": "Schedule (Every Monday 8am)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [250, 300],
+      "parameters": {
+        "rule": {
+          "interval": [{"field": "cronExpression", "expression": "0 8 * * 1"}]
+        }
+      }
+    },
+    {
+      "name": "Get Active Users",
+      "type": "n8n-nodes-base.postgres",
+      "position": [450, 300],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT u.id, u.email, op.target_positions, op.target_country, op.core_skills FROM users u JOIN onboarding_profiles op ON u.id = op.user_id WHERE u.created_at > NOW() - INTERVAL '90 days'"
+      }
+    },
+    {
+      "name": "For Each User",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [650, 300],
+      "parameters": {
+        "batchSize": 1
+      }
+    },
+    {
+      "name": "Get Latest Resume",
+      "type": "n8n-nodes-base.postgres",
+      "position": [850, 300],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT parsed_text FROM resumes WHERE user_id = '{{ $json.id }}' ORDER BY created_at DESC LIMIT 1"
+      }
+    },
+    {
+      "name": "Call Job Search Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1050, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/jds/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "userId", "value": "={{ $json.id }}"},
+            {"name": "resumeText", "value": "={{ $json.parsed_text }}"},
+            {"name": "targetPositions", "value": "={{ $json.target_positions }}"},
+            {"name": "targetCountry", "value": "={{ $json.target_country }}"},
+            {"name": "coreSkills", "value": "={{ $json.core_skills }}"}
+          ]
+        }
+      }
+    },
+    {
+      "name": "Filter High Matches (>70%)",
+      "type": "n8n-nodes-base.if",
+      "position": [1250, 300],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          }
+        }
+      }
+    },
+    {
+      "name": "Send Digest Email",
+      "type": "n8n-nodes-base.emailSend",
+      "position": [1450, 200],
+      "parameters": {
+        "fromEmail": "jobs@resumatch.app",
+        "toEmail": "={{ $json.email }}",
+        "subject": "🎯 Your Weekly Job Matches — ResuMatch",
+        "text": "Hi! Here are your top job matches this week:\n\n{{ $json.jobs }}\n\nView and analyze them: http://localhost:3000/dashboard/jds"
+      }
+    },
+    {
+      "name": "Log Skipped (Low Match)",
+      "type": "n8n-nodes-base.noOp",
+      "position": [1450, 400]
+    }
+  ],
+  "connections": {
+    "Schedule (Every Monday 8am)": {
+      "main": [[{"node": "Get Active Users", "type": "main", "index": 0}]]
+    },
+    "Get Active Users": {
+      "main": [[{"node": "For Each User", "type": "main", "index": 0}]]
+    },
+    "For Each User": {
+      "main": [[{"node": "Get Latest Resume", "type": "main", "index": 0}]]
+    },
+    "Get Latest Resume": {
+      "main": [[{"node": "Call Job Search Agent", "type": "main", "index": 0}]]
+    },
+    "Call Job Search Agent": {
+      "main": [[{"node": "Filter High Matches (>70%)", "type": "main", "index": 0}]]
+    },
+    "Filter High Matches (>70%)": {
+      "main": [
+        [{"node": "Send Digest Email", "type": "main", "index": 0}],
+        [{"node": "Log Skipped (Low Match)", "type": "main", "index": 1}]
+      ]
+    }
+  }
+}

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { generateOptimizedResume } from "@/lib/deepseek";
+import { runResumeWriterAgent } from "@/lib/agents";
 import { generateOptimizedResumePdf } from "@/lib/pdf-generator";
 import { modifyDocxText } from "@/lib/docx-modifier";
 import { loadOriginalFile, getOriginalFormat } from "@/lib/storage";
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
       where: { id: analysisId, userId },
       include: {
         resume: true,
-        jobDescription: { select: { title: true } },
+        jobDescription: { select: { title: true, rawText: true } },
         suggestions: {
           where: { id: { in: acceptedSuggestionIds } },
         },
@@ -95,19 +95,21 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // ── PDF path: AI rewrite + pdfkit (fallback for .pdf, .doc, and failed docx) ──
-    const optimizedText = await generateOptimizedResume(
-      resume.parsedText,
-      analysis.suggestions.map((s) => ({
+    // ── PDF path: AI agent rewrite + pdfkit (fallback for .pdf, .doc, and failed docx) ──
+    const writerResult = await runResumeWriterAgent({
+      resumeText: resume.parsedText,
+      jobDescriptionTitle: analysis.jobDescription.title,
+      jobDescriptionText: analysis.jobDescription.rawText,
+      suggestions: analysis.suggestions.map((s) => ({
         section: s.section,
         originalText: s.originalText,
         suggestedText: s.suggestedText,
+        rationale: s.rationale,
       })),
-      analysis.jobDescription.title
-    );
+    });
 
     const pdfBuffer = await generateOptimizedResumePdf(
-      optimizedText,
+      writerResult.finalResume,
       resume.name
     );
 

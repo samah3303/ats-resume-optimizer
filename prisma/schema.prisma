@@ -1,10 +1,12 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  extensions = [pgvector(map: "vector", schema: "public")]
 }
 
 model User {
@@ -23,6 +25,7 @@ model User {
   onboardingProfile OnboardingProfile?
   roadmaps          Roadmap[]
   applications     Application[]
+  suggestionFeedbacks SuggestionFeedback[]
 
   @@map("users")
 }
@@ -42,6 +45,7 @@ model Resume {
   analyses           Analysis[]
   onboardingProfiles OnboardingProfile[]
   originalFile       OriginalFile?
+  chunks             ResumeChunk[]
 
   @@map("resumes")
 }
@@ -89,6 +93,7 @@ model JobDescription {
   positionProfile PositionProfile? @relation(fields: [positionProfileId], references: [id], onDelete: SetNull)
   analyses        Analysis[]
   applications    Application[]
+  chunks          JDChunk[]
 
   @@map("job_descriptions")
 }
@@ -127,6 +132,7 @@ model Suggestion {
   createdAt     DateTime @default(now()) @map("created_at")
 
   analysis Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  feedbacks SuggestionFeedback[]
 
   @@map("suggestions")
 }
@@ -210,4 +216,49 @@ model WeekTask {
   roadmap Roadmap @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
 
   @@map("week_tasks")
+}
+
+model ResumeChunk {
+  id        String   @id @default(uuid())
+  resumeId  String   @map("resume_id")
+  chunkText String   @map("chunk_text") @db.Text
+  chunkIndex Int     @map("chunk_index")
+  embedding Unsupported("vector(384)")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  resume Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+
+  @@index([resumeId])
+  @@map("resume_chunks")
+}
+
+model JDChunk {
+  id        String   @id @default(uuid())
+  jdId      String   @map("jd_id")
+  chunkText String   @map("chunk_text") @db.Text
+  chunkIndex Int     @map("chunk_index")
+  embedding Unsupported("vector(384)")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  jobDescription JobDescription @relation(fields: [jdId], references: [id], onDelete: Cascade)
+
+  @@index([jdId])
+  @@map("jd_chunks")
+}
+
+model SuggestionFeedback {
+  id           String   @id @default(uuid())
+  suggestionId String   @map("suggestion_id")
+  userId       String   @map("user_id")
+  accepted     Boolean
+  appliedScore Int?     @map("applied_score")
+  feedback     String?  @db.Text
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  suggestion Suggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([suggestionId])
+  @@index([userId])
+  @@map("suggestion_feedback")
 }

@@ -3,9 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
-  generateRecommendedPositions,
-  generateRecommendedJDs,
-} from "@/lib/deepseek";
+  runJobSearchAgent,
+} from "@/lib/agents";
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -59,11 +58,26 @@ export async function GET(req: NextRequest) {
 
     if (type === "positions" || type === "both") {
       try {
-        result.positions = await generateRecommendedPositions(
-          resume.parsedText.slice(0, 3000),
+        // Use job search agent which returns real/synthetic jobs with match scores
+        const searchResult = await runJobSearchAgent({
+          userId,
+          resumeText: resume.parsedText.slice(0, 4000),
+          targetPositions,
+          targetCountry,
           coreSkills,
-          targetCountry
-        );
+        });
+        result.positions = searchResult.jobs.map((j) => ({
+          title: j.title,
+          targetRole: j.title,
+          industry: profile?.industry || "Technology",
+          matchReason: `${j.matchScore}% match — ${j.snippet.slice(0, 100)}`,
+        }));
+        result.jds = searchResult.jobs.map((j) => ({
+          title: j.title,
+          company: j.company,
+          rawText: j.snippet,
+          matchReason: `${j.matchScore}% match based on your skills and experience`,
+        }));
       } catch (err) {
         console.error("Position recommendations failed:", err);
         result.positions = [];
@@ -71,15 +85,8 @@ export async function GET(req: NextRequest) {
     }
 
     if (type === "jds" || type === "both") {
-      try {
-        result.jds = await generateRecommendedJDs(
-          resume.parsedText.slice(0, 3000),
-          coreSkills,
-          targetPositions,
-          targetCountry
-        );
-      } catch (err) {
-        console.error("JD recommendations failed:", err);
+      // JDs already generated above by runJobSearchAgent
+      if (!result.jds) {
         result.jds = [];
       }
     }

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { analyzeResumeAgainstJD } from "@/lib/deepseek";
+import { runAtsAnalysisAgent } from "@/lib/agents";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -113,16 +113,16 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Run AI analysis
+    // Run multi-step AI analysis agent
     try {
-      const result = await analyzeResumeAgainstJD({
+      const result = await runAtsAnalysisAgent({
         resumeText: resume.parsedText,
+        resumeName: resume.name,
         jobDescriptionText,
-        positionTitle,
-        jobType: jobType || undefined,
+        jdTitle: positionTitle,
       });
 
-      // Update analysis with results
+      // Update analysis with agent results
       await prisma.analysis.update({
         where: { id: analysis.id },
         data: {
@@ -132,11 +132,14 @@ export async function POST(req: NextRequest) {
           formatScore: result.formatScore,
           impactScore: result.impactScore,
           summaryText: result.summaryText,
-          rawAiResponse: JSON.stringify(result),
+          rawAiResponse: JSON.stringify({
+            ...result,
+            agentSteps: result.agentSteps,
+          }),
         },
       });
 
-      // Create suggestions
+      // Create suggestions from agent output
       if (result.suggestions?.length > 0) {
         await prisma.suggestion.createMany({
           data: result.suggestions.map((s) => ({
