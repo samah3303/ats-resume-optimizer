@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { embedText, chunkText, toPgVector } from "@/lib/embeddings";
-import { neon } from "@neondatabase/serverless";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -66,6 +64,12 @@ async function embedJdAsync(jdId: string, rawText: string) {
   try {
     const dbUrl = process.env.DATABASE_URL;
     if (!dbUrl) return;
+
+    const [{ neon }, { embedText, chunkText, toPgVector }] = await Promise.all([
+      import("@neondatabase/serverless"),
+      import("@/lib/embeddings"),
+    ]);
+
     const sql = neon(dbUrl);
     await sql`DELETE FROM jd_chunks WHERE jd_id = ${jdId}`;
     const chunks = chunkText(rawText, 500, 100);

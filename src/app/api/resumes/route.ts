@@ -4,8 +4,6 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { parseResumeFile } from "@/lib/resume-parser";
 import { saveOriginalFile } from "@/lib/storage";
-import { embedText, chunkText, toPgVector } from "@/lib/embeddings";
-import { neon } from "@neondatabase/serverless";
 
 function detectDocType(mimeType: string, fileName: string): string | null {
   // Check MIME type first
@@ -140,15 +138,20 @@ export async function POST(req: NextRequest) {
 
 /**
  * Fire-and-forget: embed a resume's chunks into pgvector for RAG.
- * Uses Neon HTTP driver (works even when TCP 5432 is blocked).
+ * Uses dynamic imports to avoid blocking the upload response or crashing
+ * if the embedding model fails to load.
  */
 async function embedResumeAsync(resumeId: string, parsedText: string) {
   try {
     const dbUrl = process.env.DATABASE_URL;
     if (!dbUrl) return;
-    const sql = neon(dbUrl);
 
-    // Delete old chunks
+    const [{ neon }, { embedText, chunkText, toPgVector }] = await Promise.all([
+      import("@neondatabase/serverless"),
+      import("@/lib/embeddings"),
+    ]);
+
+    const sql = neon(dbUrl);
     await sql`DELETE FROM resume_chunks WHERE resume_id = ${resumeId}`;
 
     const chunks = chunkText(parsedText, 500, 100);
