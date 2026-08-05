@@ -73,12 +73,21 @@ export async function POST(req: NextRequest) {
     }
 
     // Step 1: Run Mode 1 analysis
-    const mode1Result = await mode1OnboardingAnalysis(
-      resume.parsedText,
-      positions,
-      targetCountry,
-      linkedinUrl || undefined
-    );
+    let mode1Result: Awaited<ReturnType<typeof mode1OnboardingAnalysis>>;
+    try {
+      mode1Result = await mode1OnboardingAnalysis(
+        resume.parsedText,
+        positions,
+        targetCountry,
+        linkedinUrl || undefined
+      );
+    } catch (err) {
+      console.error("Mode 1 onboarding analysis failed:", err);
+      return NextResponse.json(
+        { error: "AI analysis failed. Please try again." },
+        { status: 502 }
+      );
+    }
 
     // Step 2: Create onboarding profile
     const profile = await prisma.onboardingProfile.create({
@@ -102,94 +111,67 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Step 3: Generate roadmap
-    const mode2Result = await mode2GenerateRoadmap(
+    // Step 3: Generate roadmap (non-blocking — profile is already saved)
+    let roadmap: any = null;
+    try {
+      const mode2Result = await mode2GenerateRoadmap(
+        resume.parsedText,
+        mode1Result.detectedCoreSkills,
+        mode1Result.marketGaps,
+        positions
+      );
+
+      // Delete any old roadmaps
+      await prisma.roadmap.deleteMany({ where: { userId } });
+
+      const getPhase = (weekNumber: number): string => {
+        if (weekNumber <= 2) return "Foundation";
+        if (weekNumber <= 5) return "High Velocity";
+        return "Conversion";
+      };
+
+      roadmap = await prisma.roadmap.create({
+        data: {
+          userId,
+          strategyOverview: mode2Result.strategyOverview,
+          weeks: {
+            create: mode2Result.weeks.map((w) => ({
+              weekNumber: w.weekNumber,
+              phase: getPhase(w.weekNumber),
+              focusTitle: w.focus,
+              tasks: JSON.stringify(w.tasks),
+              milestone: w.milestone,
+            })),
+          },
+        },
+        include: {
+          weeks: { orderBy: { weekNumber: "asc" } },
+        },
+      });
+    } catch (err) {
+      console.error("Roadmap generation failed (non-blocking):", err);
+      // Profile is already saved — onboarding succeeds without roadmap
+    }
+
+    // Step 4: Fire-and-forget recommendations (don't block the response)
+    generateRecommendationsAsync(
+      userId,
       resume.parsedText,
       mode1Result.detectedCoreSkills,
-      mode1Result.marketGaps,
-      positions
-    );
-
-    const getPhase = (weekNumber: number): string => {
-      if (weekNumber <= 2) return "Foundation";
-      if (weekNumber <= 5) return "High Velocity";
-      return "Conversion";
-    };
-
-    // Step 4: Create roadmap with weeks
-    const roadmap = await prisma.roadmap.create({
-      data: {
-        userId,
-        strategyOverview: mode2Result.strategyOverview,
-        weeks: {
-          create: mode2Result.weeks.map((w) => ({
-            weekNumber: w.weekNumber,
-            phase: getPhase(w.weekNumber),
-            focusTitle: w.focus,
-            tasks: JSON.stringify(w.tasks),
-            milestone: w.milestone,
-          })),
-        },
-      },
-      include: {
-        weeks: { orderBy: { weekNumber: "asc" } },
-      },
+      positions,
+      targetCountry
+    ).catch((err) => {
+      console.error("Background recommendations failed:", err);
     });
-
-    // Step 5: Generate recommendations in background (don't block onboarding)
-    let recommendedPositions: Awaited<ReturnType<typeof generateRecommendedPositions>> = [];
-    let recommendedJDs: Awaited<ReturnType<typeof generateRecommendedJDs>> = [];
-    try {
-      const coreSkills = mode1Result.detectedCoreSkills;
-      [recommendedPositions, recommendedJDs] = await Promise.all([
-        generateRecommendedPositions(resume.parsedText, coreSkills, targetCountry),
-        generateRecommendedJDs(resume.parsedText, coreSkills, positions, targetCountry),
-      ]);
-
-      // Create position profiles from recommendations
-      if (recommendedPositions.length > 0) {
-        await prisma.positionProfile.createMany({
-          data: recommendedPositions.map((p) => ({
-            userId,
-            title: p.title,
-            targetRole: p.targetRole,
-            industry: p.industry || null,
-            notes: `🤖 AI Recommended based on your profile — ${p.matchReason}`,
-          })),
-        });
-      }
-
-      // Create JDs from recommendations
-      if (recommendedJDs.length > 0) {
-        await Promise.all(
-          recommendedJDs.map((jd) =>
-            prisma.jobDescription.create({
-              data: {
-                userId,
-                title: jd.title,
-                company: jd.company || null,
-                rawText: jd.rawText,
-                sourceUrl: (jd as unknown as Record<string,string>)?.sourceUrl || null,
-                notes: `🤖 AI Recommended based on your profile — ${jd.matchReason}`,
-                positionProfileId: null,
-              },
-            })
-          )
-        );
-      }
-    } catch (recErr) {
-      console.error("Failed to generate recommendations:", recErr);
-      // Non-blocking: onboarding still succeeds
-    }
 
     return NextResponse.json(
       {
         profile,
-        roadmap: {
+        roadmap: roadmap ? {
           id: roadmap.id,
           strategyOverview: roadmap.strategyOverview,
           generatedAt: roadmap.generatedAt,
-          weeks: roadmap.weeks.map((w) => ({
+          weeks: roadmap.weeks.map((w: any) => ({
             id: w.id,
             weekNumber: w.weekNumber,
             phase: w.phase,
@@ -197,11 +179,7 @@ export async function POST(req: NextRequest) {
             tasks: JSON.parse(w.tasks),
             milestone: w.milestone,
           })),
-        },
-        recommendations: {
-          positionsCreated: recommendedPositions.length,
-          jdsCreated: recommendedJDs.length,
-        },
+        } : null,
       },
       { status: 201 }
     );
@@ -211,5 +189,55 @@ export async function POST(req: NextRequest) {
       { error: "Failed to complete onboarding." },
       { status: 500 }
     );
+  }
+}
+
+/**
+ * Fire-and-forget: generate position + JD recommendations after onboarding.
+ * Runs in background so the user sees their dashboard immediately.
+ */
+async function generateRecommendationsAsync(
+  userId: string,
+  resumeText: string,
+  coreSkills: string[],
+  positions: string[],
+  targetCountry: string
+) {
+  try {
+    const [posRecs, jdRecs] = await Promise.all([
+      generateRecommendedPositions(resumeText.slice(0, 3000), coreSkills, targetCountry),
+      generateRecommendedJDs(resumeText.slice(0, 3000), coreSkills, positions, targetCountry),
+    ]);
+
+    if (posRecs.length > 0) {
+      await prisma.positionProfile.createMany({
+        data: posRecs.map((p) => ({
+          userId,
+          title: p.title,
+          targetRole: p.targetRole,
+          industry: p.industry || null,
+          notes: `🤖 AI Recommended — ${p.matchReason}`,
+        })),
+        skipDuplicates: true,
+      });
+      console.log(`[onboarding] Created ${posRecs.length} recommended positions`);
+    }
+
+    if (jdRecs.length > 0) {
+      for (const jd of jdRecs) {
+        await prisma.jobDescription.create({
+          data: {
+            userId,
+            title: jd.title,
+            company: jd.company || null,
+            rawText: jd.rawText,
+            notes: `🤖 AI Recommended — ${jd.matchReason}`,
+          },
+        });
+      }
+      console.log(`[onboarding] Created ${jdRecs.length} recommended JDs`);
+    }
+  } catch (err) {
+    console.error("[onboarding] Background recommendations failed:", err);
   }
 }

@@ -11,7 +11,7 @@
  * Uses Vercel AI SDK with DeepSeek as the backing model.
  */
 
-import { generateText, tool } from "ai";
+import { generateText } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
 import { extractLocalKeywordMatch, pruneJobDescription } from "@/lib/keyword-matcher";
 import { parseJsonSafely } from "@/lib/deepseek";

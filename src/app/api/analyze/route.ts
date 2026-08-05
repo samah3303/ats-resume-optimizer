@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { runAtsAnalysisAgent } from "@/lib/agents";
+import { analyzeResumeAgainstJD } from "@/lib/deepseek";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -113,36 +114,64 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Run multi-step AI analysis agent
+    // Run AI analysis — try multi-step agent first, fall back to single-prompt
     try {
-      const result = await runAtsAnalysisAgent({
-        resumeText: resume.parsedText,
-        resumeName: resume.name,
-        jobDescriptionText,
-        jdTitle: positionTitle,
-      });
+      let analysisResult;
+      let usedAgent = false;
+      try {
+        analysisResult = await runAtsAnalysisAgent({
+          resumeText: resume.parsedText,
+          resumeName: resume.name,
+          jobDescriptionText,
+          jdTitle: positionTitle,
+        });
+        usedAgent = true;
+      } catch (agentErr) {
+        console.warn("Agent analysis failed, using fallback:", (agentErr as Error).message);
+        const fb = await analyzeResumeAgainstJD({
+          resumeText: resume.parsedText,
+          jobDescriptionText,
+          positionTitle,
+        });
+        analysisResult = {
+          overallScore: fb.overallScore,
+          keywordsMatchPct: fb.keywordsMatchPct,
+          skillsGapJson: fb.skillsGapJson,
+          formatScore: fb.formatScore,
+          impactScore: fb.impactScore,
+          summaryText: fb.summaryText,
+          suggestions: fb.suggestions.map((s) => ({
+            section: s.section,
+            originalText: s.originalText,
+            suggestedText: s.suggestedText,
+            rationale: s.rationale,
+            targetedSkill: "",
+            impact: "medium" as const,
+          })),
+        };
+      }
 
-      // Update analysis with agent results
+      // Update analysis with results
       await prisma.analysis.update({
         where: { id: analysis.id },
         data: {
-          overallScore: result.overallScore,
-          keywordsMatchPct: result.keywordsMatchPct,
-          skillsGapJson: result.skillsGapJson,
-          formatScore: result.formatScore,
-          impactScore: result.impactScore,
-          summaryText: result.summaryText,
+          overallScore: analysisResult.overallScore,
+          keywordsMatchPct: analysisResult.keywordsMatchPct,
+          skillsGapJson: analysisResult.skillsGapJson,
+          formatScore: analysisResult.formatScore,
+          impactScore: analysisResult.impactScore,
+          summaryText: analysisResult.summaryText,
           rawAiResponse: JSON.stringify({
-            ...result,
-            agentSteps: result.agentSteps,
+            ...analysisResult,
+            usedAgent,
           }),
         },
       });
 
-      // Create suggestions from agent output
-      if (result.suggestions?.length > 0) {
+      // Create suggestions
+      if (analysisResult.suggestions?.length > 0) {
         await prisma.suggestion.createMany({
-          data: result.suggestions.map((s) => ({
+          data: analysisResult.suggestions.map((s) => ({
             analysisId: analysis.id,
             section: s.section,
             originalText: s.originalText,
