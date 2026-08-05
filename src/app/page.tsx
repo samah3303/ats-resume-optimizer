@@ -203,22 +203,36 @@ export default function HomePage() {
         <section className="flex flex-col items-center justify-center text-center px-4 py-24 md:py-32 bg-gradient-to-b from-white to-indigo-50">
           <div className="max-w-3xl mx-auto space-y-6">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">
-              ✨ AI-Powered Resume Analysis
+              🚀 Multi-Agent AI + RAG + ML
             </div>
 
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-gray-900">
               Make Your Resume{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
-                ATS-Proof
+                Unstoppable
               </span>
             </h1>
 
             <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Most resumes never reach a human because they fail ATS scans. Our
-              AI analyzes your resume against real job descriptions, finds
-              keyword gaps, and suggests rewrites — so you get past the bots
-              and land interviews.
+              75% of resumes are rejected by ATS before a human sees them. ResuMatch uses{" "}
+              <strong>6 AI agents</strong>, semantic search, and machine learning to analyze,
+              rewrite, and optimize every line — so you beat the bots and land more interviews.
             </p>
+
+            <div className="flex flex-wrap items-center justify-center gap-2 pt-2 text-sm text-gray-500">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-white border border-gray-200 rounded-full">
+                🧠 Multi-Agent AI
+              </span>
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-white border border-gray-200 rounded-full">
+                🔍 RAG Semantic Search
+              </span>
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-white border border-gray-200 rounded-full">
+                📊 ML Score Predictor
+              </span>
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-white border border-gray-200 rounded-full">
+                🎯 Interview Coach
+              </span>
+            </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
               <Link
@@ -240,36 +254,126 @@ export default function HomePage() {
         {/* Feature Grid */}
         <section className="py-20 px-4 bg-white">
           <div className="max-w-5xl mx-auto">
-            <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-12">
-              How It Works
+            <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-4">
+              Everything You Need to Land the Job
             </h2>
-            <div className="grid md:grid-cols-3 gap-8">
+            <p className="text-center text-gray-500 mb-12 max-w-xl mx-auto">
+              From resume analysis to salary negotiation — one platform, zero effort.
+            </p>
+            <div className="grid md:grid-cols-3 gap-6">
               {[
                 {
-                  icon: "📄",
-                  title: "Upload Resume",
-                  desc: "Upload your resume in PDF or DOCX format. We'll parse and extract all your content.",
+                  icon: "🧠",
+                  title: "Multi-Agent ATS Analysis",
+                  desc: "6 AI agents work together — extract requirements, map skills, find gaps, rewrite bullets, and self-verify. 5-step pipeline beats single-prompt AI.",
+                  tag: "Core",
                 },
                 {
                   icon: "🔍",
-                  title: "Analyze vs JD",
-                  desc: "Paste a job description and our AI compares every section — keywords, skills, format, impact.",
+                  title: "RAG Semantic Matching",
+                  desc: "Vector embeddings compare your resume with job descriptions at a deep semantic level. Catches synonyms, context, and skill relationships that keyword matching misses.",
+                  tag: "New",
                 },
                 {
-                  icon: "✨",
-                  title: "Get Optimized",
-                  desc: "Receive a scored report with specific suggestions. Accept them and download an optimized resume.",
+                  icon: "📊",
+                  title: "ML Score Predictor",
+                  desc: "Instant ATS score from 12 resume features — no API call needed. Trained on real analysis data, improves with every scan. Get explainable, consistent scores.",
+                  tag: "New",
+                },
+                {
+                  icon: "🎯",
+                  title: "Interactive Interview Coach",
+                  desc: "Mock interviews tailored to your target job. Answer questions, get scored on each response with model answers, and receive a final performance report.",
+                  tag: "New",
+                },
+                {
+                  icon: "🗺️",
+                  title: "8-Week Career Roadmap",
+                  desc: "Personalized week-by-week plan to close skill gaps. Includes course recommendations, salary projections, and timeline milestones.",
+                },
+                {
+                  icon: "🔎",
+                  title: "Real Job Search Agent",
+                  desc: "Searches live job boards with semantic ranking. Auto-saves matched jobs to your dashboard with match percentages.",
+                  tag: "New",
+                },
+                {
+                  icon: "✍️",
+                  title: "Iterative Resume Writer",
+                  desc: "Draft → self-critique → revise → polish. Three refinement passes produce a professional, ATS-optimized resume that preserves your original formatting.",
+                },
+                {
+                  icon: "📋",
+                  title: "Kanban Job Tracker",
+                  desc: "Track every application from Wishlist → Applied → Interview → Offer. Drag-and-drop columns with status automation.",
+                },
+                {
+                  icon: "📝",
+                  title: "Cover Letter Generator",
+                  desc: "Tailored cover letters for each job — pulls your relevant experience and addresses the specific requirements from the JD.",
+                },
+                {
+                  icon: "💰",
+                  title: "Salary Negotiation Kit",
+                  desc: "Market range estimates, counter-offer scripts, acceptance emails, and negotiation talking points — all personalized to your experience.",
+                },
+                {
+                  icon: "📤",
+                  title: "Outreach Message Pack",
+                  desc: "Cold emails, LinkedIn messages, and recruiter outreach templates customized for each job you're targeting.",
+                },
+                {
+                  icon: "🔌",
+                  title: "MCP + n8n Automation",
+                  desc: "Connect to Claude Desktop via MCP. Automate weekly job hunts and application pipelines with n8n workflows.",
+                  tag: "Dev",
                 },
               ].map((feature) => (
                 <div
                   key={feature.title}
-                  className="p-6 rounded-xl border border-gray-200 bg-gray-50 hover:shadow-md transition-shadow"
+                  className="relative p-6 rounded-xl border border-gray-200 bg-white hover:border-indigo-200 hover:shadow-lg transition-all group"
                 >
-                  <div className="text-3xl mb-3">{feature.icon}</div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  {feature.tag && (
+                    <span className={`absolute top-3 right-3 text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${
+                      feature.tag === "New"
+                        ? "bg-green-100 text-green-700"
+                        : feature.tag === "Dev"
+                        ? "bg-purple-100 text-purple-700"
+                        : "bg-indigo-100 text-indigo-700"
+                    }`}>
+                      {feature.tag}
+                    </span>
+                  )}
+                  <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">{feature.icon}</div>
+                  <h3 className="text-base font-semibold text-gray-900 mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-sm text-gray-600">{feature.desc}</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">{feature.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Tech Stack Banner */}
+        <section className="py-16 px-4 bg-gradient-to-r from-indigo-600 to-purple-600">
+          <div className="max-w-4xl mx-auto text-center text-white">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">
+              Powered by Cutting-Edge AI
+            </h2>
+            <p className="text-indigo-100 mb-8 max-w-2xl mx-auto">
+              We combine multiple AI techniques to give you results that single-prompt tools can&apos;t match.
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-left">
+              {[
+                { title: "6 AI Agents", desc: "Multi-step reasoning with self-verification for accurate, actionable suggestions" },
+                { title: "RAG + pgvector", desc: "384-dim semantic embeddings for deep resume-JD matching, not just keyword counts" },
+                { title: "ML Models", desc: "Trained on real analysis data. Instant scores with explainable feature importance" },
+                { title: "DeepSeek V4", desc: "State-of-the-art LLM at 18x lower cost than GPT-4o. Fast, affordable, reliable" },
+              ].map((item) => (
+                <div key={item.title} className="bg-white/10 backdrop-blur rounded-lg p-4">
+                  <div className="font-bold text-sm mb-1">{item.title}</div>
+                  <div className="text-xs text-indigo-200 leading-relaxed">{item.desc}</div>
                 </div>
               ))}
             </div>
