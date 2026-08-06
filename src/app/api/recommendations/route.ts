@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import {
-  runJobSearchAgent,
-} from "@/lib/agents";
+// Agent dynamically imported to avoid Vercel ai SDK bundling issues
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -59,6 +57,7 @@ export async function GET(req: NextRequest) {
     if (type === "positions" || type === "both") {
       try {
         // Use job search agent which returns real/synthetic jobs with match scores
+        const { runJobSearchAgent } = await import("@/lib/agents");
         const searchResult = await runJobSearchAgent({
           userId,
           resumeText: resume.parsedText.slice(0, 4000),

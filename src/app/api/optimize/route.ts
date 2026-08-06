@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { runResumeWriterAgent } from "@/lib/agents";
+// Agent dynamically imported to avoid Vercel ai SDK bundling issues
 import { generateOptimizedResumePdf } from "@/lib/pdf-generator";
 import { modifyDocxText } from "@/lib/docx-modifier";
 import { loadOriginalFile, getOriginalFormat } from "@/lib/storage";
@@ -96,6 +96,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ── PDF path: AI agent rewrite + pdfkit (fallback for .pdf, .doc, and failed docx) ──
+    const { runResumeWriterAgent } = await import("@/lib/agents");
     const writerResult = await runResumeWriterAgent({
       resumeText: resume.parsedText,
       jobDescriptionTitle: analysis.jobDescription.title,

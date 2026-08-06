@@ -296,24 +296,30 @@ let _cachedModel: TrainedModel | null = null;
 export async function getModel(): Promise<TrainedModel> {
   if (_cachedModel) return _cachedModel;
 
-  const data = await loadTrainingData();
-  if (data.length < 10) {
-    // Not enough data — return a heuristic fallback
-    console.log("[ml-predictor] Insufficient training data (<10 samples). Using heuristic model.");
-    _cachedModel = {
-      weights: [0.01, 0.15, 2.0, 8.0, 6.0, 5.0, 3.0, 0.5, 1.2, 0.05, 4.0, 0.3],
-      bias: 45,
-      featureMeans: Array(12).fill(0),
-      featureStds: Array(12).fill(1),
-      trainedAt: new Date().toISOString(),
-      sampleCount: data.length,
-      r2Score: 0.5,
-    };
-    return _cachedModel;
+  try {
+    const data = await loadTrainingData();
+    if (data.length >= 10) {
+      _cachedModel = trainModel(data);
+      console.log(`[ml-predictor] Model trained on ${data.length} samples | R² = ${_cachedModel.r2Score.toFixed(3)}`);
+      return _cachedModel;
+    }
+    console.log(`[ml-predictor] Only ${data.length} training samples, using heuristic model`);
+  } catch (err) {
+    console.warn("[ml-predictor] Could not load training data:", (err as Error).message);
   }
 
-  _cachedModel = trainModel(data);
-  console.log(`[ml-predictor] Model trained on ${data.length} samples | R² = ${_cachedModel.r2Score.toFixed(3)}`);
+  // Sensible default model with weights that produce reasonable scores
+  // For a typical resume (500 words, 10 bullets, 4 sections, contact present, 3 years exp)
+  // Expected: ~65-75 score
+  _cachedModel = {
+    weights: [0.005, 0.3, 1.5, 5.0, 4.0, 3.0, 2.0, 0.3, 1.0, 0.02, 3.0, 0.4],
+    bias: 35,
+    featureMeans: Array(12).fill(0),
+    featureStds: Array(12).fill(1),
+    trainedAt: new Date().toISOString(),
+    sampleCount: 0,
+    r2Score: 0,
+  };
   return _cachedModel;
 }
 

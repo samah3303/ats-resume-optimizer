@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { runAtsAnalysisAgent } from "@/lib/agents";
-import { analyzeResumeAgainstJD } from "@/lib/deepseek";
+// Agents are dynamically imported to prevent Vercel build crashes from ai SDK bundling
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -119,6 +118,8 @@ export async function POST(req: NextRequest) {
       let analysisResult;
       let usedAgent = false;
       try {
+        // Dynamic import to avoid Vercel build issues with ai SDK
+        const { runAtsAnalysisAgent } = await import("@/lib/agents");
         analysisResult = await runAtsAnalysisAgent({
           resumeText: resume.parsedText,
           resumeName: resume.name,
@@ -128,6 +129,7 @@ export async function POST(req: NextRequest) {
         usedAgent = true;
       } catch (agentErr) {
         console.warn("Agent analysis failed, using fallback:", (agentErr as Error).message);
+        const { analyzeResumeAgainstJD } = await import("@/lib/deepseek");
         const fb = await analyzeResumeAgainstJD({
           resumeText: resume.parsedText,
           jobDescriptionText,

@@ -2,13 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import {
-  startInterviewSession,
-  evaluateAnswer,
-  getNextQuestion,
-  generateInterviewReport,
-  endInterviewSession,
-} from "@/lib/agents";
+// Agents dynamically imported to avoid Vercel ai SDK bundling issues
 
 /**
  * POST /api/interview — Start a new interview session or evaluate an answer
@@ -33,6 +27,7 @@ export async function POST(req: NextRequest) {
 
     switch (action) {
       case "start": {
+        const { startInterviewSession } = await import("@/lib/agents");
         const { analysisId, resumeId, jdId } = body;
 
         let skillsGapJson: string | undefined;
@@ -87,6 +82,7 @@ export async function POST(req: NextRequest) {
       }
 
       case "answer": {
+        const { evaluateAnswer, getNextQuestion } = await import("@/lib/agents");
         const { sessionId, questionId, answer } = body;
         if (!sessionId || !questionId || answer === undefined) {
           return NextResponse.json(
@@ -113,6 +109,7 @@ export async function POST(req: NextRequest) {
       }
 
       case "next": {
+        const { getNextQuestion } = await import("@/lib/agents");
         const { sessionId } = body;
         if (!sessionId) {
           return NextResponse.json({ error: "sessionId is required." }, { status: 400 });
@@ -122,6 +119,7 @@ export async function POST(req: NextRequest) {
       }
 
       case "report": {
+        const { generateInterviewReport } = await import("@/lib/agents");
         const { sessionId } = body;
         if (!sessionId) {
           return NextResponse.json({ error: "sessionId is required." }, { status: 400 });
@@ -138,6 +136,7 @@ export async function POST(req: NextRequest) {
       }
 
       case "end": {
+        const { endInterviewSession } = await import("@/lib/agents");
         const { sessionId } = body;
         if (sessionId) endInterviewSession(sessionId);
         return NextResponse.json({ success: true });
