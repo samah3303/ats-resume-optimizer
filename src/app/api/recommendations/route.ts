@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
 
     if (type === "positions" || type === "both") {
       try {
-        // Use job search agent which returns real/synthetic jobs with match scores
+        // Try job search agent for real job matching
         const { runJobSearchAgent } = await import("@/lib/agents/job-search-agent");
         const searchResult = await runJobSearchAgent({
           userId,
@@ -78,8 +78,20 @@ export async function GET(req: NextRequest) {
           matchReason: `${j.matchScore}% match based on your skills and experience`,
         }));
       } catch (err) {
-        console.error("Position recommendations failed:", err);
-        result.positions = [];
+        console.error("Job search agent failed, using LLM fallback:", (err as Error).message);
+        try {
+          const { generateRecommendedPositions, generateRecommendedJDs } = await import("@/lib/deepseek");
+          result.positions = await generateRecommendedPositions(
+            resume.parsedText.slice(0, 3000), coreSkills, targetCountry
+          );
+          result.jds = await generateRecommendedJDs(
+            resume.parsedText.slice(0, 3000), coreSkills, targetPositions, targetCountry
+          );
+        } catch (fbErr) {
+          console.error("LLM fallback also failed:", (fbErr as Error).message);
+          result.positions = [];
+          result.jds = [];
+        }
       }
     }
 
