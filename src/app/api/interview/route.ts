@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
 
     switch (action) {
       case "start": {
-        const { startInterviewSession } = await import("@/lib/agents");
+        const { startInterviewSession } = await import("@/lib/agents/interview-coach-agent");
         const { analysisId, resumeId, jdId } = body;
 
         let skillsGapJson: string | undefined;
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
       }
 
       case "answer": {
-        const { evaluateAnswer, getNextQuestion } = await import("@/lib/agents");
+        const { evaluateAnswer, getNextQuestion } = await import("@/lib/agents/interview-coach-agent");
         const { sessionId, questionId, answer } = body;
         if (!sessionId || !questionId || answer === undefined) {
           return NextResponse.json(
@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
       }
 
       case "next": {
-        const { getNextQuestion } = await import("@/lib/agents");
+        const { getNextQuestion } = await import("@/lib/agents/interview-coach-agent");
         const { sessionId } = body;
         if (!sessionId) {
           return NextResponse.json({ error: "sessionId is required." }, { status: 400 });
@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
       }
 
       case "report": {
-        const { generateInterviewReport } = await import("@/lib/agents");
+        const { generateInterviewReport } = await import("@/lib/agents/interview-coach-agent");
         const { sessionId } = body;
         if (!sessionId) {
           return NextResponse.json({ error: "sessionId is required." }, { status: 400 });
@@ -136,7 +136,7 @@ export async function POST(req: NextRequest) {
       }
 
       case "end": {
-        const { endInterviewSession } = await import("@/lib/agents");
+        const { endInterviewSession } = await import("@/lib/agents/interview-coach-agent");
         const { sessionId } = body;
         if (sessionId) endInterviewSession(sessionId);
         return NextResponse.json({ success: true });

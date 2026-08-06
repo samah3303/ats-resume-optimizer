@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
     if (type === "positions" || type === "both") {
       try {
         // Use job search agent which returns real/synthetic jobs with match scores
-        const { runJobSearchAgent } = await import("@/lib/agents");
+        const { runJobSearchAgent } = await import("@/lib/agents/job-search-agent");
         const searchResult = await runJobSearchAgent({
           userId,
           resumeText: resume.parsedText.slice(0, 4000),

@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
       let usedAgent = false;
       try {
         // Dynamic import to avoid Vercel build issues with ai SDK
-        const { runAtsAnalysisAgent } = await import("@/lib/agents");
+        const { runAtsAnalysisAgent } = await import("@/lib/agents/analyze-agent");
         analysisResult = await runAtsAnalysisAgent({
           resumeText: resume.parsedText,
           resumeName: resume.name,

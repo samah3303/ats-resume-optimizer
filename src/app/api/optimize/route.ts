@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ── PDF path: AI agent rewrite + pdfkit (fallback for .pdf, .doc, and failed docx) ──
-    const { runResumeWriterAgent } = await import("@/lib/agents");
+    const { runResumeWriterAgent } = await import("@/lib/agents/resume-writer-agent");
     const writerResult = await runResumeWriterAgent({
       resumeText: resume.parsedText,
       jobDescriptionTitle: analysis.jobDescription.title,
