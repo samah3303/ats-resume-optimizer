@@ -90,9 +90,6 @@ export async function POST(req: NextRequest) {
         console.warn("Failed to save original file, continuing without it");
       }
 
-      // Fire-and-forget: embed this resume for RAG semantic search
-      embedResumeAsync(resume.id, parsedText);
-
       return NextResponse.json({ resume }, { status: 201 });
     }
 
@@ -122,9 +119,6 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Fire-and-forget: embed this resume for RAG semantic search
-    embedResumeAsync(resume.id, body.parsedText);
-
     return NextResponse.json({ resume }, { status: 201 });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
@@ -133,37 +127,5 @@ export async function POST(req: NextRequest) {
       { error: `Failed to process resume: ${message}` },
       { status: 500 }
     );
-  }
-}
-
-/**
- * Fire-and-forget: embed a resume's chunks into pgvector for RAG.
- * Uses dynamic imports to avoid blocking the upload response or crashing
- * if the embedding model fails to load.
- */
-async function embedResumeAsync(resumeId: string, parsedText: string) {
-  try {
-    const dbUrl = process.env.DATABASE_URL;
-    if (!dbUrl) return;
-
-    const [{ neon }, { embedText, chunkText, toPgVector }] = await Promise.all([
-      import("@neondatabase/serverless"),
-      import("@/lib/embeddings"),
-    ]);
-
-    const sql = neon(dbUrl);
-    await sql`DELETE FROM resume_chunks WHERE resume_id = ${resumeId}`;
-
-    const chunks = chunkText(parsedText, 500, 100);
-    for (let i = 0; i < chunks.length; i++) {
-      const embedding = await embedText(chunks[i]);
-      await sql`
-        INSERT INTO resume_chunks (id, resume_id, chunk_text, chunk_index, embedding)
-        VALUES (gen_random_uuid()::text, ${resumeId}, ${chunks[i]}, ${i}, ${toPgVector(embedding)}::vector)
-      `;
-    }
-    console.log(`[embeddings] Auto-embedded resume ${resumeId}: ${chunks.length} chunks`);
-  } catch (err) {
-    console.error(`[embeddings] Failed to auto-embed resume ${resumeId}:`, (err as Error).message);
   }
 }
