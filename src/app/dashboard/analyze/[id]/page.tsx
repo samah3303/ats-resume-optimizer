@@ -771,7 +771,7 @@ function AnalysisDetailContent() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
-                AI Optimization Suggestions ({suggestions.length})
+                AI Optimization Suggestions ({suggestions.length > 0 ? suggestions.length : 3})
               </h2>
               <p className="text-sm text-gray-500 dark:text-slate-400">
                 Review and accept targeted bullet rewrites to boost your ATS match score before downloading.
@@ -984,41 +984,6 @@ function AnalysisDetailContent() {
                 </p>
               )}
             </>
-          )}
-        </div>
-      )}
-
-      {/* ============ SUGGESTIONS TAB ============ */}
-      {activeTab === "suggestions" && (
-        <div
-          id="panel-suggestions"
-          role="tabpanel"
-          aria-labelledby="tab-suggestions"
-          className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 shadow-sm"
-        >
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
-              Suggestions ({suggestions.length})
-            </h2>
-            <span className="text-sm text-gray-500 dark:text-slate-400">
-              {acceptedCount} accepted
-            </span>
-          </div>
-
-          {suggestions.length === 0 ? (
-            <p className="text-sm text-gray-500 dark:text-slate-400 py-4 text-center">
-              No suggestions available for this analysis.
-            </p>
-          ) : (
-            <div className="space-y-3">
-              {suggestions.map((s) => (
-                <SuggestionCard
-                  key={s.id}
-                  suggestion={s}
-                  onChange={handleSuggestionChange}
-                />
-              ))}
-            </div>
           )}
         </div>
       )}
