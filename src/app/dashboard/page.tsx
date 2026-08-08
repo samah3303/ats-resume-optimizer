@@ -247,12 +247,37 @@ function DashboardContent() {
               <span aria-hidden="true">📖</span> How to Use
             </Link>
             <Link
-              href="/dashboard/analyze"
-              className="btn-primary-gradient px-5 py-2.5 text-sm font-medium inline-flex items-center min-h-[44px] sm:min-h-0"
+              href="/dashboard/studio"
+              className="bg-gradient-to-r from-indigo-700 to-indigo-600 hover:from-indigo-800 hover:to-indigo-700 text-white font-bold px-5 py-2.5 text-sm rounded-xl shadow-md transition-all inline-flex items-center gap-2 min-h-[44px] sm:min-h-0"
             >
-              + New Analysis
+              ⚡ 1-Click Studio
             </Link>
           </div>
+        </div>
+
+        {/* Studio Hero Feature Banner */}
+        <div className="mb-8 p-6 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-indigo-500/30 rounded-3xl text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/20 border border-indigo-400/30 text-indigo-300">
+              <span>🚀 New Feature</span>
+              <span>•</span>
+              <span>1-Click Application Studio</span>
+            </div>
+            <h2 className="text-xl font-extrabold text-white">
+              Optimize Resumes & Target Job Postings in 1 Screen
+            </h2>
+            <p className="text-xs text-slate-300 max-w-xl">
+              Import job postings directly from URL, audit ATS scannability with live step-by-step progress, apply instant STAR bullet fixes, and sync to your Kanban tracker.
+            </p>
+          </div>
+
+          <Link
+            href="/dashboard/studio"
+            className="px-6 py-3 rounded-2xl bg-white text-indigo-950 hover:bg-indigo-50 font-extrabold text-sm transition-all shadow-lg shrink-0 flex items-center gap-2"
+          >
+            <span>Launch Studio</span>
+            <span>→</span>
+          </Link>
         </div>
 
         {/* Error banner */}
