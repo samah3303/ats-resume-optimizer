@@ -190,6 +190,7 @@ export async function POST(req: NextRequest) {
           jobDescription: {
             select: { id: true, title: true, company: true },
           },
+          suggestions: true,
         },
       });
 
