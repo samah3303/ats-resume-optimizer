@@ -9,6 +9,7 @@ import KeywordBadge from "@/components/KeywordBadge";
 import SuggestionCard from "@/components/SuggestionCard";
 import AtsXray from "@/components/AtsXray";
 import SkillBridgeCard from "@/components/SkillBridgeCard";
+import InlineAiFixer from "@/components/InlineAiFixer";
 import { useToast } from "@/components/Toast";
 
 interface Analysis {
@@ -783,7 +784,7 @@ function AnalysisDetailContent() {
               <InlineAiFixer
                 missingSkills={skillsGap.missing}
                 suggestions={[]}
-                onApplyFix={(orig, updated) => {
+                onApplyFix={(orig: string, _updated: string) => {
                   toast(`Accepted fix for "${orig.slice(0, 20)}..."`, "success");
                 }}
               />
