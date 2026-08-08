@@ -9,6 +9,7 @@ import KeywordBadge from "@/components/KeywordBadge";
 import SuggestionCard from "@/components/SuggestionCard";
 import AtsXray from "@/components/AtsXray";
 import SkillBridgeCard from "@/components/SkillBridgeCard";
+import InlineAiFixer from "@/components/InlineAiFixer";
 import { useToast } from "@/components/Toast";
 
 interface Analysis {
@@ -754,6 +755,49 @@ function AnalysisDetailContent() {
                   );
                 })}
               </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ============ SUGGESTIONS TAB ============ */}
+      {activeTab === "suggestions" && (
+        <div
+          id="panel-suggestions"
+          role="tabpanel"
+          aria-labelledby="tab-suggestions"
+          className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 mb-6 shadow-sm space-y-4"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
+                AI Optimization Suggestions ({suggestions.length})
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-slate-400">
+                Review and accept targeted bullet rewrites to boost your ATS match score before downloading.
+              </p>
+            </div>
+          </div>
+
+          {suggestions.length === 0 ? (
+            <div className="py-4">
+              <InlineAiFixer
+                missingSkills={skillsGap.missing}
+                suggestions={[]}
+                onApplyFix={(orig: string, _updated: string) => {
+                  toast(`Accepted fix for "${orig.slice(0, 20)}..."`, "success");
+                }}
+              />
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {suggestions.map((sug) => (
+                <SuggestionCard
+                  key={sug.id}
+                  suggestion={sug}
+                  onChange={handleSuggestionChange}
+                />
+              ))}
             </div>
           )}
         </div>

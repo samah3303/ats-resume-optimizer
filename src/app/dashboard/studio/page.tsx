@@ -24,6 +24,7 @@ interface JdItem {
 }
 
 interface AuditResult {
+  id?: string;
   overallScore: number;
   keywordsMatchPct: number;
   formatScore: number;
@@ -209,6 +210,7 @@ export default function StudioPage() {
         );
 
       setAuditResult({
+        id: analysis.id,
         overallScore,
         keywordsMatchPct: analysis.keywordsMatchPct ?? localScan.keywordsMatchPct,
         formatScore: analysis.formatScore ?? localScan.formatScore,
@@ -492,13 +494,24 @@ export default function StudioPage() {
                     </div>
                   </div>
 
-                  <button
-                    onClick={handleSaveToKanban}
-                    disabled={isSavingApp}
-                    className="w-full sm:w-auto px-5 py-3 rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-700 text-white shadow-md transition-all shrink-0"
-                  >
-                    {isSavingApp ? "Saving..." : "📌 Add to Application Kanban"}
-                  </button>
+                  <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
+                    {auditResult.id && (
+                      <button
+                        onClick={() => router.push(`/dashboard/analyze/${auditResult.id}`)}
+                        className="w-full sm:w-auto px-4 py-3 rounded-xl font-bold text-xs bg-indigo-600 hover:bg-indigo-700 text-white shadow-md transition-all flex items-center justify-center gap-1.5"
+                      >
+                        <span>📊 View Full Detailed Report</span>
+                        <span>→</span>
+                      </button>
+                    )}
+                    <button
+                      onClick={handleSaveToKanban}
+                      disabled={isSavingApp}
+                      className="w-full sm:w-auto px-4 py-3 rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-700 text-white shadow-md transition-all"
+                    >
+                      {isSavingApp ? "Saving..." : "📌 Add to Application Kanban"}
+                    </button>
+                  </div>
                 </div>
 
                 {/* Sub Score Pills */}
