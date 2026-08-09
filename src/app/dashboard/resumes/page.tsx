@@ -16,14 +16,14 @@ interface Resume {
 
 function getDocTypeBadge(docType: string | null, name: string) {
   const type = docType || name.split(".").pop()?.toLowerCase() || null;
-  if (type === "pdf") return { label: "PDF", color: "bg-red-100 text-red-700" };
-  if (type === "docx") return { label: "DOCX", color: "bg-blue-100 text-blue-700" };
-  if (type === "doc") return { label: "DOC", color: "bg-amber-100 text-amber-700" };
+  if (type === "pdf") return { label: "PDF", color: "bg-rose-950 text-rose-300 border border-rose-800" };
+  if (type === "docx") return { label: "DOCX", color: "bg-blue-950 text-blue-300 border border-blue-800" };
+  if (type === "doc") return { label: "DOC", color: "bg-amber-950 text-amber-300 border border-amber-800" };
   return null;
 }
 
 export default function ResumesPage() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [loading, setLoading] = useState(true);
@@ -91,7 +91,7 @@ export default function ResumesPage() {
     }
   };
 
-  const handleUploaded = (resume: { id: string; name: string }) => {
+  const handleUploaded = () => {
     fetchResumes();
   };
 
@@ -116,8 +116,8 @@ export default function ResumesPage() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="flex items-center justify-center min-h-[80vh]">
-        <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+      <div className="flex items-center justify-center min-h-screen bg-[#090A0C]">
+        <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -125,133 +125,135 @@ export default function ResumesPage() {
   if (status === "unauthenticated") return null;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Resumes</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            {resumes.length} resume{resumes.length !== 1 ? "s" : ""} uploaded
-          </p>
+    <div className="min-h-screen bg-[#090A0C] text-white py-8 px-4 sm:px-6 lg:px-8 space-y-6 pb-24">
+      <div className="max-w-7xl mx-auto space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight">Resume Vault</h1>
+            <p className="text-xs sm:text-sm text-zinc-400 mt-1">
+              {resumes.length} resume{resumes.length !== 1 ? "s" : ""} stored for ATS parsing & multi-agent optimization
+            </p>
+          </div>
         </div>
-      </div>
 
-      {/* Upload Area — full when empty, compact when resumes exist */}
-      {resumes.length === 0 ? (
-        <div className="mb-8">
-          <ResumeUploader onUploaded={handleUploaded} />
-        </div>
-      ) : (
-        <div className="mb-4 flex items-center gap-3">
-          <input
-            type="file"
-            accept=".pdf,.docx,.doc"
-            onChange={handleCompactUpload}
-            className="hidden"
-            id="resume-upload"
-            disabled={compactUploading}
-          />
-          <label
-            htmlFor="resume-upload"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors cursor-pointer disabled:opacity-50"
-          >
-            {compactUploading ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Uploading...
-              </>
-            ) : (
-              <>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                </svg>
-                Browse Files
-              </>
-            )}
-          </label>
-          <span className="text-xs text-gray-400">PDF, DOC, or DOCX, up to 5MB</span>
-        </div>
-      )}
-
-      {/* Resume Cards */}
-      {resumes.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
-          <p className="text-gray-500">
-            No resumes yet. Upload your first one above.
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-          {resumes.map((resume) => {
-            const badge = getDocTypeBadge(resume.docType, resume.name);
-            return (
-            <div
-              key={resume.id}
-              className="bg-white rounded-xl border border-gray-200 overflow-hidden card-hover"
+        {/* Upload Area */}
+        {resumes.length === 0 ? (
+          <div className="mb-8">
+            <ResumeUploader onUploaded={handleUploaded} />
+          </div>
+        ) : (
+          <div className="mb-4 flex items-center gap-3">
+            <input
+              type="file"
+              accept=".pdf,.docx,.doc"
+              onChange={handleCompactUpload}
+              className="hidden"
+              id="resume-upload"
+              disabled={compactUploading}
+            />
+            <label
+              htmlFor="resume-upload"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-500 text-slate-950 text-xs font-black rounded-xl hover:bg-amber-400 transition-all cursor-pointer shadow-lg shadow-amber-500/20 disabled:opacity-50"
             >
-              <div className="px-4 py-3 sm:px-5 sm:py-5">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">📄</span>
-                    <div>
-                      <h3 className="font-semibold text-gray-900 truncate max-w-[180px]">
-                        {resume.name}
-                      </h3>
-                      <div className="flex items-center gap-1.5 mt-0.5">
-                        {badge && (
-                          <span className={`px-1.5 py-0.5 text-[10px] font-semibold rounded ${badge.color}`}>
-                            {badge.label}
-                          </span>
-                        )}
-                        <p className="text-xs text-gray-500">
-                          {new Date(resume.createdAt).toLocaleDateString()}
-                        </p>
+              {compactUploading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  </svg>
+                  Browse & Upload Resume
+                </>
+              )}
+            </label>
+            <span className="text-xs text-zinc-400 font-mono">PDF, DOC, or DOCX up to 5MB</span>
+          </div>
+        )}
+
+        {/* Resume Cards Grid */}
+        {resumes.length === 0 ? (
+          <div className="text-center py-12 bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] p-8 space-y-3">
+            <p className="text-xs text-zinc-400">
+              No resumes yet. Upload your primary resume above to get started.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {resumes.map((resume) => {
+              const badge = getDocTypeBadge(resume.docType, resume.name);
+              return (
+                <div
+                  key={resume.id}
+                  className="bg-[#14161D]/80 backdrop-blur-xl rounded-3xl border border-[#242834] hover:border-amber-500/40 p-6 shadow-xl transition-all flex flex-col justify-between space-y-4 group"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between border-b border-[#242834] pb-3">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span className="text-2xl">📄</span>
+                        <div className="min-w-0">
+                          <h3 className="font-extrabold text-white text-sm truncate group-hover:text-amber-400 transition-colors">
+                            {resume.name}
+                          </h3>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            {badge && (
+                              <span className={`px-2 py-0.5 text-[10px] font-black rounded-md ${badge.color}`}>
+                                {badge.label}
+                              </span>
+                            )}
+                            <p className="text-[10px] text-zinc-500 font-mono">
+                              {new Date(resume.createdAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
                       </div>
+                      {resume.isPrimary && (
+                        <span className="px-2.5 py-1 bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black rounded-full">
+                          PRIMARY
+                        </span>
+                      )}
                     </div>
+
+                    <p className="text-xs text-zinc-300 line-clamp-3 leading-relaxed break-words">
+                      {resume.parsedText?.slice(0, 180) || "No text extracted"}
+                    </p>
                   </div>
-                  {resume.isPrimary && (
-                    <span className="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs font-medium rounded-full">
-                      Primary
-                    </span>
-                  )}
-                </div>
 
-                <p className="text-sm text-gray-600 line-clamp-3 mb-4">
-                  {resume.parsedText?.slice(0, 200) || "No text extracted"}
-                </p>
-
-                <div className="flex items-center gap-2">
-                  <label className="flex items-center gap-1.5 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={resume.isPrimary}
-                      onChange={(e) =>
-                        handleSetPrimary(resume.id, e.target.checked)
-                      }
-                      className="w-3.5 h-3.5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                    />
-                    <span className="text-xs text-gray-600">Primary</span>
-                  </label>
-                  <button
-                    onClick={() => handleDelete(resume.id)}
-                    disabled={deletingId === resume.id}
-                    className="ml-auto px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 min-h-[44px] sm:min-h-0"
-                  >
-                    {deletingId === resume.id ? "Deleting..." : "Delete"}
-                  </button>
+                  <div className="flex items-center justify-between pt-3 border-t border-[#242834]">
+                    <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-zinc-300">
+                      <input
+                        type="checkbox"
+                        checked={resume.isPrimary}
+                        onChange={(e) => handleSetPrimary(resume.id, e.target.checked)}
+                        className="w-4 h-4 rounded text-amber-500 accent-amber-500"
+                      />
+                      <span>Set Primary</span>
+                    </label>
+                    <button
+                      onClick={() => handleDelete(resume.id)}
+                      disabled={deletingId === resume.id}
+                      className="px-3 py-1.5 text-xs font-bold text-rose-400 hover:bg-rose-950/50 rounded-xl transition-colors disabled:opacity-50"
+                    >
+                      {deletingId === resume.id ? "Deleting..." : "Delete"}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </div>
-          )})}
-          {/* Inline Add Card */}
-          <label
-            htmlFor="resume-upload"
-            className="bg-white rounded-xl border-2 border-dashed border-gray-300 overflow-hidden card-hover flex flex-col items-center justify-center px-4 py-3 sm:px-5 sm:py-5 min-h-[200px] text-gray-400 hover:text-indigo-500 hover:border-indigo-300 transition-colors cursor-pointer"
-          >
-            <span className="text-3xl mb-2">+</span>
-            <span className="text-sm font-medium">Add Resume</span>
-          </label>
-        </div>
-      )}
+              );
+            })}
+
+            {/* Inline Add Card */}
+            <label
+              htmlFor="resume-upload"
+              className="bg-[#14161D]/40 rounded-3xl border-2 border-dashed border-[#242834] hover:border-amber-500/50 flex flex-col items-center justify-center p-6 min-h-[220px] text-zinc-400 hover:text-amber-300 transition-all cursor-pointer group"
+            >
+              <span className="text-4xl mb-2 group-hover:scale-110 transition-transform text-amber-400">+</span>
+              <span className="text-xs font-extrabold uppercase tracking-wider text-white">Upload New Resume</span>
+            </label>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -124,7 +124,6 @@ function AnalyzePageContent() {
       if (jRes.ok) setJds((await jRes.json()).jds || []);
       if (pRes.ok) setPositions((await pRes.json()).positions || []);
 
-      // Fetch onboarding profile
       try {
         const oRes = await fetch("/api/onboarding");
         if (oRes.ok) {
@@ -284,8 +283,8 @@ function AnalyzePageContent() {
 
   if (status === "loading" || loadingData) {
     return (
-      <div className="flex items-center justify-center min-h-[80vh]">
-        <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+      <div className="flex items-center justify-center min-h-screen bg-[#090A0C]">
+        <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -293,390 +292,363 @@ function AnalyzePageContent() {
   if (status === "unauthenticated") return null;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Run Analysis</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Compare your resume against a job description
-        </p>
-      </div>
+    <div className="min-h-screen bg-[#090A0C] text-white py-8 px-4 sm:px-6 lg:px-8 pb-24">
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">Run ATS Analysis</h1>
+          <p className="text-xs sm:text-sm text-zinc-400 mt-1">
+            Compare your resume against a target job posting using Multi-Agent RAG evaluation.
+          </p>
+        </div>
 
-      {/* Form */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {error && (
-            <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
-              {error}
-            </div>
-          )}
+        {/* Glassmorphic Form Container */}
+        <div className="bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-amber-500/20 p-6 sm:p-8 shadow-2xl space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="p-3.5 rounded-xl bg-rose-950/80 border border-rose-800 text-xs text-rose-300 font-bold animate-fadeIn">
+                ⚠️ {error}
+              </div>
+            )}
 
-          {/* Step 0: Profile & Onboarding Info */}
-          {onboardingProfile && (
-            <div className="p-4 bg-gradient-to-r from-indigo-50 to-white rounded-xl border border-indigo-100 space-y-4">
-              <h3 className="text-sm font-semibold text-indigo-900">📋 Your Profile</h3>
+            {/* Profile & Target Info */}
+            {onboardingProfile && (
+              <div className="p-5 bg-[#090A0C] rounded-2xl border border-[#242834] space-y-4">
+                <h3 className="text-xs font-black uppercase tracking-wider text-amber-300">📋 Your Target Profile</h3>
 
-              {/* Multi-select Target Positions */}
-              {onboardingProfile.targetPositions && onboardingProfile.targetPositions.length > 0 && (
+                {/* Target Positions Checkboxes */}
+                {onboardingProfile.targetPositions && onboardingProfile.targetPositions.length > 0 && (
+                  <div>
+                    <label className="block text-[11px] font-bold text-zinc-400 mb-1.5 uppercase">
+                      Target Roles:
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {onboardingProfile.targetPositions.map((pos) => {
+                        const isChecked = selectedTargetPositions.includes(pos);
+                        return (
+                          <label
+                            key={pos}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-extrabold cursor-pointer transition-all border ${
+                              isChecked
+                                ? "bg-amber-500 text-slate-950 border-amber-400 shadow-md"
+                                : "bg-[#14161D] text-zinc-300 border-[#242834] hover:border-amber-500/50"
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={() =>
+                                setSelectedTargetPositions((prev) =>
+                                  prev.includes(pos)
+                                    ? prev.filter((p) => p !== pos)
+                                    : [...prev, pos]
+                                )
+                              }
+                              className="sr-only"
+                            />
+                            {pos}
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Country Badge */}
+                {onboardingProfile.country && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-zinc-400">Target Country:</span>
+                    <span className="px-2.5 py-1 bg-emerald-950 text-emerald-300 text-xs font-black rounded-full border border-emerald-800">
+                      {onboardingProfile.country}
+                    </span>
+                  </div>
+                )}
+
+                {/* Job Type */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1.5">
-                    Target Positions
+                  <label className="block text-[11px] font-bold text-zinc-400 mb-1.5 uppercase">
+                    Job Type Preference:
                   </label>
                   <div className="flex flex-wrap gap-2">
-                    {onboardingProfile.targetPositions.map((pos) => {
-                      const isChecked = selectedTargetPositions.includes(pos);
-                      return (
-                        <label
-                          key={pos}
-                          className={`px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-colors border ${
-                            isChecked
-                              ? "bg-indigo-600 text-white border-indigo-600"
-                              : "bg-white text-gray-600 border-gray-300 hover:border-indigo-300"
-                          }`}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={isChecked}
-                            onChange={() =>
-                              setSelectedTargetPositions((prev) =>
-                                prev.includes(pos)
-                                  ? prev.filter((p) => p !== pos)
-                                  : [...prev, pos]
-                              )
-                            }
-                            className="sr-only"
-                          />
-                          {pos}
-                        </label>
-                      );
-                    })}
+                    {JOB_TYPES.map((jt) => (
+                      <label
+                        key={jt}
+                        className={`px-3 py-1 rounded-xl text-xs font-extrabold cursor-pointer transition-all border ${
+                          selectedJobType === jt
+                            ? "bg-amber-500 text-slate-950 border-amber-400 shadow-md"
+                            : "bg-[#14161D] text-zinc-300 border-[#242834] hover:border-amber-500/50"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="jobType"
+                          value={jt}
+                          checked={selectedJobType === jt}
+                          onChange={() => setSelectedJobType(jt)}
+                          className="sr-only"
+                        />
+                        {jt}
+                      </label>
+                    ))}
                   </div>
                 </div>
-              )}
-
-              {/* Country Badge */}
-              {onboardingProfile.country && (
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium text-gray-500">Target Country:</span>
-                  <span className="px-2.5 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
-                    {onboardingProfile.country}
-                  </span>
-                </div>
-              )}
-
-              {/* Job Type Radio */}
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">
-                  Job Type
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {JOB_TYPES.map((jt) => (
-                    <label
-                      key={jt}
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-colors border ${
-                        selectedJobType === jt
-                          ? "bg-indigo-600 text-white border-indigo-600"
-                          : "bg-white text-gray-600 border-gray-300 hover:border-indigo-300"
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="jobType"
-                        value={jt}
-                        checked={selectedJobType === jt}
-                        onChange={() => setSelectedJobType(jt)}
-                        className="sr-only"
-                      />
-                      {jt}
-                    </label>
-                  ))}
-                </div>
               </div>
-
-            </div>
-          )}
-
-          {/* Step 1: Select Resume */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Step 1: Select Resume
-            </label>
-            {resumes.length === 0 ? (
-              <div className="p-4 bg-gray-50 rounded-lg text-center">
-                <p className="text-sm text-gray-500 mb-2">
-                  No resumes uploaded yet.
-                </p>
-                <Link
-                  href="/dashboard/resumes"
-                  className="text-sm text-indigo-600 font-medium hover:text-indigo-700"
-                >
-                  Upload a resume first →
-                </Link>
-              </div>
-            ) : (
-              <select
-                value={resumeId}
-                onChange={(e) => setResumeId(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
-              >
-                <option value="">Select a resume...</option>
-                {resumes.map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {r.name}
-                  </option>
-                ))}
-              </select>
             )}
-          </div>
 
-          {/* Step 2: Select or Paste JD */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Step 2: Select Job Description(s)
-            </label>
-
-            <div className="flex items-center gap-4 mb-3">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  checked={!usePastedJd}
-                  onChange={() => setUsePastedJd(false)}
-                  className="w-4 h-4 text-indigo-600"
-                />
-                <span className="text-sm text-gray-700">Saved JD</span>
+            {/* Step 1: Select Resume */}
+            <div className="space-y-2">
+              <label className="block text-xs font-black uppercase tracking-wider text-amber-300">
+                Step 1: Select Resume
               </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  checked={usePastedJd}
-                  onChange={() => setUsePastedJd(true)}
-                  className="w-4 h-4 text-indigo-600"
-                />
-                <span className="text-sm text-gray-700">Paste New JD</span>
-              </label>
-            </div>
-
-            {!usePastedJd ? (
-              jds.length === 0 ? (
-                <div className="p-4 bg-gray-50 rounded-lg text-center">
-                  <p className="text-sm text-gray-500 mb-2">
-                    No JDs saved. Switch to &ldquo;Paste New JD&rdquo; or save
-                    one first.
-                  </p>
+              {resumes.length === 0 ? (
+                <div className="p-4 bg-[#090A0C] rounded-2xl border border-[#242834] text-center space-y-2">
+                  <p className="text-xs text-zinc-400">No resumes uploaded yet.</p>
                   <Link
-                    href="/dashboard/jds"
-                    className="text-sm text-indigo-600 font-medium hover:text-indigo-700"
+                    href="/dashboard/resumes"
+                    className="text-xs text-amber-400 font-bold hover:underline inline-block"
                   >
-                    Save a JD →
+                    Upload a resume first →
                   </Link>
                 </div>
               ) : (
-                <div className="space-y-2 max-h-60 overflow-y-auto p-2 border border-gray-200 rounded-lg">
-                  <p className="text-xs text-gray-500 px-2 pb-1">
-                    {selectedJdIds.length} selected
-                    {selectedJdIds.length > 1 && " (batch mode)"}
-                  </p>
-                  {jds.map((j) => (
-                    <label
-                      key={j.id}
-                      className={`flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition-colors ${
-                        selectedJdIds.includes(j.id)
-                          ? "bg-indigo-50 border border-indigo-200"
-                          : "hover:bg-gray-50 border border-transparent"
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedJdIds.includes(j.id)}
-                        onChange={() => handleJdToggle(j.id)}
-                        className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                      />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900">
-                          {j.title}
-                        </p>
-                        {j.company && (
-                          <p className="text-xs text-gray-500">{j.company}</p>
-                        )}
-                      </div>
-                    </label>
+                <select
+                  value={resumeId}
+                  onChange={(e) => setResumeId(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl text-xs bg-[#090A0C] border border-[#242834] text-white focus:outline-none focus:border-amber-500"
+                >
+                  <option value="">Select a resume...</option>
+                  {resumes.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.name}
+                    </option>
                   ))}
-                </div>
-              )
-            ) : (
-              <div className="space-y-3">
-                {/* URL Importer Bar */}
-                <div className="p-3 bg-[#090A0C] border border-[#242834] rounded-xl space-y-2">
-                  <label className="block text-xs font-bold text-amber-300">
-                    ⚡ Auto-Fetch Job Details From Web URL
-                  </label>
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <input
-                      type="url"
-                      value={fetchUrlInput}
-                      onChange={(e) => {
-                        setFetchUrlInput(e.target.value);
-                        setUrlFetchError("");
-                      }}
-                      placeholder="Paste job URL (LinkedIn, Indeed, Company careers)..."
-                      className="flex-1 px-3 py-2 rounded-lg text-xs bg-[#14161D] border border-[#242834] text-white focus:outline-none focus:border-amber-500"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleFetchUrlDetails}
-                      disabled={urlFetching || !fetchUrlInput.trim()}
-                      className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-lg transition-all disabled:opacity-50 flex items-center justify-center gap-1.5"
-                    >
-                      {urlFetching ? "Fetching..." : "📥 Fetch Details"}
-                    </button>
-                  </div>
-                  {urlFetchError && (
-                    <p className="text-[11px] text-rose-400 font-medium">{urlFetchError}</p>
-                  )}
-                </div>
+                </select>
+              )}
+            </div>
 
-                <input
-                  type="text"
-                  value={pasteJdTitle}
-                  onChange={(e) => setPasteJdTitle(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-[#242834] dark:bg-[#090A0C] dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none text-xs font-medium"
-                  placeholder="Job title (e.g. Senior Frontend Developer)"
-                />
-                <textarea
-                  value={pasteJdText}
-                  onChange={(e) => setPasteJdText(e.target.value)}
-                  rows={8}
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-[#242834] dark:bg-[#090A0C] dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none resize-y text-xs"
-                  placeholder="Paste the full job description here..."
-                />
+            {/* Step 2: Select or Paste JD */}
+            <div className="space-y-3">
+              <label className="block text-xs font-black uppercase tracking-wider text-amber-300">
+                Step 2: Select Job Description(s)
+              </label>
+
+              <div className="flex items-center gap-4">
+                <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-zinc-200">
+                  <input
+                    type="radio"
+                    checked={!usePastedJd}
+                    onChange={() => setUsePastedJd(false)}
+                    className="w-4 h-4 text-amber-500 accent-amber-500"
+                  />
+                  <span>Saved JD</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-zinc-200">
+                  <input
+                    type="radio"
+                    checked={usePastedJd}
+                    onChange={() => setUsePastedJd(true)}
+                    className="w-4 h-4 text-amber-500 accent-amber-500"
+                  />
+                  <span>Paste New JD</span>
+                </label>
               </div>
-            )}
-          </div>
 
-          {/* Summary */}
-          {selectedResume && (
-            <div className="p-4 bg-indigo-50 rounded-xl border border-indigo-100">
-              <p className="text-sm text-indigo-800">
-                Ready to analyze <strong>{selectedResume.name}</strong> against{" "}
-                {usePastedJd ? (
-                  <strong>{pasteJdTitle || "(new JD)"}</strong>
-                ) : selectedJdIds.length > 1 ? (
-                  <strong>{selectedJdIds.length} job descriptions</strong>
+              {!usePastedJd ? (
+                jds.length === 0 ? (
+                  <div className="p-4 bg-[#090A0C] rounded-2xl border border-[#242834] text-center space-y-2">
+                    <p className="text-xs text-zinc-400">
+                      No saved JDs found. Switch to &ldquo;Paste New JD&rdquo; or add one first.
+                    </p>
+                    <Link
+                      href="/dashboard/jds"
+                      className="text-xs text-amber-400 font-bold hover:underline inline-block"
+                    >
+                      Save a JD →
+                    </Link>
+                  </div>
                 ) : (
-                  <strong>
-                    {jds.find((j) => j.id === selectedJdIds[0])?.title ||
-                      "(select a JD)"}
+                  <div className="space-y-2 max-h-60 overflow-y-auto p-2 bg-[#090A0C] border border-[#242834] rounded-2xl">
+                    <p className="text-[10px] text-zinc-500 px-2 pb-1 font-mono uppercase">
+                      {selectedJdIds.length} selected
+                      {selectedJdIds.length > 1 && " (batch scan)"}
+                    </p>
+                    {jds.map((j) => (
+                      <label
+                        key={j.id}
+                        className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all border ${
+                          selectedJdIds.includes(j.id)
+                            ? "bg-amber-500/10 border-amber-500/40 text-white"
+                            : "hover:bg-[#14161D] border-transparent text-zinc-300"
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedJdIds.includes(j.id)}
+                          onChange={() => handleJdToggle(j.id)}
+                          className="w-4 h-4 rounded text-amber-500 accent-amber-500"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-bold text-white truncate">{j.title}</p>
+                          {j.company && (
+                            <p className="text-[11px] text-zinc-400 truncate">{j.company}</p>
+                          )}
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                )
+              ) : (
+                <div className="space-y-3">
+                  {/* URL Importer Bar */}
+                  <div className="p-4 bg-[#090A0C] border border-amber-500/30 rounded-2xl space-y-2">
+                    <label className="block text-xs font-black uppercase text-amber-300 tracking-wider">
+                      ⚡ Auto-Fetch Job Details From Web URL
+                    </label>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <input
+                        type="url"
+                        value={fetchUrlInput}
+                        onChange={(e) => {
+                          setFetchUrlInput(e.target.value);
+                          setUrlFetchError("");
+                        }}
+                        placeholder="Paste job URL (LinkedIn, Indeed, Company careers)..."
+                        className="flex-1 px-3.5 py-2.5 rounded-xl text-xs bg-[#14161D] border border-[#242834] text-white focus:outline-none focus:border-amber-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleFetchUrlDetails}
+                        disabled={urlFetching || !fetchUrlInput.trim()}
+                        className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-1.5 shrink-0"
+                      >
+                        {urlFetching ? "Fetching..." : "📥 Fetch Details"}
+                      </button>
+                    </div>
+                    {urlFetchError && (
+                      <p className="text-[11px] text-rose-400 font-medium">{urlFetchError}</p>
+                    )}
+                  </div>
+
+                  <input
+                    type="text"
+                    value={pasteJdTitle}
+                    onChange={(e) => setPasteJdTitle(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl bg-[#090A0C] border border-[#242834] text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500 text-xs font-semibold"
+                    placeholder="Job title (e.g. Senior Frontend Developer)"
+                  />
+                  <textarea
+                    value={pasteJdText}
+                    onChange={(e) => setPasteJdText(e.target.value)}
+                    rows={8}
+                    className="w-full p-4 rounded-xl bg-[#090A0C] border border-[#242834] text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500 resize-y text-xs"
+                    placeholder="Paste the full job description here..."
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Summary */}
+            {selectedResume && (
+              <div className="p-4 bg-amber-500/10 rounded-2xl border border-amber-500/30 text-xs text-amber-200">
+                Ready to analyze <strong className="text-white">{selectedResume.name}</strong> against{" "}
+                {usePastedJd ? (
+                  <strong className="text-white">{pasteJdTitle || "(new JD)"}</strong>
+                ) : selectedJdIds.length > 1 ? (
+                  <strong className="text-white">{selectedJdIds.length} job descriptions</strong>
+                ) : (
+                  <strong className="text-white">
+                    {jds.find((j) => j.id === selectedJdIds[0])?.title || "(select a JD)"}
                   </strong>
                 )}
-              </p>
+              </div>
+            )}
+
+            {/* Submit CTA */}
+            <button
+              type="submit"
+              disabled={submitting || batchInProgress}
+              className="w-full py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider rounded-2xl transition-all shadow-lg shadow-amber-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {submitting || batchInProgress ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                  Running AI Analysis...
+                </>
+              ) : selectedJdIds.length > 1 ? (
+                `Analyze All ${selectedJdIds.length} Selected`
+              ) : (
+                "Run Analysis →"
+              )}
+            </button>
+          </form>
+
+          {/* Batch Results */}
+          {batchResults && batchResults.length > 0 && (
+            <div className="mt-8 pt-6 border-t border-[#242834] space-y-4">
+              <h2 className="text-sm font-black text-white uppercase tracking-wider">
+                Batch Analysis Results
+              </h2>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="border-b border-[#242834] text-[11px] font-bold text-zinc-400 uppercase">
+                      <th className="text-left px-4 py-2">Job Description</th>
+                      <th className="text-center px-4 py-2">Overall Score</th>
+                      <th className="text-center px-4 py-2">Keyword Match</th>
+                      <th className="text-center px-4 py-2">Format</th>
+                      <th className="text-center px-4 py-2">Impact</th>
+                      <th className="text-right px-4 py-2">Details</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#242834] text-xs">
+                    {batchResults.map((br, idx) => (
+                      <tr key={idx} className="hover:bg-[#1C1F2B] transition-colors">
+                        <td className="px-4 py-3 font-bold text-white">{br.jdTitle}</td>
+                        {br.analysis ? (
+                          <>
+                            <td className="px-4 py-3 text-center">
+                              <span
+                                className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-black ${
+                                  br.analysis.overallScore >= 75
+                                    ? "bg-emerald-950 text-emerald-300 border border-emerald-800"
+                                    : br.analysis.overallScore >= 60
+                                      ? "bg-amber-950 text-amber-300 border border-amber-800"
+                                      : "bg-rose-950 text-rose-300 border border-rose-800"
+                                }`}
+                              >
+                                {br.analysis.overallScore}%
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-center font-bold text-zinc-300">
+                              {Math.round(br.analysis.keywordsMatchPct)}%
+                            </td>
+                            <td className="px-4 py-3 text-center text-zinc-400">
+                              {br.analysis.formatScore}/100
+                            </td>
+                            <td className="px-4 py-3 text-center text-zinc-400">
+                              {br.analysis.impactScore}/100
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              <Link
+                                href={`/dashboard/analyze/${br.analysis.id}`}
+                                className="text-xs text-amber-400 hover:underline font-bold"
+                              >
+                                View →
+                              </Link>
+                            </td>
+                          </>
+                        ) : (
+                          <td colSpan={5} className="px-4 py-3 text-rose-400 text-xs font-bold">
+                            {br.error || "Analysis failed"}
+                          </td>
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
-
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={submitting || batchInProgress}
-            className="w-full py-3 min-h-[44px] bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          >
-            {submitting || batchInProgress ? (
-              <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Running AI Analysis...
-              </>
-            ) : selectedJdIds.length > 1 ? (
-              `Analyze All ${selectedJdIds.length} Selected`
-            ) : (
-              "Run Analysis"
-            )}
-          </button>
-        </form>
-
-        {/* Batch Results */}
-        {batchResults && batchResults.length > 0 && (
-          <div className="mt-8">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              Batch Analysis Results
-            </h2>
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-2">
-                      Job Description
-                    </th>
-                    <th className="text-center text-xs font-semibold text-gray-500 uppercase px-4 py-2">
-                      Overall Score
-                    </th>
-                    <th className="text-center text-xs font-semibold text-gray-500 uppercase px-4 py-2">
-                      Keyword Match
-                    </th>
-                    <th className="text-center text-xs font-semibold text-gray-500 uppercase px-4 py-2">
-                      Format
-                    </th>
-                    <th className="text-center text-xs font-semibold text-gray-500 uppercase px-4 py-2">
-                      Impact
-                    </th>
-                    <th className="text-right text-xs font-semibold text-gray-500 uppercase px-4 py-2">
-                      Details
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {batchResults.map((br, idx) => (
-                    <tr
-                      key={idx}
-                      className="border-b border-gray-100 hover:bg-gray-50"
-                    >
-                      <td className="px-4 py-3 text-sm text-gray-900">
-                        {br.jdTitle}
-                      </td>
-                      {br.analysis ? (
-                        <>
-                          <td className="px-4 py-3 text-center">
-                            <span
-                              className={`inline-flex px-2 py-0.5 rounded-full text-xs font-bold ${
-                                br.analysis.overallScore >= 70
-                                  ? "bg-green-100 text-green-800"
-                                  : br.analysis.overallScore >= 50
-                                    ? "bg-yellow-100 text-yellow-800"
-                                    : "bg-red-100 text-red-800"
-                              }`}
-                            >
-                              {br.analysis.overallScore}%
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-center text-sm">
-                            {Math.round(br.analysis.keywordsMatchPct)}%
-                          </td>
-                          <td className="px-4 py-3 text-center text-sm">
-                            {br.analysis.formatScore}/100
-                          </td>
-                          <td className="px-4 py-3 text-center text-sm">
-                            {br.analysis.impactScore}/100
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            <Link
-                              href={`/dashboard/analyze/${br.analysis.id}`}
-                              className="text-xs text-indigo-600 hover:text-indigo-700 font-medium"
-                            >
-                              View →
-                            </Link>
-                          </td>
-                        </>
-                      ) : (
-                        <td
-                          colSpan={5}
-                          className="px-4 py-3 text-sm text-red-600"
-                        >
-                          {br.error || "Analysis failed"}
-                        </td>
-                      )}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );
@@ -686,8 +658,8 @@ export default function AnalyzePage() {
   return (
     <Suspense
       fallback={
-        <div className="flex items-center justify-center min-h-[80vh]">
-          <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+        <div className="flex items-center justify-center min-h-screen bg-[#090A0C]">
+          <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
         </div>
       }
     >
