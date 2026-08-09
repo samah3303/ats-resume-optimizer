@@ -106,7 +106,6 @@ export default function InterviewPage() {
 
     setEvaluatingIndex(index);
     try {
-      // Call optimize/negotiate endpoint or inline mock evaluation
       const res = await fetch("/api/star-bullet", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -143,183 +142,185 @@ export default function InterviewPage() {
 
   if (status === "loading" || loadingData) {
     return (
-      <div className="flex items-center justify-center min-h-[80vh]">
-        <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+      <div className="flex items-center justify-center min-h-screen bg-[#090A0C]">
+        <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      <div>
-        <div className="flex items-center gap-2 text-xs font-semibold text-indigo-600 uppercase tracking-wider mb-1">
-          <span>Interview Readiness Studio</span>
+    <div className="min-h-screen bg-[#090A0C] text-white py-8 px-4 sm:px-6 lg:px-8 space-y-8 pb-24">
+      <div className="max-w-6xl mx-auto space-y-8">
+        <div>
+          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-amber-400 mb-1">
+            <span>Interview Readiness Studio</span>
+          </div>
+          <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+            AI Interview Question Predictor & Roleplay
+          </h1>
+          <p className="text-xs sm:text-sm text-zinc-400 mt-1 max-w-3xl">
+            Predict high-probability technical, behavioral, and gap questions tailored specifically to your resume and target job posting.
+          </p>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-          AI Interview Question Predictor & Roleplay
-        </h1>
-        <p className="text-sm text-slate-500 mt-1 max-w-3xl">
-          Predict high-probability technical, behavioral, and gap questions tailored specifically to your resume and target job posting.
-        </p>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Form */}
-        <div className="lg:col-span-4 bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm space-y-5">
-          <h2 className="text-base font-bold text-slate-900">1. Setup Practice Session</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Form */}
+          <div className="lg:col-span-4 bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-amber-500/20 p-6 shadow-2xl space-y-5">
+            <h2 className="text-base font-black text-white">1. Setup Practice Session</h2>
 
-          <form onSubmit={handleGenerate} className="space-y-4">
-            {error && (
-              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700">
-                {error}
+            <form onSubmit={handleGenerate} className="space-y-4">
+              {error && (
+                <div className="p-3 bg-rose-950/80 border border-rose-800 rounded-xl text-xs text-rose-300 font-bold">
+                  ⚠️ {error}
+                </div>
+              )}
+
+              <div>
+                <label className="block text-xs font-bold text-amber-300 mb-1.5">
+                  Select Your Resume
+                </label>
+                <select
+                  value={resumeId}
+                  onChange={(e) => setResumeId(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl bg-[#090A0C] border border-[#242834] text-xs font-semibold text-white focus:outline-none focus:border-amber-500"
+                >
+                  <option value="">-- Choose Resume --</option>
+                  {resumes.map((r) => (
+                    <option key={r.id} value={r.id}>{r.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-amber-300 mb-1.5">
+                  Select Job Posting
+                </label>
+                <select
+                  value={jdId}
+                  onChange={(e) => setJdId(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl bg-[#090A0C] border border-[#242834] text-xs font-semibold text-white focus:outline-none focus:border-amber-500"
+                >
+                  <option value="">-- Choose Job Description --</option>
+                  {jds.map((j) => (
+                    <option key={j.id} value={j.id}>
+                      {j.title} {j.company ? `at ${j.company}` : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <button
+                type="submit"
+                disabled={generating || !resumeId || !jdId}
+                className="w-full py-3.5 px-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider rounded-2xl shadow-lg shadow-amber-500/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {generating ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                    Predicting Questions...
+                  </>
+                ) : (
+                  "🎯 Predict Top Interview Questions"
+                )}
+              </button>
+            </form>
+          </div>
+
+          {/* Output */}
+          <div className="lg:col-span-8 space-y-6">
+            {questions && questions.length > 0 ? (
+              <div className="space-y-6">
+                {/* Category Filter Pills */}
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setActiveCategory(cat)}
+                      className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
+                        activeCategory === cat
+                          ? "bg-amber-500 text-slate-950 shadow-md"
+                          : "bg-[#14161D] border border-[#242834] text-zinc-300 hover:text-white"
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Question Cards */}
+                <div className="space-y-4">
+                  {filteredQuestions.map((q, idx) => (
+                    <div
+                      key={idx}
+                      className="bg-[#14161D]/80 backdrop-blur-xl rounded-3xl border border-[#242834] p-6 shadow-xl space-y-4 hover:border-amber-500/40 transition-all"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="px-3 py-1 rounded-full text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                          {q.category}
+                        </span>
+                        <span className="text-[10px] text-zinc-500 font-mono">Question {idx + 1}</span>
+                      </div>
+
+                      <div>
+                        <h3 className="text-sm font-black text-white leading-snug">
+                          &ldquo;{q.question}&rdquo;
+                        </h3>
+                        <p className="text-xs text-zinc-400 mt-1 italic">
+                          Why recruiter asks this: {q.rationale}
+                        </p>
+                      </div>
+
+                      {/* Interactive Practice Box */}
+                      <div className="space-y-2 pt-3 border-t border-[#242834]">
+                        <label className="block text-[10px] font-black text-amber-300 uppercase tracking-wider">
+                          Practice Your Answer (STAR Method):
+                        </label>
+                        <textarea
+                          value={practiceAnswer[idx] || ""}
+                          onChange={(e) =>
+                            setPracticeAnswer((prev) => ({ ...prev, [idx]: e.target.value }))
+                          }
+                          placeholder="Type your response here..."
+                          rows={3}
+                          className="w-full p-4 rounded-xl bg-[#090A0C] border border-[#242834] text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500"
+                        />
+                        <button
+                          onClick={() => handleEvaluateAnswer(idx, q.question)}
+                          disabled={evaluatingIndex === idx || !practiceAnswer[idx]?.trim()}
+                          className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black rounded-xl disabled:opacity-40 transition-all flex items-center gap-1.5"
+                        >
+                          {evaluatingIndex === idx ? (
+                            <>
+                              <div className="w-3 h-3 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                              Evaluating Answer...
+                            </>
+                          ) : (
+                            "🤖 Get AI STAR Feedback"
+                          )}
+                        </button>
+
+                        {feedback[idx] && (
+                          <div className="p-4 bg-emerald-950/80 border border-emerald-800 rounded-2xl text-xs text-emerald-300 whitespace-pre-wrap font-sans mt-2">
+                            {feedback[idx]}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-dashed border-[#242834] p-12 text-center space-y-3">
+                <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center justify-center font-bold text-xl mx-auto">
+                  🎙️
+                </div>
+                <h3 className="text-base font-black text-white">Your Predicted Interview Questions</h3>
+                <p className="text-xs text-zinc-400 max-w-md mx-auto">
+                  Select a resume and job description to get tailored questions and practice your STAR answers with AI feedback.
+                </p>
               </div>
             )}
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                Select Your Resume
-              </label>
-              <select
-                value={resumeId}
-                onChange={(e) => setResumeId(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium text-slate-800 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
-              >
-                <option value="">-- Choose Resume --</option>
-                {resumes.map((r) => (
-                  <option key={r.id} value={r.id}>{r.name}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                Select Job Posting
-              </label>
-              <select
-                value={jdId}
-                onChange={(e) => setJdId(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium text-slate-800 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
-              >
-                <option value="">-- Choose Job Description --</option>
-                {jds.map((j) => (
-                  <option key={j.id} value={j.id}>
-                    {j.title} {j.company ? `at ${j.company}` : ""}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <button
-              type="submit"
-              disabled={generating || !resumeId || !jdId}
-              className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {generating ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Predicting Questions...
-                </>
-              ) : (
-                "🎯 Predict Top Interview Questions"
-              )}
-            </button>
-          </form>
-        </div>
-
-        {/* Output */}
-        <div className="lg:col-span-8 space-y-6">
-          {questions && questions.length > 0 ? (
-            <div className="space-y-6">
-              {/* Category Filter Pills */}
-              <div className="flex flex-wrap gap-2">
-                {categories.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setActiveCategory(cat)}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                      activeCategory === cat
-                        ? "bg-indigo-600 text-white shadow-sm"
-                        : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-
-              {/* Question Cards */}
-              <div className="space-y-4">
-                {filteredQuestions.map((q, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm space-y-4 hover:border-indigo-200 transition-all"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-900 border border-amber-200">
-                        {q.category}
-                      </span>
-                      <span className="text-[11px] text-slate-400 font-medium">Question {idx + 1}</span>
-                    </div>
-
-                    <div>
-                      <h3 className="text-sm font-bold text-slate-900 leading-snug">
-                        &ldquo;{q.question}&rdquo;
-                      </h3>
-                      <p className="text-xs text-slate-500 mt-1 italic">
-                        Why recruiter asks this: {q.rationale}
-                      </p>
-                    </div>
-
-                    {/* Interactive Practice Box */}
-                    <div className="space-y-2 pt-2 border-t border-slate-100">
-                      <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider">
-                        Practice Your Answer (STAR Method):
-                      </label>
-                      <textarea
-                        value={practiceAnswer[idx] || ""}
-                        onChange={(e) =>
-                          setPracticeAnswer((prev) => ({ ...prev, [idx]: e.target.value }))
-                        }
-                        placeholder="Type your response here..."
-                        rows={3}
-                        className="w-full p-3 rounded-xl border border-slate-300 text-xs text-slate-800 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
-                      />
-                      <button
-                        onClick={() => handleEvaluateAnswer(idx, q.question)}
-                        disabled={evaluatingIndex === idx || !practiceAnswer[idx]?.trim()}
-                        className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg disabled:opacity-40 transition-all flex items-center gap-1.5"
-                      >
-                        {evaluatingIndex === idx ? (
-                          <>
-                            <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            Evaluating Answer...
-                          </>
-                        ) : (
-                          "🤖 Get AI STAR Feedback"
-                        )}
-                      </button>
-
-                      {feedback[idx] && (
-                        <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900 whitespace-pre-wrap font-sans mt-2">
-                          {feedback[idx]}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="bg-slate-50 rounded-2xl border border-dashed border-slate-300 p-12 text-center space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xl mx-auto">
-                🎙️
-              </div>
-              <h3 className="text-base font-bold text-slate-800">Your Predicted Interview Questions</h3>
-              <p className="text-xs text-slate-500 max-w-md mx-auto">
-                Select a resume and job description to get tailored questions and practice your STAR answers with AI feedback.
-              </p>
-            </div>
-          )}
+          </div>
         </div>
       </div>
     </div>
