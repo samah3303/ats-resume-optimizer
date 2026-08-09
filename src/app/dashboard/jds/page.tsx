@@ -397,16 +397,14 @@ export default function JDsPage() {
                     {jd.rawText.slice(0, 180)}...
                   </p>
 
-                  {jd.sourceUrl && (
-                    <a
-                      href={jd.sourceUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-300 hover:text-emerald-200 bg-emerald-950/80 px-3 py-1 rounded-xl border border-emerald-800 transition-colors"
-                    >
-                      <span>🔗 View Job Posting</span>
-                    </a>
-                  )}
+                  <a
+                    href={jd.sourceUrl || `https://www.google.com/search?q=${encodeURIComponent(jd.title + (jd.company ? " " + jd.company : "") + " job posting")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-[11px] font-extrabold text-emerald-300 hover:text-emerald-200 bg-emerald-950/80 px-3 py-1.5 rounded-xl border border-emerald-800 transition-colors shadow-sm self-start"
+                  >
+                    <span>🔗 View Job Posting</span>
+                  </a>
                 </div>
 
                 {/* Action Buttons */}

@@ -248,12 +248,14 @@ async function generateRecommendationsAsync(
 
     if (jdRecs.length > 0) {
       for (const jd of jdRecs) {
+        const generatedUrl = (jd as any).sourceUrl || `https://www.google.com/search?q=${encodeURIComponent(jd.title + (jd.company ? " " + jd.company : "") + " " + targetCountry + " job posting")}`;
         await prisma.jobDescription.create({
           data: {
             userId,
             title: jd.title,
             company: jd.company || null,
             rawText: jd.rawText,
+            sourceUrl: generatedUrl,
             notes: `🤖 AI Recommended (50-60% Primary Resume Match) — ${jd.matchReason}`,
           },
         });
