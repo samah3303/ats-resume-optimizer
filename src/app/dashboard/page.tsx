@@ -79,7 +79,7 @@ function DashboardContent() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, router]);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -146,12 +146,11 @@ function DashboardContent() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded w-48 animate-pulse" />
-          <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-64 mt-2 animate-pulse" />
+      <div className="min-h-screen bg-[#090A0C] text-white py-8 px-4 sm:px-6 lg:px-8 space-y-6">
+        <div className="max-w-7xl mx-auto space-y-6">
+          <div className="h-8 bg-[#14161D] rounded w-48 animate-pulse mb-8" />
+          <SkeletonGrid count={4} />
         </div>
-        <SkeletonGrid count={4} />
       </div>
     );
   }
@@ -179,90 +178,92 @@ function DashboardContent() {
   })();
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-[76px] md:pb-8">
-      {/* Header */}
-      <DashboardHeader
-        userName={session?.user?.name}
-        resumeCount={resumes.length}
-        analysisCount={analyses.length}
-        generalAtsScore={generalAtsScore}
-        onResetOnboarding={handleResetOnboarding}
-      />
+    <div className="min-h-screen bg-[#090A0C] text-white py-8 px-4 sm:px-6 lg:px-8 space-y-6 pb-24">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
+        <DashboardHeader
+          userName={session?.user?.name}
+          resumeCount={resumes.length}
+          analysisCount={analyses.length}
+          generalAtsScore={generalAtsScore}
+          onResetOnboarding={handleResetOnboarding}
+        />
 
-      {/* Studio Hero Feature Banner */}
-      <div className="mb-8 p-6 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-indigo-500/30 rounded-3xl text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/20 border border-indigo-400/30 text-indigo-300">
-            <span>🚀 New Feature</span>
-            <span>•</span>
-            <span>1-Click Application Studio</span>
+        {/* Studio Hero Feature Banner */}
+        <div className="p-6 sm:p-8 bg-[#14161D]/80 backdrop-blur-2xl border border-amber-500/20 rounded-3xl text-white shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-amber-500/10 border border-amber-500/30 text-amber-300">
+              <span>🚀 Primary Feature</span>
+              <span>•</span>
+              <span>1-Click Application Studio</span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+              Optimize Resumes & Target Job Postings in 1 Screen
+            </h2>
+            <p className="text-xs sm:text-sm text-zinc-400 max-w-xl">
+              Import job postings directly from URL, audit ATS scannability with live step-by-step progress, apply instant STAR bullet fixes, and sync to your Kanban tracker.
+            </p>
           </div>
-          <h2 className="text-xl font-extrabold text-white">
-            Optimize Resumes & Target Job Postings in 1 Screen
-          </h2>
-          <p className="text-xs text-slate-300 max-w-xl">
-            Import job postings directly from URL, audit ATS scannability with live step-by-step progress, apply instant STAR bullet fixes, and sync to your Kanban tracker.
-          </p>
-        </div>
 
-        <Link
-          href="/dashboard/studio"
-          className="px-6 py-3 rounded-2xl bg-white text-indigo-950 hover:bg-indigo-50 font-extrabold text-sm transition-all shadow-lg shrink-0 flex items-center gap-2"
-        >
-          <span>Launch Studio</span>
-          <span>→</span>
-        </Link>
-      </div>
-
-      {/* Error banner */}
-      {dataError && (
-        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-sm text-red-700 dark:text-red-300 flex items-center justify-between">
-          <span>{dataError}</span>
-          <button
-            onClick={fetchData}
-            className="px-3 py-1 text-xs font-medium bg-red-100 dark:bg-red-800/50 rounded-lg hover:bg-red-200 dark:hover:bg-red-800 transition-colors min-h-[32px]"
+          <Link
+            href="/dashboard/studio"
+            className="px-6 py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-amber-500/20 shrink-0 flex items-center gap-2"
           >
-            Retry
-          </button>
+            <span>Launch Studio</span>
+            <span>→</span>
+          </Link>
         </div>
-      )}
 
-      {/* Recent Analyses & Score */}
-      <RecentAnalysesCard
-        analyses={analyses}
-        generalAtsScore={generalAtsScore}
-        onEditOnboarding={() => setShowEditModal(true)}
-      />
+        {/* Error banner */}
+        {dataError && (
+          <div className="p-4 bg-rose-950/80 border border-rose-800 rounded-2xl text-xs text-rose-300 font-bold flex items-center justify-between">
+            <span>{dataError}</span>
+            <button
+              onClick={fetchData}
+              className="px-3 py-1.5 text-xs font-bold bg-rose-900 text-rose-200 rounded-xl hover:bg-rose-800 transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        )}
 
-      {/* Resumes List with Primary toggle */}
-      <ResumeListCard
-        resumes={resumes}
-        onChangePrimary={handleChangePrimaryResume}
-      />
+        {/* Recent Analyses & Score */}
+        <RecentAnalysesCard
+          analyses={analyses}
+          generalAtsScore={generalAtsScore}
+          onEditOnboarding={() => setShowEditModal(true)}
+        />
 
-      {/* Onboarding Insights Accordion */}
-      <OnboardingInsights
-        roadmap={roadmap}
-        roadmapLoading={roadmapLoading}
-        onRegenRoadmap={handleRegenRoadmap}
-        onResetOnboarding={handleResetOnboarding}
-        linkedinTips={linkedinTips}
-        resumeImprovements={resumeImprovements}
-        expandedInsight={expandedInsight}
-        setInsightWithUrl={setInsightWithUrl}
-      />
+        {/* Resumes List with Primary toggle */}
+        <ResumeListCard
+          resumes={resumes}
+          onChangePrimary={handleChangePrimaryResume}
+        />
 
-      {/* Edit Onboarding & Primary Resume Modal */}
-      <EditOnboardingModal
-        open={showEditModal}
-        onClose={() => setShowEditModal(false)}
-        onSaved={() => {
-          fetchData();
-          toast("Onboarding target & primary resume updated! Analysis regenerated.", "success");
-        }}
-        resumes={resumes}
-        profile={onboardingProfile}
-      />
+        {/* Onboarding Insights Accordion */}
+        <OnboardingInsights
+          roadmap={roadmap}
+          roadmapLoading={roadmapLoading}
+          onRegenRoadmap={handleRegenRoadmap}
+          onResetOnboarding={handleResetOnboarding}
+          linkedinTips={linkedinTips}
+          resumeImprovements={resumeImprovements}
+          expandedInsight={expandedInsight}
+          setInsightWithUrl={setInsightWithUrl}
+        />
+
+        {/* Edit Onboarding & Primary Resume Modal */}
+        <EditOnboardingModal
+          open={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          onSaved={() => {
+            fetchData();
+            toast("Onboarding target & primary resume updated! Analysis regenerated.", "success");
+          }}
+          resumes={resumes}
+          profile={onboardingProfile}
+        />
+      </div>
     </div>
   );
 }
@@ -271,8 +272,8 @@ export default function DashboardPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex items-center justify-center min-h-[80vh]">
-          <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+        <div className="flex items-center justify-center min-h-screen bg-[#090A0C]">
+          <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
         </div>
       }
     >

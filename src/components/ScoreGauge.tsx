@@ -12,53 +12,55 @@ export default function ScoreGauge({ score, size = 120 }: ScoreGaugeProps) {
 
   const color =
     clampedScore >= 70
-      ? "stroke-green-500"
+      ? "stroke-emerald-400"
       : clampedScore >= 50
-        ? "stroke-yellow-500"
-        : "stroke-red-500";
+        ? "stroke-amber-400"
+        : "stroke-rose-500";
 
   const textColor =
     clampedScore >= 70
-      ? "text-green-600"
+      ? "text-emerald-400"
       : clampedScore >= 50
-        ? "text-yellow-600"
-        : "text-red-600";
+        ? "text-amber-400"
+        : "text-rose-400";
 
   return (
     <div className="flex flex-col items-center gap-2">
-      <svg
-        width={size}
-        height={size}
-        viewBox={`0 0 ${size} ${size}`}
-        className="transform -rotate-90"
-      >
-        {/* Background circle */}
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={strokeWidth}
-          className="text-gray-200"
-        />
-        {/* Progress circle */}
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={strokeWidth}
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={circumference - progress}
-          className={`${color} transition-all duration-1000 ease-out`}
-        />
-      </svg>
-      <span className={`text-2xl font-bold ${textColor}`}>
-        {clampedScore}%
-      </span>
+      <div className="relative flex items-center justify-center">
+        <svg
+          width={size}
+          height={size}
+          viewBox={`0 0 ${size} ${size}`}
+          className="transform -rotate-90"
+        >
+          {/* Background circle */}
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={strokeWidth}
+            className="text-[#242834]"
+          />
+          {/* Progress circle */}
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={strokeWidth}
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={circumference - progress}
+            className={`${color} transition-all duration-1000 ease-out`}
+          />
+        </svg>
+        <span className={`absolute text-xl font-black ${textColor}`}>
+          {clampedScore}%
+        </span>
+      </div>
     </div>
   );
 }

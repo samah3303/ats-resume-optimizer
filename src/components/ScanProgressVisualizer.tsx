@@ -39,10 +39,10 @@ export default function ScanProgressVisualizer({ isScanning }: { isScanning: boo
   if (!isScanning) return null;
 
   return (
-    <div className="bg-slate-900 border border-indigo-500/30 rounded-2xl p-6 shadow-2xl text-white my-6 animate-pulse">
+    <div className="bg-[#14161D]/80 backdrop-blur-2xl border border-amber-500/20 rounded-3xl p-6 shadow-2xl text-white my-6 animate-pulse">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-4 h-4 rounded-full bg-indigo-500 animate-ping" />
-        <h3 className="text-lg font-bold text-indigo-300">AI ATS Deep Audit in Progress...</h3>
+        <div className="w-4 h-4 rounded-full bg-amber-500 animate-ping" />
+        <h3 className="text-base font-black text-amber-300 uppercase tracking-wider">AI ATS Deep Audit in Progress...</h3>
       </div>
 
       <div className="space-y-4">
@@ -53,9 +53,9 @@ export default function ScanProgressVisualizer({ isScanning }: { isScanning: boo
           return (
             <div
               key={step.id}
-              className={`flex items-start gap-4 p-3 rounded-xl transition-all duration-500 ${
+              className={`flex items-start gap-4 p-3.5 rounded-2xl transition-all duration-500 ${
                 isCurrent
-                  ? "bg-indigo-950/70 border border-indigo-500/50 shadow-md"
+                  ? "bg-[#090A0C] border border-amber-500/50 shadow-md"
                   : isDone
                   ? "opacity-75"
                   : "opacity-40"
@@ -63,25 +63,25 @@ export default function ScanProgressVisualizer({ isScanning }: { isScanning: boo
             >
               <div className="mt-0.5 shrink-0">
                 {isDone ? (
-                  <span className="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold">
+                  <span className="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center text-xs font-black">
                     ✓
                   </span>
                 ) : isCurrent ? (
-                  <span className="w-6 h-6 rounded-full bg-indigo-500 text-white flex items-center justify-center text-xs font-bold animate-spin">
+                  <span className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center text-xs font-black animate-spin">
                     ⚙
                   </span>
                 ) : (
-                  <span className="w-6 h-6 rounded-full border border-slate-600 text-slate-400 flex items-center justify-center text-xs">
+                  <span className="w-6 h-6 rounded-full border border-zinc-700 text-zinc-500 flex items-center justify-center text-xs font-mono">
                     {idx + 1}
                   </span>
                 )}
               </div>
 
               <div>
-                <p className={`text-sm font-semibold ${isCurrent ? "text-indigo-200" : isDone ? "text-slate-300" : "text-slate-500"}`}>
+                <p className={`text-xs font-bold ${isCurrent ? "text-amber-300" : isDone ? "text-zinc-300" : "text-zinc-500"}`}>
                   {step.label}
                 </p>
-                <p className="text-xs text-slate-400 mt-0.5">{step.detail}</p>
+                <p className="text-[11px] text-zinc-400 mt-0.5">{step.detail}</p>
               </div>
             </div>
           );

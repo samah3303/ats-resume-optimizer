@@ -98,130 +98,110 @@ export default function StudioPage() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Scraping failed");
-
-      const title = data.title || "Job Posting";
-      const company = data.company || "";
-      const rawText = data.rawText || "";
-
-      setPastedJdTitle(title);
-      setPastedJdText(rawText);
-
-      // Save imported JD to DB
-      const saveRes = await fetch("/api/jds", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: company ? `${title} at ${company}` : title,
-          company: company || null,
-          rawText,
-          sourceUrl: data.sourceUrl,
-        }),
-      });
-
-      if (saveRes.ok) {
-        const savedData = await saveRes.json();
-        if (savedData.jd?.id) {
-          setJds((prev) => [savedData.jd, ...prev]);
-          setSelectedJdId(savedData.jd.id);
-        }
+      if (res.ok && data.job) {
+        setPastedJdTitle(data.job.title || "Fetched Job Posting");
+        setPastedJdText(data.job.rawText || "");
+        setSelectedJdId("");
+        setStatusMessage(`✅ Extracted: "${data.job.title}"! Click Run Instant ATS Audit.`);
+      } else {
+        setStatusMessage(`⚠️ ${data.error || "Could not auto-extract job. Paste description text below."}`);
       }
-
-      setStatusMessage("✅ Job requirements extracted successfully!");
-    } catch (err) {
-      setStatusMessage(`❌ Error importing URL: ${(err as Error).message}`);
+    } catch {
+      setStatusMessage("⚠️ Server error reading URL. Please paste description text below.");
     } finally {
       setIsFetchingUrl(false);
     }
   };
 
   const handleRunAudit = async () => {
-    const resume = resumes.find((r) => r.id === selectedResumeId);
-    let jdText = "";
-    let targetJdId = selectedJdId;
+    const selectedResume = resumes.find((r) => r.id === selectedResumeId);
+    const selectedJd = jds.find((j) => j.id === selectedJdId);
+    const rawJdContent = selectedJd?.rawText || pastedJdText;
 
-    if (pastedJdText.trim().length > 0) {
-      jdText = pastedJdText;
-    } else {
-      const jd = jds.find((j) => j.id === selectedJdId);
-      jdText = jd?.rawText || "";
-    }
-
-    if (!resume) {
-      setStatusMessage("Please select or upload a resume first.");
+    if (!selectedResume) {
+      setStatusMessage("Please select a target resume to run scan.");
       return;
     }
-
-    if (!jdText) {
-      setStatusMessage("Please select a saved job or paste job description text.");
+    if (!rawJdContent.trim()) {
+      setStatusMessage("Please select a job description or paste requirements.");
       return;
     }
 
     setIsScanning(true);
-    setAuditResult(null);
     setStatusMessage(null);
+    setAuditResult(null);
 
-    // Compute local fallback scan upfront
-    const localScan = extractLocalKeywordMatch(resume.parsedText, jdText);
+    // Fast local client scan fallback
+    const localScan = extractLocalKeywordMatch(selectedResume.parsedText, rawJdContent);
 
     try {
-      // Build request body for POST /api/analyze
-      const payload: Record<string, any> = {
-        resumeId: resume.id,
-      };
+      let analysis: any = null;
+      let parsedGaps: any = { keywords: localScan.keywords, skills: localScan.skills };
 
-      if (targetJdId) {
-        payload.jdId = targetJdId;
-      } else {
-        payload.pasteJdTitle = pastedJdTitle || "Target Job Posting";
-        payload.pasteJdText = jdText;
+      // Call analyze endpoint if we have saved JD ID
+      if (selectedJdId) {
+        const res = await fetch("/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ resumeId: selectedResumeId, jdId: selectedJdId }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          analysis = data.analysis;
+          if (analysis?.skillsGapJson) {
+            try {
+              parsedGaps = JSON.parse(analysis.skillsGapJson);
+            } catch {}
+          }
+        }
       }
 
-      const res = await fetch("/api/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      // If no analysis created yet (e.g. pasted JD), create one
+      if (!analysis) {
+        const analyzeRes = await fetch("/api/analyze/standalone", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            resumeId: selectedResumeId,
+            jdTitle: pastedJdTitle || "Custom Job Description",
+            jdText: rawJdContent,
+          }),
+        });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Analysis API failed");
-
-      const analysis = data.analysis || data;
-
-      // Parse JSON skills gap if present
-      let parsedGaps = { keywords: localScan.keywords, skills: localScan.skills };
-      if (analysis.skillsGapJson) {
-        try {
-          const parsed = JSON.parse(analysis.skillsGapJson);
-          if (parsed.keywords) parsedGaps.keywords = parsed.keywords;
-          if (parsed.skills) parsedGaps.skills = parsed.skills;
-        } catch {
-          // fallback to localScan
+        if (analyzeRes.ok) {
+          const data = await analyzeRes.json();
+          analysis = data.analysis;
+          if (analysis?.skillsGapJson) {
+            try {
+              parsedGaps = JSON.parse(analysis.skillsGapJson);
+            } catch {}
+          }
         }
       }
 
       const overallScore =
-        analysis.overallScore ??
+        analysis?.overallScore ??
         Math.round(
-          ((analysis.keywordsMatchPct || localScan.keywordsMatchPct) +
-            (analysis.formatScore || localScan.formatScore) +
-            (analysis.impactScore || localScan.impactScore)) /
+          ((analysis?.keywordsMatchPct || localScan.keywordsMatchPct) +
+            (analysis?.formatScore || localScan.formatScore) +
+            (analysis?.impactScore || localScan.impactScore)) /
             3
         );
 
       setAuditResult({
-        id: analysis.id,
+        id: analysis?.id,
         overallScore,
-        keywordsMatchPct: analysis.keywordsMatchPct ?? localScan.keywordsMatchPct,
-        formatScore: analysis.formatScore ?? localScan.formatScore,
-        impactScore: analysis.impactScore ?? localScan.impactScore,
+        keywordsMatchPct: analysis?.keywordsMatchPct ?? localScan.keywordsMatchPct,
+        formatScore: analysis?.formatScore ?? localScan.formatScore,
+        impactScore: analysis?.impactScore ?? localScan.impactScore,
         keywords: parsedGaps.keywords || localScan.keywords,
         skills: parsedGaps.skills || localScan.skills,
         summaryText:
-          analysis.summaryText ||
+          analysis?.summaryText ||
           `Resume matches ${localScan.keywordsMatchPct}% of key terms for this role. Incorporate missing hard skills to pass ATS filters.`,
         suggestions:
-          analysis.suggestions?.length > 0
+          analysis?.suggestions?.length > 0
             ? analysis.suggestions
             : localScan.skills.missing.slice(0, 5).map((skill) => ({
                 section: "Technical Skills",
@@ -232,7 +212,6 @@ export default function StudioPage() {
       });
     } catch (err) {
       console.warn("API audit failed, using local analysis fallback:", err);
-      // Fast Zero-Cost Fallback Analysis
       const overallScore = Math.round(
         (localScan.keywordsMatchPct + localScan.formatScore + localScan.impactScore) / 3
       );
@@ -261,7 +240,6 @@ export default function StudioPage() {
     let jdIdToSave = selectedJdId;
 
     if (!jdIdToSave && pastedJdText.trim().length > 0) {
-      // Save pasted JD first if not saved yet
       try {
         const saveRes = await fetch("/api/jds", {
           method: "POST",
@@ -309,252 +287,261 @@ export default function StudioPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 space-y-8">
-      {/* Header Banner */}
-      <div className="bg-gradient-to-r from-indigo-950 via-slate-900 to-indigo-950 rounded-3xl p-6 sm:p-8 text-white shadow-xl">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div>
-            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/30 border border-indigo-400/40 text-indigo-200">
-              ⚡ Unified Studio Workflow
-            </span>
-            <h1 className="text-2xl sm:text-3xl font-extrabold mt-3 tracking-tight">
-              1-Click Application Studio
-            </h1>
-            <p className="text-xs sm:text-sm text-indigo-200 mt-2 max-w-2xl">
-              Select your resume, import a target job link or text, run instant ATS audits, apply STAR bullet fixes, and sync to your application tracker.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3 shrink-0">
-            <button
-              onClick={() => router.push("/dashboard/resumes")}
-              className="px-4 py-2.5 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm transition-all"
-            >
-              + Upload Resume
-            </button>
-            <button
-              onClick={() => router.push("/dashboard/builder")}
-              className="px-4 py-2.5 rounded-xl text-xs font-semibold bg-white text-indigo-950 hover:bg-indigo-50 transition-all shadow-md"
-            >
-              📄 ATS Builder
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {statusMessage && (
-        <div className="p-4 rounded-xl text-xs font-semibold bg-indigo-50 text-indigo-900 dark:bg-indigo-950 dark:text-indigo-200 border border-indigo-200 dark:border-indigo-800">
-          {statusMessage}
-        </div>
-      )}
-
-      {/* Main Studio Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Input Studio Panel (5 cols) */}
-        <div className="lg:col-span-5 space-y-6">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
-            <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <span>🎯</span> Step 1: Select Inputs
-            </h2>
-
-            {/* Resume Selection */}
+    <div className="min-h-screen bg-[#090A0C] text-white py-8 px-4 sm:px-6 lg:px-8 space-y-8 pb-24">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header Banner */}
+        <div className="bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-amber-500/20 p-6 sm:p-8 text-white shadow-2xl space-y-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                Choose Target Resume
-              </label>
-              {resumes.length === 0 ? (
-                <div className="p-3 bg-amber-50 dark:bg-amber-950/40 rounded-xl text-xs text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-900/50">
-                  No resumes found. Upload your first PDF/DOCX resume to get started.
+              <span className="px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-amber-500/10 border border-amber-500/30 text-amber-300">
+                ⚡ Unified Studio Workflow
+              </span>
+              <h1 className="text-2xl sm:text-4xl font-black mt-3 tracking-tight text-white">
+                1-Click Application Studio
+              </h1>
+              <p className="text-xs sm:text-sm text-zinc-400 mt-2 max-w-2xl">
+                Select your resume, import a target job link or text, run instant ATS audits, apply STAR bullet fixes, and sync to your application tracker.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 shrink-0">
+              <button
+                onClick={() => router.push("/dashboard/resumes")}
+                className="px-4 py-2.5 rounded-xl text-xs font-bold bg-[#090A0C] border border-[#242834] text-white hover:border-amber-500/40 transition-all"
+              >
+                + Upload Resume
+              </button>
+              <button
+                onClick={() => router.push("/dashboard/builder")}
+                className="px-5 py-2.5 rounded-xl text-xs font-black bg-amber-500 hover:bg-amber-400 text-slate-950 transition-all shadow-lg shadow-amber-500/20"
+              >
+                📄 ATS Builder
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {statusMessage && (
+          <div className="p-4 rounded-2xl text-xs font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30">
+            {statusMessage}
+          </div>
+        )}
+
+        {/* Main Studio Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Left Input Studio Panel */}
+          <div className="lg:col-span-5 space-y-6">
+            <div className="bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-amber-500/20 p-6 shadow-2xl space-y-6">
+              <h2 className="text-base font-black text-white flex items-center gap-2">
+                <span>🎯</span> Step 1: Select Inputs
+              </h2>
+
+              {/* Resume Selection */}
+              <div>
+                <label className="block text-xs font-bold text-amber-300 mb-2">
+                  Choose Target Resume
+                </label>
+                {resumes.length === 0 ? (
+                  <div className="p-3 bg-[#090A0C] rounded-xl text-xs text-zinc-400 border border-[#242834]">
+                    No resumes found. Upload your first PDF/DOCX resume to get started.
+                  </div>
+                ) : (
+                  <select
+                    value={selectedResumeId}
+                    onChange={(e) => setSelectedResumeId(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl text-xs bg-[#090A0C] border border-[#242834] text-white font-medium focus:outline-none focus:border-amber-500"
+                  >
+                    {resumes.map((r) => (
+                      <option key={r.id} value={r.id}>
+                        📄 {r.name} ({new Date(r.createdAt).toLocaleDateString()})
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
+              <hr className="border-[#242834]" />
+
+              {/* URL Job Importer */}
+              <div>
+                <label className="block text-xs font-bold text-amber-300 mb-2">
+                  Option A: Extract Job from URL
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="url"
+                    placeholder="https://linkedin.com/jobs/view/..."
+                    value={jdUrl}
+                    onChange={(e) => setJdUrl(e.target.value)}
+                    className="flex-1 px-4 py-2.5 rounded-xl text-xs bg-[#090A0C] border border-[#242834] text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500"
+                  />
+                  <button
+                    onClick={handleFetchUrl}
+                    disabled={isFetchingUrl}
+                    className="px-4 py-2.5 rounded-xl text-xs font-black bg-amber-500 hover:bg-amber-400 text-slate-950 disabled:opacity-50 transition-all shrink-0 shadow-md shadow-amber-500/20"
+                  >
+                    {isFetchingUrl ? "Fetching..." : "Fetch Job"}
+                  </button>
                 </div>
-              ) : (
+              </div>
+
+              {/* Existing Saved JDs */}
+              <div>
+                <label className="block text-xs font-bold text-amber-300 mb-2">
+                  Option B: Choose Saved Job Description
+                </label>
                 <select
-                  value={selectedResumeId}
-                  onChange={(e) => setSelectedResumeId(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl text-xs bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500"
+                  value={selectedJdId}
+                  onChange={(e) => {
+                    setSelectedJdId(e.target.value);
+                    setPastedJdText("");
+                  }}
+                  className="w-full px-4 py-3 rounded-xl text-xs bg-[#090A0C] border border-[#242834] text-white font-medium focus:outline-none focus:border-amber-500"
                 >
-                  {resumes.map((r) => (
-                    <option key={r.id} value={r.id}>
-                      📄 {r.name} ({new Date(r.createdAt).toLocaleDateString()})
+                  <option value="">-- Select Saved Job --</option>
+                  {jds.map((j) => (
+                    <option key={j.id} value={j.id}>
+                      🎯 {j.title} {j.company ? `@ ${j.company}` : ""}
                     </option>
                   ))}
                 </select>
-              )}
-            </div>
-
-            <hr className="border-slate-200 dark:border-slate-800" />
-
-            {/* URL Job Importer */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                Option A: Extract Job from URL
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="url"
-                  placeholder="https://linkedin.com/jobs/view/..."
-                  value={jdUrl}
-                  onChange={(e) => setJdUrl(e.target.value)}
-                  className="flex-1 px-3 py-2 rounded-xl text-xs bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white"
-                />
-                <button
-                  onClick={handleFetchUrl}
-                  disabled={isFetchingUrl}
-                  className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 transition-all shrink-0"
-                >
-                  {isFetchingUrl ? "Fetching..." : "Fetch Job"}
-                </button>
               </div>
-            </div>
 
-            {/* Existing Saved JDs */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                Option B: Choose Saved Job Description
-              </label>
-              <select
-                value={selectedJdId}
-                onChange={(e) => {
-                  setSelectedJdId(e.target.value);
-                  setPastedJdText("");
-                }}
-                className="w-full px-3 py-2.5 rounded-xl text-xs bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500"
+              {/* Raw JD Text Fallback */}
+              <div>
+                <label className="block text-xs font-bold text-amber-300 mb-2">
+                  Option C: Paste Job Description Text
+                </label>
+                <textarea
+                  rows={5}
+                  placeholder="Paste responsibilities, qualifications, and requirements..."
+                  value={pastedJdText}
+                  onChange={(e) => setPastedJdText(e.target.value)}
+                  className="w-full p-4 rounded-xl text-xs bg-[#090A0C] border border-[#242834] text-white placeholder-zinc-500 font-mono focus:outline-none focus:border-amber-500"
+                />
+              </div>
+
+              <button
+                onClick={handleRunAudit}
+                disabled={isScanning || !selectedResumeId}
+                className="w-full py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-lg shadow-amber-500/20 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
               >
-                <option value="">-- Select Saved Job --</option>
-                {jds.map((j) => (
-                  <option key={j.id} value={j.id}>
-                    🎯 {j.title} {j.company ? `@ ${j.company}` : ""}
-                  </option>
-                ))}
-              </select>
+                {isScanning ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                    Running Deep Scan...
+                  </>
+                ) : (
+                  "🚀 Run Instant ATS Audit"
+                )}
+              </button>
             </div>
-
-            {/* Raw JD Text Fallback */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                Option C: Paste Job Description Text
-              </label>
-              <textarea
-                rows={5}
-                placeholder="Paste responsibilities, qualifications, and requirements..."
-                value={pastedJdText}
-                onChange={(e) => setPastedJdText(e.target.value)}
-                className="w-full p-3 rounded-xl text-xs bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-mono"
-              />
-            </div>
-
-            <button
-              onClick={handleRunAudit}
-              disabled={isScanning || !selectedResumeId}
-              className="w-full py-3.5 rounded-xl font-bold text-sm bg-gradient-to-r from-indigo-700 to-indigo-600 hover:from-indigo-800 hover:to-indigo-700 text-white shadow-lg disabled:opacity-50 transition-all flex items-center justify-center gap-2"
-            >
-              {isScanning ? "Running Deep Scan..." : "🚀 Run Instant ATS Audit"}
-            </button>
           </div>
-        </div>
 
-        {/* Right Audit & Optimization Panel (7 cols) */}
-        <div className="lg:col-span-7 space-y-6">
-          <ScanProgressVisualizer isScanning={isScanning} />
+          {/* Right Audit & Optimization Panel */}
+          <div className="lg:col-span-7 space-y-6">
+            <ScanProgressVisualizer isScanning={isScanning} />
 
-          {!auditResult && !isScanning && (
-            <div className="bg-white dark:bg-slate-900 border border-dashed border-slate-300 dark:border-slate-800 rounded-2xl p-12 text-center text-slate-500 dark:text-slate-400 space-y-3">
-              <div className="text-4xl">🔍</div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                Ready for Audit
-              </h3>
-              <p className="text-xs max-w-md mx-auto">
-                Select your resume and target job posting on the left, then click <strong>Run Instant ATS Audit</strong> to view scannability scores and 1-click STAR bullet fixes.
-              </p>
-            </div>
-          )}
+            {!auditResult && !isScanning && (
+              <div className="bg-[#14161D]/80 backdrop-blur-2xl border border-dashed border-[#242834] rounded-3xl p-12 text-center text-zinc-400 space-y-3">
+                <div className="text-4xl">🔍</div>
+                <h3 className="text-base font-black text-white">
+                  Ready for Audit
+                </h3>
+                <p className="text-xs max-w-md mx-auto">
+                  Select your resume and target job posting on the left, then click <strong>Run Instant ATS Audit</strong> to view scannability scores and 1-click STAR bullet fixes.
+                </p>
+              </div>
+            )}
 
-          {auditResult && (
-            <div className="space-y-6">
-              {/* Score Breakdown Header */}
-              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-                  <div className="flex items-center gap-6">
-                    <ScoreGauge score={auditResult.overallScore || 0} size={110} />
-                    <div>
-                      <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                        Overall ATS Match
-                      </span>
-                      <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
-                        {auditResult.overallScore >= 80
-                          ? "High Candidate Match 🎉"
-                          : auditResult.overallScore >= 60
-                          ? "Moderate Match ⚡"
-                          : "Needs Optimization ⚠️"}
-                      </h3>
-                      {auditResult.summaryText && (
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md">
-                          {auditResult.summaryText}
-                        </p>
+            {auditResult && (
+              <div className="space-y-6">
+                {/* Score Breakdown Header */}
+                <div className="bg-[#14161D]/80 backdrop-blur-2xl border border-amber-500/20 rounded-3xl p-6 shadow-2xl">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+                    <div className="flex items-center gap-6">
+                      <ScoreGauge score={auditResult.overallScore || 0} size={110} />
+                      <div>
+                        <span className="text-xs font-black uppercase tracking-wider text-amber-300">
+                          Overall ATS Match
+                        </span>
+                        <h3 className="text-2xl font-black text-white mt-1">
+                          {auditResult.overallScore >= 80
+                            ? "High Candidate Match 🎉"
+                            : auditResult.overallScore >= 60
+                            ? "Moderate Match ⚡"
+                            : "Needs Optimization ⚠️"}
+                        </h3>
+                        {auditResult.summaryText && (
+                          <p className="text-xs text-zinc-400 mt-1 max-w-md">
+                            {auditResult.summaryText}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
+                      {auditResult.id && (
+                        <button
+                          onClick={() => router.push(`/dashboard/analyze/${auditResult.id}`)}
+                          className="w-full sm:w-auto px-4 py-3 rounded-xl font-bold text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 transition-all flex items-center justify-center gap-1.5"
+                        >
+                          <span>📊 View Full Detailed Report</span>
+                          <span>→</span>
+                        </button>
                       )}
+                      <button
+                        onClick={handleSaveToKanban}
+                        disabled={isSavingApp}
+                        className="w-full sm:w-auto px-5 py-3 rounded-xl font-black text-xs bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-md shadow-amber-500/20 transition-all"
+                      >
+                        {isSavingApp ? "Saving..." : "📌 Add to Application Kanban"}
+                      </button>
                     </div>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
-                    {auditResult.id && (
-                      <button
-                        onClick={() => router.push(`/dashboard/analyze/${auditResult.id}`)}
-                        className="w-full sm:w-auto px-4 py-3 rounded-xl font-bold text-xs bg-indigo-600 hover:bg-indigo-700 text-white shadow-md transition-all flex items-center justify-center gap-1.5"
-                      >
-                        <span>📊 View Full Detailed Report</span>
-                        <span>→</span>
-                      </button>
-                    )}
-                    <button
-                      onClick={handleSaveToKanban}
-                      disabled={isSavingApp}
-                      className="w-full sm:w-auto px-4 py-3 rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-700 text-white shadow-md transition-all"
-                    >
-                      {isSavingApp ? "Saving..." : "📌 Add to Application Kanban"}
-                    </button>
+                  {/* Sub Score Pills */}
+                  <div className="grid grid-cols-3 gap-3 mt-6 pt-6 border-t border-[#242834] text-center">
+                    <div className="p-3 rounded-2xl bg-[#090A0C] border border-[#242834]">
+                      <span className="text-[10px] text-zinc-500 block font-bold uppercase">Keywords</span>
+                      <span className="text-lg font-black text-white">
+                        {Math.round(auditResult.keywordsMatchPct || 0)}%
+                      </span>
+                    </div>
+                    <div className="p-3 rounded-2xl bg-[#090A0C] border border-[#242834]">
+                      <span className="text-[10px] text-zinc-500 block font-bold uppercase">Formatting</span>
+                      <span className="text-lg font-black text-white">
+                        {auditResult.formatScore || 0}/100
+                      </span>
+                    </div>
+                    <div className="p-3 rounded-2xl bg-[#090A0C] border border-[#242834]">
+                      <span className="text-[10px] text-zinc-500 block font-bold uppercase">Metrics & Impact</span>
+                      <span className="text-lg font-black text-white">
+                        {auditResult.impactScore || 0}/100
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Sub Score Pills */}
-                <div className="grid grid-cols-3 gap-3 mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
-                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60">
-                    <span className="text-xs text-slate-400 block font-medium">Keywords</span>
-                    <span className="text-lg font-bold text-slate-900 dark:text-white">
-                      {Math.round(auditResult.keywordsMatchPct || 0)}%
-                    </span>
-                  </div>
-                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60">
-                    <span className="text-xs text-slate-400 block font-medium">Formatting</span>
-                    <span className="text-lg font-bold text-slate-900 dark:text-white">
-                      {auditResult.formatScore || 0}/100
-                    </span>
-                  </div>
-                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60">
-                    <span className="text-xs text-slate-400 block font-medium">Metrics & Impact</span>
-                    <span className="text-lg font-bold text-slate-900 dark:text-white">
-                      {auditResult.impactScore || 0}/100
-                    </span>
-                  </div>
-                </div>
+                {/* Color-Coded Keyword Breakdown */}
+                <KeywordDiffHighlighter
+                  matched={auditResult.keywords?.matched}
+                  missing={auditResult.keywords?.missing}
+                  presentSkills={auditResult.skills?.present}
+                  missingSkills={auditResult.skills?.missing}
+                />
+
+                {/* 1-Click AI Bullet Rewriter / Fixer */}
+                <InlineAiFixer
+                  suggestions={auditResult.suggestions || []}
+                  missingSkills={auditResult.skills?.missing}
+                  onApplyFix={(original) => {
+                    setStatusMessage(`✅ Applied fix for "${original.slice(0, 20)}..."`);
+                  }}
+                />
               </div>
-
-              {/* Color-Coded Keyword Breakdown */}
-              <KeywordDiffHighlighter
-                matched={auditResult.keywords?.matched}
-                missing={auditResult.keywords?.missing}
-                presentSkills={auditResult.skills?.present}
-                missingSkills={auditResult.skills?.missing}
-              />
-
-              {/* 1-Click AI Bullet Rewriter / Fixer */}
-              <InlineAiFixer
-                suggestions={auditResult.suggestions || []}
-                missingSkills={auditResult.skills?.missing}
-                onApplyFix={(original, updated) => {
-                  setStatusMessage(`✅ Applied fix for "${original.slice(0, 20)}..."`);
-                }}
-              />
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>
