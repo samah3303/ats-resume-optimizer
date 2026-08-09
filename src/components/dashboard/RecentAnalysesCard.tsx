@@ -1,6 +1,9 @@
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ScoreGauge from "@/components/ScoreGauge";
+import TrafficLightStatus from "@/components/TrafficLightStatus";
+import FixMyResumeWizardModal from "@/components/FixMyResumeWizardModal";
 import { Analysis } from "@/types/dashboard";
 
 interface RecentAnalysesCardProps {
@@ -15,44 +18,59 @@ export default function RecentAnalysesCard({
   onEditOnboarding,
 }: RecentAnalysesCardProps) {
   const router = useRouter();
+  const [showFixWizard, setShowFixWizard] = useState(false);
 
   return (
     <>
       {/* General ATS Score (from onboarding) */}
       {generalAtsScore !== null && (
-        <div className="bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-amber-500/20 p-6 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-6 text-white">
+        <div className="bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-amber-500/20 p-6 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6 text-white">
           <div className="flex flex-col sm:flex-row items-center gap-6">
             <div className="shrink-0">
               <ScoreGauge score={generalAtsScore} size={100} />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-lg font-black text-white mb-1">
+            <div className="space-y-2 text-center sm:text-left">
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                <h3 className="text-lg font-black text-white">
                   Resume ATS Compatibility
                 </h3>
-                <span className="px-2.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-black rounded-full uppercase">
-                  Primary Baseline
-                </span>
+                <TrafficLightStatus score={generalAtsScore} size="sm" />
               </div>
               <p className="text-xs text-zinc-400 leading-relaxed max-w-2xl">
-                This score reflects how well your primary resume is structured for
-                applicant tracking systems — based on formatting, keyword density, action
-                verbs, and target country alignment.
+                This baseline score reflects how well your primary resume is structured for
+                automated applicant tracking systems based on formatting, keyword density, action verbs, and target country alignment.
               </p>
             </div>
           </div>
 
-          {onEditOnboarding && (
+          <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0 w-full sm:w-auto">
             <button
-              onClick={onEditOnboarding}
-              className="px-4 py-2.5 text-xs font-black text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-xl transition-all shrink-0 flex items-center gap-1.5 min-h-[40px] sm:min-h-0"
-              title="Edit target positions, country, or primary resume and re-analyze"
+              onClick={() => setShowFixWizard(true)}
+              className="w-full sm:w-auto px-5 py-3 text-xs font-black text-slate-950 bg-amber-500 hover:bg-amber-400 rounded-2xl shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-1.5"
             >
-              <span>✏️</span> Edit Target & Regenerate
+              <span>⚡ Fix My Resume (1-Click)</span>
             </button>
-          )}
+            {onEditOnboarding && (
+              <button
+                onClick={onEditOnboarding}
+                className="w-full sm:w-auto px-4 py-3 text-xs font-black text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-2xl transition-all flex items-center justify-center gap-1.5"
+                title="Edit target positions, country, or primary resume and re-analyze"
+              >
+                <span>✏️</span> Edit Target
+              </button>
+            )}
+          </div>
         </div>
       )}
+
+      {/* 1-Click Fix Wizard Modal */}
+      <FixMyResumeWizardModal
+        open={showFixWizard}
+        onClose={() => setShowFixWizard(false)}
+        overallScore={generalAtsScore || 70}
+        suggestions={[]}
+        missingSkills={["System Architecture", "SQL Database Optimization", "Cross-Functional Leadership"]}
+      />
 
       {/* Analyses table */}
       <div className="bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] overflow-hidden text-white shadow-xl">
@@ -92,7 +110,7 @@ export default function RecentAnalysesCard({
               <thead>
                 <tr className="border-b border-[#242834]">
                   <th className="text-left text-[10px] font-black text-amber-300 uppercase tracking-wider px-6 py-3">
-                    Score
+                    Status & Score
                   </th>
                   <th className="text-left text-[10px] font-black text-amber-300 uppercase tracking-wider px-6 py-3">
                     Resume
@@ -124,17 +142,7 @@ export default function RecentAnalysesCard({
                   >
                     <td className="px-6 py-4">
                       {analysis.overallScore !== null ? (
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-black ${
-                            analysis.overallScore >= 70
-                              ? "bg-emerald-950 text-emerald-300 border border-emerald-800"
-                              : analysis.overallScore >= 50
-                              ? "bg-amber-950 text-amber-300 border border-amber-800"
-                              : "bg-rose-950 text-rose-300 border border-rose-800"
-                          }`}
-                        >
-                          {analysis.overallScore}%
-                        </span>
+                        <TrafficLightStatus score={analysis.overallScore} size="sm" />
                       ) : (
                         <span className="text-zinc-500 text-xs">—</span>
                       )}

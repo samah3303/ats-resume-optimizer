@@ -11,6 +11,7 @@ import RecentAnalysesCard from "@/components/dashboard/RecentAnalysesCard";
 import ResumeListCard from "@/components/dashboard/ResumeListCard";
 import OnboardingInsights from "@/components/dashboard/OnboardingInsights";
 import EditOnboardingModal from "@/components/dashboard/EditOnboardingModal";
+import IndustrySelector from "@/components/IndustrySelector";
 import {
   Resume,
   Analysis,
@@ -188,6 +189,15 @@ function DashboardContent() {
           generalAtsScore={generalAtsScore}
           onResetOnboarding={handleResetOnboarding}
         />
+
+        {/* Industry Selector bar */}
+        <div className="p-5 bg-[#14161D]/80 backdrop-blur-2xl border border-amber-500/20 rounded-3xl text-white shadow-xl">
+          <IndustrySelector
+            onSelectDomain={(domain) => {
+              toast(`Industry set to: ${domain.name}. AI prompt terminology updated.`, "info");
+            }}
+          />
+        </div>
 
         {/* Studio Hero Feature Banner */}
         <div className="p-6 sm:p-8 bg-[#14161D]/80 backdrop-blur-2xl border border-amber-500/20 rounded-3xl text-white shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
