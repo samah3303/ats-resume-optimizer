@@ -1,5 +1,7 @@
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { ToastProvider } from "@/components/Toast";
+import CommandPalette from "@/components/CommandPalette";
+import FloatingActionButton from "@/components/FloatingActionButton";
 
 export default function DashboardLayout({
   children,
@@ -8,7 +10,11 @@ export default function DashboardLayout({
 }) {
   return (
     <ErrorBoundary>
-      <ToastProvider>{children}</ToastProvider>
+      <ToastProvider>
+        {children}
+        <CommandPalette />
+        <FloatingActionButton />
+      </ToastProvider>
     </ErrorBoundary>
   );
 }

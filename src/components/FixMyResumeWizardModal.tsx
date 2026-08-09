@@ -235,9 +235,9 @@ export default function FixMyResumeWizardModal({
                     <p className="font-mono text-zinc-200 truncate flex-1">&bull; {item.suggestedText}</p>
                     <button
                       onClick={() => handleCopy(item.suggestedText, idx)}
-                      className="px-3 py-1 bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 font-bold rounded-lg text-xs transition-colors shrink-0"
+                      className={`px-3 py-1 font-bold rounded-lg text-xs transition-all shrink-0 ${copiedIndex === idx ? "bg-emerald-500/30 text-emerald-300 animate-copy-bounce" : "bg-amber-500/20 text-amber-300 hover:bg-amber-500/30"}`}
                     >
-                      {copiedIndex === idx ? "✓ Copied!" : "📋 Copy"}
+                      {copiedIndex === idx ? "✅ Copied!" : "📋 Copy"}
                     </button>
                   </div>
                 ))}

@@ -170,9 +170,9 @@ export default function InlineAiFixer({
                     ) : (
                       <button
                         onClick={() => handleCopy(generated, skill)}
-                        className="w-full sm:w-auto px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-sm"
+                        className={`w-full sm:w-auto px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm ${copiedId === skill ? "bg-emerald-500 text-white animate-copy-bounce" : "bg-emerald-600 text-white hover:bg-emerald-700"}`}
                       >
-                        {copiedId === skill ? "Copied! ✓" : "Copy Bullet"}
+                        {copiedId === skill ? "✅ Copied!" : "📋 Copy Bullet"}
                       </button>
                     )}
                   </div>
@@ -203,9 +203,9 @@ export default function InlineAiFixer({
                       handleCopy(item.suggestedText, itemKey);
                       if (onApplyFix) onApplyFix(item.originalText, item.suggestedText);
                     }}
-                    className="px-3.5 py-1.5 text-xs font-black bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl transition-all shadow-sm"
+                    className={`px-3.5 py-1.5 text-xs font-black rounded-xl transition-all shadow-sm ${copiedId === itemKey ? "bg-emerald-500 text-white animate-copy-bounce" : "bg-amber-500 hover:bg-amber-400 text-slate-950"}`}
                   >
-                    {copiedId === itemKey ? "Copied! ✓" : "⚡ Apply Fix"}
+                    {copiedId === itemKey ? "✅ Copied!" : "⚡ Apply Fix"}
                   </button>
                 </div>
 

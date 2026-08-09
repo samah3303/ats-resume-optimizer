@@ -8,6 +8,7 @@ import InlineAiFixer from "@/components/InlineAiFixer";
 import ScoreGauge from "@/components/ScoreGauge";
 import TrafficLightStatus from "@/components/TrafficLightStatus";
 import FixMyResumeWizardModal from "@/components/FixMyResumeWizardModal";
+import ConfettiCelebration from "@/components/ConfettiCelebration";
 import { extractLocalKeywordMatch } from "@/lib/keyword-matcher";
 
 interface ResumeItem {
@@ -58,6 +59,9 @@ export default function StudioPage() {
 
   // 1-Click Fix Wizard Modal
   const [showFixWizard, setShowFixWizard] = useState(false);
+
+  // Confetti celebration for 75%+ scores
+  const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -211,6 +215,9 @@ export default function StudioPage() {
             summaryText: analysisObj.summaryText || "AI audit complete. Apply STAR bullet rewrites to maximize interview callbacks.",
           });
           setStatusMessage("✅ Deep ATS Audit Complete!");
+          if ((analysisObj.overallScore ?? localMatch.keywordsMatchPct) >= 75) {
+            setShowConfetti(true);
+          }
           setIsScanning(false);
           return;
         }
@@ -294,6 +301,9 @@ export default function StudioPage() {
 
   return (
     <div className="min-h-screen bg-[#090A0C] text-white py-8 px-4 sm:px-6 lg:px-8 space-y-8 pb-24">
+      {/* Confetti burst on 75%+ score */}
+      <ConfettiCelebration show={showConfetti} onComplete={() => setShowConfetti(false)} />
+
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header Banner */}
         <div className="bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-amber-500/20 p-6 sm:p-8 text-white shadow-2xl space-y-4">

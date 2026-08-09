@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import ScoreGauge from "@/components/ScoreGauge";
 import TrafficLightStatus from "@/components/TrafficLightStatus";
 import FixMyResumeWizardModal from "@/components/FixMyResumeWizardModal";
+import ScoreTrendChart from "@/components/ScoreTrendChart";
 import { Analysis } from "@/types/dashboard";
 
 interface RecentAnalysesCardProps {
@@ -19,6 +20,17 @@ export default function RecentAnalysesCard({
 }: RecentAnalysesCardProps) {
   const router = useRouter();
   const [showFixWizard, setShowFixWizard] = useState(false);
+
+  // Map analyses to score trend data
+  const scoreTrendData = analyses
+    .filter((a) => a.overallScore !== null)
+    .slice(0, 15)
+    .reverse()
+    .map((a) => ({
+      score: a.overallScore!,
+      date: a.createdAt,
+      jobTitle: a.jobDescription?.title || undefined,
+    }));
 
   return (
     <>
@@ -88,21 +100,40 @@ export default function RecentAnalysesCard({
           )}
         </div>
 
+        {/* Score Trend Sparkline */}
+        {scoreTrendData.length > 1 && (
+          <div className="px-5 py-3 border-b border-[#242834]">
+            <p className="text-[10px] font-black text-amber-300 uppercase tracking-wider mb-2">Score Trend</p>
+            <ScoreTrendChart scores={scoreTrendData} height={56} />
+          </div>
+        )}
+
         {analyses.length === 0 ? (
-          <div className="py-16 text-center px-6 space-y-3">
-            <div className="w-16 h-16 mx-auto bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-2xl flex items-center justify-center">
-              <span className="text-3xl" aria-hidden="true">🔍</span>
+          <div className="py-16 text-center px-6 space-y-5">
+            <div className="w-20 h-20 mx-auto bg-amber-500/10 text-amber-300 border border-amber-500/20 rounded-3xl flex items-center justify-center">
+              <span className="text-4xl" aria-hidden="true">🎯</span>
             </div>
-            <p className="text-xs text-zinc-400 max-w-sm mx-auto">
-              Upload a resume and compare it against a job description to get
-              your first ATS score and tailored suggestions.
-            </p>
-            <Link
-              href="/dashboard/analyze"
-              className="px-5 py-2.5 bg-amber-500 text-slate-950 text-xs font-black rounded-xl inline-block"
-            >
-              Run Your First Analysis
-            </Link>
+            <div className="space-y-2">
+              <h3 className="text-base font-black text-white">Ready to Beat the ATS?</h3>
+              <p className="text-xs text-zinc-400 max-w-md mx-auto leading-relaxed">
+                Run your first scan to see how your resume performs against real job descriptions.
+                Our AI will identify missing keywords, weak bullets, and formatting issues.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link
+                href="/dashboard/studio"
+                className="px-6 py-3 bg-amber-500 text-slate-950 text-xs font-black rounded-2xl shadow-lg shadow-amber-500/20 hover:bg-amber-400 transition-all flex items-center gap-2"
+              >
+                <span>⚡</span> Launch Studio & Scan
+              </Link>
+              <Link
+                href="/dashboard/resumes"
+                className="px-5 py-3 bg-amber-500/10 text-amber-300 text-xs font-bold border border-amber-500/30 rounded-2xl hover:bg-amber-500/20 transition-all"
+              >
+                📄 Upload Resume First
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="overflow-x-auto">

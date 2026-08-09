@@ -12,6 +12,7 @@ import ResumeListCard from "@/components/dashboard/ResumeListCard";
 import OnboardingInsights from "@/components/dashboard/OnboardingInsights";
 import EditOnboardingModal from "@/components/dashboard/EditOnboardingModal";
 import IndustrySelector, { IndustryDomain } from "@/components/IndustrySelector";
+import NextBestActionBanner from "@/components/NextBestActionBanner";
 import {
   Resume,
   Analysis,
@@ -195,6 +196,13 @@ function DashboardContent() {
           analysisCount={analyses.length}
           generalAtsScore={generalAtsScore}
           onResetOnboarding={handleResetOnboarding}
+        />
+
+        {/* Smart Next Best Action Banner */}
+        <NextBestActionBanner
+          resumeCount={resumes.length}
+          analysisCount={analyses.length}
+          generalAtsScore={generalAtsScore}
         />
 
         {/* Industry Selector bar */}

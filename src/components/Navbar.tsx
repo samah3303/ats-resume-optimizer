@@ -19,7 +19,7 @@ export default function Navbar() {
   const pathname = usePathname();
 
   return (
-    <nav className="bg-white/95 dark:bg-[#0D0E11]/95 backdrop-blur-md border-b border-amber-500/20 sticky top-0 z-50 transition-colors">
+    <nav className="bg-white/95 dark:bg-[#0D0E11]/95 backdrop-blur-md border-b border-amber-500/20 sticky top-0 z-50 transition-colors" role="navigation" aria-label="Main navigation">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -37,6 +37,7 @@ export default function Navbar() {
                   <Link
                     key={link.href}
                     href={link.href}
+                    aria-current={isActive ? "page" : undefined}
                     className={`px-3 py-2 rounded-xl text-xs font-bold transition-all ${
                       isActive
                         ? "bg-slate-900 text-amber-400 dark:bg-amber-500/20 dark:text-amber-300 dark:border dark:border-amber-500/40"
@@ -57,6 +58,7 @@ export default function Navbar() {
                 <Link
                   href="/dashboard/studio"
                   className="md:hidden px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition-colors"
+                  aria-label="Open Studio"
                 >
                   Studio ⚡
                 </Link>
@@ -66,6 +68,7 @@ export default function Navbar() {
               <button
                 onClick={() => signIn(undefined, { callbackUrl: "/dashboard" })}
                 className="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-amber-300 dark:bg-amber-500 dark:text-slate-950 hover:bg-slate-800 dark:hover:bg-amber-400 transition-all shadow-sm"
+                aria-label="Sign in to your account"
               >
                 Login
               </button>
