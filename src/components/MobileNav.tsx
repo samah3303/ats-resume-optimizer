@@ -1,5 +1,6 @@
 "use client";
 
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -12,7 +13,13 @@ const mobileLinks = [
 ];
 
 export default function MobileNav() {
+  const { data: session } = useSession();
   const pathname = usePathname();
+
+  // Only render bottom navigation for authenticated logged-in users
+  if (!session?.user) {
+    return null;
+  }
 
   return (
     <nav
