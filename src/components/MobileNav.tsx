@@ -7,8 +7,7 @@ import { usePathname } from "next/navigation";
 const mobileLinks = [
   { href: "/dashboard/studio", label: "Studio", emoji: "⚡" },
   { href: "/dashboard/roadmap", label: "Roadmap", emoji: "🗺️" },
-  { href: "/dashboard/tracker", label: "Tracker", emoji: "📊" },
-  { href: "/dashboard/how-to-use", label: "Guide", emoji: "📖" },
+  { href: "/dashboard/jds", label: "Jobs", emoji: "🔎" },
   { href: "/dashboard/tools", label: "Tools", emoji: "🧩" },
 ];
 
@@ -30,9 +29,9 @@ export default function MobileNav() {
       {/* Glassmorphic backdrop with carbon black / warm yellow theme */}
       <div className="absolute inset-0 bg-white/95 dark:bg-[#0D0E11]/95 backdrop-blur-xl border-t border-amber-500/20 shadow-2xl" />
 
-      {/* Fixed 5-Column Touch Target Grid */}
+      {/* Fixed 4-Column Touch Target Grid */}
       <div
-        className="relative grid grid-cols-5 items-center px-1.5 py-1"
+        className="relative grid grid-cols-4 items-center px-1.5 py-1"
         style={{
           paddingBottom: "max(env(safe-area-inset-bottom, 0px), 6px)",
           height: "calc(60px + env(safe-area-inset-bottom, 0px))",
@@ -53,7 +52,7 @@ export default function MobileNav() {
               className={`flex flex-col items-center justify-center gap-0.5 py-1 px-1 rounded-xl transition-all duration-200 min-h-[48px] ${
                 isActive
                   ? "bg-slate-900 text-amber-400 dark:bg-amber-500/20 dark:text-amber-300 font-bold shadow-sm"
-                  : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white"
               }`}
             >
               <span className="relative flex items-center justify-center">

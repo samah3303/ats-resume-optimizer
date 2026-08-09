@@ -10,8 +10,7 @@ const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/dashboard/studio", label: "Studio ⚡" },
   { href: "/dashboard/roadmap", label: "2-Month Roadmap 🗺️" },
-  { href: "/dashboard/tracker", label: "Tracker 📊" },
-  { href: "/dashboard/how-to-use", label: "How to Use 📖" },
+  { href: "/dashboard/jds", label: "Jobs 🔎" },
   { href: "/dashboard/tools", label: "All Tools 🧩" },
 ];
 

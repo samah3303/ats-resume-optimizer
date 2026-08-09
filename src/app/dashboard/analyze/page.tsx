@@ -64,6 +64,38 @@ function AnalyzePageContent() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
+  // URL Importer State
+  const [fetchUrlInput, setFetchUrlInput] = useState("");
+  const [urlFetching, setUrlFetching] = useState(false);
+  const [urlFetchError, setUrlFetchError] = useState("");
+
+  const handleFetchUrlDetails = async () => {
+    if (!fetchUrlInput.trim()) {
+      setUrlFetchError("Please enter a valid job URL.");
+      return;
+    }
+    setUrlFetching(true);
+    setUrlFetchError("");
+    try {
+      const res = await fetch("/api/jds/fetch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: fetchUrlInput.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to fetch job URL");
+      }
+      if (data.title) setPasteJdTitle(data.title);
+      if (data.rawText) setPasteJdText(data.rawText);
+      setFetchUrlInput("");
+    } catch (err) {
+      setUrlFetchError(err instanceof Error ? err.message : "Failed to fetch URL");
+    } finally {
+      setUrlFetching(false);
+    }
+  };
+
   // Result state
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [batchResults, setBatchResults] = useState<BatchResult[] | null>(null);
@@ -472,18 +504,48 @@ function AnalyzePageContent() {
               )
             ) : (
               <div className="space-y-3">
+                {/* URL Importer Bar */}
+                <div className="p-3 bg-[#090A0C] border border-[#242834] rounded-xl space-y-2">
+                  <label className="block text-xs font-bold text-amber-300">
+                    ⚡ Auto-Fetch Job Details From Web URL
+                  </label>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="url"
+                      value={fetchUrlInput}
+                      onChange={(e) => {
+                        setFetchUrlInput(e.target.value);
+                        setUrlFetchError("");
+                      }}
+                      placeholder="Paste job URL (LinkedIn, Indeed, Company careers)..."
+                      className="flex-1 px-3 py-2 rounded-lg text-xs bg-[#14161D] border border-[#242834] text-white focus:outline-none focus:border-amber-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleFetchUrlDetails}
+                      disabled={urlFetching || !fetchUrlInput.trim()}
+                      className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-lg transition-all disabled:opacity-50 flex items-center justify-center gap-1.5"
+                    >
+                      {urlFetching ? "Fetching..." : "📥 Fetch Details"}
+                    </button>
+                  </div>
+                  {urlFetchError && (
+                    <p className="text-[11px] text-rose-400 font-medium">{urlFetchError}</p>
+                  )}
+                </div>
+
                 <input
                   type="text"
                   value={pasteJdTitle}
                   onChange={(e) => setPasteJdTitle(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-[#242834] dark:bg-[#090A0C] dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none text-xs font-medium"
                   placeholder="Job title (e.g. Senior Frontend Developer)"
                 />
                 <textarea
                   value={pasteJdText}
                   onChange={(e) => setPasteJdText(e.target.value)}
                   rows={8}
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none resize-y"
+                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-[#242834] dark:bg-[#090A0C] dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none resize-y text-xs"
                   placeholder="Paste the full job description here..."
                 />
               </div>
