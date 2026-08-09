@@ -66,8 +66,11 @@ function DashboardContent() {
       if (roadmapRes.ok) setRoadmap((await roadmapRes.json()).roadmap || null);
       if (onboardRes.ok) {
         const onboardData = await onboardRes.json();
-        if (onboardData.profile) {
+        if (onboardData.profile && onboardData.completed) {
           setOnboardingProfile(onboardData.profile);
+        } else {
+          router.replace("/");
+          return;
         }
       }
     } catch {

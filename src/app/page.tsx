@@ -190,62 +190,64 @@ export default function HomePage() {
   if (onboardingDone) return null;
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 md:py-12">
-      <OnboardingStepper step={step} />
+    <div className="min-h-[85vh] bg-[#090A0C] py-8 md:py-12 px-4">
+      <div className="max-w-2xl mx-auto space-y-6">
+        <OnboardingStepper step={step} />
 
-      <div className="bg-white rounded-xl border border-gray-200 p-6 md:p-8 shadow-sm">
-        {step === 1 && (
-          <StepResumeUpload
-            resumeFormat={resumeFormat}
-            onUploaded={handleResumeUploaded}
-            onFormatDetected={handleFormatDetected}
-          />
-        )}
+        <div className="bg-[#14161D] rounded-3xl border border-[#242834] p-6 md:p-8 shadow-2xl">
+          {step === 1 && (
+            <StepResumeUpload
+              resumeFormat={resumeFormat}
+              onUploaded={handleResumeUploaded}
+              onFormatDetected={handleFormatDetected}
+            />
+          )}
 
-        {step === 2 && (
-          <StepTargetPreferences
-            autoFilling={autoFilling}
-            resumeName={resumeName}
-            positions={positions}
-            setPositions={setPositions}
-            suggestedPositions={suggestedPositions}
-            togglePosition={togglePosition}
-            industry={industry}
-            setIndustry={setIndustry}
-            country={country}
-            setCountry={setCountry}
-            jobType={jobType}
-            setJobType={setJobType}
-            linkedin={linkedin}
-            setLinkedin={setLinkedin}
-            portfolioUrl={portfolioUrl}
-            setPortfolioUrl={setPortfolioUrl}
-            githubUrl={githubUrl}
-            setGithubUrl={setGithubUrl}
-            onBack={() => setStep(1)}
-            onSkip={() => router.push("/dashboard")}
-            onNext={() => setStep(3)}
-            onChangeResume={() => {
-              setResumeId(null);
-              setResumeName(null);
-              setResumeFormat(null);
-              setStep(1);
-            }}
-          />
-        )}
+          {step === 2 && (
+            <StepTargetPreferences
+              autoFilling={autoFilling}
+              resumeName={resumeName}
+              positions={positions}
+              setPositions={setPositions}
+              suggestedPositions={suggestedPositions}
+              togglePosition={togglePosition}
+              industry={industry}
+              setIndustry={setIndustry}
+              country={country}
+              setCountry={setCountry}
+              jobType={jobType}
+              setJobType={setJobType}
+              linkedin={linkedin}
+              setLinkedin={setLinkedin}
+              portfolioUrl={portfolioUrl}
+              setPortfolioUrl={setPortfolioUrl}
+              githubUrl={githubUrl}
+              setGithubUrl={setGithubUrl}
+              onBack={() => setStep(1)}
+              onSkip={() => router.push("/dashboard")}
+              onNext={() => setStep(3)}
+              onChangeResume={() => {
+                setResumeId(null);
+                setResumeName(null);
+                setResumeFormat(null);
+                setStep(1);
+              }}
+            />
+          )}
 
-        {step === 3 && (
-          <StepAnalyzingProgress
-            analyzing={analyzing}
-            resumeName={resumeName}
-            positions={positions}
-            country={country}
-            linkedin={linkedin}
-            error={error}
-            onBack={() => setStep(2)}
-            onSubmit={handleSubmit}
-          />
-        )}
+          {step === 3 && (
+            <StepAnalyzingProgress
+              analyzing={analyzing}
+              resumeName={resumeName}
+              positions={positions}
+              country={country}
+              linkedin={linkedin}
+              error={error}
+              onBack={() => setStep(2)}
+              onSubmit={handleSubmit}
+            />
+          )}
+        </div>
       </div>
     </div>
   );
