@@ -26,6 +26,7 @@ model User {
   roadmaps          Roadmap[]
   applications     Application[]
   suggestionFeedbacks SuggestionFeedback[]
+  aiUsageLogs      AiUsageLog[]
 
   @@map("users")
 }
@@ -263,4 +264,23 @@ model SuggestionFeedback {
   @@index([suggestionId])
   @@index([userId])
   @@map("suggestion_feedback")
+}
+
+model AiUsageLog {
+  id               String   @id @default(uuid())
+  userId           String?  @map("user_id")
+  feature          String   // "analysis", "roadmap", "onboarding", "interview", "cover_letter", "star_rewrite", "compare"
+  model            String   @default("deepseek-chat")
+  promptTokens     Int      @default(0) @map("prompt_tokens")
+  completionTokens Int      @default(0) @map("completion_tokens")
+  totalTokens      Int      @default(0) @map("total_tokens")
+  costINR          Float    @default(0.0) @map("cost_inr")
+  costUSD          Float    @default(0.0) @map("cost_usd")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([feature])
+  @@map("ai_usage_logs")
 }

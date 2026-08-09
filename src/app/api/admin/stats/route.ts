@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const [users, resumes, jds, analyses, onboardingProfiles, roadmaps, shared] =
+    const [users, resumes, jds, analyses, onboardingProfiles, roadmaps, shared, usageLogAggregate] =
       await Promise.all([
         prisma.user.count(),
         prisma.resume.count(),
@@ -19,37 +19,65 @@ export async function GET(req: NextRequest) {
         prisma.onboardingProfile.count(),
         prisma.roadmap.count(),
         prisma.sharedAnalysis.count(),
+        prisma.aiUsageLog.aggregate({
+          _sum: {
+            totalTokens: true,
+            costINR: true,
+            costUSD: true,
+          },
+          _count: { id: true },
+        }),
       ]);
 
-    // Calculate AI Token Spend & Estimated Costs in INR (₹)
-    // DeepSeek V3/V4 API Rates (~$0.27/1M input, ~$1.10/1M output = ~₹0.05 per 1,000 tokens)
-    const avgTokensPerAnalysis = 2500;
-    const avgTokensPerRoadmap = 1800;
-    const avgTokensPerOnboarding = 1500;
-    const avgTokensPerJobFetch = 800;
+    let totalTokens = usageLogAggregate._sum.totalTokens || 0;
+    let totalSpendINR = Math.round((usageLogAggregate._sum.costINR || 0) * 100) / 100;
+    let totalSpendUSD = Math.round((usageLogAggregate._sum.costUSD || 0) * 100) / 100;
 
-    const estimatedAnalysisTokens = analyses * avgTokensPerAnalysis;
-    const estimatedRoadmapTokens = roadmaps * avgTokensPerRoadmap;
-    const estimatedOnboardingTokens = onboardingProfiles * avgTokensPerOnboarding;
-    const estimatedJobTokens = jds * avgTokensPerJobFetch;
+    // Fallback to model estimates if no exact logs recorded yet for legacy records
+    if (usageLogAggregate._count.id === 0) {
+      const avgTokensPerAnalysis = 2500;
+      const avgTokensPerRoadmap = 1800;
+      const avgTokensPerOnboarding = 1500;
+      const avgTokensPerJobFetch = 800;
 
-    const totalTokens =
-      estimatedAnalysisTokens +
-      estimatedRoadmapTokens +
-      estimatedOnboardingTokens +
-      estimatedJobTokens;
+      const estimatedAnalysisTokens = analyses * avgTokensPerAnalysis;
+      const estimatedRoadmapTokens = roadmaps * avgTokensPerRoadmap;
+      const estimatedOnboardingTokens = onboardingProfiles * avgTokensPerOnboarding;
+      const estimatedJobTokens = jds * avgTokensPerJobFetch;
 
-    // Blended rate: ₹0.052 per 1,000 tokens (at ₹83 / USD)
-    const costPer1kTokensINR = 0.052;
-    const totalSpendINR = Math.round(totalTokens * (costPer1kTokensINR / 1000) * 100) / 100;
-    const totalSpendUSD = Math.round((totalSpendINR / 83) * 100) / 100;
+      totalTokens =
+        estimatedAnalysisTokens +
+        estimatedRoadmapTokens +
+        estimatedOnboardingTokens +
+        estimatedJobTokens;
+
+      const costPer1kTokensINR = 0.052;
+      totalSpendINR = Math.round(totalTokens * (costPer1kTokensINR / 1000) * 100) / 100;
+      totalSpendUSD = Math.round((totalSpendINR / 83) * 100) / 100;
+    }
+
     const avgSpendPerUserINR = users > 0 ? (totalSpendINR / users).toFixed(2) : "0.00";
 
+    // Feature breakdown spend in INR
+    const analysisUsage = await prisma.aiUsageLog.aggregate({
+      where: { feature: "analysis" },
+      _sum: { costINR: true, totalTokens: true },
+    });
+    const roadmapUsage = await prisma.aiUsageLog.aggregate({
+      where: { feature: "roadmap" },
+      _sum: { costINR: true, totalTokens: true },
+    });
+    const onboardingUsage = await prisma.aiUsageLog.aggregate({
+      where: { feature: "onboarding" },
+      _sum: { costINR: true, totalTokens: true },
+    });
+
+    const costPer1kTokensINR = 0.052;
     const spendByFeatureINR = {
-      analyses: Math.round(estimatedAnalysisTokens * (costPer1kTokensINR / 1000) * 100) / 100,
-      roadmaps: Math.round(estimatedRoadmapTokens * (costPer1kTokensINR / 1000) * 100) / 100,
-      onboarding: Math.round(estimatedOnboardingTokens * (costPer1kTokensINR / 1000) * 100) / 100,
-      jobFetches: Math.round(estimatedJobTokens * (costPer1kTokensINR / 1000) * 100) / 100,
+      analyses: analysisUsage._sum.costINR || Math.round(analyses * 2500 * (costPer1kTokensINR / 1000) * 100) / 100,
+      roadmaps: roadmapUsage._sum.costINR || Math.round(roadmaps * 1800 * (costPer1kTokensINR / 1000) * 100) / 100,
+      onboarding: onboardingUsage._sum.costINR || Math.round(onboardingProfiles * 1500 * (costPer1kTokensINR / 1000) * 100) / 100,
+      jobFetches: Math.round(jds * 800 * (costPer1kTokensINR / 1000) * 100) / 100,
     };
 
     // Recent analyses with details
@@ -186,7 +214,7 @@ export async function GET(req: NextRequest) {
         averageScore: Math.round(avgScoreResult._avg.overallScore || 0),
         scoreDistribution: { high, medium, low },
         dailyTrend,
-        // AI Token & Spend Metrics
+        // AI Token & Spend Metrics (exact logged + model estimation fallback)
         aiTokenSpend: {
           totalTokens,
           totalSpendINR,
