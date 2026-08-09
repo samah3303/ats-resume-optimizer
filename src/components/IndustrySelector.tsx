@@ -70,18 +70,20 @@ export default function IndustrySelector({ onSelectDomain }: IndustrySelectorPro
   const [selectedDomainId, setSelectedDomainId] = useState<string>("software");
 
   useEffect(() => {
-    const saved = localStorage.getItem("resumatch_industry_domain");
+    const saved = typeof window !== "undefined" ? localStorage.getItem("resumatch_industry_domain") : null;
     if (saved) {
       setSelectedDomainId(saved);
-      const found = INDUSTRY_DOMAINS.find((d) => d.id === saved);
-      if (found && onSelectDomain) onSelectDomain(found);
     }
-  }, [onSelectDomain]);
+  }, []);
 
   const handleSelect = (domain: IndustryDomain) => {
     setSelectedDomainId(domain.id);
-    localStorage.setItem("resumatch_industry_domain", domain.id);
-    if (onSelectDomain) onSelectDomain(domain);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("resumatch_industry_domain", domain.id);
+    }
+    if (onSelectDomain) {
+      onSelectDomain(domain);
+    }
   };
 
   return (

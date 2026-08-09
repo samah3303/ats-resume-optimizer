@@ -11,7 +11,7 @@ import RecentAnalysesCard from "@/components/dashboard/RecentAnalysesCard";
 import ResumeListCard from "@/components/dashboard/ResumeListCard";
 import OnboardingInsights from "@/components/dashboard/OnboardingInsights";
 import EditOnboardingModal from "@/components/dashboard/EditOnboardingModal";
-import IndustrySelector from "@/components/IndustrySelector";
+import IndustrySelector, { IndustryDomain } from "@/components/IndustrySelector";
 import {
   Resume,
   Analysis,
@@ -51,6 +51,13 @@ function DashboardContent() {
     }
     window.history.replaceState({}, "", url.toString());
   };
+
+  const handleSelectDomain = useCallback(
+    (domain: IndustryDomain) => {
+      toast(`Industry set to: ${domain.name}. AI prompt terminology updated.`, "info");
+    },
+    [toast]
+  );
 
   const fetchData = useCallback(async () => {
     setDataError(null);
@@ -192,11 +199,7 @@ function DashboardContent() {
 
         {/* Industry Selector bar */}
         <div className="p-5 bg-[#14161D]/80 backdrop-blur-2xl border border-amber-500/20 rounded-3xl text-white shadow-xl">
-          <IndustrySelector
-            onSelectDomain={(domain) => {
-              toast(`Industry set to: ${domain.name}. AI prompt terminology updated.`, "info");
-            }}
-          />
+          <IndustrySelector onSelectDomain={handleSelectDomain} />
         </div>
 
         {/* Studio Hero Feature Banner */}
