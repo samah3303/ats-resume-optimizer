@@ -3,33 +3,37 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #F8FAFC;
-  --foreground: #0F172A;
-  --primary: #312E81;
-  --primary-light: #4338CA;
-  --accent: #F59E0B;
-  --card-bg: #ffffff;
-  --card-border: #E2E8F0;
-  --text-heading: #0F172A;
-  --text-body: #475569;
-  --text-muted: #94A3B8;
-  --surface: #F1F5F9;
+  /* Light Theme: Very Light Warm Soft Yellow / Cream Paper & Carbon Black */
+  --background: #FFFDF5;
+  --surface: #FAF7EC;
+  --foreground: #121318;
+  --primary: #121318;
+  --primary-light: #2A2E3B;
+  --accent: #D97706;
+  --accent-yellow: #EAB308;
+  --card-bg: #FFFFFF;
+  --card-border: #E5E0D5;
+  --text-heading: #0D0E11;
+  --text-body: #2D303E;
+  --text-muted: #71717A;
   /* Mobile bottom nav safe area */
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .dark {
-  --background: #0F172A;
-  --foreground: #F1F5F9;
-  --primary: #6366F1;
-  --primary-light: #818CF8;
-  --accent: #FBBF24;
-  --card-bg: #1E293B;
-  --card-border: #334155;
-  --text-heading: #F8FAFC;
-  --text-body: #CBD5E1;
-  --text-muted: #64748B;
-  --surface: #1E293B;
+  /* Dark Theme: Carbon Black Backgrounds, Electric Amber Yellow & Pure White */
+  --background: #090A0C;
+  --surface: #101216;
+  --foreground: #F4F4F5;
+  --primary: #F59E0B;
+  --primary-light: #FBBF24;
+  --accent: #F59E0B;
+  --accent-yellow: #FDE047;
+  --card-bg: #14161D;
+  --card-border: #242834;
+  --text-heading: #FFFFFF;
+  --text-body: #E4E4E7;
+  --text-muted: #A1A1AA;
 }
 
 @theme inline {
@@ -45,7 +49,7 @@
 }
 
 body {
-  background: linear-gradient(180deg, var(--background) 0%, var(--surface) 100%);
+  background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans, Arial, Helvetica, sans-serif);
   min-height: 100vh;
@@ -59,26 +63,44 @@ body {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
   transition: all 200ms ease;
 }
+
 .card-premium:hover {
-  box-shadow: 0 4px 16px rgba(49, 46, 129, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
-  border-color: #C7D2FE;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+  border-color: #D97706;
 }
 
-/* Gradient button */
+.dark .card-premium:hover {
+  border-color: #F59E0B;
+  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.08);
+}
+
+/* Carbon Black & Electric Yellow Buttons */
 .btn-primary-gradient {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-  color: white;
+  background: linear-gradient(135deg, #121318 0%, #2A2E3B 100%);
+  color: #FDE047;
   border-radius: 12px;
-  font-weight: 500;
+  font-weight: 700;
   transition: all 200ms ease;
-  box-shadow: 0 2px 8px rgba(49, 46, 129, 0.25);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(234, 179, 8, 0.3);
 }
+
 .btn-primary-gradient:hover {
-  box-shadow: 0 4px 16px rgba(49, 46, 129, 0.35);
+  box-shadow: 0 4px 16px rgba(234, 179, 8, 0.25);
   transform: translateY(-1px);
+  color: #FFFFFF;
 }
-.btn-primary-gradient:active {
-  transform: translateY(0);
+
+.dark .btn-primary-gradient {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  color: #090A0C;
+  border: 1px solid #FBBF24;
+  box-shadow: 0 2px 12px rgba(245, 158, 11, 0.25);
+}
+
+.dark .btn-primary-gradient:hover {
+  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
+  color: #000000;
 }
 
 /* Score gauge animation */
@@ -91,12 +113,13 @@ body {
   }
 }
 
-/* Card hover effects — legacy compat, use card-premium for new cards */
+/* Card hover effects */
 .card-hover {
   transition: all 200ms ease;
 }
+
 .card-hover:hover {
-  box-shadow: 0 4px 16px rgba(49, 46, 129, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   transform: translateY(-1px);
 }
 
@@ -105,26 +128,23 @@ body {
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-image: linear-gradient(135deg, #312E81 0%, #4338CA 100%);
+  background-image: linear-gradient(135deg, #D97706 0%, #B45309 100%);
 }
 
-.dark .card-premium:hover {
-  border-color: #4338CA;
-}
-
-.dark .btn-primary-gradient {
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+.dark .text-gradient {
+  background-image: linear-gradient(135deg, #FDE047 0%, #F59E0B 100%);
 }
 
 .dark .skeleton {
-  background-color: #334155;
+  background-color: #242834;
 }
 
 .dark ::-webkit-scrollbar-track {
-  background: #1E293B;
+  background: #090A0C;
 }
+
 .dark ::-webkit-scrollbar-thumb {
-  background: #475569;
+  background: #242834;
 }
 
 /* Shimmer loading */
@@ -138,7 +158,7 @@ body {
 }
 
 .skeleton {
-  background-color: #E2E8F0;
+  background-color: #E5E0D5;
   border-radius: 8px;
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
@@ -149,16 +169,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--surface);
+  background: var(--background);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: #D4CEBE;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: #A19B8B;
 }
 
 /* Bottom nav safe area */

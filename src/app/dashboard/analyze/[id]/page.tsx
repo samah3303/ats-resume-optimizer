@@ -49,6 +49,9 @@ interface InterviewQuestion {
   category: string;
   question: string;
   rationale: string;
+  stage?: string;
+  answer?: string;
+  keyTalkingPoints?: string[];
 }
 
 interface KeywordFrequency {
@@ -198,7 +201,12 @@ function AnalysisDetailContent() {
     setTimeout(() => setCoverLetterCopied(false), 2000);
   };
 
-  const handleGenerateQuestions = async () => {
+  // Stage & Answer expander states for interview coach
+  const [selectedStage, setSelectedStage] = useState<string>("all");
+  const [expandedAnswers, setExpandedAnswers] = useState<Record<number, boolean>>({});
+
+  const handleGenerateQuestions = async (stageKey: string = selectedStage) => {
+    setSelectedStage(stageKey);
     setGeneratingQuestions(true);
     setInterviewQuestions(null);
     setShowQuestions(true);
@@ -206,11 +214,11 @@ function AnalysisDetailContent() {
       const res = await fetch("/api/interview", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ analysisId: id }),
+        body: JSON.stringify({ analysisId: id, stage: stageKey }),
       });
       if (res.ok) {
         const data = await res.json();
-        setInterviewQuestions(data.questions);
+        setInterviewQuestions(data.questions || []);
       } else {
         toast("Failed to generate interview questions", "error");
       }
@@ -768,13 +776,39 @@ function AnalysisDetailContent() {
           aria-labelledby="tab-suggestions"
           className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 mb-6 shadow-sm space-y-4"
         >
-          <div className="flex items-center justify-between mb-4">
+          {/* Target Score Goal & Projection Banner */}
+          <div className="p-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl border border-indigo-500/30 shadow-md space-y-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 bg-emerald-500 text-slate-950 font-extrabold text-[10px] uppercase rounded-full">
+                  🎯 Target Goal: 75%–80%+ ATS Score
+                </span>
+                <span className="text-xs text-indigo-300 font-semibold">
+                  {suggestions.length} Tailored Suggestions
+                </span>
+              </div>
+              {analysis?.overallScore !== null && analysis?.overallScore !== undefined && (
+                <div className="text-xs font-bold text-emerald-400">
+                  Current Score: {analysis.overallScore}% ➔ Projected Score:{" "}
+                  <span className="text-sm font-extrabold text-white underline">
+                    {Math.min(95, Math.max(78, analysis.overallScore + suggestions.length * 3))}%
+                  </span>{" "}
+                  (+{Math.min(95, Math.max(78, analysis.overallScore + suggestions.length * 3)) - analysis.overallScore}% Boost)
+                </div>
+              )}
+            </div>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              These suggestions are generated strictly by matching your uploaded resume against this target Job Description. Accept and apply these targeted bullet rewrites to push your resume into the <strong>75%–80%+ top ATS match bracket</strong>.
+            </p>
+          </div>
+
+          <div className="flex items-center justify-between mb-2">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
-                AI Optimization Suggestions ({suggestions.length > 0 ? suggestions.length : 3})
+              <h2 className="text-base font-bold text-gray-900 dark:text-slate-100">
+                Section-by-Section ATS Rewrites ({suggestions.length})
               </h2>
-              <p className="text-sm text-gray-500 dark:text-slate-400">
-                Review and accept targeted bullet rewrites to boost your ATS match score before downloading.
+              <p className="text-xs text-gray-500 dark:text-slate-400">
+                Accept suggestions to apply them automatically to your downloadable optimized resume.
               </p>
             </div>
           </div>
@@ -892,95 +926,153 @@ function AnalysisDetailContent() {
           id="panel-interview"
           role="tabpanel"
           aria-labelledby="tab-interview"
-          className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 mb-6 shadow-sm"
+          className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 mb-6 shadow-sm space-y-4"
         >
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
-              Interview Questions
-            </h2>
-            {!showQuestions && (
-              <button
-                onClick={handleGenerateQuestions}
-                disabled={generatingQuestions}
-                className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-              >
-                {generatingQuestions ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  "Generate Interview Questions"
-                )}
-              </button>
-            )}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-700 pb-4">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-slate-100">
+                🎯 Stage-Wise Interview Coach & Model Answers
+              </h2>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
+                Generate questions and high-scoring STAR-method model responses tailored by interview stage.
+              </p>
+            </div>
+
+            <button
+              onClick={() => handleGenerateQuestions(selectedStage)}
+              disabled={generatingQuestions}
+              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-colors disabled:opacity-50 flex items-center gap-2 shrink-0"
+            >
+              {generatingQuestions ? (
+                <>
+                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Generating Q&As...
+                </>
+              ) : (
+                "🔄 Generate Questions & Answers"
+              )}
+            </button>
+          </div>
+
+          {/* Stage Filter Buttons */}
+          <div className="flex flex-wrap gap-2 pt-1">
+            {[
+              { id: "all", label: "🌐 All Stages" },
+              { id: "hr", label: "💼 HR Screening" },
+              { id: "technical", label: "💻 Technical Deep-Dive" },
+              { id: "coding", label: "⚡ Live Coding / System Design" },
+              { id: "behavioral", label: "🤝 Behavioral & Leadership" },
+              { id: "ceo", label: "👑 CEO / Executive Round" },
+            ].map((stage) => {
+              const active = selectedStage === stage.id;
+              return (
+                <button
+                  key={stage.id}
+                  onClick={() => handleGenerateQuestions(stage.id)}
+                  disabled={generatingQuestions}
+                  className={`px-3 py-1.5 text-xs font-bold rounded-xl transition-all ${
+                    active
+                      ? "bg-indigo-600 text-white shadow-sm"
+                      : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600"
+                  }`}
+                >
+                  {stage.label}
+                </button>
+              );
+            })}
           </div>
 
           {showQuestions && (
             <>
               {generatingQuestions ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-                  <span className="ml-3 text-sm text-gray-500 dark:text-slate-400">
-                    Generating interview questions...
+                <div className="flex flex-col items-center justify-center py-12 space-y-3">
+                  <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                  <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                    Analyzing resume & JD to build model answers for <strong>{selectedStage.toUpperCase()}</strong> stage...
                   </span>
                 </div>
               ) : interviewQuestions && interviewQuestions.length > 0 ? (
-                <div className="space-y-4">
-                  {Array.from(
-                    new Set(interviewQuestions.map((q) => q.category))
-                  ).map((category) => {
-                    const catQuestions = interviewQuestions.filter(
-                      (q) => q.category === category
-                    );
-                    const catLabel =
-                      category.charAt(0).toUpperCase() + category.slice(1);
+                <div className="space-y-4 pt-2">
+                  {interviewQuestions.map((q, idx) => {
+                    const isAnswerExpanded = Boolean(expandedAnswers[idx]);
                     return (
-                      <div key={category}>
-                        <h3 className="text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2 flex items-center gap-2">
-                          <span
-                            className={`w-2 h-2 rounded-full ${
-                              category === "technical"
-                                ? "bg-blue-500"
-                                : category === "behavioral"
-                                  ? "bg-amber-500"
-                                  : "bg-emerald-500"
-                            }`}
-                            aria-hidden="true"
-                          />
-                          {catLabel} ({catQuestions.length})
+                      <div
+                        key={idx}
+                        className="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600 space-y-3"
+                      >
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            {q.stage && (
+                              <span className="px-2.5 py-0.5 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-800 dark:text-indigo-300 font-extrabold text-[10px] rounded-full uppercase">
+                                📌 {q.stage}
+                              </span>
+                            )}
+                            <span className="px-2 py-0.5 bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-300 font-semibold text-[10px] rounded-full">
+                              {q.category}
+                            </span>
+                          </div>
+                        </div>
+
+                        <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 leading-snug">
+                          ❓ {q.question}
                         </h3>
-                        <div className="space-y-2">
-                          {catQuestions.map((q, idx) => (
-                            <div
-                              key={idx}
-                              className="p-3 bg-gray-50 dark:bg-slate-700/50 rounded-lg border border-gray-100 dark:border-slate-600"
-                            >
-                              <p className="text-sm font-medium text-gray-800 dark:text-slate-200">
-                                {q.question}
-                              </p>
-                              <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
-                                {q.rationale}
-                              </p>
+
+                        <p className="text-xs text-slate-500 dark:text-slate-400 italic">
+                          💡 <strong>Why Asked:</strong> {q.rationale}
+                        </p>
+
+                        {/* Model Answer Expander Toggle */}
+                        <div className="pt-2 border-t border-slate-200/60 dark:border-slate-600/60">
+                          <button
+                            onClick={() =>
+                              setExpandedAnswers((prev) => ({
+                                ...prev,
+                                [idx]: !prev[idx],
+                              }))
+                            }
+                            className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1.5"
+                          >
+                            <span>{isAnswerExpanded ? "▼ Hide Model Answer" : "► View High-Scoring STAR Model Answer & Talking Points"}</span>
+                          </button>
+
+                          {isAnswerExpanded && (
+                            <div className="mt-3 p-3.5 bg-white dark:bg-slate-800 rounded-xl border border-indigo-100 dark:border-indigo-900/50 space-y-3 animate-fadeIn">
+                              {q.answer && (
+                                <div>
+                                  <p className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide mb-1">
+                                    ⭐ STAR Sample Response (Targeting Resume Experience)
+                                  </p>
+                                  <p className="text-xs text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed">
+                                    {q.answer}
+                                  </p>
+                                </div>
+                              )}
+
+                              {q.keyTalkingPoints && q.keyTalkingPoints.length > 0 && (
+                                <div>
+                                  <p className="text-[11px] font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wide mb-1">
+                                    🎯 Key Talking Points to Mention
+                                  </p>
+                                  <ul className="space-y-1 text-xs text-slate-600 dark:text-slate-300">
+                                    {q.keyTalkingPoints.map((tp, tpIdx) => (
+                                      <li key={tpIdx} className="flex items-start gap-1.5">
+                                        <span className="text-indigo-500 font-bold">•</span>
+                                        <span>{tp}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
                             </div>
-                          ))}
+                          )}
                         </div>
                       </div>
                     );
                   })}
-                  <button
-                    onClick={() => {
-                      setShowQuestions(false);
-                      setInterviewQuestions(null);
-                    }}
-                    className="px-4 py-1.5 text-sm font-medium text-gray-600 dark:text-slate-400 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
-                  >
-                    Regenerate
-                  </button>
                 </div>
               ) : (
-                <p className="text-sm text-gray-500 dark:text-slate-400 py-4">
-                  No questions generated. Please try again.
+                <p className="text-xs text-slate-500 dark:text-slate-400 py-6 text-center">
+                  Click a stage above to generate tailored interview questions and model answers.
                 </p>
               )}
             </>

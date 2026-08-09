@@ -19,171 +19,171 @@ interface Step {
 const STEPS: Step[] = [
   {
     number: "01",
-    title: "Upload & Parse Resume",
-    subtitle: "Extract structured data & check formatting",
+    title: "Upload Primary Resume & Target Goals",
+    subtitle: "Establish baseline ATS score & target country",
     description:
-      "Upload your resume in PDF or DOCX format. ResuMatch automatically extracts your work history, education, skills, and contact details while detecting ATS formatting hazards like complex tables or text boxes.",
-    actionText: "Upload Resume",
+      "Upload your primary resume in PDF or DOCX format. ResuMatch automatically extracts your core skills, work history, target roles, and country preferences, establishing your General ATS baseline score.",
+    actionText: "Upload Primary Resume",
     actionHref: "/dashboard/resumes",
     icon: "📄",
     badge: "Step 1",
     tips: [
-      "Use clear, single-column layouts for maximum ATS readability.",
-      "Avoid tables, text boxes, and background images in your uploaded file.",
-      "Ensure text is select-able (not scanned image PDFs).",
+      "Set your primary resume to drive your onboarding analysis baseline.",
+      "Specify your target country (UAE, India, US, etc.) for region-specific ATS algorithms.",
+      "ResuMatch auto-populates target positions and skills directly from your uploaded document.",
     ],
   },
   {
     number: "02",
-    title: "Target Job Description",
-    subtitle: "Define your target position & keywords",
+    title: "Generate Interactive 8-Week Roadmap",
+    subtitle: "Execute week-by-week tasks with saved checkbox progress",
     description:
-      "Paste the target job posting text including title, company name, and core requirements. ResuMatch extracts hard skills, domain keywords, and expected experience levels.",
-    actionText: "Add Job Posting",
-    actionHref: "/dashboard/jds",
-    icon: "🎯",
+      "Receive a personalized 8-week career roadmap split into Foundation, High Velocity, and Conversion phases. Click task checkboxes to track and persist your overall progress across devices.",
+    actionText: "View Your Roadmap",
+    actionHref: "/dashboard#roadmap",
+    icon: "🗺️",
     badge: "Step 2",
     tips: [
-      "Include both primary qualifications and nice-to-have technical skills.",
-      "Keep original formatting and line breaks intact when pasting.",
-      "Save multiple job postings to run batch ATS comparisons.",
+      "Check off weekly tasks as you complete them — progress is automatically saved to the database.",
+      "Iteration 1 includes tasks to fix initial resume and LinkedIn recommendations.",
+      "Click 'Regenerate Roadmap' once baseline fixes are done to unlock post-fix advanced career steps.",
     ],
   },
   {
     number: "03",
-    title: "Run AI ATS Audit & Skill Bridge",
-    subtitle: "Calculate score & close keyword gaps",
+    title: "1-Click Studio per Application (Target 75-80%+)",
+    subtitle: "Tailor bullet points specifically to each Job Description",
     description:
-      "Run a comprehensive ATS scan comparing your resume to the job description. Get an overall match score (0-100%), keyword gap analysis, section completeness scores, and curated free course links for missing skills.",
-    actionText: "Run ATS Scan",
-    actionHref: "/dashboard/analyze",
-    icon: "🔍",
+      "Never send a generic resume. Paste JD text or import job URLs directly into 1-Click Studio. Review 7 to 10 section-by-section STAR bullet rewrites until your ATS score reaches 75%–80%+.",
+    actionText: "Open 1-Click Studio",
+    actionHref: "/dashboard/studio",
+    icon: "⚡",
     badge: "Step 3",
     tips: [
-      "Aim for an overall ATS Match Score of 75%+ before submitting.",
-      "Review the missing skills section for free YouTube course links.",
-      "Check the Keyword Density Heatmap to fix missing term frequencies.",
+      "Aim for an overall ATS Match Score of 75%–80%+ before submitting your application.",
+      "Accept AI suggestions to automatically incorporate missing hard skills with ROI metrics.",
+      "Export clean single-column ATS PDFs directly from the studio workspace.",
     ],
   },
   {
     number: "04",
-    title: "Outreach & STAR Rewriter",
-    subtitle: "Generate cover letters, cold emails & STAR bullets",
+    title: "Stage-Wise Interview Coach & Model Answers",
+    subtitle: "Practice HR, Technical, Coding, and CEO round questions",
     description:
-      "Generate 1-click tailored cover letters, 250-character LinkedIn connection notes, recruiter cold emails, and transform weak resume lines into high-impact STAR achievement metrics.",
-    actionText: "Open Outreach Studio",
-    actionHref: "/dashboard/outreach",
-    icon: "✉️",
+      "Filter practice questions by interview stage (HR Screening, Technical Deep-Dive, Live Coding / System Design, CEO Round). Toggle expanders to view high-scoring STAR-method model responses.",
+    actionText: "Practice Interview Q&As",
+    actionHref: "/dashboard/interview",
+    icon: "🎯",
     badge: "Step 4",
     tips: [
-      "Send a 2-sentence LinkedIn note to a recruiter within 24 hours of applying.",
-      "Use quantified STAR metrics (%, $, time saved) in every resume bullet.",
-      "Use follow-up scripts 5 days post-application to stay top of mind.",
+      "Filter by stage to prepare for your exact upcoming interview round.",
+      "Review the 'Why Asked' recruiter intent for every question.",
+      "Study the sample STAR response to structure your own resume accomplishments.",
     ],
   },
   {
     number: "05",
-    title: "AI Interview Question Predictor",
-    subtitle: "Practice top predicted questions & STAR feedback",
+    title: "LinkedIn Optimization & Recruiter Hack Pack",
+    subtitle: "Set up 24h job alerts, free premium trial & Open to Work",
     description:
-      "Predict high-probability technical, behavioral, and skills gap interview questions generated specifically from the job description and your resume gaps. Practice your answers with real-time AI feedback.",
-    actionText: "Start Interview Prep",
-    actionHref: "/dashboard/interview",
-    icon: "🎙️",
+      "Optimize your LinkedIn headline and summary for recruiter searches. Utilize recruiter job hunting hacks including past 24-hour job alert filters and free Premium InMail outreach.",
+    actionText: "View LinkedIn Hacks",
+    actionHref: "/dashboard#linkedin",
+    icon: "💼",
     badge: "Step 5",
     tips: [
-      "Review the recruiter rationale behind every question to understand what they test.",
-      "Structure all behavioral answers using Situation, Task, Action, Result.",
-      "Practice your 60-second elevator pitch for 'Tell me about yourself'.",
+      "Filter job alerts strictly by 'Posted in last 24 hours' to be in the first 25 applicants.",
+      "Activate LinkedIn Premium 30-day trial for 5 free monthly recruiter InMails.",
+      "Enable 'Open to Work' (Recruiters Only mode) to increase recruiter outreach by 40%.",
     ],
   },
   {
     number: "06",
-    title: "ATS PDF Export & Daily Search Sprint",
-    subtitle: "Download 100% ATS PDF & track daily routine",
+    title: "Batch Resume Comparison & Application Tracking",
+    subtitle: "Compare version quality side-by-side & manage pipeline",
     description:
-      "Export your optimized resume text into a clean single-column PDF engineered for 100% ATS readability. Track your daily search goals (applications, outreaches, prep) and active applications on your kanban board.",
-    actionText: "Open ATS Builder",
-    actionHref: "/dashboard/builder",
-    icon: "📥",
+      "Compare up to 4 resume versions side-by-side to evaluate quality scores and strengths. Track active applications from Wishlist → Applied → Interview → Offer on your Kanban board.",
+    actionText: "Batch Compare Resumes",
+    actionHref: "/dashboard/compare",
+    icon: "⚖️",
     badge: "Step 6",
     tips: [
-      "Hit your daily targets: 3 applications, 2 cold outreaches, 1 prep session.",
-      "Maintain your daily streak to stay consistent and avoid job search burnout.",
-      "Export clean PDFs directly without re-typing into Word or Canva.",
+      "Compare old resume versions against optimized versions to verify quality score gains.",
+      "Log applied dates on your Kanban board to trigger automated 5-day follow-up reminders.",
+      "Use Outreach Studio for personalized recruiter cold emails and InMails.",
     ],
   },
 ];
 
 const FEATURE_TABS = [
   {
-    id: "outreach",
-    name: "Outreach Studio",
-    icon: "✉️",
-    title: "Application Booster & Cold Outreach Studio",
+    id: "studio",
+    name: "1-Click Studio",
+    icon: "⚡",
+    title: "1-Click Application Optimization Studio",
     description:
-      "Generate job-tailored cover letters, 250-character LinkedIn connection notes, recruiter cold emails, 5-day follow-up scripts, and 60-second elevator pitches in seconds.",
+      "Import job postings directly from URL or text, audit ATS scannability with live 5-step progress, apply instant STAR bullet fixes, and export ATS-compliant PDFs.",
     highlights: [
-      "1-Click Cover Letter tailored to JD & Resume",
-      "LinkedIn Connection Request Note (<300 chars)",
-      "Recruiter Cold Email & Subject Line Pitch",
-      "STAR Method Bullet Point Rewriter",
+      "7 to 10 Tailored Suggestions per Scan",
+      "Target Goal Banner (75-80%+ ATS Match)",
+      "Live Step-by-Step AI Pipeline Visualizer",
+      "1-Click PDF Export & Sync to Kanban",
+    ],
+  },
+  {
+    id: "roadmap",
+    name: "8-Week Roadmap",
+    icon: "🗺️",
+    title: "Interactive 8-Week Phased Career Roadmap",
+    description:
+      "Personalized week-by-week plan to close skill gaps and build career momentum with interactive database-persisted task checkboxes and completion progress tracking.",
+    highlights: [
+      "Phased Timeline (Foundation, High Velocity, Conversion)",
+      "Interactive Saved Task Checkboxes",
+      "Overall Completion Progress Bar",
+      "Iteration 1 Setup vs Post-Fix Regenerated Roadmap",
     ],
   },
   {
     id: "interview",
-    name: "Interview Studio",
-    icon: "🎙️",
-    title: "AI Interview Question Predictor & STAR Practice",
+    name: "Interview Coach",
+    icon: "🎯",
+    title: "Stage-Wise Interview Coach & Model Answers",
     description:
-      "Predict high-probability interview questions customized to the target JD and candidate background with real-time STAR framework evaluation.",
+      "Tailor interview preparation by round (HR, Technical Deep-Dive, Live Coding / System Design, CEO Round) with comprehensive STAR model answers and key talking points.",
     highlights: [
-      "Technical, Behavioral & Gap Questions",
+      "Stage Filters (HR, Tech, Coding, CEO)",
+      "STAR-Method Sample Responses",
+      "3 Key Talking Points per Question",
       "Recruiter Intent & Rationale Explanations",
-      "Interactive STAR Answer Practice Box",
-      "Real-time AI Feedback & Score Improvement",
     ],
   },
   {
-    id: "builder",
-    name: "ATS PDF Builder",
-    icon: "📥",
-    title: "One-Click ATS-Friendly PDF Resume Generator",
+    id: "compare",
+    name: "Batch Comparison",
+    icon: "⚖️",
+    title: "Side-by-Side Batch Resume Comparison Tool",
     description:
-      "Edit and export single-column ATS-friendly PDF resumes directly without complex formatting tools breaking ATS scannability.",
+      "Compare up to 4 resume versions side-by-side to evaluate overall quality ratings (0-100), key strengths, and area-by-area improvement opportunities.",
     highlights: [
-      "100% ATS-readable single-column layout",
-      "Plain text / Markdown inline editor",
-      "Instant PDF download via PDFKit engine",
-      "Pre-loaded from parsed resume data",
+      "Compare up to 4 Resumes Simultaneously",
+      "Side-by-Side Overall Quality Scores",
+      "Detailed Strengths & Improvement Lists",
+      "Determines Best Baseline Resume for Target Roles",
     ],
   },
   {
-    id: "skillbridge",
-    name: "Skill-Bridging",
-    icon: "🎓",
-    title: "Free Course Links & Micro-Project Blueprints",
+    id: "jds",
+    name: "50-60% Job Matcher",
+    icon: "🔎",
+    title: "Real Active Job Opening Recommendation Engine",
     description:
-      "Automatically maps missing hard skills from ATS audits to free learning resources and 48-hour weekend portfolio project ideas.",
+      "Searches live job boards in your target country for real job roles matching 50% to 60% of your primary resume (ideal sweet spot for growth).",
     highlights: [
-      "Free YouTube & FreeCodeCamp crash course links",
-      "Weekend portfolio project blueprints",
-      "GitHub starter repo search shortcuts",
-      "Remediates missing keyword gaps fast",
-    ],
-  },
-  {
-    id: "sprint",
-    name: "Daily Sprint",
-    icon: "🔥",
-    title: "Daily Job Search Discipline & Accountability",
-    description:
-      "Gamify your daily job search routine with structured target counters, streak milestones, and follow-up reminders.",
-    highlights: [
-      "Daily targets: 3 Apps, 2 Outreaches, 1 Prep",
-      "Streak counter & streak protection",
-      "Integrated into the main dashboard",
-      "Prevents job hunter fatigue & burnout",
+      "Enforces 50%–60% Primary Resume Match",
+      "Real Active Hiring Companies in Target Region",
+      "Direct Search Links to LinkedIn, Indeed & Naukrigulf",
+      "Auto-Saves Matched Openings to Dashboard",
     ],
   },
 ];
@@ -217,28 +217,41 @@ export default function HowToUseSection() {
 
           <div className="flex flex-wrap gap-4 pt-2">
             <Link
-              href="/dashboard/analyze"
+              href="/dashboard/studio"
               className="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 font-bold text-sm text-white shadow-lg shadow-indigo-500/25 transition-all hover:scale-[1.02]"
             >
-              Start Free ATS Scan →
+              Open 1-Click Studio →
             </Link>
             <Link
-              href="/dashboard/outreach"
+              href="/dashboard/compare"
               className="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 backdrop-blur-md font-bold text-sm text-white transition-all"
             >
-              Open Outreach Studio ✉️
+              Batch Compare Resumes ⚖️
             </Link>
           </div>
         </div>
       </div>
 
+      {/* Founder's Story Banner */}
+      <div className="p-6 bg-slate-900 text-white rounded-3xl border border-indigo-500/30 shadow-lg space-y-3">
+        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-300">
+          <span>❤️ Why ResuMatch Was Built</span>
+        </div>
+        <h3 className="text-lg font-extrabold text-white">
+          Built From 8 Months of Job Hunt Struggle to Make Sure Everyone Lands Interviews
+        </h3>
+        <p className="text-xs text-slate-300 leading-relaxed">
+          &quot;After suffering through 8 months of ghosting and automated ATS rejection emails, I created ResuMatch to break open the black box of corporate hiring algorithms. We keep this platform 100% free for job seekers right now so no candidate suffers alone.&quot;
+        </p>
+      </div>
+
       {/* Interactive 6-Step Guide */}
       <div className="space-y-8">
         <div className="text-center max-w-2xl mx-auto space-y-2">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100">
             The 6-Step Job Landing Workflow
           </h2>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             Click through each step to understand how to turn applications into interview calls.
           </p>
         </div>
@@ -254,7 +267,7 @@ export default function HowToUseSection() {
                 className={`p-3.5 rounded-2xl text-left border transition-all relative overflow-hidden ${
                   isActive
                     ? "bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-500/20 scale-[1.02]"
-                    : "bg-white text-slate-700 border-slate-200/80 hover:border-indigo-300 hover:bg-indigo-50/50"
+                    : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200/80 dark:border-slate-700 hover:border-indigo-300 hover:bg-indigo-50/50"
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
@@ -263,7 +276,7 @@ export default function HowToUseSection() {
                   </span>
                   <span className="text-lg">{step.icon}</span>
                 </div>
-                <p className={`text-xs font-bold line-clamp-1 ${isActive ? "text-white" : "text-slate-900"}`}>
+                <p className={`text-xs font-bold line-clamp-1 ${isActive ? "text-white" : "text-slate-900 dark:text-slate-100"}`}>
                   {step.title}
                 </p>
               </button>
@@ -272,26 +285,26 @@ export default function HowToUseSection() {
         </div>
 
         {/* Step Detail Card */}
-        <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-sm grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/80 dark:border-slate-700 p-6 sm:p-8 shadow-sm grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div className="lg:col-span-7 space-y-5">
             <div className="flex items-center gap-3">
-              <span className="px-3 py-1 bg-indigo-100 text-indigo-800 text-xs font-extrabold rounded-full">
+              <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-800 dark:text-indigo-300 text-xs font-extrabold rounded-full">
                 {currentStep.badge}
               </span>
               <span className="text-xs font-semibold text-slate-400">Step {activeStep + 1} of 6</span>
             </div>
 
             <div className="space-y-1">
-              <h3 className="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+              <h3 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                 <span>{currentStep.icon}</span>
                 <span>{currentStep.title}</span>
               </h3>
-              <p className="text-xs font-semibold text-indigo-600 uppercase tracking-wider">
+              <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
                 {currentStep.subtitle}
               </p>
             </div>
 
-            <p className="text-sm text-slate-600 leading-relaxed">
+            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
               {currentStep.description}
             </p>
 
@@ -307,14 +320,14 @@ export default function HowToUseSection() {
           </div>
 
           {/* Pro Tips Box */}
-          <div className="lg:col-span-5 bg-slate-50 border border-slate-200/70 rounded-2xl p-6 space-y-4">
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-900 uppercase tracking-wider">
+          <div className="lg:col-span-5 bg-slate-50 dark:bg-slate-700/50 border border-slate-200/70 dark:border-slate-600 rounded-2xl p-6 space-y-4">
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider">
               <span>💡 Pro Tips for {currentStep.badge}</span>
             </div>
 
             <ul className="space-y-3">
               {currentStep.tips.map((tip, idx) => (
-                <li key={idx} className="flex items-start gap-2.5 text-xs text-slate-700 leading-relaxed">
+                <li key={idx} className="flex items-start gap-2.5 text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
                   <span className="text-emerald-500 font-bold shrink-0 mt-0.5">✓</span>
                   <span>{tip}</span>
                 </li>
@@ -327,10 +340,10 @@ export default function HowToUseSection() {
       {/* Feature Deep Dive Tabs */}
       <div className="space-y-8 pt-6">
         <div className="text-center max-w-2xl mx-auto space-y-2">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100">
             Platform Feature Deep Dive
           </h2>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             Explore our specialized AI toolkits built for job seekers.
           </p>
         </div>
@@ -345,8 +358,8 @@ export default function HowToUseSection() {
                 onClick={() => setActiveFeatureTab(idx)}
                 className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
                   isActive
-                    ? "bg-slate-900 text-white shadow-md"
-                    : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
+                    ? "bg-slate-900 dark:bg-indigo-600 text-white shadow-md"
+                    : "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50"
                 }`}
               >
                 <span>{tab.icon}</span>
@@ -387,10 +400,10 @@ export default function HowToUseSection() {
               Start optimizing your applications with AI precision today.
             </p>
             <Link
-              href="/dashboard/analyze"
+              href="/dashboard/studio"
               className="block w-full py-3 bg-white text-indigo-950 font-bold text-xs rounded-xl hover:bg-indigo-50 transition-colors shadow-md"
             >
-              Get Started Now →
+              Open 1-Click Studio Now →
             </Link>
           </div>
         </div>

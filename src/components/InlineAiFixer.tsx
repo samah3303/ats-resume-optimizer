@@ -92,8 +92,8 @@ export default function InlineAiFixer({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
+    <div className="space-y-6 max-w-full overflow-hidden">
+      <div className="bg-white dark:bg-[#14161D] border border-slate-200 dark:border-[#242834] rounded-2xl p-4 sm:p-6 shadow-sm space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
@@ -105,18 +105,18 @@ export default function InlineAiFixer({
           </div>
         </div>
 
-        {/* Custom Skill Bullet Generator Input */}
-        <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3">
-          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+        {/* Custom Skill Bullet Generator Input - Responsive Mobile Stacking */}
+        <div className="bg-slate-50 dark:bg-[#1C1F2B] p-4 rounded-xl border border-slate-200 dark:border-[#2E3345] space-y-3">
+          <label className="block text-xs font-bold text-slate-700 dark:text-amber-300">
             Generate Custom STAR Bullet for Any Skill:
           </label>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full">
             <input
               type="text"
               placeholder="e.g. Kubernetes, Redis, System Design..."
               value={customSkillInput}
               onChange={(e) => setCustomSkillInput(e.target.value)}
-              className="flex-1 px-3 py-2 rounded-lg text-xs bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white"
+              className="w-full flex-1 min-w-0 px-3.5 py-2.5 rounded-xl text-xs bg-white dark:bg-[#0D0E11] border border-slate-300 dark:border-[#2E3345] text-slate-900 dark:text-white focus:ring-2 focus:ring-amber-500 focus:outline-hidden"
             />
             <button
               onClick={() => {
@@ -125,16 +125,16 @@ export default function InlineAiFixer({
                 }
               }}
               disabled={!customSkillInput.trim() || loadingSkill === customSkillInput.trim()}
-              className="px-4 py-2 rounded-lg text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white transition-all disabled:opacity-50 shrink-0"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-900 text-amber-300 dark:bg-amber-500 dark:text-slate-950 hover:bg-slate-800 dark:hover:bg-amber-400 transition-all disabled:opacity-50 shrink-0 shadow-sm whitespace-nowrap"
             >
-              {loadingSkill === customSkillInput.trim() ? "Generating..." : "⚡ Generate STAR Bullet"}
+              {loadingSkill === customSkillInput.trim() ? "Generating..." : "⚡ Generate STAR"}
             </button>
           </div>
         </div>
 
         {/* Missing Skill AI Bullet Generators */}
-        <div className="bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 rounded-xl p-4">
-          <h4 className="text-xs font-bold text-indigo-900 dark:text-indigo-300 mb-3">
+        <div className="bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/30 rounded-xl p-4">
+          <h4 className="text-xs font-bold text-amber-900 dark:text-amber-300 mb-3">
             Target Skill Optimization Badges:
           </h4>
           <div className="space-y-3">
@@ -145,32 +145,32 @@ export default function InlineAiFixer({
               return (
                 <div
                   key={skill}
-                  className="bg-white dark:bg-slate-900 rounded-xl p-3 border border-indigo-100 dark:border-indigo-900/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs"
+                  className="bg-white dark:bg-[#0D0E11] rounded-xl p-3.5 border border-amber-200/80 dark:border-[#2E3345] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs"
                 >
-                  <div className="flex-1">
-                    <span className="text-xs font-bold text-slate-900 dark:text-white">
+                  <div className="flex-1 min-w-0 w-full">
+                    <span className="text-xs font-bold text-slate-900 dark:text-white block truncate">
                       Target Skill: {skill}
                     </span>
                     {generated && (
-                      <p className="text-xs text-emerald-700 dark:text-emerald-400 mt-1 font-mono bg-emerald-50 dark:bg-emerald-950/40 p-2.5 rounded-lg border border-emerald-200 dark:border-emerald-800/60">
-                        "{generated}"
+                      <p className="text-xs text-emerald-700 dark:text-emerald-400 mt-2 font-mono bg-emerald-50 dark:bg-emerald-950/40 p-2.5 rounded-lg border border-emerald-200 dark:border-emerald-800/60 break-words">
+                        &quot;{generated}&quot;
                       </p>
                     )}
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end">
                     {!generated ? (
                       <button
                         onClick={() => handleGenerateSkillFix(skill)}
                         disabled={isLoading}
-                        className="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white transition-all shadow-sm flex items-center gap-1"
+                        className="w-full sm:w-auto px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 transition-all shadow-sm flex items-center justify-center gap-1"
                       >
                         {isLoading ? "Generating..." : "⚡ Fix with AI"}
                       </button>
                     ) : (
                       <button
                         onClick={() => handleCopy(generated, skill)}
-                        className="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-sm"
+                        className="w-full sm:w-auto px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-sm"
                       >
                         {copiedId === skill ? "Copied! ✓" : "Copy Bullet"}
                       </button>
@@ -192,10 +192,10 @@ export default function InlineAiFixer({
             return (
               <div
                 key={itemKey}
-                className="bg-slate-50 dark:bg-slate-800/60 rounded-xl p-4 border border-slate-200 dark:border-slate-700 space-y-3"
+                className="bg-slate-50 dark:bg-[#1C1F2B] rounded-xl p-4 border border-slate-200 dark:border-[#2E3345] space-y-3"
               >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-extrabold px-2.5 py-0.5 rounded-md bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-xs font-extrabold px-2.5 py-0.5 rounded-md bg-amber-100 text-amber-900 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300 dark:border-amber-800">
                     {item.section}
                   </span>
                   <button
@@ -203,21 +203,21 @@ export default function InlineAiFixer({
                       handleCopy(item.suggestedText, itemKey);
                       if (onApplyFix) onApplyFix(item.originalText, item.suggestedText);
                     }}
-                    className="px-3 py-1.5 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-all shadow-sm"
+                    className="px-3 py-1.5 text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl transition-all shadow-sm"
                   >
                     {copiedId === itemKey ? "Copied! ✓" : "⚡ Apply Fix"}
                   </button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                  <div className="bg-rose-50/60 dark:bg-rose-950/30 p-3 rounded-xl border border-rose-100 dark:border-rose-900/30">
+                  <div className="bg-rose-50/60 dark:bg-rose-950/30 p-3 rounded-xl border border-rose-100 dark:border-rose-900/30 break-words">
                     <span className="font-bold text-rose-700 dark:text-rose-400 block mb-1">
                       Weak / Unquantified Bullet:
                     </span>
                     <p className="text-slate-700 dark:text-slate-300 italic">{item.originalText}</p>
                   </div>
 
-                  <div className="bg-emerald-50/60 dark:bg-emerald-950/30 p-3 rounded-xl border border-emerald-100 dark:border-emerald-900/30">
+                  <div className="bg-emerald-50/60 dark:bg-emerald-950/30 p-3 rounded-xl border border-emerald-100 dark:border-emerald-900/30 break-words">
                     <span className="font-bold text-emerald-700 dark:text-emerald-400 block mb-1">
                       Optimized STAR Metric Bullet:
                     </span>

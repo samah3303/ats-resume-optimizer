@@ -7,7 +7,8 @@ const mobileLinks = [
   { href: "/dashboard/studio", label: "Studio", emoji: "⚡" },
   { href: "/dashboard/roadmap", label: "Roadmap", emoji: "🗺️" },
   { href: "/dashboard/tracker", label: "Tracker", emoji: "📊" },
-  { href: "/dashboard/tools", label: "All Tools", emoji: "🧩" },
+  { href: "/dashboard/how-to-use", label: "Guide", emoji: "📖" },
+  { href: "/dashboard/tools", label: "Tools", emoji: "🧩" },
 ];
 
 export default function MobileNav() {
@@ -19,12 +20,12 @@ export default function MobileNav() {
       role="navigation"
       aria-label="Mobile main navigation"
     >
-      {/* Glassmorphic backdrop with blur */}
-      <div className="absolute inset-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-t border-slate-200/80 dark:border-slate-800 shadow-2xl" />
+      {/* Glassmorphic backdrop with carbon black / warm yellow theme */}
+      <div className="absolute inset-0 bg-white/95 dark:bg-[#0D0E11]/95 backdrop-blur-xl border-t border-amber-500/20 shadow-2xl" />
 
-      {/* Fixed 4-Column Touch Target Grid */}
+      {/* Fixed 5-Column Touch Target Grid */}
       <div
-        className="relative grid grid-cols-4 items-center px-2 py-1"
+        className="relative grid grid-cols-5 items-center px-1.5 py-1"
         style={{
           paddingBottom: "max(env(safe-area-inset-bottom, 0px), 6px)",
           height: "calc(60px + env(safe-area-inset-bottom, 0px))",
@@ -42,24 +43,24 @@ export default function MobileNav() {
               href={link.href}
               aria-label={link.label}
               aria-current={isActive ? "page" : undefined}
-              className={`flex flex-col items-center justify-center gap-1 py-1.5 px-2 rounded-2xl transition-all duration-200 min-h-[48px] ${
+              className={`flex flex-col items-center justify-center gap-0.5 py-1 px-1 rounded-xl transition-all duration-200 min-h-[48px] ${
                 isActive
-                  ? "bg-indigo-50/80 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-bold shadow-sm"
+                  ? "bg-slate-900 text-amber-400 dark:bg-amber-500/20 dark:text-amber-300 font-bold shadow-sm"
                   : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
               <span className="relative flex items-center justify-center">
                 {isActive && (
-                  <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-5 h-1 rounded-full bg-indigo-600 dark:bg-indigo-400 shadow-sm" />
+                  <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-4 h-1 rounded-full bg-amber-500 shadow-sm" />
                 )}
-                <span className="text-xl" aria-hidden="true">
+                <span className="text-lg" aria-hidden="true">
                   {link.emoji}
                 </span>
               </span>
               <span
-                className={`text-[11px] leading-none ${
+                className={`text-[10px] leading-none ${
                   isActive
-                    ? "font-extrabold text-indigo-800 dark:text-indigo-300"
+                    ? "font-extrabold text-amber-500 dark:text-amber-300"
                     : "font-semibold text-slate-600 dark:text-slate-400"
                 }`}
               >

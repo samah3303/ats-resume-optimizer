@@ -2,17 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-// Agents dynamically imported to avoid Vercel ai SDK bundling issues
+import { generateInterviewQuestions } from "@/lib/deepseek";
 
-/**
- * POST /api/interview — Start a new interview session or evaluate an answer
- *
- * Body for starting: { action: "start", analysisId?, resumeId?, jdId? }
- * Body for answering: { action: "answer", sessionId, questionId, answer }
- * Body for next:     { action: "next", sessionId }
- * Body for report:   { action: "report", sessionId }
- * Body for end:      { action: "end", sessionId }
- */
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
@@ -23,16 +14,65 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { action } = body;
+    const { action, analysisId, resumeId, jdId, stage } = body;
 
+    // Handle direct interview questions request (e.g. from analysis details page)
+    if (!action || action === "generate") {
+      let skillsGapJson: string | undefined;
+      let resumeText = "";
+      let jobDescriptionText = "";
+      let jobTitle: string | undefined;
+
+      if (analysisId) {
+        const analysis = await prisma.analysis.findFirst({
+          where: { id: analysisId, userId },
+          include: { resume: true, jobDescription: true },
+        });
+        if (!analysis) {
+          return NextResponse.json({ error: "Analysis not found." }, { status: 404 });
+        }
+        skillsGapJson = analysis.skillsGapJson || undefined;
+        resumeText = analysis.resume?.parsedText || "";
+        jobDescriptionText = analysis.jobDescription.rawText;
+        jobTitle = analysis.jobDescription.title;
+      } else if (resumeId && jdId) {
+        const resume = await prisma.resume.findFirst({ where: { id: resumeId, userId } });
+        if (!resume) {
+          return NextResponse.json({ error: "Resume not found." }, { status: 404 });
+        }
+        const jd = await prisma.jobDescription.findFirst({ where: { id: jdId, userId } });
+        if (!jd) {
+          return NextResponse.json({ error: "Job description not found." }, { status: 404 });
+        }
+        resumeText = resume.parsedText;
+        jobDescriptionText = jd.rawText;
+        jobTitle = jd.title;
+      } else {
+        return NextResponse.json(
+          { error: "Either analysisId or both resumeId and jdId are required." },
+          { status: 400 }
+        );
+      }
+
+      const questions = await generateInterviewQuestions({
+        skillsGapJson,
+        resumeText,
+        jobDescriptionText,
+        jobTitle,
+        stage: stage || "all",
+      });
+
+      return NextResponse.json({ questions });
+    }
+
+    // Handle session-based interactive mock coach actions
     switch (action) {
       case "start": {
         const { startInterviewSession } = await import("@/lib/agents/interview-coach-agent");
-        const { analysisId, resumeId, jdId } = body;
 
         let skillsGapJson: string | undefined;
-        let resumeText: string;
-        let jobDescriptionText: string;
+        let resumeText = "";
+        let jobDescriptionText = "";
         let jobTitle: string | undefined;
 
         if (analysisId) {
@@ -59,11 +99,6 @@ export async function POST(req: NextRequest) {
           resumeText = resume.parsedText;
           jobDescriptionText = jd.rawText;
           jobTitle = jd.title;
-        } else {
-          return NextResponse.json(
-            { error: "Either analysisId or both resumeId and jdId are required." },
-            { status: 400 }
-          );
         }
 
         const result = await startInterviewSession({
@@ -144,12 +179,12 @@ export async function POST(req: NextRequest) {
 
       default:
         return NextResponse.json(
-          { error: `Unknown action: ${action}. Use start, answer, next, report, or end.` },
+          { error: `Unknown action: ${action}.` },
           { status: 400 }
         );
     }
   } catch (err) {
-    console.error("Interview coach error:", err);
+    console.error("Interview route error:", err);
     return NextResponse.json(
       { error: "Failed to process interview request." },
       { status: 500 }

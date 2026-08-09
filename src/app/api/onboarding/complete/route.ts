@@ -19,7 +19,16 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { resumeId, targetPositions, targetCountry, linkedinUrl, portfolioUrl, githubUrl, industry, jobType } = body;
+    const {
+      resumeId,
+      targetPositions,
+      targetCountry,
+      linkedinUrl,
+      portfolioUrl,
+      githubUrl,
+      industry,
+      jobType,
+    } = body;
 
     if (!resumeId) {
       return NextResponse.json(
@@ -61,18 +70,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check if already completed
-    const existing = await prisma.onboardingProfile.findUnique({
-      where: { userId },
+    // Mark chosen resume as primary, reset others
+    await prisma.resume.updateMany({
+      where: { userId, id: { not: resumeId } },
+      data: { isPrimary: false },
     });
-    if (existing) {
-      return NextResponse.json(
-        { error: "Onboarding already completed." },
-        { status: 409 }
-      );
-    }
+    await prisma.resume.update({
+      where: { id: resumeId },
+      data: { isPrimary: true },
+    });
 
-    // Step 1: Run Mode 1 analysis
+    // Step 1: Run Mode 1 onboarding analysis
     let mode1Result: Awaited<ReturnType<typeof mode1OnboardingAnalysis>>;
     try {
       mode1Result = await mode1OnboardingAnalysis(
@@ -89,10 +97,28 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Step 2: Create onboarding profile
-    const profile = await prisma.onboardingProfile.create({
-      data: {
+    // Step 2: Upsert onboarding profile (create or update)
+    const profile = await prisma.onboardingProfile.upsert({
+      where: { userId },
+      create: {
         userId,
+        resumeId,
+        targetPositions: positions.join(", "),
+        targetCountry,
+        linkedinUrl: linkedinUrl || null,
+        portfolioUrl: portfolioUrl || null,
+        githubUrl: githubUrl || null,
+        industry: industry || null,
+        jobType: jobType || null,
+        profileSummary: mode1Result.profileSummary,
+        coreSkills: JSON.stringify(mode1Result.detectedCoreSkills),
+        marketGaps: JSON.stringify(mode1Result.marketGaps),
+        aiSuggestions: JSON.stringify(mode1Result.aiSuggestions),
+        linkedinOpts: JSON.stringify(mode1Result.linkedinOptimizations),
+        generalAtsScore: mode1Result.generalAtsScore,
+        resumeImprovements: JSON.stringify(mode1Result.resumeImprovements),
+      },
+      update: {
         resumeId,
         targetPositions: positions.join(", "),
         targetCountry,
@@ -111,7 +137,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Step 3: Generate roadmap (non-blocking — profile is already saved)
+    // Step 3: Generate roadmap
     let roadmap: any = null;
     try {
       const mode2Result = await mode2GenerateRoadmap(
@@ -150,10 +176,9 @@ export async function POST(req: NextRequest) {
       });
     } catch (err) {
       console.error("Roadmap generation failed (non-blocking):", err);
-      // Profile is already saved — onboarding succeeds without roadmap
     }
 
-    // Step 4: Fire-and-forget recommendations (don't block the response)
+    // Step 4: Fire-and-forget recommendations (matching 50-60% of primary resume)
     generateRecommendationsAsync(
       userId,
       resume.parsedText,
@@ -167,21 +192,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         profile,
-        roadmap: roadmap ? {
-          id: roadmap.id,
-          strategyOverview: roadmap.strategyOverview,
-          generatedAt: roadmap.generatedAt,
-          weeks: roadmap.weeks.map((w: any) => ({
-            id: w.id,
-            weekNumber: w.weekNumber,
-            phase: w.phase,
-            focusTitle: w.focusTitle,
-            tasks: JSON.parse(w.tasks),
-            milestone: w.milestone,
-          })),
-        } : null,
+        message: "Primary resume and onboarding analysis updated successfully.",
+        roadmap: roadmap
+          ? {
+              id: roadmap.id,
+              strategyOverview: roadmap.strategyOverview,
+              generatedAt: roadmap.generatedAt,
+              weeks: roadmap.weeks.map((w: any) => ({
+                id: w.id,
+                weekNumber: w.weekNumber,
+                phase: w.phase,
+                focusTitle: w.focusTitle,
+                tasks: JSON.parse(w.tasks),
+                milestone: w.milestone,
+              })),
+            }
+          : null,
       },
-      { status: 201 }
+      { status: 200 }
     );
   } catch (err) {
     console.error("Onboarding complete error:", err);
@@ -192,10 +220,6 @@ export async function POST(req: NextRequest) {
   }
 }
 
-/**
- * Fire-and-forget: generate position + JD recommendations after onboarding.
- * Runs in background so the user sees their dashboard immediately.
- */
 async function generateRecommendationsAsync(
   userId: string,
   resumeText: string,
@@ -220,7 +244,6 @@ async function generateRecommendationsAsync(
         })),
         skipDuplicates: true,
       });
-      console.log(`[onboarding] Created ${posRecs.length} recommended positions`);
     }
 
     if (jdRecs.length > 0) {
@@ -231,11 +254,10 @@ async function generateRecommendationsAsync(
             title: jd.title,
             company: jd.company || null,
             rawText: jd.rawText,
-            notes: `🤖 AI Recommended — ${jd.matchReason}`,
+            notes: `🤖 AI Recommended (50-60% Primary Resume Match) — ${jd.matchReason}`,
           },
         });
       }
-      console.log(`[onboarding] Created ${jdRecs.length} recommended JDs`);
     }
   } catch (err) {
     console.error("[onboarding] Background recommendations failed:", err);

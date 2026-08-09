@@ -23,10 +23,19 @@ export async function GET() {
   const parsed = roadmap
     ? {
         ...roadmap,
-        weeks: roadmap.weeks.map((w) => ({
-          ...w,
-          tasks: JSON.parse(w.tasks) as string[],
-        })),
+        weeks: roadmap.weeks.map((w) => {
+          let completedTasks: boolean[] = [];
+          try {
+            completedTasks = JSON.parse(w.completedTasks || "[]");
+          } catch {
+            completedTasks = [];
+          }
+          return {
+            ...w,
+            tasks: JSON.parse(w.tasks) as string[],
+            completedTasks,
+          };
+        }),
       }
     : null;
 
@@ -73,11 +82,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const existingRoadmap = await prisma.roadmap.findFirst({
+      where: { userId },
+      orderBy: { generatedAt: "desc" },
+    });
+
+    const nextGenCount = (existingRoadmap?.generationCount || 1) + 1;
+
     const result = await mode2GenerateRoadmap(
       profile.resume.parsedText,
       coreSkills,
       marketGaps,
-      positions
+      positions,
+      nextGenCount
     );
 
     const getPhase = (weekNumber: number): string => {
@@ -93,12 +110,14 @@ export async function POST(req: NextRequest) {
       data: {
         userId,
         strategyOverview: result.strategyOverview,
+        generationCount: nextGenCount,
         weeks: {
           create: result.weeks.map((w) => ({
             weekNumber: w.weekNumber,
             phase: getPhase(w.weekNumber),
             focusTitle: w.focus,
             tasks: JSON.stringify(w.tasks),
+            completedTasks: JSON.stringify(new Array(w.tasks.length).fill(false)),
             milestone: w.milestone,
           })),
         },
@@ -113,6 +132,7 @@ export async function POST(req: NextRequest) {
       weeks: roadmap.weeks.map((w) => ({
         ...w,
         tasks: JSON.parse(w.tasks) as string[],
+        completedTasks: JSON.parse(w.completedTasks || "[]") as boolean[],
       })),
     };
 
@@ -121,6 +141,65 @@ export async function POST(req: NextRequest) {
     console.error("Roadmap generation error:", err);
     return NextResponse.json(
       { error: "Failed to generate roadmap." },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const userId = (session.user as { id: string }).id;
+
+  try {
+    const { weekTaskId, taskIndex, completed } = await req.json();
+
+    if (!weekTaskId || typeof taskIndex !== "number") {
+      return NextResponse.json(
+        { error: "weekTaskId and taskIndex are required" },
+        { status: 400 }
+      );
+    }
+
+    const weekTask = await prisma.weekTask.findUnique({
+      where: { id: weekTaskId },
+      include: { roadmap: true },
+    });
+
+    if (!weekTask || weekTask.roadmap.userId !== userId) {
+      return NextResponse.json({ error: "Task not found" }, { status: 404 });
+    }
+
+    const tasks = JSON.parse(weekTask.tasks || "[]") as string[];
+    let completedTasks = JSON.parse(weekTask.completedTasks || "[]") as boolean[];
+
+    if (completedTasks.length < tasks.length) {
+      completedTasks = new Array(tasks.length).fill(false);
+    }
+
+    completedTasks[taskIndex] = Boolean(completed);
+
+    const updated = await prisma.weekTask.update({
+      where: { id: weekTaskId },
+      data: {
+        completedTasks: JSON.stringify(completedTasks),
+      },
+    });
+
+    return NextResponse.json({
+      weekTask: {
+        ...updated,
+        tasks,
+        completedTasks,
+      },
+    });
+  } catch (err) {
+    console.error("Update roadmap task error:", err);
+    return NextResponse.json(
+      { error: "Failed to update task state" },
       { status: 500 }
     );
   }

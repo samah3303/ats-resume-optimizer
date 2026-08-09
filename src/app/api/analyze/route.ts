@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { extractLocalKeywordMatch, pruneJobDescription } from "@/lib/keyword-matcher";
 // Agents are dynamically imported to prevent Vercel build crashes from ai SDK bundling
 
 export async function GET() {
@@ -115,7 +116,7 @@ export async function POST(req: NextRequest) {
 
     // Run AI analysis — try multi-step agent first, fall back to single-prompt
     try {
-      let analysisResult;
+      let analysisResult: any;
       let usedAgent = false;
       try {
         // Dynamic import to avoid Vercel build issues with ai SDK
@@ -148,7 +149,7 @@ export async function POST(req: NextRequest) {
             suggestedText: s.suggestedText,
             rationale: s.rationale,
             targetedSkill: "",
-            impact: "medium" as const,
+            impact: "high" as const,
           })),
         };
       }
@@ -170,38 +171,38 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      // Create suggestions in DB
-      const suggestionsToSave =
-        analysisResult.suggestions?.length > 0
-          ? analysisResult.suggestions
-          : [
-              {
-                section: "Technical Skills",
-                originalText: "Worked with core frontend frameworks and software development.",
-                suggestedText: "Engineered responsive full-stack applications with React, Next.js, and TypeScript, improving page load speed by 35%.",
-                rationale: "Quantifies technical skills with concrete performance metrics.",
-              },
-              {
-                section: "Work Experience",
-                originalText: "Responsible for building UI components and managing API data.",
-                suggestedText: "Architected high-throughput REST API integrations and state management schemas, supporting 50k+ daily active sessions.",
-                rationale: "Replaces general statements with specific architecture and scale metrics.",
-              },
-              {
-                section: "Impact & Performance",
-                originalText: "Helped team improve website performance and user interface.",
-                suggestedText: "Optimized Core Web Vitals and front-end bundle sizes, boosting page load speeds by 42% and increasing user retention by 18%.",
-                rationale: "Directly connects UI improvements to key business outcome metrics.",
-              },
-            ];
+      // Local keyword check to supplement suggestions if AI returned fewer than 6
+      const prunedJd = pruneJobDescription(jobDescriptionText);
+      const localMatch = extractLocalKeywordMatch(resume.parsedText, prunedJd);
+      const missingSkills = [...localMatch.skills.missing, ...localMatch.keywords.missing];
+
+      let finalSuggestions = Array.isArray(analysisResult.suggestions)
+        ? [...analysisResult.suggestions]
+        : [];
+
+      // If AI produced < 7 suggestions, dynamically generate additional strict suggestions based on missing JD skills
+      if (finalSuggestions.length < 7 && missingSkills.length > 0) {
+        const extraNeeded = 8 - finalSuggestions.length;
+        const extraItems = missingSkills.slice(0, extraNeeded);
+        extraItems.forEach((skill, idx) => {
+          finalSuggestions.push({
+            section: idx % 2 === 0 ? "Work Experience" : "Technical Skills",
+            originalText: `Missing key JD skill: "${skill}"`,
+            suggestedText: `Engineered scalable features using "${skill}" with performance benchmarking and metric ROI.`,
+            rationale: `Including "${skill}" directly addresses a missing hard skill required by this target Job Description.`,
+            targetedSkill: skill,
+            impact: "high",
+          });
+        });
+      }
 
       await prisma.suggestion.createMany({
-        data: suggestionsToSave.map((s) => ({
+        data: finalSuggestions.map((s: any) => ({
           analysisId: analysis.id,
-          section: s.section,
-          originalText: s.originalText,
-          suggestedText: s.suggestedText,
-          rationale: s.rationale,
+          section: s.section || "Experience",
+          originalText: s.originalText || "Weak bullet point",
+          suggestedText: s.suggestedText || "ATS optimized STAR bullet point",
+          rationale: s.rationale || "Improves keyword match score for this job description",
         })),
       });
 
@@ -218,18 +219,16 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json({ analysis: updatedAnalysis }, { status: 201 });
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error";
-      console.error("AI analysis error:", err);
-      // Keep the pending analysis but return error
+      console.error("Analysis execution failed:", err);
       return NextResponse.json(
-        { error: `AI analysis failed: ${message}`, analysisId: analysis.id },
+        { error: "Failed to run analysis." },
         { status: 500 }
       );
     }
   } catch (err) {
-    console.error("Analysis API error:", err);
+    console.error("POST /api/analyze error:", err);
     return NextResponse.json(
-      { error: "Failed to run analysis." },
+      { error: "Internal server error." },
       { status: 500 }
     );
   }
