@@ -48,6 +48,8 @@ model Resume {
   originalFile       OriginalFile?
   chunks             ResumeChunk[]
 
+  @@index([userId])
+  @@index([userId, isPrimary])
   @@map("resumes")
 }
 
@@ -76,6 +78,7 @@ model PositionProfile {
   user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   jobDescriptions JobDescription[]
 
+  @@index([userId])
   @@map("position_profiles")
 }
 
@@ -96,6 +99,7 @@ model JobDescription {
   applications    Application[]
   chunks          JDChunk[]
 
+  @@index([userId])
   @@map("job_descriptions")
 }
 
@@ -119,6 +123,8 @@ model Analysis {
   suggestions      Suggestion[]
   sharedAnalyses   SharedAnalysis[]
 
+  @@index([userId])
+  @@index([userId, createdAt])
   @@map("analyses")
 }
 
@@ -135,6 +141,7 @@ model Suggestion {
   analysis Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
   feedbacks SuggestionFeedback[]
 
+  @@index([analysisId])
   @@map("suggestions")
 }
 
@@ -189,6 +196,8 @@ model Application {
   user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   jobDescription JobDescription @relation(fields: [jdId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
+  @@index([userId, status])
   @@map("applications")
 }
 
@@ -203,6 +212,7 @@ model Roadmap {
   user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   weeks WeekTask[]
 
+  @@index([userId])
   @@map("roadmaps")
 }
 
@@ -218,6 +228,7 @@ model WeekTask {
 
   roadmap Roadmap @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
 
+  @@index([roadmapId])
   @@map("week_tasks")
 }
 
