@@ -390,8 +390,8 @@ export default function UnauthenticatedHero() {
         <StatsAndReviewsSection />
       </section>
 
-      <footer className="py-8 px-4 text-center text-xs text-zinc-400 bg-[#090A0C]">
-        &copy; {new Date().getFullYear()} ResuMatch.ai. All rights reserved. Built with ❤️ in Carbon Black & Amber Yellow for job seekers everywhere.
+      <footer className="py-8 px-4 text-center text-xs text-zinc-400 bg-[#090A0C] border-t border-[#242834]">
+        &copy; {new Date().getFullYear()} ResuMatch.ai. All rights reserved. Built with ❤️ for job seekers worldwide — 100% Free Multi-Agent AI & RAG Engine.
       </footer>
     </div>
   );
