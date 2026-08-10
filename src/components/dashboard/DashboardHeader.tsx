@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import TrafficLightStatus from "@/components/TrafficLightStatus";
 import { useState } from "react";
 
 interface DashboardHeaderProps {
@@ -23,60 +24,76 @@ export default function DashboardHeader({
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-            Welcome, {userName?.split(" ")[0] || "back"}!
-          </h1>
-          <p className="text-xs sm:text-sm text-zinc-400 mt-1">
-            Here&apos;s your resume optimization overview & career dashboard
-          </p>
-        </div>
-        <div className="flex items-center gap-2.5 flex-wrap">
-          {/* Compact metrics pill */}
-          <div className="hidden sm:flex items-center gap-3 px-3.5 py-2 bg-[#14161D] rounded-2xl text-xs font-bold text-zinc-300 border border-[#242834]">
-            <span>
-              📄 {resumeCount} Resume{resumeCount !== 1 ? "s" : ""}
-            </span>
-            <span className="text-zinc-600">•</span>
-            <span>
-              🔍 {analysisCount} Scan{analysisCount !== 1 ? "s" : ""}
-            </span>
-            {generalAtsScore !== null && (
-              <>
-                <span className="text-zinc-600">•</span>
-                <span className="text-amber-400 font-black">⭐ {generalAtsScore}% Baseline</span>
-              </>
-            )}
+      <div className="bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-amber-500/20 p-6 sm:p-8 text-white shadow-2xl space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30">
+                Job Search Dashboard
+              </span>
+              {generalAtsScore !== null && (
+                <TrafficLightStatus score={generalAtsScore} size="sm" />
+              )}
+            </div>
+            <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+              Welcome back, {userName?.split(" ")[0] || "Candidate"}!
+            </h1>
+            <p className="text-xs sm:text-sm text-zinc-400 max-w-xl leading-relaxed">
+              {generalAtsScore !== null
+                ? `Your baseline resume score is ${generalAtsScore}%. Ready to apply for a job? Run a targeted job analysis or follow your 2-Month Plan.`
+                : "Upload your resume to get your baseline ATS score and start applying."}
+            </p>
           </div>
-          <button
-            onClick={() => setShowResetConfirm(true)}
-            className="px-3.5 py-2.5 text-xs font-bold text-zinc-300 hover:text-white bg-[#14161D] border border-[#242834] rounded-2xl transition-all"
-            title="Reset onboarding & re-analyze resume"
-          >
-            🔄 Reset Target
-          </button>
-          <Link
-            href="/dashboard/how-to-use"
-            className="px-4 py-2.5 text-xs font-bold border border-amber-500/30 text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 rounded-2xl transition-all inline-flex items-center gap-1.5 min-h-[44px] sm:min-h-0"
-          >
-            <span aria-hidden="true">📖</span> Guide
-          </Link>
-          {onNewAnalysis ? (
-            <button
-              onClick={onNewAnalysis}
-              className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-5 py-2.5 text-xs rounded-2xl shadow-lg shadow-amber-500/20 transition-all inline-flex items-center gap-1.5 min-h-[44px] sm:min-h-0"
-            >
-              ⚡ + New Analysis
-            </button>
-          ) : (
+
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+            {onNewAnalysis ? (
+              <button
+                onClick={onNewAnalysis}
+                className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-6 py-3.5 text-xs rounded-2xl shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2"
+              >
+                <span>⚡ + Run New Analysis</span>
+              </button>
+            ) : (
+              <Link
+                href="/dashboard/analyze"
+                className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-6 py-3.5 text-xs rounded-2xl shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2"
+              >
+                <span>⚡ + Run New Analysis</span>
+              </Link>
+            )}
+
             <Link
-              href="/dashboard/analyze"
-              className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-5 py-2.5 text-xs rounded-2xl shadow-lg shadow-amber-500/20 transition-all inline-flex items-center gap-1.5 min-h-[44px] sm:min-h-0"
+              href="/dashboard/roadmap"
+              className="px-5 py-3.5 text-xs font-black border border-amber-500/30 text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 rounded-2xl transition-all flex items-center justify-center gap-2"
             >
-              ⚡ + New Analysis
+              <span>🗺️ View 2-Month Plan</span>
             </Link>
-          )}
+          </div>
+        </div>
+
+        {/* Bottom meta row */}
+        <div className="pt-4 border-t border-[#242834] flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-4 text-zinc-400 font-medium">
+            <span>📄 <strong>{resumeCount}</strong> Resume{resumeCount !== 1 ? "s" : ""}</span>
+            <span>•</span>
+            <span>🔍 <strong>{analysisCount}</strong> Job Scan{analysisCount !== 1 ? "s" : ""}</span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Link
+              href="/dashboard/how-to-use"
+              className="text-zinc-400 hover:text-amber-300 text-xs font-bold transition-colors"
+            >
+              📖 System Guide
+            </Link>
+            <span className="text-zinc-700">•</span>
+            <button
+              onClick={() => setShowResetConfirm(true)}
+              className="text-zinc-400 hover:text-rose-400 text-xs font-bold transition-colors"
+            >
+              🔄 Reset Target
+            </button>
+          </div>
         </div>
       </div>
 

@@ -191,7 +191,7 @@ function DashboardContent() {
   return (
     <div className="min-h-screen bg-[#090A0C] text-white py-8 px-4 sm:px-6 lg:px-8 space-y-6 pb-24">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
+        {/* Single Hero Header */}
         <DashboardHeader
           userName={session?.user?.name}
           resumeCount={resumes.length}
@@ -201,38 +201,9 @@ function DashboardContent() {
           onNewAnalysis={() => setShowNewAnalysisModal(true)}
         />
 
-        {/* Smart Next Best Action Banner */}
-        <NextBestActionBanner
-          resumeCount={resumes.length}
-          analysisCount={analyses.length}
-          generalAtsScore={generalAtsScore}
-        />
-
         {/* Industry Selector bar */}
-        <div className="p-5 bg-[#14161D]/80 backdrop-blur-2xl border border-amber-500/20 rounded-3xl text-white shadow-xl">
+        <div className="p-4 bg-[#14161D]/80 backdrop-blur-2xl border border-amber-500/20 rounded-3xl text-white shadow-xl">
           <IndustrySelector onSelectDomain={handleSelectDomain} />
-        </div>
-
-        {/* Workflow Clarity Guidance Card */}
-        <div className="p-6 sm:p-7 bg-[#14161D]/80 backdrop-blur-2xl border border-amber-500/20 rounded-3xl text-white shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-amber-500/10 border border-amber-500/30 text-amber-300">
-              <span>💡 General Baseline vs. Targeted Job Scan</span>
-            </div>
-            <h2 className="text-xl font-black text-white tracking-tight">
-              Ready to apply for a specific job?
-            </h2>
-            <p className="text-xs sm:text-sm text-zinc-400 max-w-2xl leading-relaxed">
-              Your baseline ATS score above and <strong>2-Month Plan</strong> show your overall resume quality. For each job posting you apply to, click <strong>+ New Analysis</strong> to compare requirements, find missing keywords, and get tailored fixes.
-            </p>
-          </div>
-
-          <button
-            onClick={() => setShowNewAnalysisModal(true)}
-            className="px-6 py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-amber-500/20 shrink-0 flex items-center gap-2"
-          >
-            <span>⚡ + New Job Analysis</span>
-          </button>
         </div>
 
         {/* Error banner */}
