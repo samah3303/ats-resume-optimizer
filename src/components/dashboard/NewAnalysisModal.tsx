@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Resume } from "@/types/dashboard";
 
@@ -20,10 +20,15 @@ interface NewAnalysisModalProps {
 export default function NewAnalysisModal({
   open,
   onClose,
-  resumes,
+  resumes: initialResumes,
 }: NewAnalysisModalProps) {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [localResumes, setLocalResumes] = useState<Resume[]>(initialResumes);
   const [selectedResumeId, setSelectedResumeId] = useState<string>("");
+  const [isUploadingResume, setIsUploadingResume] = useState(false);
+
   const [savedJds, setSavedJds] = useState<JdOption[]>([]);
   const [selectedJdId, setSelectedJdId] = useState<string>("");
   const [jdUrl, setJdUrl] = useState("");
@@ -34,13 +39,18 @@ export default function NewAnalysisModal({
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
 
+  // Sync initial resumes
+  useEffect(() => {
+    setLocalResumes(initialResumes);
+  }, [initialResumes]);
+
   // Set default resume
   useEffect(() => {
-    if (resumes.length > 0 && !selectedResumeId) {
-      const primary = resumes.find((r) => r.isPrimary) || resumes[0];
+    if (localResumes.length > 0 && !selectedResumeId) {
+      const primary = localResumes.find((r) => r.isPrimary) || localResumes[0];
       setSelectedResumeId(primary.id);
     }
-  }, [resumes, selectedResumeId]);
+  }, [localResumes, selectedResumeId]);
 
   // Fetch saved job descriptions
   useEffect(() => {
@@ -59,8 +69,7 @@ export default function NewAnalysisModal({
               setInputMode("text");
             }
           }
-        } catch (err) {
-          console.error("Failed to fetch saved jobs", err);
+        } catch {
           setInputMode("text");
         }
       }
@@ -70,11 +79,46 @@ export default function NewAnalysisModal({
 
   if (!open) return null;
 
+  // Handle inline PDF upload
+  const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingResume(true);
+    setStatusMessage("Parsing & uploading PDF resume...");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/resumes", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const newResume: Resume = data.resume;
+        setLocalResumes((prev) => [newResume, ...prev]);
+        setSelectedResumeId(newResume.id);
+        setStatusMessage(`✅ Uploaded "${newResume.name}" PDF successfully!`);
+      } else {
+        const errData = await res.json();
+        setStatusMessage(`⚠️ ${errData.error || "Failed to upload PDF."}`);
+      }
+    } catch {
+      setStatusMessage("⚠️ Failed to parse PDF resume.");
+    } finally {
+      setIsUploadingResume(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
   const handleRunAnalysis = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!selectedResumeId) {
-      setStatusMessage("⚠️ Please select a resume.");
+      setStatusMessage("⚠️ Please select or upload a resume.");
       return;
     }
 
@@ -119,7 +163,6 @@ export default function NewAnalysisModal({
             return;
           }
 
-          // Save extracted job
           setStatusMessage("Saving job description...");
           const createJdRes = await fetch("/api/jds", {
             method: "POST",
@@ -237,25 +280,52 @@ export default function NewAnalysisModal({
         </div>
 
         <form onSubmit={handleRunAnalysis} className="space-y-5">
-          {/* Step 1: Select Resume */}
+          {/* Step 1: Select or Upload Resume */}
           <div className="space-y-2">
-            <label className="text-xs font-black text-amber-300 uppercase tracking-wider block">
-              1. Select Resume:
-            </label>
-            {resumes.length === 0 ? (
-              <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs text-amber-300 font-bold">
-                ⚠️ No resumes uploaded yet. Please upload a resume first.
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-black text-amber-300 uppercase tracking-wider block">
+                1. Select or Upload Resume (PDF / DOCX):
+              </label>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploadingResume || loading}
+                className="px-3 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-black rounded-lg transition-colors flex items-center gap-1"
+              >
+                {isUploadingResume ? (
+                  <>
+                    <span className="w-3 h-3 border border-amber-300 border-t-transparent rounded-full animate-spin" />
+                    <span>Uploading...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>📁 + Upload New PDF</span>
+                  </>
+                )}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,.docx,.doc"
+                onChange={handlePdfUpload}
+                className="hidden"
+              />
+            </div>
+
+            {localResumes.length === 0 ? (
+              <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl text-xs text-amber-300 font-bold flex items-center justify-between">
+                <span>⚠️ No resumes uploaded yet. Click "+ Upload New PDF" above to start.</span>
               </div>
             ) : (
               <select
                 value={selectedResumeId}
                 onChange={(e) => setSelectedResumeId(e.target.value)}
-                disabled={loading}
+                disabled={loading || isUploadingResume}
                 className="w-full px-4 py-3 bg-[#090A0C] border border-[#242834] rounded-2xl text-xs font-bold text-white focus:border-amber-500 focus:outline-none transition-colors"
               >
-                {resumes.map((r) => (
+                {localResumes.map((r) => (
                   <option key={r.id} value={r.id}>
-                    {r.name} {r.isPrimary ? "(Primary Baseline)" : ""}
+                    📄 {r.name} {r.isPrimary ? "(Primary Baseline)" : ""}
                   </option>
                 ))}
               </select>
@@ -328,7 +398,7 @@ export default function NewAnalysisModal({
                   >
                     {savedJds.map((j) => (
                       <option key={j.id} value={j.id}>
-                        {j.title} {j.company ? `(${j.company})` : ""}
+                        💼 {j.title} {j.company ? `(${j.company})` : ""}
                       </option>
                     ))}
                   </select>
@@ -391,14 +461,14 @@ export default function NewAnalysisModal({
             <button
               type="button"
               onClick={onClose}
-              disabled={loading}
+              disabled={loading || isUploadingResume}
               className="px-5 py-3 text-xs font-bold text-zinc-400 hover:text-white transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              disabled={loading || resumes.length === 0}
+              disabled={loading || isUploadingResume || localResumes.length === 0}
               className="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black uppercase tracking-wider rounded-2xl shadow-lg shadow-amber-500/20 transition-all disabled:opacity-50 flex items-center gap-2"
             >
               {loading ? (

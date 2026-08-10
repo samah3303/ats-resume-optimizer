@@ -278,11 +278,10 @@ function AnalysisDetailContent() {
   };
 
   const handleDownloadOptimized = async () => {
-    const acceptedIds = suggestions.filter((s) => s.accepted).map((s) => s.id);
-
+    let acceptedIds = suggestions.filter((s) => s.accepted).map((s) => s.id);
     if (acceptedIds.length === 0) {
-      toast("Please accept at least one suggestion before downloading", "info");
-      return;
+      // Use all suggestions by default for 1-click PDF export
+      acceptedIds = suggestions.map((s) => s.id);
     }
 
     setDownloading(true);
@@ -511,20 +510,20 @@ function AnalysisDetailContent() {
           </div>
           <button
             onClick={handleDownloadOptimized}
-            disabled={downloading || acceptedCount === 0}
-            className="px-6 py-2.5 min-h-[44px] sm:min-h-0 bg-green-600 text-white text-sm font-semibold rounded-xl hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shrink-0"
+            disabled={downloading}
+            className="px-6 py-2.5 min-h-[44px] sm:min-h-0 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black uppercase tracking-wider rounded-2xl shadow-lg shadow-amber-500/20 transition-all disabled:opacity-50 flex items-center gap-2 shrink-0"
           >
             {downloading ? (
               <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Generating...
+                <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                Generating PDF...
               </>
             ) : (
               <>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
-                Download Optimized ({acceptedCount})
+                <span>📥 Download ATS PDF</span>
               </>
             )}
           </button>
