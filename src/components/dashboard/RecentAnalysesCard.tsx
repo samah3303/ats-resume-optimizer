@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import ScoreGauge from "@/components/ScoreGauge";
 import TrafficLightStatus from "@/components/TrafficLightStatus";
 import FixMyResumeWizardModal from "@/components/FixMyResumeWizardModal";
-import ScoreTrendChart from "@/components/ScoreTrendChart";
 import { Analysis } from "@/types/dashboard";
 
 interface RecentAnalysesCardProps {
@@ -22,17 +21,6 @@ export default function RecentAnalysesCard({
 }: RecentAnalysesCardProps) {
   const router = useRouter();
   const [showFixWizard, setShowFixWizard] = useState(false);
-
-  // Map analyses to score trend data
-  const scoreTrendData = analyses
-    .filter((a) => a.overallScore !== null)
-    .slice(0, 15)
-    .reverse()
-    .map((a) => ({
-      score: a.overallScore!,
-      date: a.createdAt,
-      jobTitle: a.jobDescription?.title || undefined,
-    }));
 
   return (
     <>
@@ -58,14 +46,6 @@ export default function RecentAnalysesCard({
             </Link>
           )}
         </div>
-
-        {/* Score Trend Sparkline */}
-        {scoreTrendData.length > 1 && (
-          <div className="px-5 py-3 border-b border-[#242834]">
-            <p className="text-[10px] font-black text-amber-300 uppercase tracking-wider mb-2">Score Trend</p>
-            <ScoreTrendChart scores={scoreTrendData} height={56} />
-          </div>
-        )}
 
         {analyses.length === 0 ? (
           <div className="py-16 text-center px-6 space-y-5">
