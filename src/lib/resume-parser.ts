@@ -21,32 +21,40 @@ if (typeof globalThis.DOMMatrix === "undefined") {
 }
 
 async function parsePdf(buffer: Buffer): Promise<string> {
-  // 1. Try legacy pdf-parse function interface first if available
+  // 1. Primary: pdf-parse v2 API (options object with data property)
+  try {
+    const { PDFParse } = await import("pdf-parse");
+    const uint8 = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+    const parser = new PDFParse({ data: uint8 });
+    const result = await parser.getText();
+    await parser.destroy().catch(() => null);
+
+    const extractedText = typeof result === "string" ? result : result?.text || "";
+    if (extractedText && extractedText.trim()) {
+      return extractedText.trim();
+    }
+  } catch (v2Err) {
+    console.warn("PDF v2 parsing warning:", v2Err);
+  }
+
+  // 2. Fallback: try pdf-parse legacy CJS default function
   try {
     // @ts-ignore
-    const pdfParseModule = await import("pdf-parse/lib/pdf-parse.js").catch(() => null);
-    const pdfParse = pdfParseModule?.default || pdfParseModule;
+    const pdfParseCjs: any = await import("pdf-parse/node").catch(() => null);
+    const pdfParse = pdfParseCjs?.default || pdfParseCjs;
     if (typeof pdfParse === "function") {
       const data = await pdfParse(buffer);
-      if (data?.text) {
+      if (data?.text?.trim()) {
         return data.text.trim();
       }
     }
   } catch (legacyErr) {
-    console.warn("Legacy pdf-parse fallback skipped:", legacyErr);
+    console.warn("PDF legacy parser warning:", legacyErr);
   }
 
-  // 2. Fallback to pdf-parse v2 class API
-  try {
-    const { PDFParse } = await import("pdf-parse");
-    const parser = new PDFParse(new Uint8Array(buffer));
-    const result = await parser.getText();
-    const extractedText = typeof result === "string" ? result : (result as { text: string }).text;
-    return extractedText.trim() || "[No extractable text found in PDF]";
-  } catch (v2Err) {
-    console.error("PDF v2 parsing error:", v2Err);
-    throw new Error("Unable to extract text from PDF. The PDF may be scanned/image-based or corrupted.");
-  }
+  throw new Error(
+    "Unable to extract text from PDF. The PDF may be scanned/image-based or encrypted. Please try another PDF or a DOCX file."
+  );
 }
 
 export async function parseResumeFile(
