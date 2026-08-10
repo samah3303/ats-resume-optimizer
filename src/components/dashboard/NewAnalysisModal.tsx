@@ -4,6 +4,13 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Resume } from "@/types/dashboard";
 
+interface JdOption {
+  id: string;
+  title: string;
+  company?: string | null;
+  rawText: string;
+}
+
 interface NewAnalysisModalProps {
   open: boolean;
   onClose: () => void;
@@ -17,20 +24,49 @@ export default function NewAnalysisModal({
 }: NewAnalysisModalProps) {
   const router = useRouter();
   const [selectedResumeId, setSelectedResumeId] = useState<string>("");
+  const [savedJds, setSavedJds] = useState<JdOption[]>([]);
+  const [selectedJdId, setSelectedJdId] = useState<string>("");
   const [jdUrl, setJdUrl] = useState("");
   const [jdTitle, setJdTitle] = useState("");
   const [jdText, setJdText] = useState("");
-  const [inputMode, setInputMode] = useState<"text" | "url">("text");
+  const [inputMode, setInputMode] = useState<"select" | "text" | "url">("select");
 
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
 
+  // Set default resume
   useEffect(() => {
     if (resumes.length > 0 && !selectedResumeId) {
       const primary = resumes.find((r) => r.isPrimary) || resumes[0];
       setSelectedResumeId(primary.id);
     }
   }, [resumes, selectedResumeId]);
+
+  // Fetch saved job descriptions
+  useEffect(() => {
+    if (open) {
+      async function fetchJds() {
+        try {
+          const res = await fetch("/api/jds");
+          if (res.ok) {
+            const data = await res.json();
+            const list: JdOption[] = data.jds || [];
+            setSavedJds(list);
+            if (list.length > 0) {
+              setSelectedJdId(list[0].id);
+              setInputMode("select");
+            } else {
+              setInputMode("text");
+            }
+          }
+        } catch (err) {
+          console.error("Failed to fetch saved jobs", err);
+          setInputMode("text");
+        }
+      }
+      fetchJds();
+    }
+  }, [open]);
 
   if (!open) return null;
 
@@ -42,15 +78,23 @@ export default function NewAnalysisModal({
       return;
     }
 
-    let finalJdText = jdText.trim();
-    let finalJdTitle = jdTitle.trim() || "Target Job Posting";
-
     setLoading(true);
     setStatusMessage("Preparing job description...");
 
     try {
-      // If URL mode, fetch text first
-      if (inputMode === "url") {
+      let activeJdId: string | null = null;
+
+      // Mode 1: Select already saved job
+      if (inputMode === "select") {
+        if (!selectedJdId) {
+          setStatusMessage("⚠️ Please select a saved job description.");
+          setLoading(false);
+          return;
+        }
+        activeJdId = selectedJdId;
+      }
+      // Mode 2: Import Job Link
+      else if (inputMode === "url") {
         if (!jdUrl.trim()) {
           setStatusMessage("⚠️ Please enter a valid job URL.");
           setLoading(false);
@@ -66,45 +110,67 @@ export default function NewAnalysisModal({
 
         if (urlRes.ok) {
           const urlData = await urlRes.json();
-          finalJdText = urlData.job?.rawText || "";
-          finalJdTitle = urlData.job?.title || "Extracted Job Posting";
+          const fetchedText = urlData.job?.rawText || "";
+          const fetchedTitle = urlData.job?.title || "Extracted Job Posting";
+
+          if (!fetchedText) {
+            setStatusMessage("⚠️ Could not extract job text from link. Switch to Paste Text tab.");
+            setLoading(false);
+            return;
+          }
+
+          // Save extracted job
+          setStatusMessage("Saving job description...");
+          const createJdRes = await fetch("/api/jds", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              title: fetchedTitle,
+              rawText: fetchedText,
+              sourceUrl: jdUrl.trim(),
+            }),
+          });
+
+          if (createJdRes.ok) {
+            const createData = await createJdRes.json();
+            activeJdId = createData.jobDescription?.id || null;
+          }
         } else {
           const errData = await urlRes.json();
-          setStatusMessage(`⚠️ ${errData.error || "Failed to parse URL. Switch to text tab."}`);
+          setStatusMessage(`⚠️ ${errData.error || "Failed to parse URL. Switch to Paste Text tab."}`);
           setLoading(false);
           return;
         }
       }
+      // Mode 3: Paste Text
+      else {
+        const finalJdText = jdText.trim();
+        const finalJdTitle = jdTitle.trim() || "Target Job Posting";
 
-      if (!finalJdText) {
-        setStatusMessage("⚠️ Please provide job description text.");
-        setLoading(false);
-        return;
+        if (!finalJdText) {
+          setStatusMessage("⚠️ Please paste the job description text.");
+          setLoading(false);
+          return;
+        }
+
+        setStatusMessage("Saving job description...");
+        const createJdRes = await fetch("/api/jds", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: finalJdTitle,
+            rawText: finalJdText,
+          }),
+        });
+
+        if (createJdRes.ok) {
+          const createData = await createJdRes.json();
+          activeJdId = createData.jobDescription?.id || null;
+        }
       }
 
-      // Step 1: Create JD record
-      setStatusMessage("Saving job description...");
-      const createJdRes = await fetch("/api/jds", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: finalJdTitle,
-          rawText: finalJdText,
-          sourceUrl: inputMode === "url" ? jdUrl.trim() : undefined,
-        }),
-      });
-
-      if (!createJdRes.ok) {
-        setStatusMessage("⚠️ Failed to save job description.");
-        setLoading(false);
-        return;
-      }
-
-      const jdData = await createJdRes.json();
-      const jdId = jdData.jobDescription?.id;
-
-      if (!jdId) {
-        setStatusMessage("⚠️ Unexpected error saving job description.");
+      if (!activeJdId) {
+        setStatusMessage("⚠️ Failed to process job description. Please try again.");
         setLoading(false);
         return;
       }
@@ -116,7 +182,7 @@ export default function NewAnalysisModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           resumeId: selectedResumeId,
-          jdId: jdId,
+          jdId: activeJdId,
         }),
       });
 
@@ -125,7 +191,6 @@ export default function NewAnalysisModal({
         const analysisId = analyzeData.analysis?.id;
         setStatusMessage("✅ Analysis complete! Opening details report...");
         
-        // Reset form & close modal
         onClose();
         
         if (analysisId) {
@@ -197,13 +262,24 @@ export default function NewAnalysisModal({
             )}
           </div>
 
-          {/* Step 2: Job Details Mode Toggle */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
+          {/* Step 2: Target Job Selection Mode */}
+          <div className="space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <label className="text-xs font-black text-amber-300 uppercase tracking-wider block">
                 2. Target Job Description:
               </label>
               <div className="flex items-center gap-1 p-1 bg-[#090A0C] border border-[#242834] rounded-xl text-[10px] font-bold">
+                <button
+                  type="button"
+                  onClick={() => setInputMode("select")}
+                  className={`px-3 py-1 rounded-lg transition-colors ${
+                    inputMode === "select"
+                      ? "bg-amber-500 text-slate-950 font-black"
+                      : "text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  Saved Jobs ({savedJds.length})
+                </button>
                 <button
                   type="button"
                   onClick={() => setInputMode("text")}
@@ -224,23 +300,55 @@ export default function NewAnalysisModal({
                       : "text-zinc-400 hover:text-white"
                   }`}
                 >
-                  Import Job Link
+                  Import Link
                 </button>
               </div>
             </div>
 
-            {inputMode === "text" ? (
+            {/* Mode 1: Select Saved Job */}
+            {inputMode === "select" && (
+              <div className="space-y-2">
+                {savedJds.length === 0 ? (
+                  <div className="p-4 bg-[#090A0C] border border-[#242834] rounded-2xl text-xs text-zinc-400 text-center space-y-2">
+                    <p>No saved job descriptions found in your library yet.</p>
+                    <button
+                      type="button"
+                      onClick={() => setInputMode("text")}
+                      className="text-amber-400 font-bold hover:underline"
+                    >
+                      + Paste job description text instead
+                    </button>
+                  </div>
+                ) : (
+                  <select
+                    value={selectedJdId}
+                    onChange={(e) => setSelectedJdId(e.target.value)}
+                    disabled={loading}
+                    className="w-full px-4 py-3 bg-[#090A0C] border border-[#242834] rounded-2xl text-xs font-bold text-white focus:border-amber-500 focus:outline-none transition-colors"
+                  >
+                    {savedJds.map((j) => (
+                      <option key={j.id} value={j.id}>
+                        {j.title} {j.company ? `(${j.company})` : ""}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+            )}
+
+            {/* Mode 2: Paste Text */}
+            {inputMode === "text" && (
               <div className="space-y-3">
                 <input
                   type="text"
-                  placeholder="Job Title (e.g. Senior Software Engineer)"
+                  placeholder="Job Title (e.g. Associate Staff Engineer)"
                   value={jdTitle}
                   onChange={(e) => setJdTitle(e.target.value)}
                   disabled={loading}
                   className="w-full px-4 py-2.5 bg-[#090A0C] border border-[#242834] rounded-2xl text-xs font-medium text-white placeholder-zinc-500 focus:border-amber-500 focus:outline-none"
                 />
                 <textarea
-                  rows={6}
+                  rows={5}
                   placeholder="Paste job posting description requirements & qualifications text here..."
                   value={jdText}
                   onChange={(e) => setJdText(e.target.value)}
@@ -248,7 +356,10 @@ export default function NewAnalysisModal({
                   className="w-full p-4 bg-[#090A0C] border border-[#242834] rounded-2xl text-xs font-medium text-white placeholder-zinc-500 focus:border-amber-500 focus:outline-none resize-none"
                 />
               </div>
-            ) : (
+            )}
+
+            {/* Mode 3: Import Link */}
+            {inputMode === "url" && (
               <div className="space-y-2">
                 <input
                   type="url"
