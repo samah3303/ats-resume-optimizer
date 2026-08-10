@@ -151,7 +151,7 @@ export default function RecentAnalysesCard({
                         href={`/dashboard/analyze/${analysis.id}`}
                         className="px-3 py-1.5 rounded-xl text-xs font-black bg-amber-500/10 text-amber-300 border border-amber-500/30 hover:bg-amber-500 hover:text-slate-950 transition-all inline-flex items-center gap-1 shadow-sm"
                       >
-                        <span>View Details</span>
+                        <span>View</span>
                         <span>→</span>
                       </Link>
                     </td>

@@ -32,7 +32,7 @@ export default function TrafficLightStatus({ score, size = "md" }: TrafficLightS
     return (
       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black border ${badgeBg}`}>
         <span className={`w-2 h-2 rounded-full ${dotColor} animate-pulse`} />
-        <span>{label} ({score}%)</span>
+        <span>{score}%</span>
       </span>
     );
   }
