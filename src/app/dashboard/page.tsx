@@ -217,17 +217,8 @@ function DashboardContent() {
           onNewAnalysis={() => setShowNewAnalysisModal(true)}
         />
 
-        {/* Resumes List with Primary toggle */}
-        <ResumeListCard
-          resumes={resumes}
-          onChangePrimary={handleChangePrimaryResume}
-        />
-
-        {/* Onboarding Insights Accordion & Roadmap */}
+        {/* Onboarding Profile & Insights */}
         <OnboardingInsights
-          roadmap={roadmap}
-          roadmapLoading={roadmapLoading}
-          onRegenRoadmap={handleRegenRoadmap}
           onResetOnboarding={handleResetOnboarding}
           linkedinTips={linkedinTips}
           resumeImprovements={resumeImprovements}
