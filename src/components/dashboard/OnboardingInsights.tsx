@@ -240,18 +240,18 @@ export default function OnboardingInsights({
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30">
-                        {item.area || "General Improvement"}
+                        {item.section || "General Improvement"}
                       </span>
                       <span className="text-[10px] font-bold text-zinc-500">
                         Priority {i + 1}
                       </span>
                     </div>
                     <p className="text-xs text-zinc-300 font-medium leading-relaxed">
-                      {item.suggestion}
+                      {item.suggested || item.current}
                     </p>
-                    {item.rationale && (
+                    {item.reason && (
                       <p className="text-[11px] text-zinc-400 italic">
-                        💡 {item.rationale}
+                        💡 {item.reason}
                       </p>
                     )}
                   </div>
