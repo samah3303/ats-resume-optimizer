@@ -16,14 +16,14 @@ const quickActions: QuickAction[] = [
     href: "/dashboard",
   },
   {
-    label: "Paste Job URL",
-    emoji: "🔗",
-    href: "/dashboard/studio",
+    label: "View Jobs",
+    emoji: "💼",
+    href: "/dashboard/jds",
   },
   {
     label: "Scan Resume",
     emoji: "📸",
-    href: "/dashboard/studio",
+    href: "/dashboard",
   },
 ];
 

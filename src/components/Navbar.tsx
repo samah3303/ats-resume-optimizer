@@ -7,10 +7,10 @@ import ProfileDropdown from "./ProfileDropdown";
 import Logo from "./Logo";
 
 const navLinks = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/dashboard/studio", label: "Studio ⚡" },
-  { href: "/dashboard/roadmap", label: "2-Month Roadmap 🗺️" },
-  { href: "/dashboard/jds", label: "Jobs 🔎" },
+  { href: "/dashboard", label: "Home 🏠" },
+  { href: "/dashboard/roadmap", label: "2-Month Plan 🗺️" },
+  { href: "/dashboard/resumes", label: "Resumes 📄" },
+  { href: "/dashboard/jds", label: "Jobs 💼" },
   { href: "/dashboard/tools", label: "All Tools 🧩" },
 ];
 
@@ -54,16 +54,7 @@ export default function Navbar() {
           {/* Auth area */}
           <div className="flex items-center gap-3">
             {session ? (
-              <div className="flex items-center gap-3">
-                <Link
-                  href="/dashboard/studio"
-                  className="md:hidden px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition-colors"
-                  aria-label="Open Studio"
-                >
-                  Studio ⚡
-                </Link>
-                <ProfileDropdown />
-              </div>
+              <ProfileDropdown />
             ) : (
               <button
                 onClick={() => signIn(undefined, { callbackUrl: "/dashboard" })}

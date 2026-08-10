@@ -13,6 +13,7 @@ import OnboardingInsights from "@/components/dashboard/OnboardingInsights";
 import EditOnboardingModal from "@/components/dashboard/EditOnboardingModal";
 import IndustrySelector, { IndustryDomain } from "@/components/IndustrySelector";
 import NextBestActionBanner from "@/components/NextBestActionBanner";
+import NewAnalysisModal from "@/components/dashboard/NewAnalysisModal";
 import {
   Resume,
   Analysis,
@@ -36,6 +37,7 @@ function DashboardContent() {
     useState<OnboardingProfileData | null>(null);
   const [dataError, setDataError] = useState<string | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showNewAnalysisModal, setShowNewAnalysisModal] = useState(false);
 
   // Accordion state for onboarding insights
   const [expandedInsight, setExpandedInsight] = useState<string | null>(
@@ -196,6 +198,7 @@ function DashboardContent() {
           analysisCount={analyses.length}
           generalAtsScore={generalAtsScore}
           onResetOnboarding={handleResetOnboarding}
+          onNewAnalysis={() => setShowNewAnalysisModal(true)}
         />
 
         {/* Smart Next Best Action Banner */}
@@ -210,29 +213,26 @@ function DashboardContent() {
           <IndustrySelector onSelectDomain={handleSelectDomain} />
         </div>
 
-        {/* Studio Hero Feature Banner */}
-        <div className="p-6 sm:p-8 bg-[#14161D]/80 backdrop-blur-2xl border border-amber-500/20 rounded-3xl text-white shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
+        {/* Workflow Clarity Guidance Card */}
+        <div className="p-6 sm:p-7 bg-[#14161D]/80 backdrop-blur-2xl border border-amber-500/20 rounded-3xl text-white shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-amber-500/10 border border-amber-500/30 text-amber-300">
-              <span>🚀 Primary Feature</span>
-              <span>•</span>
-              <span>1-Click Application Studio</span>
+              <span>💡 General Baseline vs. Targeted Job Scan</span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-              Optimize Resumes & Target Job Postings in 1 Screen
+            <h2 className="text-xl font-black text-white tracking-tight">
+              Ready to apply for a specific job?
             </h2>
-            <p className="text-xs sm:text-sm text-zinc-400 max-w-xl">
-              Import job postings directly from URL, audit ATS scannability with live step-by-step progress, apply instant STAR bullet fixes, and sync to your Kanban tracker.
+            <p className="text-xs sm:text-sm text-zinc-400 max-w-2xl leading-relaxed">
+              Your baseline ATS score above and <strong>2-Month Plan</strong> show your overall resume quality. For each job posting you apply to, click <strong>+ New Analysis</strong> to compare requirements, find missing keywords, and get tailored fixes.
             </p>
           </div>
 
-          <Link
-            href="/dashboard/studio"
+          <button
+            onClick={() => setShowNewAnalysisModal(true)}
             className="px-6 py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-amber-500/20 shrink-0 flex items-center gap-2"
           >
-            <span>Launch Studio</span>
-            <span>→</span>
-          </Link>
+            <span>⚡ + New Job Analysis</span>
+          </button>
         </div>
 
         {/* Error banner */}
@@ -253,6 +253,7 @@ function DashboardContent() {
           analyses={analyses}
           generalAtsScore={generalAtsScore}
           onEditOnboarding={() => setShowEditModal(true)}
+          onNewAnalysis={() => setShowNewAnalysisModal(true)}
         />
 
         {/* Resumes List with Primary toggle */}
@@ -261,7 +262,7 @@ function DashboardContent() {
           onChangePrimary={handleChangePrimaryResume}
         />
 
-        {/* Onboarding Insights Accordion */}
+        {/* Onboarding Insights Accordion & Roadmap */}
         <OnboardingInsights
           roadmap={roadmap}
           roadmapLoading={roadmapLoading}
@@ -283,6 +284,13 @@ function DashboardContent() {
           }}
           resumes={resumes}
           profile={onboardingProfile}
+        />
+
+        {/* New Job Analysis Popup Modal */}
+        <NewAnalysisModal
+          open={showNewAnalysisModal}
+          onClose={() => setShowNewAnalysisModal(false)}
+          resumes={resumes}
         />
       </div>
     </div>

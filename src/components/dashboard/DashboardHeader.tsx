@@ -8,6 +8,7 @@ interface DashboardHeaderProps {
   analysisCount: number;
   generalAtsScore: number | null;
   onResetOnboarding: () => void;
+  onNewAnalysis?: () => void;
 }
 
 export default function DashboardHeader({
@@ -16,6 +17,7 @@ export default function DashboardHeader({
   analysisCount,
   generalAtsScore,
   onResetOnboarding,
+  onNewAnalysis,
 }: DashboardHeaderProps) {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
@@ -58,14 +60,23 @@ export default function DashboardHeader({
             href="/dashboard/how-to-use"
             className="px-4 py-2.5 text-xs font-bold border border-amber-500/30 text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 rounded-2xl transition-all inline-flex items-center gap-1.5 min-h-[44px] sm:min-h-0"
           >
-            <span aria-hidden="true">📖</span> How to Use
+            <span aria-hidden="true">📖</span> Guide
           </Link>
-          <Link
-            href="/dashboard/studio"
-            className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-5 py-2.5 text-xs rounded-2xl shadow-lg shadow-amber-500/20 transition-all inline-flex items-center gap-1.5 min-h-[44px] sm:min-h-0"
-          >
-            ⚡ 1-Click Studio
-          </Link>
+          {onNewAnalysis ? (
+            <button
+              onClick={onNewAnalysis}
+              className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-5 py-2.5 text-xs rounded-2xl shadow-lg shadow-amber-500/20 transition-all inline-flex items-center gap-1.5 min-h-[44px] sm:min-h-0"
+            >
+              ⚡ + New Analysis
+            </button>
+          ) : (
+            <Link
+              href="/dashboard/analyze"
+              className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-5 py-2.5 text-xs rounded-2xl shadow-lg shadow-amber-500/20 transition-all inline-flex items-center gap-1.5 min-h-[44px] sm:min-h-0"
+            >
+              ⚡ + New Analysis
+            </Link>
+          )}
         </div>
       </div>
 

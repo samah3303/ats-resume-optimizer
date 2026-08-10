@@ -5,9 +5,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const mobileLinks = [
-  { href: "/dashboard/studio", label: "Studio", emoji: "⚡" },
-  { href: "/dashboard/roadmap", label: "Roadmap", emoji: "🗺️" },
-  { href: "/dashboard/jds", label: "Jobs", emoji: "🔎" },
+  { href: "/dashboard", label: "Home", emoji: "🏠" },
+  { href: "/dashboard/roadmap", label: "Plan", emoji: "🗺️" },
+  { href: "/dashboard/resumes", label: "Resumes", emoji: "📄" },
+  { href: "/dashboard/jds", label: "Jobs", emoji: "💼" },
   { href: "/dashboard/tools", label: "Tools", emoji: "🧩" },
 ];
 
@@ -29,9 +30,9 @@ export default function MobileNav() {
       {/* Glassmorphic backdrop with carbon black / warm yellow theme */}
       <div className="absolute inset-0 bg-white/95 dark:bg-[#0D0E11]/95 backdrop-blur-xl border-t border-amber-500/20 shadow-2xl" />
 
-      {/* Fixed 4-Column Touch Target Grid */}
+      {/* Fixed 5-Column Touch Target Grid */}
       <div
-        className="relative grid grid-cols-4 items-center px-1.5 py-1"
+        className="relative grid grid-cols-5 items-center px-1 py-1"
         style={{
           paddingBottom: "max(env(safe-area-inset-bottom, 0px), 6px)",
           height: "calc(60px + env(safe-area-inset-bottom, 0px))",
@@ -39,8 +40,8 @@ export default function MobileNav() {
       >
         {mobileLinks.map((link) => {
           const isActive =
-            link.href === "/dashboard/studio"
-              ? pathname === "/dashboard/studio" || pathname === "/dashboard" || pathname === "/dashboard/analyze"
+            link.href === "/dashboard"
+              ? pathname === "/dashboard"
               : pathname.startsWith(link.href);
 
           return (

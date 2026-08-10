@@ -15,7 +15,7 @@ const commands: CommandItem[] = [
   {
     id: "run-ats-scan",
     title: "Run ATS Scan",
-    href: "/dashboard/studio",
+    href: "/dashboard",
     icon: "⚡",
     description: "Scan & optimize resume against job description",
   },
