@@ -36,55 +36,6 @@ export default function RecentAnalysesCard({
 
   return (
     <>
-      {/* General ATS Score (from onboarding) */}
-      {generalAtsScore !== null && (
-        <div className="bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-amber-500/20 p-6 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6 text-white">
-          <div className="flex flex-col sm:flex-row items-center gap-6">
-            <div className="shrink-0">
-              <ScoreGauge score={generalAtsScore} size={100} />
-            </div>
-            <div className="space-y-2 text-center sm:text-left">
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                <h3 className="text-lg font-black text-white">
-                  General Baseline ATS Score
-                </h3>
-                <TrafficLightStatus score={generalAtsScore} size="sm" />
-              </div>
-              <p className="text-xs text-zinc-400 leading-relaxed max-w-2xl">
-                This baseline score reflects your overall resume scannability. To target a specific job description, click <strong>+ New Analysis</strong> below.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0 w-full sm:w-auto">
-            <button
-              onClick={() => setShowFixWizard(true)}
-              className="w-full sm:w-auto px-5 py-3 text-xs font-black text-slate-950 bg-amber-500 hover:bg-amber-400 rounded-2xl shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-1.5"
-            >
-              <span>⚡ Fix My Resume (1-Click)</span>
-            </button>
-            {onEditOnboarding && (
-              <button
-                onClick={onEditOnboarding}
-                className="w-full sm:w-auto px-4 py-3 text-xs font-black text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-2xl transition-all flex items-center justify-center gap-1.5"
-                title="Edit target positions, country, or primary resume and re-analyze"
-              >
-                <span>✏️</span> Edit Target
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* 1-Click Fix Wizard Modal */}
-      <FixMyResumeWizardModal
-        open={showFixWizard}
-        onClose={() => setShowFixWizard(false)}
-        overallScore={generalAtsScore || 70}
-        suggestions={[]}
-        missingSkills={["System Architecture", "SQL Database Optimization", "Cross-Functional Leadership"]}
-      />
-
       {/* Analyses table */}
       <div className="bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] overflow-hidden text-white shadow-xl">
         <div className="flex items-center justify-between p-5 border-b border-[#242834]">

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import TrafficLightStatus from "@/components/TrafficLightStatus";
+import ScoreGauge from "@/components/ScoreGauge";
+import FixMyResumeWizardModal from "@/components/FixMyResumeWizardModal";
 import { useState } from "react";
 
 interface DashboardHeaderProps {
@@ -10,6 +12,7 @@ interface DashboardHeaderProps {
   generalAtsScore: number | null;
   onResetOnboarding: () => void;
   onNewAnalysis?: () => void;
+  onEditOnboarding?: () => void;
 }
 
 export default function DashboardHeader({
@@ -19,55 +22,74 @@ export default function DashboardHeader({
   generalAtsScore,
   onResetOnboarding,
   onNewAnalysis,
+  onEditOnboarding,
 }: DashboardHeaderProps) {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showFixWizard, setShowFixWizard] = useState(false);
 
   return (
     <>
       <div className="bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-amber-500/20 p-6 sm:p-8 text-white shadow-2xl space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30">
-                Job Search Dashboard
-              </span>
-              {generalAtsScore !== null && (
-                <TrafficLightStatus score={generalAtsScore} size="sm" />
-              )}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          
+          {/* Left: Score Gauge + Welcome Message */}
+          <div className="flex flex-col sm:flex-row items-center sm:items-start lg:items-center gap-6">
+            {generalAtsScore !== null && (
+              <div className="shrink-0">
+                <ScoreGauge score={generalAtsScore} size={96} />
+              </div>
+            )}
+            <div className="space-y-2 text-center sm:text-left">
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                  Welcome back, {userName?.split(" ")[0] || "Candidate"}!
+                </h1>
+                {generalAtsScore !== null && (
+                  <TrafficLightStatus score={generalAtsScore} size="sm" />
+                )}
+              </div>
+              <p className="text-xs sm:text-sm text-zinc-400 max-w-xl leading-relaxed">
+                {generalAtsScore !== null
+                  ? `Your baseline resume score is ${generalAtsScore}%. Target a specific job posting or follow your 2-Month Plan.`
+                  : "Upload your resume to get your baseline ATS score and start applying."}
+              </p>
             </div>
-            <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-              Welcome back, {userName?.split(" ")[0] || "Candidate"}!
-            </h1>
-            <p className="text-xs sm:text-sm text-zinc-400 max-w-xl leading-relaxed">
-              {generalAtsScore !== null
-                ? `Your baseline resume score is ${generalAtsScore}%. Ready to apply for a job? Run a targeted job analysis or follow your 2-Month Plan.`
-                : "Upload your resume to get your baseline ATS score and start applying."}
-            </p>
           </div>
 
+          {/* Right: Primary Action Buttons */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
             {onNewAnalysis ? (
               <button
                 onClick={onNewAnalysis}
-                className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-6 py-3.5 text-xs rounded-2xl shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2"
+                className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-5 py-3 text-xs rounded-2xl shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2"
               >
                 <span>⚡ + Run New Analysis</span>
               </button>
             ) : (
               <Link
                 href="/dashboard/analyze"
-                className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-6 py-3.5 text-xs rounded-2xl shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2"
+                className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-5 py-3 text-xs rounded-2xl shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2"
               >
                 <span>⚡ + Run New Analysis</span>
               </Link>
             )}
 
-            <Link
-              href="/dashboard/roadmap"
-              className="px-5 py-3.5 text-xs font-black border border-amber-500/30 text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 rounded-2xl transition-all flex items-center justify-center gap-2"
+            <button
+              onClick={() => setShowFixWizard(true)}
+              className="px-5 py-3 text-xs font-black text-slate-950 bg-amber-500 hover:bg-amber-400 rounded-2xl shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-1.5"
             >
-              <span>🗺️ View 2-Month Plan</span>
-            </Link>
+              <span>⚡ Fix My Resume</span>
+            </button>
+
+            {onEditOnboarding && (
+              <button
+                onClick={onEditOnboarding}
+                className="px-4 py-3 text-xs font-black text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-2xl transition-all flex items-center justify-center gap-1.5"
+                title="Edit target positions, country, or primary resume"
+              >
+                <span>✏️ Edit Target</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -80,6 +102,13 @@ export default function DashboardHeader({
           </div>
 
           <div className="flex items-center gap-3">
+            <Link
+              href="/dashboard/roadmap"
+              className="text-amber-400 hover:underline text-xs font-black transition-colors flex items-center gap-1"
+            >
+              <span>🗺️ 2-Month Plan</span>
+            </Link>
+            <span className="text-zinc-700">•</span>
             <Link
               href="/dashboard/how-to-use"
               className="text-zinc-400 hover:text-amber-300 text-xs font-bold transition-colors"
@@ -96,6 +125,15 @@ export default function DashboardHeader({
           </div>
         </div>
       </div>
+
+      {/* 1-Click Fix Wizard Modal */}
+      <FixMyResumeWizardModal
+        open={showFixWizard}
+        onClose={() => setShowFixWizard(false)}
+        overallScore={generalAtsScore || 70}
+        suggestions={[]}
+        missingSkills={["System Architecture", "SQL Database Optimization", "Cross-Functional Leadership"]}
+      />
 
       {/* Reset confirmation modal */}
       <ConfirmDialog

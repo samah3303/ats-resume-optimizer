@@ -193,6 +193,7 @@ function DashboardContent() {
           generalAtsScore={generalAtsScore}
           onResetOnboarding={handleResetOnboarding}
           onNewAnalysis={() => setShowNewAnalysisModal(true)}
+          onEditOnboarding={() => setShowEditModal(true)}
         />
 
         {/* Error banner */}
