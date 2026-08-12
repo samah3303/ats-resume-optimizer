@@ -3,7 +3,10 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback, type ChangeEvent } from "react";
+import Link from "next/link";
 import ResumeUploader from "@/components/ResumeUploader";
+import DriveDocumentPreviewModal from "@/components/DriveDocumentPreviewModal";
+import { useToast } from "@/components/Toast";
 
 interface Resume {
   id: string;
@@ -25,9 +28,11 @@ function getDocTypeBadge(docType: string | null, name: string) {
 export default function ResumesPage() {
   const { status } = useSession();
   const router = useRouter();
+  const { toast } = useToast();
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [previewResume, setPreviewResume] = useState<Resume | null>(null);
 
   const fetchResumes = useCallback(async () => {
     try {
@@ -60,9 +65,10 @@ export default function ResumesPage() {
       const res = await fetch(`/api/resumes/${id}`, { method: "DELETE" });
       if (res.ok) {
         setResumes((prev) => prev.filter((r) => r.id !== id));
+        toast("Resume deleted", "success");
       }
     } catch {
-      // silently fail
+      toast("Failed to delete resume", "error");
     } finally {
       setDeletingId(null);
     }
@@ -85,14 +91,16 @@ export default function ResumesPage() {
                 : r
           )
         );
+        toast("Primary resume updated!", "success");
       }
     } catch {
-      // silently fail
+      toast("Failed to update primary resume", "error");
     }
   };
 
   const handleUploaded = () => {
     fetchResumes();
+    toast("Resume uploaded successfully!", "success");
   };
 
   const [compactUploading, setCompactUploading] = useState(false);
@@ -106,9 +114,12 @@ export default function ResumesPage() {
       const res = await fetch("/api/resumes", { method: "POST", body: formData });
       if (res.ok) {
         fetchResumes();
+        toast("Resume uploaded successfully!", "success");
+      } else {
+        toast("Failed to upload resume", "error");
       }
     } catch {
-      // silently fail
+      toast("Failed to upload resume", "error");
     } finally {
       setCompactUploading(false);
     }
@@ -127,16 +138,21 @@ export default function ResumesPage() {
   return (
     <div className="min-h-screen bg-[#090A0C] text-white py-8 px-4 sm:px-6 lg:px-8 space-y-6 pb-24">
       <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight">Resume Vault</h1>
+            <div className="flex items-center gap-2">
+              <Link href="/dashboard" className="text-xs font-bold text-amber-400 hover:underline">
+                ← Back to Dashboard
+              </Link>
+            </div>
+            <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight mt-1">Resume Vault & Document Viewer</h1>
             <p className="text-xs sm:text-sm text-zinc-400 mt-1">
-              {resumes.length} resume{resumes.length !== 1 ? "s" : ""} stored for ATS parsing & multi-agent optimization
+              {resumes.length} resume{resumes.length !== 1 ? "s" : ""} stored with Google Drive-style document content preview
             </p>
           </div>
         </div>
 
-        {/* Upload Area */}
+        {/* Upload Action */}
         {resumes.length === 0 ? (
           <div className="mb-8">
             <ResumeUploader onUploaded={handleUploaded} />
@@ -165,7 +181,7 @@ export default function ResumesPage() {
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
-                  Browse & Upload Resume
+                  Browse & Upload New Resume
                 </>
               )}
             </label>
@@ -181,15 +197,16 @@ export default function ResumesPage() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {resumes.map((resume) => {
               const badge = getDocTypeBadge(resume.docType, resume.name);
               return (
                 <div
                   key={resume.id}
-                  className="bg-[#14161D]/80 backdrop-blur-xl rounded-3xl border border-[#242834] hover:border-amber-500/40 p-6 shadow-xl transition-all flex flex-col justify-between space-y-4 group"
+                  className="bg-[#14161D]/90 backdrop-blur-xl rounded-3xl border border-[#242834] hover:border-amber-500/40 p-6 shadow-xl transition-all flex flex-col justify-between space-y-4 group"
                 >
                   <div className="space-y-3">
+                    {/* Tile Header */}
                     <div className="flex items-start justify-between border-b border-[#242834] pb-3">
                       <div className="flex items-center gap-2.5 min-w-0">
                         <span className="text-2xl">📄</span>
@@ -210,34 +227,59 @@ export default function ResumesPage() {
                         </div>
                       </div>
                       {resume.isPrimary && (
-                        <span className="px-2.5 py-1 bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black rounded-full">
+                        <span className="px-2.5 py-1 bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black rounded-full shrink-0">
                           PRIMARY
                         </span>
                       )}
                     </div>
 
-                    <p className="text-xs text-zinc-300 line-clamp-3 leading-relaxed break-words">
-                      {resume.parsedText?.slice(0, 180) || "No text extracted"}
-                    </p>
+                    {/* Google Drive Style Document Sheet Container inside Tile */}
+                    <div className="relative rounded-2xl bg-[#090A0C] border border-[#242834] p-4 h-52 overflow-y-auto space-y-2 group-hover:border-amber-500/30 transition-colors">
+                      <div className="flex items-center justify-between border-b border-[#1E2230] pb-2 text-[10px] font-mono text-amber-400">
+                        <span className="font-black uppercase tracking-wider">Document Preview Page</span>
+                        <span className="text-zinc-500">Google Drive Style</span>
+                      </div>
+                      <p className="text-xs text-zinc-300 font-sans leading-relaxed whitespace-pre-wrap break-words">
+                        {resume.parsedText || "No text extracted from document."}
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-3 border-t border-[#242834]">
-                    <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-zinc-300">
-                      <input
-                        type="checkbox"
-                        checked={resume.isPrimary}
-                        onChange={(e) => handleSetPrimary(resume.id, e.target.checked)}
-                        className="w-4 h-4 rounded text-amber-500 accent-amber-500"
-                      />
-                      <span>Set Primary</span>
-                    </label>
-                    <button
-                      onClick={() => handleDelete(resume.id)}
-                      disabled={deletingId === resume.id}
-                      className="px-3 py-1.5 text-xs font-bold text-rose-400 hover:bg-rose-950/50 rounded-xl transition-colors disabled:opacity-50"
-                    >
-                      {deletingId === resume.id ? "Deleting..." : "Delete"}
-                    </button>
+                  {/* Tile Actions */}
+                  <div className="space-y-3 pt-2">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setPreviewResume(resume)}
+                        className="flex-1 px-3 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1"
+                      >
+                        <span>🔍 Drive Full Page View</span>
+                      </button>
+                      <Link
+                        href="/dashboard"
+                        className="px-3 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1"
+                      >
+                        <span>⚡ Run Scan</span>
+                      </Link>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-[#242834]">
+                      <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-zinc-300">
+                        <input
+                          type="checkbox"
+                          checked={resume.isPrimary}
+                          onChange={(e) => handleSetPrimary(resume.id, e.target.checked)}
+                          className="w-4 h-4 rounded text-amber-500 accent-amber-500"
+                        />
+                        <span>Set Primary</span>
+                      </label>
+                      <button
+                        onClick={() => handleDelete(resume.id)}
+                        disabled={deletingId === resume.id}
+                        className="px-3 py-1.5 text-xs font-bold text-rose-400 hover:bg-rose-950/50 rounded-xl transition-colors disabled:opacity-50"
+                      >
+                        {deletingId === resume.id ? "Deleting..." : "Delete"}
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
@@ -246,7 +288,7 @@ export default function ResumesPage() {
             {/* Inline Add Card */}
             <label
               htmlFor="resume-upload"
-              className="bg-[#14161D]/40 rounded-3xl border-2 border-dashed border-[#242834] hover:border-amber-500/50 flex flex-col items-center justify-center p-6 min-h-[220px] text-zinc-400 hover:text-amber-300 transition-all cursor-pointer group"
+              className="bg-[#14161D]/40 rounded-3xl border-2 border-dashed border-[#242834] hover:border-amber-500/50 flex flex-col items-center justify-center p-6 min-h-[300px] text-zinc-400 hover:text-amber-300 transition-all cursor-pointer group"
             >
               <span className="text-4xl mb-2 group-hover:scale-110 transition-transform text-amber-400">+</span>
               <span className="text-xs font-extrabold uppercase tracking-wider text-white">Upload New Resume</span>
@@ -254,6 +296,19 @@ export default function ResumesPage() {
           </div>
         )}
       </div>
+
+      {/* Drive Document Viewer Modal */}
+      {previewResume && (
+        <DriveDocumentPreviewModal
+          isOpen={Boolean(previewResume)}
+          onClose={() => setPreviewResume(null)}
+          resumeName={previewResume.name}
+          parsedText={previewResume.parsedText}
+          docType={previewResume.docType}
+          createdAt={previewResume.createdAt}
+          isPrimary={previewResume.isPrimary}
+        />
+      )}
     </div>
   );
 }
