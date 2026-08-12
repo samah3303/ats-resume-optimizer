@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useToast } from "@/components/Toast";
+import { isHumanReadableText } from "@/lib/resume-parser";
 
 interface DriveDocumentPreviewModalProps {
   isOpen: boolean;
@@ -95,16 +96,25 @@ export default function DriveDocumentPreviewModal({
             </div>
 
             {/* Document Content */}
-            {paragraphs.length > 0 ? (
+            {parsedText && isHumanReadableText(parsedText) ? (
               paragraphs.map((para, idx) => (
                 <p key={idx} className="whitespace-pre-wrap leading-relaxed text-zinc-300 font-normal">
                   {para}
                 </p>
               ))
             ) : (
-              <p className="text-zinc-500 italic py-12 text-center">
-                No text extracted from this document.
-              </p>
+              <div className="p-6 bg-rose-950/40 border border-rose-800/50 rounded-2xl text-center space-y-3 my-8">
+                <span className="text-3xl">⚠️</span>
+                <h4 className="text-sm font-black text-rose-300">
+                  Unreadable Custom Font Subset PDF
+                </h4>
+                <p className="text-xs text-zinc-300 leading-relaxed max-w-lg mx-auto">
+                  This PDF was saved using custom font subset encodings (common in Canva/Figma design exports), causing character byte mapping to display as random symbols (<code className="text-rose-400 font-mono">9%*;!&8, & $3/"O#</code>).
+                </p>
+                <p className="text-xs font-bold text-amber-300">
+                  💡 Fix: Re-export your resume as a standard text PDF (from Word / Google Docs) or upload as DOCX.
+                </p>
+              </div>
             )}
           </div>
         </div>

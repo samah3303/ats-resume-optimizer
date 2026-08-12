@@ -23,26 +23,39 @@ if (typeof globalThis.DOMMatrix === "undefined") {
 
 /**
  * Validates whether an extracted string is readable human text
- * (at least 80% standard printable ASCII or common Unicode characters).
+ * with genuine words and standard alphanumeric ratio (eliminating custom font encoding garble).
  */
-function isReadableText(str: string): boolean {
-  if (!str || str.trim().length === 0) return false;
-  let printableCount = 0;
-  for (let i = 0; i < str.length; i++) {
-    const code = str.charCodeAt(i);
-    // Standard printable ASCII (space to ~), tabs, newlines, carriage returns, or extended latin
+export function isHumanReadableText(str: string): boolean {
+  if (!str || str.trim().length < 5) return false;
+  const clean = str.trim();
+  let normalCount = 0;
+  let symbolNoiseCount = 0;
+
+  for (let i = 0; i < clean.length; i++) {
+    const char = clean[i];
+    const code = clean.charCodeAt(i);
+
     if (
-      (code >= 32 && code <= 126) ||
-      code === 10 ||
-      code === 13 ||
-      code === 9 ||
-      (code >= 160 && code <= 383)
+      (code >= 48 && code <= 57) ||   // 0-9
+      (code >= 65 && code <= 90) ||   // A-Z
+      (code >= 97 && code <= 122) ||  // a-z
+      code === 32 || code === 10 || code === 13 || code === 9 || // spaces/newlines
+      (code >= 160 && code <= 383) || // extended latin
+      (code >= 1536 && code <= 1791)  // Arabic characters
     ) {
-      printableCount++;
+      normalCount++;
+    } else if (/[.,\-_@:\/()+|]/.test(char)) {
+      normalCount++;
+    } else if (/[%*;!&$\"#^~`<>=?\\{}[\]]/.test(char)) {
+      symbolNoiseCount++;
     }
   }
-  const ratio = printableCount / str.length;
-  return ratio > 0.8;
+
+  const normalRatio = normalCount / clean.length;
+  const noiseRatio = symbolNoiseCount / clean.length;
+
+  // Real human text must be at least 70% normal letters/digits/spaces AND less than 15% symbol noise!
+  return normalRatio >= 0.70 && noiseRatio < 0.15;
 }
 
 /**
@@ -96,7 +109,7 @@ function parsePdfFlateStreams(buffer: Buffer): string {
     }
 
     const result = chunks.join(" ").replace(/\s+/g, " ").trim();
-    if (isReadableText(result)) {
+    if (isHumanReadableText(result)) {
       return result;
     }
     return "";
@@ -124,7 +137,7 @@ async function parsePdf(buffer: Buffer): Promise<string> {
     // Clean up page markers like "-- 1 of 2 --"
     text = text.replace(/--\s*\d+\s*of\s*\d+\s*--/gi, "").trim();
 
-    if (text && text.length > 20 && isReadableText(text)) {
+    if (text && text.length > 15 && isHumanReadableText(text)) {
       return text;
     }
   } catch (v2Err) {
@@ -133,12 +146,12 @@ async function parsePdf(buffer: Buffer): Promise<string> {
 
   // 2. Fallback: Decompress FlateDecode streams and parse text
   const flateText = parsePdfFlateStreams(buffer);
-  if (flateText && flateText.length > 10 && isReadableText(flateText)) {
+  if (flateText && flateText.length > 10 && isHumanReadableText(flateText)) {
     return flateText;
   }
 
   throw new Error(
-    "Unable to extract readable text from PDF. The PDF may be a scanned image or encrypted. Please try uploading your resume as a standard text-based PDF or DOCX file."
+    "Unable to extract readable text from PDF due to custom font encodings or image-based formatting. Please export your resume using standard 'Save as PDF' (with standard system fonts) or upload as DOCX."
   );
 }
 

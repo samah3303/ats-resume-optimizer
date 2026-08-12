@@ -6,6 +6,7 @@ import { useEffect, useState, useCallback, type ChangeEvent } from "react";
 import Link from "next/link";
 import ResumeUploader from "@/components/ResumeUploader";
 import DriveDocumentPreviewModal from "@/components/DriveDocumentPreviewModal";
+import { isHumanReadableText } from "@/lib/resume-parser";
 import { useToast } from "@/components/Toast";
 
 interface Resume {
@@ -239,9 +240,20 @@ export default function ResumesPage() {
                         <span className="font-black uppercase tracking-wider">Document Preview Page</span>
                         <span className="text-zinc-500">Google Drive Style</span>
                       </div>
-                      <p className="text-xs text-zinc-300 font-sans leading-relaxed whitespace-pre-wrap break-words">
-                        {resume.parsedText || "No text extracted from document."}
-                      </p>
+                      {resume.parsedText && isHumanReadableText(resume.parsedText) ? (
+                        <p className="text-xs text-zinc-300 font-sans leading-relaxed whitespace-pre-wrap break-words">
+                          {resume.parsedText}
+                        </p>
+                      ) : (
+                        <div className="p-3 bg-rose-950/40 border border-rose-800/50 rounded-xl space-y-1.5 text-center my-4">
+                          <p className="text-xs font-black text-rose-300">
+                            ⚠️ Unreadable Custom Font Subset PDF
+                          </p>
+                          <p className="text-[10px] text-zinc-400 leading-snug">
+                            This PDF was saved using custom font encodings (e.g. Canva/Figma subset fonts). Please re-upload as DOCX or a standard text PDF.
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
 
