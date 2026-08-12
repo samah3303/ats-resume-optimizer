@@ -285,9 +285,10 @@ function AnalysisDetailContent() {
   };
 
   const handleDownloadOptimized = async () => {
-    let acceptedIds = suggestions.filter((s) => s.accepted).map((s) => s.id);
+    const safeSugs = Array.isArray(suggestions) ? suggestions : [];
+    let acceptedIds = safeSugs.filter((s) => s.accepted).map((s) => s.id);
     if (acceptedIds.length === 0) {
-      acceptedIds = suggestions.map((s) => s.id);
+      acceptedIds = safeSugs.map((s) => s.id);
     }
 
     setDownloading(true);
@@ -321,7 +322,7 @@ function AnalysisDetailContent() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      const acceptedCount = suggestions.filter((s) => s.accepted).length;
+      const acceptedCount = safeSugs.filter((s) => s.accepted).length;
       const boost = Math.min(acceptedCount * 5, 25);
       setScoreBoost(boost);
       setDownloadSuccess(true);
@@ -377,37 +378,63 @@ function AnalysisDetailContent() {
     );
   }
 
-  // Parse JSON data safely
+  // Parse JSON data safely with strict array guarantees
   let keywords: KeywordData = { matched: [], missing: [] };
   try {
     const raw = (analysis as unknown as Record<string, unknown>).keywordsJson as string;
-    if (raw) keywords = JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object") {
+        keywords = {
+          matched: Array.isArray(parsed.matched) ? parsed.matched : [],
+          missing: Array.isArray(parsed.missing) ? parsed.missing : [],
+        };
+      }
+    }
   } catch {
-    // fallback
+    keywords = { matched: [], missing: [] };
   }
 
   let skillsGap: SkillsGapData = { present: [], missing: [] };
   try {
-    if (analysis.skillsGapJson) skillsGap = JSON.parse(analysis.skillsGapJson);
+    if (analysis.skillsGapJson) {
+      const parsed = JSON.parse(analysis.skillsGapJson);
+      if (parsed && typeof parsed === "object") {
+        skillsGap = {
+          present: Array.isArray(parsed.present) ? parsed.present : [],
+          missing: Array.isArray(parsed.missing) ? parsed.missing : [],
+        };
+      }
+    }
   } catch {
-    // fallback
+    skillsGap = { present: [], missing: [] };
   }
+
+  // Ensure safe arrays
+  const safeMatchedKeywords = keywords.matched || [];
+  const safeMissingKeywords = keywords.missing || [];
+  const safePresentSkills = skillsGap.present || [];
+  const safeMissingSkills = skillsGap.missing || [];
+  const safeSuggestions = Array.isArray(suggestions) ? suggestions : [];
 
   // Frequency mapping for heatmap
   let keywordFrequencies: KeywordFrequency[] = [];
   try {
     const freqRaw = (analysis as unknown as Record<string, unknown>).keywordFrequenciesJson as string;
     if (freqRaw) {
-      keywordFrequencies = JSON.parse(freqRaw);
+      const parsed = JSON.parse(freqRaw);
+      if (Array.isArray(parsed)) {
+        keywordFrequencies = parsed;
+      }
     }
   } catch {
-    // fallback
+    keywordFrequencies = [];
   }
 
   if (keywordFrequencies.length === 0) {
     keywordFrequencies = [
-      ...keywords.matched.map((w) => ({ word: w, count: 1, matched: true })),
-      ...keywords.missing.map((w) => ({ word: w, count: 1, matched: false })),
+      ...safeMatchedKeywords.map((w) => ({ word: w, count: 1, matched: true })),
+      ...safeMissingKeywords.map((w) => ({ word: w, count: 1, matched: false })),
     ];
   }
 
@@ -564,13 +591,13 @@ function AnalysisDetailContent() {
             >
               <span>{tab.icon}</span>
               <span>{tab.label}</span>
-              {tab.id === "suggestions" && suggestions.length > 0 && (
+              {tab.id === "suggestions" && safeSuggestions.length > 0 && (
                 <span
                   className={`ml-1 px-2 py-0.5 text-[10px] font-black rounded-full ${
                     isActive ? "bg-slate-950 text-amber-400" : "bg-amber-500/20 text-amber-300"
                   }`}
                 >
-                  {suggestions.length}
+                  {safeSuggestions.length}
                 </span>
               )}
             </button>
@@ -615,31 +642,31 @@ function AnalysisDetailContent() {
           </div>
 
           {/* Keywords Match & Missing */}
-          {(keywords.matched.length > 0 || keywords.missing.length > 0) && (
+          {(safeMatchedKeywords.length > 0 || safeMissingKeywords.length > 0) && (
             <div className="p-6 bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] space-y-5">
               <h2 className="text-sm font-black text-white uppercase tracking-wider">
                 Keyword Matching Breakdown
               </h2>
-              {keywords.matched.length > 0 && (
+              {safeMatchedKeywords.length > 0 && (
                 <div className="space-y-2">
                   <p className="text-xs font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <span>✅ Matched Keywords ({keywords.matched.length}):</span>
+                    <span>✅ Matched Keywords ({safeMatchedKeywords.length}):</span>
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {keywords.matched.map((kw) => (
+                    {safeMatchedKeywords.map((kw) => (
                       <KeywordBadge key={kw} keyword={kw} matched />
                     ))}
                   </div>
                 </div>
               )}
 
-              {keywords.missing.length > 0 && (
+              {safeMissingKeywords.length > 0 && (
                 <div className="space-y-2 pt-2 border-t border-[#242834]">
                   <p className="text-xs font-black text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <span>❌ Missing Keywords to Add ({keywords.missing.length}):</span>
+                    <span>❌ Missing Keywords to Add ({safeMissingKeywords.length}):</span>
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {keywords.missing.map((kw) => (
+                    {safeMissingKeywords.map((kw) => (
                       <KeywordBadge key={kw} keyword={kw} matched={false} />
                     ))}
                   </div>
@@ -649,7 +676,7 @@ function AnalysisDetailContent() {
           )}
 
           {/* Skills Gap Analysis */}
-          {(skillsGap.present.length > 0 || skillsGap.missing.length > 0) && (
+          {(safePresentSkills.length > 0 || safeMissingSkills.length > 0) && (
             <div className="p-6 bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] space-y-4">
               <h2 className="text-sm font-black text-white uppercase tracking-wider">
                 Technical Skills Gap Analysis
@@ -660,7 +687,7 @@ function AnalysisDetailContent() {
                     Skills Found in Resume
                   </p>
                   <div className="flex flex-wrap gap-1.5">
-                    {skillsGap.present.map((s) => (
+                    {safePresentSkills.map((s) => (
                       <span
                         key={s}
                         className="px-2.5 py-1 bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 text-[11px] font-bold rounded-xl"
@@ -675,7 +702,7 @@ function AnalysisDetailContent() {
                     Missing Target Skills
                   </p>
                   <div className="flex flex-wrap gap-1.5">
-                    {skillsGap.missing.map((s) => (
+                    {safeMissingSkills.map((s) => (
                       <span
                         key={s}
                         className="px-2.5 py-1 bg-rose-500/10 text-rose-300 border border-rose-500/30 text-[11px] font-bold rounded-xl"
@@ -690,10 +717,10 @@ function AnalysisDetailContent() {
           )}
 
           {/* Skill Bridge Card */}
-          {(skillsGap.missing.length > 0 || keywords.missing.length > 0) && (
+          {(safeMissingSkills.length > 0 || safeMissingKeywords.length > 0) && (
             <SkillBridgeCard
               missingSkills={Array.from(
-                new Set([...skillsGap.missing, ...keywords.missing])
+                new Set([...safeMissingSkills, ...safeMissingKeywords])
               )}
             />
           )}
@@ -730,12 +757,12 @@ function AnalysisDetailContent() {
           <div className="p-5 bg-[#090A0C] border border-amber-500/30 rounded-2xl space-y-2">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <span className="text-xs font-black text-amber-300 uppercase tracking-wider">
-                ⚡ Tailored STAR Bullet Rewrites ({suggestions.length})
+                ⚡ Tailored STAR Bullet Rewrites ({safeSuggestions.length})
               </span>
               <span className="text-xs font-bold text-emerald-400">
                 Current: {overallScoreVal}% ➔ Projected:{" "}
                 <span className="text-white underline font-extrabold">
-                  {Math.min(95, Math.max(78, overallScoreVal + suggestions.length * 3))}% Match
+                  {Math.min(95, Math.max(78, overallScoreVal + safeSuggestions.length * 3))}% Match
                 </span>
               </span>
             </div>
@@ -744,9 +771,9 @@ function AnalysisDetailContent() {
             </p>
           </div>
 
-          {suggestions.length === 0 ? (
+          {safeSuggestions.length === 0 ? (
             <InlineAiFixer
-              missingSkills={skillsGap.missing}
+              missingSkills={safeMissingSkills}
               suggestions={[]}
               onApplyFix={(orig: string) => {
                 toast(`Accepted fix for "${orig.slice(0, 20)}..."`, "success");
@@ -754,7 +781,7 @@ function AnalysisDetailContent() {
             />
           ) : (
             <div className="space-y-4">
-              {suggestions.map((sug) => (
+              {safeSuggestions.map((sug) => (
                 <SuggestionCard
                   key={sug.id}
                   suggestion={sug}

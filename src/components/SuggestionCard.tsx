@@ -25,10 +25,13 @@ export default function SuggestionCard({
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
 
-  const boostPct = Math.min(10, Math.max(3, Math.round(4 + suggestion.originalText.length * 0.02)));
+  const origText = suggestion?.originalText || "";
+  const suggestedText = suggestion?.suggestedText || "";
+  const boostPct = Math.min(10, Math.max(3, Math.round(4 + origText.length * 0.02)));
 
   const handleCopyBullet = async () => {
-    await navigator.clipboard.writeText(suggestion.suggestedText);
+    if (!suggestedText) return;
+    await navigator.clipboard.writeText(suggestedText);
     setCopied(true);
     toast("Copied STAR bullet to clipboard!", "success");
     setTimeout(() => setCopied(false), 2000);
