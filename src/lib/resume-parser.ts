@@ -1,4 +1,5 @@
 import mammoth from "mammoth";
+import zlib from "zlib";
 
 // Ensure DOMMatrix polyfill in Node runtime for pdfjs-dist / pdf-parse
 if (typeof globalThis.DOMMatrix === "undefined") {
@@ -21,62 +22,96 @@ if (typeof globalThis.DOMMatrix === "undefined") {
 }
 
 /**
- * Fallback parser that extracts text blocks directly from raw PDF streams
- * when standard PDF rendering libraries fail on custom fonts or scanned streams.
+ * Validates whether an extracted string is readable human text
+ * (at least 80% standard printable ASCII or common Unicode characters).
  */
-function extractRawPdfText(buffer: Buffer): string {
-  try {
-    const raw = buffer.toString("binary");
-    const extractedChunks: string[] = [];
+function isReadableText(str: string): boolean {
+  if (!str || str.trim().length === 0) return false;
+  let printableCount = 0;
+  for (let i = 0; i < str.length; i++) {
+    const code = str.charCodeAt(i);
+    // Standard printable ASCII (space to ~), tabs, newlines, carriage returns, or extended latin
+    if (
+      (code >= 32 && code <= 126) ||
+      code === 10 ||
+      code === 13 ||
+      code === 9 ||
+      (code >= 160 && code <= 383)
+    ) {
+      printableCount++;
+    }
+  }
+  const ratio = printableCount / str.length;
+  return ratio > 0.8;
+}
 
-    // Match text literal parenthesis: (Text here) Tj or (Text) TJ
-    const textLiteralRegex = /\(([^()\\]*(?:\\.[^()\\]*)*)\)\s*(?:Tj|TJ|'|")/g;
+/**
+ * Extracts plain text from decompressed FlateDecode streams in PDFs
+ */
+function parsePdfFlateStreams(buffer: Buffer): string {
+  try {
+    const chunks: string[] = [];
+    const str = buffer.toString("binary");
+
+    // Match stream blocks in PDF
+    const streamRegex = /stream\r?\n([\s\S]*?)\r?\nendstream/g;
     let match: RegExpExecArray | null;
 
-    while ((match = textLiteralRegex.exec(raw)) !== null) {
-      const text = match[1]
-        .replace(/\\([()\\])/g, "$1")
-        .replace(/\\n/g, "\n")
-        .replace(/\\r/g, "\r")
-        .replace(/\\t/g, "\t");
+    while ((match = streamRegex.exec(str)) !== null) {
+      const rawStream = Buffer.from(match[1], "binary");
+      let decompressedText = "";
 
-      const cleaned = text.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, "").trim();
-      if (cleaned.length > 0) {
-        extractedChunks.push(cleaned);
+      // Try zlib inflate
+      try {
+        const inflated = zlib.inflateSync(rawStream);
+        decompressedText = inflated.toString("utf-8");
+      } catch {
+        try {
+          const unzipped = zlib.unzipSync(rawStream);
+          decompressedText = unzipped.toString("utf-8");
+        } catch {
+          decompressedText = rawStream.toString("utf-8");
+        }
       }
-    }
 
-    // Match hex encoded text strings: <48656c6c6f> Tj
-    if (extractedChunks.length === 0) {
-      const hexRegex = /<([0-9a-fA-F]+)>\s*(?:Tj|TJ)/g;
-      while ((match = hexRegex.exec(raw)) !== null) {
-        const hex = match[1];
-        let str = "";
-        for (let i = 0; i < hex.length; i += 2) {
-          const code = parseInt(hex.substring(i, i + 2), 16);
-          if (code >= 32 && code <= 126) {
-            str += String.fromCharCode(code);
+      if (decompressedText) {
+        // Match text literal parenthesis: (Text here) Tj or (Text) TJ
+        const textLiteralRegex = /\(([^()\\]*(?:\\.[^()\\]*)*)\)\s*(?:Tj|TJ|'|")/g;
+        let textMatch: RegExpExecArray | null;
+
+        while ((textMatch = textLiteralRegex.exec(decompressedText)) !== null) {
+          const cleaned = textMatch[1]
+            .replace(/\\([()\\])/g, "$1")
+            .replace(/\\n/g, "\n")
+            .replace(/\\r/g, "\r")
+            .replace(/\\t/g, "\t")
+            .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, "")
+            .trim();
+
+          if (cleaned.length > 0) {
+            chunks.push(cleaned);
           }
         }
-        if (str.trim()) {
-          extractedChunks.push(str.trim());
-        }
       }
     }
 
-    return extractedChunks.join(" ").replace(/\s+/g, " ").trim();
+    const result = chunks.join(" ").replace(/\s+/g, " ").trim();
+    if (isReadableText(result)) {
+      return result;
+    }
+    return "";
   } catch (err) {
-    console.warn("Raw PDF fallback extraction error:", err);
+    console.warn("Flate stream extraction error:", err);
     return "";
   }
 }
 
 async function parsePdf(buffer: Buffer): Promise<string> {
-  // 1. Primary Attempt: pdf-parse v2 with standalone Uint8Array allocation
+  // 1. Primary: pdf-parse v2 API
   try {
     const { PDFParse } = await import("pdf-parse");
     
-    // Copy buffer to fresh standalone Uint8Array to avoid Node Buffer pool offset bugs
+    // Allocate clean standalone Uint8Array
     const uint8 = new Uint8Array(buffer.length);
     uint8.set(buffer);
 
@@ -89,21 +124,21 @@ async function parsePdf(buffer: Buffer): Promise<string> {
     // Clean up page markers like "-- 1 of 2 --"
     text = text.replace(/--\s*\d+\s*of\s*\d+\s*--/gi, "").trim();
 
-    if (text && text.length > 20) {
+    if (text && text.length > 20 && isReadableText(text)) {
       return text;
     }
   } catch (v2Err) {
-    console.warn("PDFParse v2 primary failed, running raw stream extractor fallback:", v2Err);
+    console.warn("PDFParse v2 primary failed:", v2Err);
   }
 
-  // 2. Fallback: Raw PDF binary text stream extractor
-  const fallbackText = extractRawPdfText(buffer);
-  if (fallbackText && fallbackText.length > 10) {
-    return fallbackText;
+  // 2. Fallback: Decompress FlateDecode streams and parse text
+  const flateText = parsePdfFlateStreams(buffer);
+  if (flateText && flateText.length > 10 && isReadableText(flateText)) {
+    return flateText;
   }
 
   throw new Error(
-    "Unable to extract text from PDF. The PDF may be a scanned image or encrypted. Please save your resume as a standard text-based PDF or DOCX file."
+    "Unable to extract readable text from PDF. The PDF may be a scanned image or encrypted. Please try uploading your resume as a standard text-based PDF or DOCX file."
   );
 }
 
