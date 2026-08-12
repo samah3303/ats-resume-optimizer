@@ -54,7 +54,12 @@ export async function runResumeWriterAgent(params: {
   // Step 1: Initial rewrite incorporating all suggestions
   const v1Prompt = `You are an expert resume writer specialized in ATS optimization.
 
-Apply the following suggestions to the resume. Rewrite the ENTIRE resume incorporating every suggestion. Preserve all factual information — only improve wording, add metrics, and incorporate keywords.
+CRITICAL IDENTITY DIRECTIVE:
+- You MUST preserve the candidate's EXACT REAL NAME, contact details, phone number, email address, location, LinkedIn/GitHub links, company names, job titles, dates, and degree qualification exactly as stated in the Original Resume.
+- NEVER invent or use generic placeholder names (such as "Alex Morgan", "John Doe", or generic emails).
+
+TASK:
+Apply the following suggestions to the resume while keeping the candidate's exact real identity, work experience structure, and projects intact.
 
 ## Target Job: ${params.jobDescriptionTitle}
 
@@ -64,11 +69,11 @@ ${params.jobDescriptionText.slice(0, 2000)}
 ## Suggestions to Apply:
 ${suggestionsBlock}
 
-## Original Resume:
+## Original Resume (Source of Truth for Candidate Identity & Experience):
 ${params.resumeText.slice(0, 4000)}
 
 ## Rewritten Resume:
-Return ONLY the full rewrite. Use clear section headers (SUMMARY, EXPERIENCE, SKILLS, EDUCATION).`;
+Start directly with candidate name line, title line, and contact info line. Use clear uppercase section headers (PROFESSIONAL SUMMARY, TECHNICAL SKILLS, WORK EXPERIENCE, PROJECTS, EDUCATION). Return ONLY the full rewritten resume.`;
 
   const v1Result = await generateText({
     model,
