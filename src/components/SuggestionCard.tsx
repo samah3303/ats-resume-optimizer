@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useToast } from "@/components/Toast";
 
 interface Suggestion {
   id: string;
@@ -21,53 +22,74 @@ export default function SuggestionCard({
   onChange,
 }: SuggestionCardProps) {
   const [expanded, setExpanded] = useState(true);
+  const [copied, setCopied] = useState(false);
+  const { toast } = useToast();
 
   const boostPct = Math.min(10, Math.max(3, Math.round(4 + suggestion.originalText.length * 0.02)));
 
+  const handleCopyBullet = async () => {
+    await navigator.clipboard.writeText(suggestion.suggestedText);
+    setCopied(true);
+    toast("Copied STAR bullet to clipboard!", "success");
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <div
-      className={`border rounded-2xl bg-white dark:bg-slate-800 overflow-hidden transition-all duration-200 shadow-sm hover:shadow-md ${
+      className={`border rounded-2xl bg-[#090A0C] overflow-hidden transition-all duration-200 shadow-lg ${
         suggestion.accepted
-          ? "border-emerald-500 ring-2 ring-emerald-500/20 dark:border-emerald-500"
-          : "border-slate-200 dark:border-slate-700"
+          ? "border-emerald-500 ring-2 ring-emerald-500/20"
+          : "border-[#242834] hover:border-amber-500/30"
       }`}
     >
       {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-3.5 bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200/80 dark:border-slate-700">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-3.5 bg-[#14161D] border-b border-[#242834]">
         <div className="flex items-center gap-3 flex-wrap">
           <label className="flex items-center gap-2 cursor-pointer select-none">
             <input
               type="checkbox"
               checked={suggestion.accepted}
               onChange={(e) => onChange(suggestion.id, e.target.checked)}
-              className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 dark:bg-slate-700 accent-emerald-600"
+              className="w-4 h-4 rounded text-emerald-500 focus:ring-emerald-500 bg-[#090A0C] accent-emerald-500"
             />
-            <span className={`text-xs font-bold ${suggestion.accepted ? "text-emerald-700 dark:text-emerald-400" : "text-slate-700 dark:text-slate-200"}`}>
-              {suggestion.accepted ? "✓ Suggestion Accepted" : "Accept Suggestion"}
+            <span
+              className={`text-xs font-bold ${
+                suggestion.accepted ? "text-emerald-400" : "text-zinc-300 hover:text-white"
+              }`}
+            >
+              {suggestion.accepted ? "✓ Fix Accepted & Applied" : "Accept Bullet Fix"}
             </span>
           </label>
 
-          <span className="px-2.5 py-0.5 bg-indigo-100 dark:bg-indigo-950/80 text-indigo-800 dark:text-indigo-300 text-xs font-bold rounded-md border border-indigo-200 dark:border-indigo-800">
+          <span className="px-2.5 py-0.5 bg-amber-500/10 text-amber-300 text-xs font-bold rounded-lg border border-amber-500/30">
             {suggestion.section}
           </span>
 
-          <span className="px-2.5 py-0.5 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 text-xs font-bold rounded-md border border-emerald-200 dark:border-emerald-800">
-            +{boostPct}% ATS Score
+          <span className="px-2.5 py-0.5 bg-emerald-500/10 text-emerald-300 text-xs font-bold rounded-lg border border-emerald-500/30">
+            +{boostPct}% ATS Boost
           </span>
         </div>
 
-        <button
-          onClick={() => setExpanded(!expanded)}
-          className="text-xs font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-colors"
-        >
-          {expanded ? "Collapse ▲" : "Expand Diff ▼"}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleCopyBullet}
+            className="px-3 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold rounded-lg transition-colors flex items-center gap-1"
+          >
+            <span>{copied ? "✓ Copied!" : "📋 Copy Bullet"}</span>
+          </button>
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="text-xs font-bold text-zinc-400 hover:text-white transition-colors"
+          >
+            {expanded ? "Collapse ▲" : "Expand Diff ▼"}
+          </button>
+        </div>
       </div>
 
       {/* Rationale Callout */}
       {suggestion.rationale && (
-        <div className="px-5 py-3 text-xs text-slate-600 dark:text-slate-300 bg-indigo-50/30 dark:bg-indigo-950/20 border-b border-slate-100 dark:border-slate-800 font-medium">
-          💡 <span className="font-bold text-indigo-900 dark:text-indigo-300">Why:</span> {suggestion.rationale}
+        <div className="px-5 py-3 text-xs text-zinc-300 bg-[#10121A] border-b border-[#242834] font-medium leading-relaxed">
+          💡 <span className="font-bold text-amber-300">Why this fix works:</span> {suggestion.rationale}
         </div>
       )}
 
@@ -75,21 +97,21 @@ export default function SuggestionCard({
       {expanded && (
         <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
           {/* Older Version / Original */}
-          <div className="rounded-xl border border-rose-200 dark:border-rose-900/40 bg-rose-50/60 dark:bg-rose-950/30 p-4 space-y-1">
-            <span className="font-bold text-rose-700 dark:text-rose-400 text-[11px] uppercase tracking-wider block">
-              Original (Older Bullet):
+          <div className="rounded-xl border border-rose-900/50 bg-rose-950/20 p-4 space-y-1.5">
+            <span className="font-black text-rose-400 text-[10px] uppercase tracking-wider block">
+              Original (Weak Bullet):
             </span>
-            <p className="text-slate-800 dark:text-slate-200 italic leading-relaxed">
+            <p className="text-zinc-300 italic leading-relaxed">
               "{suggestion.originalText}"
             </p>
           </div>
 
           {/* Updated Version / STAR Metric */}
-          <div className="rounded-xl border border-emerald-200 dark:border-emerald-900/40 bg-emerald-50/60 dark:bg-emerald-950/30 p-4 space-y-1">
-            <span className="font-bold text-emerald-700 dark:text-emerald-400 text-[11px] uppercase tracking-wider block">
-              Optimized STAR Fix (Updated Version):
+          <div className="rounded-xl border border-emerald-900/50 bg-emerald-950/20 p-4 space-y-1.5">
+            <span className="font-black text-emerald-400 text-[10px] uppercase tracking-wider block">
+              Optimized STAR Bullet (Updated Version):
             </span>
-            <p className="text-slate-900 dark:text-slate-100 font-semibold leading-relaxed">
+            <p className="text-white font-bold leading-relaxed">
               "{suggestion.suggestedText}"
             </p>
           </div>

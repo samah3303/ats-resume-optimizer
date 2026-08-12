@@ -62,13 +62,13 @@ interface KeywordFrequency {
 
 type TabId = "overview" | "suggestions" | "coverletter" | "interview" | "share" | "salary";
 
-const TABS: { id: TabId; label: string }[] = [
-  { id: "overview", label: "Overview" },
-  { id: "suggestions", label: "Suggestions" },
-  { id: "coverletter", label: "Cover Letter" },
-  { id: "interview", label: "Interview Qs" },
-  { id: "share", label: "Share" },
-  { id: "salary", label: "Salary" },
+const TABS: { id: TabId; label: string; icon: string }[] = [
+  { id: "overview", label: "Overview", icon: "📊" },
+  { id: "suggestions", label: "Bullet Fixes", icon: "⚡" },
+  { id: "coverletter", label: "Cover Letter", icon: "✉️" },
+  { id: "interview", label: "Interview Coach", icon: "🎙️" },
+  { id: "salary", label: "Salary Guide", icon: "💰" },
+  { id: "share", label: "Share Report", icon: "🔗" },
 ];
 
 function AnalysisDetailContent() {
@@ -116,7 +116,6 @@ function AnalysisDetailContent() {
     const url = new URL(window.location.href);
     url.searchParams.set("tab", tab);
     window.history.replaceState({}, "", url.toString());
-    // Force re-render by navigating (shallow)
     router.replace(`/dashboard/analyze/${id}?tab=${tab}`, { scroll: false });
   };
 
@@ -198,6 +197,7 @@ function AnalysisDetailContent() {
     if (!coverLetterText) return;
     await navigator.clipboard.writeText(coverLetterText);
     setCoverLetterCopied(true);
+    toast("Cover letter copied to clipboard!", "success");
     setTimeout(() => setCoverLetterCopied(false), 2000);
   };
 
@@ -255,21 +255,28 @@ function AnalysisDetailContent() {
     if (!shareUrl) return;
     await navigator.clipboard.writeText(shareUrl);
     setShareCopied(true);
+    toast("Share link copied to clipboard!", "success");
     setTimeout(() => setShareCopied(false), 2000);
   };
 
   const handleNegotiate = async () => {
     if (!targetSalary.trim()) return;
     setNegotiating(true);
-    setNegotiationResult(null);
     try {
-      const res = await fetch("/api/negotiate", {
+      const res = await fetch("/api/salary", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ analysisId: id, targetSalary }),
+        body: JSON.stringify({
+          analysisId: id,
+          targetSalary: targetSalary.trim(),
+        }),
       });
-      if (res.ok) setNegotiationResult(await res.json());
-      else toast("Failed to generate negotiation guide", "error");
+      if (res.ok) {
+        const data = await res.json();
+        setNegotiationResult(data);
+      } else {
+        toast("Failed to generate negotiation guide", "error");
+      }
     } catch {
       toast("Failed to generate negotiation guide", "error");
     } finally {
@@ -280,7 +287,6 @@ function AnalysisDetailContent() {
   const handleDownloadOptimized = async () => {
     let acceptedIds = suggestions.filter((s) => s.accepted).map((s) => s.id);
     if (acceptedIds.length === 0) {
-      // Use all suggestions by default for 1-click PDF export
       acceptedIds = suggestions.map((s) => s.id);
     }
 
@@ -333,268 +339,248 @@ function AnalysisDetailContent() {
   // --- Loading state ---
   if (status === "loading" || loading) {
     return (
-      <div className="flex items-center justify-center min-h-[80vh]">
-        <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+      <div className="flex items-center justify-center min-h-[80vh] bg-[#090A0C]">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-3 border-amber-400 border-t-transparent rounded-full animate-spin" />
+          <p className="text-xs font-bold text-amber-300 uppercase tracking-wider">
+            Loading Analysis Report...
+          </p>
+        </div>
       </div>
     );
   }
-
-  if (status === "unauthenticated") return null;
 
   // --- Error state ---
-  if (fetchError) {
+  if (fetchError || !analysis) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-8 max-w-md mx-auto">
-          <p className="text-red-700 dark:text-red-300 mb-4">{fetchError}</p>
+      <div className="max-w-xl mx-auto my-16 p-8 bg-[#14161D] border border-rose-500/30 rounded-3xl text-center space-y-4 text-white shadow-2xl">
+        <span className="text-4xl" aria-hidden="true">⚠️</span>
+        <h2 className="text-lg font-black text-white">Analysis Report Not Found</h2>
+        <p className="text-xs text-zinc-400 leading-relaxed">
+          {fetchError || "The requested analysis details could not be retrieved."}
+        </p>
+        <div className="pt-2 flex items-center justify-center gap-3">
           <button
             onClick={fetchAnalysis}
-            className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+            className="px-5 py-2.5 bg-amber-500 text-slate-950 text-xs font-black rounded-xl hover:bg-amber-400 transition-colors"
           >
-            Retry
+            Try Again
           </button>
+          <Link
+            href="/dashboard"
+            className="px-5 py-2.5 bg-[#090A0C] border border-[#242834] text-zinc-300 text-xs font-bold rounded-xl hover:text-white transition-colors"
+          >
+            Back to Dashboard
+          </Link>
         </div>
       </div>
     );
   }
 
-  if (!analysis) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
-        <p className="text-gray-500 dark:text-slate-400">Analysis not found.</p>
-        <Link
-          href="/dashboard/analyze"
-          className="text-indigo-600 dark:text-indigo-400 mt-2 inline-block"
-        >
-          Run a new analysis →
-        </Link>
-      </div>
-    );
+  // Parse JSON data safely
+  let keywords: KeywordData = { matched: [], missing: [] };
+  try {
+    const raw = (analysis as unknown as Record<string, unknown>).keywordsJson as string;
+    if (raw) keywords = JSON.parse(raw);
+  } catch {
+    // fallback
   }
 
-  // Parse JSON fields
-  let keywords: KeywordData = { matched: [], missing: [] };
   let skillsGap: SkillsGapData = { present: [], missing: [] };
-  let keywordFrequencies: KeywordFrequency[] = [];
-
   try {
-    const parsed = analysis.skillsGapJson
-      ? JSON.parse(analysis.skillsGapJson)
-      : null;
-    if (parsed) {
-      keywords = {
-        matched: parsed.keywords?.matched || [],
-        missing: parsed.keywords?.missing || [],
-      };
-      skillsGap = {
-        present: parsed.skills?.present || [],
-        missing: parsed.skills?.missing || [],
-      };
+    if (analysis.skillsGapJson) skillsGap = JSON.parse(analysis.skillsGapJson);
+  } catch {
+    // fallback
+  }
+
+  // Frequency mapping for heatmap
+  let keywordFrequencies: KeywordFrequency[] = [];
+  try {
+    const freqRaw = (analysis as unknown as Record<string, unknown>).keywordFrequenciesJson as string;
+    if (freqRaw) {
+      keywordFrequencies = JSON.parse(freqRaw);
     }
   } catch {
-    // invalid JSON — already defaulted
+    // fallback
   }
 
-  const resumeText = analysis.resume?.name || "";
-  const allKeywords = [...keywords.matched, ...keywords.missing];
-  const matchedSet = new Set(keywords.matched.map((k) => k.toLowerCase()));
+  if (keywordFrequencies.length === 0) {
+    keywordFrequencies = [
+      ...keywords.matched.map((w) => ({ word: w, count: 1, matched: true })),
+      ...keywords.missing.map((w) => ({ word: w, count: 1, matched: false })),
+    ];
+  }
 
-  keywordFrequencies = allKeywords.map((word) => {
-    const regex = new RegExp(
-      word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
-      "gi"
-    );
-    const matches = resumeText.match(regex);
-    return {
-      word,
-      count: matches ? matches.length : 0,
-      matched: matchedSet.has(word.toLowerCase()),
-    };
-  });
-
-  const maxFreq =
-    keywordFrequencies.length > 0
-      ? Math.max(...keywordFrequencies.map((k) => k.count), 1)
-      : 1;
+  const maxFreq = Math.max(1, ...keywordFrequencies.map((k) => k.count));
 
   const sections = [
-    { label: "Format Score", value: analysis.formatScore },
-    { label: "Impact Score", value: analysis.impactScore },
     { label: "Keyword Match", value: analysis.keywordsMatchPct, isPct: true },
+    { label: "Format Score", value: analysis.formatScore, isPct: false },
+    { label: "Impact & STAR Bullet Score", value: analysis.impactScore, isPct: false },
   ];
 
-  const acceptedCount = suggestions.filter((s) => s.accepted).length;
+  const overallScoreVal = analysis.overallScore ?? 0;
+  const isHighMatch = overallScoreVal >= 75;
+  const isMediumMatch = overallScoreVal >= 50 && overallScoreVal < 75;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-[76px] md:pb-8">
-      {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm text-gray-500 dark:text-slate-400 mb-6" aria-label="Breadcrumb">
+    <div className="min-h-screen bg-[#090A0C] text-white p-4 sm:p-6 md:p-8 max-w-6xl mx-auto space-y-6">
+      {/* Top Navigation / Back Link */}
+      <div className="flex items-center justify-between">
         <Link
           href="/dashboard"
-          className="hover:text-gray-700 dark:hover:text-slate-300 transition-colors"
+          className="inline-flex items-center gap-2 text-xs font-black text-amber-400 hover:text-amber-300 transition-colors uppercase tracking-wider"
         >
-          Dashboard
+          <span>← Back to Dashboard</span>
         </Link>
-        <span aria-hidden="true">/</span>
-        <Link
-          href="/dashboard/analyze"
-          className="hover:text-gray-700 dark:hover:text-slate-300 transition-colors"
-        >
-          Analyses
-        </Link>
-        <span aria-hidden="true">/</span>
-        <span className="text-gray-900 dark:text-slate-100 font-medium truncate max-w-[200px]">
-          {analysis.resume?.name} vs {analysis.jobDescription?.title}
+        <span className="text-[11px] font-mono text-zinc-500">
+          Scanned {new Date(analysis.createdAt).toLocaleDateString()}
         </span>
-      </nav>
-
-      {/* Tab Navigation */}
-      <div
-        className="flex gap-1 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-1 mb-6 overflow-x-auto"
-        role="tablist"
-        aria-label="Analysis sections"
-      >
-        {TABS.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            role="tab"
-            aria-selected={activeTab === tab.id}
-            aria-controls={`panel-${tab.id}`}
-            className={`flex-1 min-w-fit px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap min-h-[44px] sm:min-h-0 ${
-              activeTab === tab.id
-                ? "bg-indigo-600 text-white shadow-sm"
-                : "text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
       </div>
 
-      {/* Header */}
-      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 mb-6 shadow-sm">
-        <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-          <ScoreGauge score={analysis.overallScore ?? 0} size={140} />
-          <div className="flex-1">
-            <h1 className="text-xl font-bold text-gray-900 dark:text-slate-100 mb-1">
-              Analysis Report
-            </h1>
-            <p className="text-sm text-gray-500 dark:text-slate-400">
-              {analysis.resume?.name} vs{" "}
-              {analysis.jobDescription?.title}
-              {analysis.jobDescription?.company &&
-                ` at ${analysis.jobDescription.company}`}
-            </p>
-            {analysis.jobDescription?.sourceUrl && (
-              <a
-                href={analysis.jobDescription.sourceUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 mt-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-                Apply for this Position
-              </a>
-            )}
-            {analysis.summaryText && (
-              <p className="text-sm text-gray-700 dark:text-slate-300 mt-3 leading-relaxed">
-                {analysis.summaryText}
+      {/* Main Analysis Header Card */}
+      <div className="bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] p-6 sm:p-8 text-white shadow-2xl space-y-6">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+          <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
+            <div className="shrink-0">
+              <ScoreGauge score={overallScoreVal} size={130} />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-center sm:justify-start gap-2">
+                <span
+                  className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                    isHighMatch
+                      ? "bg-emerald-950 text-emerald-300 border border-emerald-800"
+                      : isMediumMatch
+                      ? "bg-amber-950 text-amber-300 border border-amber-800"
+                      : "bg-rose-950 text-rose-300 border border-rose-800"
+                  }`}
+                >
+                  {isHighMatch ? "🟢 Ready to Apply" : isMediumMatch ? "🟡 Quick Fixes Needed" : "🔴 High ATS Rejection Risk"}
+                </span>
+              </div>
+              <h1 className="text-xl sm:text-2xl font-black text-white leading-tight">
+                {analysis.jobDescription?.title || "Job Analysis Report"}
+              </h1>
+              <p className="text-xs text-zinc-400 font-medium">
+                Comparing <span className="text-white font-bold">{analysis.resume?.name || "Resume"}</span> against{" "}
+                <span className="text-white font-bold">{analysis.jobDescription?.company || "Target Job Posting"}</span>
               </p>
-            )}
-            <p className="text-xs text-gray-400 dark:text-slate-500 mt-2">
-              {new Date(analysis.createdAt).toLocaleString()}
-            </p>
+              {analysis.jobDescription?.sourceUrl && (
+                <a
+                  href={analysis.jobDescription.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold rounded-xl transition-colors"
+                >
+                  <span>🔗 View Original Posting</span>
+                </a>
+              )}
+            </div>
           </div>
-          <button
-            onClick={handleDownloadOptimized}
-            disabled={downloading}
-            className="px-6 py-2.5 min-h-[44px] sm:min-h-0 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black uppercase tracking-wider rounded-2xl shadow-lg shadow-amber-500/20 transition-all disabled:opacity-50 flex items-center gap-2 shrink-0"
-          >
-            {downloading ? (
-              <>
-                <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
-                Generating PDF...
-              </>
-            ) : (
-              <>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                <span>📥 Download ATS PDF</span>
-              </>
-            )}
-          </button>
+
+          <div className="flex flex-wrap items-center justify-center gap-3 w-full lg:w-auto">
+            <button
+              onClick={handleDownloadOptimized}
+              disabled={downloading}
+              className="px-6 py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black uppercase tracking-wider rounded-2xl shadow-lg shadow-amber-500/20 transition-all disabled:opacity-50 flex items-center gap-2"
+            >
+              {downloading ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                  <span>Generating PDF...</span>
+                </>
+              ) : (
+                <>
+                  <span>📥 Download ATS PDF</span>
+                </>
+              )}
+            </button>
+            <button
+              onClick={handleShare}
+              disabled={sharing}
+              className="px-5 py-3.5 bg-[#090A0C] hover:bg-[#1A1D27] text-white border border-[#242834] text-xs font-bold rounded-2xl transition-all flex items-center gap-2"
+            >
+              <span>🔗 Share Report</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Smart Executive Guidance Banner */}
+        <div className="p-4 bg-[#090A0C] border border-[#242834] rounded-2xl text-xs space-y-1">
+          <p className="font-bold text-amber-300 flex items-center gap-1.5">
+            <span>💡 Strategic Recommendation:</span>
+          </p>
+          <p className="text-zinc-300 leading-relaxed font-medium">
+            {isHighMatch
+              ? "Your resume shows strong ATS alignment (75%+). Download your ATS PDF and submit your application with confidence!"
+              : `Your resume currently matches ${overallScoreVal}% of the job requirements. Accept the tailored bullet rewrites on the 'Bullet Fixes' tab to boost your score to 80%+.`}
+          </p>
         </div>
       </div>
 
-      {/* Download success message */}
+      {/* Download Success Banner */}
       {downloadSuccess && (
-        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-5 mb-6">
+        <div className="p-5 bg-emerald-950/80 border border-emerald-800 rounded-3xl text-white space-y-3 shadow-xl animate-fadeIn">
           <div className="flex items-start gap-3">
-            <span aria-hidden="true" className="text-2xl">🎉</span>
-            <div className="flex-1">
-              <h3 className="font-semibold text-green-800 dark:text-green-300 mb-1">
-                Resume Downloaded!
+            <span className="text-2xl">🎉</span>
+            <div className="flex-1 space-y-1">
+              <h3 className="text-sm font-black text-emerald-300">
+                Optimized Resume PDF Downloaded!
               </h3>
-              <p className="text-sm text-green-700 dark:text-green-300 mb-2">
-                Estimated ATS score boost:{" "}
-                <strong className="text-green-900 dark:text-green-200 text-lg">
-                  +{scoreBoost}%
-                </strong>
-                {analysis?.overallScore && (
-                  <>
-                    {" "}
-                    (from {analysis.overallScore}% → ~
-                    {Math.min(100, analysis.overallScore + scoreBoost)}%)
-                  </>
-                )}
+              <p className="text-xs text-zinc-300">
+                Estimated ATS score boost: <strong className="text-emerald-300">+{scoreBoost}%</strong> (Projected Score: ~{Math.min(100, overallScoreVal + scoreBoost)}%)
               </p>
-              <div className="bg-white dark:bg-slate-800 rounded-lg p-3 space-y-2 text-sm text-slate-600 dark:text-slate-400">
-                <p className="flex items-start gap-2">
-                  <span aria-hidden="true" className="text-amber-500">⚠️</span>
-                  <span>
-                    Re-check the <strong>alignment and structure</strong> — AI
-                    optimizations are great, but a human review catches nuances.
-                  </span>
-                </p>
-                <p className="flex items-start gap-2">
-                  <span aria-hidden="true" className="text-blue-500">📄</span>
-                  <span>
-                    Convert to <strong>PDF</strong> before applying — many ATS
-                    prefer PDF over DOCX.
-                  </span>
-                </p>
-                <p className="flex items-start gap-2">
-                  <span aria-hidden="true" className="text-indigo-500">🔄</span>
-                  <button
-                    onClick={() => {
-                      setDownloadSuccess(false);
-                      router.push("/dashboard/analyze");
-                    }}
-                    className="text-indigo-600 dark:text-indigo-400 font-medium hover:text-indigo-700 dark:hover:text-indigo-300 underline"
-                  >
-                    Upload the optimized version and analyze it again
-                  </button>{" "}
-                  before applying to verify the score improvement.
-                </p>
-              </div>
-              <button
-                onClick={() => setDownloadSuccess(false)}
-                className="mt-3 text-xs text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 underline"
-              >
-                Dismiss
-              </button>
             </div>
+            <button
+              onClick={() => setDownloadSuccess(false)}
+              className="text-xs font-bold text-zinc-400 hover:text-white"
+            >
+              ✕ Dismiss
+            </button>
           </div>
         </div>
       )}
 
+      {/* Tab Navigation */}
+      <div
+        className="flex gap-2 bg-[#14161D] border border-[#242834] rounded-2xl p-1.5 overflow-x-auto"
+        role="tablist"
+        aria-label="Analysis sections"
+      >
+        {TABS.map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              role="tab"
+              aria-selected={isActive}
+              className={`flex-1 min-w-fit px-4 py-2.5 text-xs font-bold rounded-xl transition-all whitespace-nowrap flex items-center justify-center gap-2 ${
+                isActive
+                  ? "bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-500/20"
+                  : "text-zinc-400 hover:text-white hover:bg-[#1C1F2B]"
+              }`}
+            >
+              <span>{tab.icon}</span>
+              <span>{tab.label}</span>
+              {tab.id === "suggestions" && suggestions.length > 0 && (
+                <span
+                  className={`ml-1 px-2 py-0.5 text-[10px] font-black rounded-full ${
+                    isActive ? "bg-slate-950 text-amber-400" : "bg-amber-500/20 text-amber-300"
+                  }`}
+                >
+                  {suggestions.length}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
       {/* ============ OVERVIEW TAB ============ */}
       {activeTab === "overview" && (
-        <div id="panel-overview" role="tabpanel" aria-labelledby="tab-overview">
+        <div className="space-y-6">
           {analysis?.resume?.id && (
             <AtsXray
               resumeId={analysis.resume.id}
@@ -602,37 +588,42 @@ function AnalysisDetailContent() {
             />
           )}
 
-          {/* Section Scores */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
-            {sections.map((section) => (
-              <div
-                key={section.label}
-                className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 px-4 py-3 sm:p-5"
-              >
-                <p className="text-sm text-gray-500 dark:text-slate-400 mb-1">
-                  {section.label}
-                </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-slate-100">
-                  {section.value !== null && section.value !== undefined
-                    ? section.isPct
-                      ? `${Math.round(section.value)}%`
-                      : `${section.value}/100`
-                    : "—"}
-                </p>
-              </div>
-            ))}
+          {/* Section Scores Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {sections.map((sec) => {
+              const val = sec.value !== null && sec.value !== undefined ? Math.round(sec.value) : 0;
+              return (
+                <div
+                  key={sec.label}
+                  className="p-5 bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] space-y-3"
+                >
+                  <div className="flex items-center justify-between text-xs text-zinc-400 font-bold">
+                    <span>{sec.label}</span>
+                    <span className="text-white font-mono">{sec.isPct ? `${val}%` : `${val}/100`}</span>
+                  </div>
+                  <div className="w-full bg-[#090A0C] rounded-full h-2 overflow-hidden border border-[#242834]">
+                    <div
+                      className={`h-full transition-all duration-500 ${
+                        val >= 75 ? "bg-emerald-500" : val >= 50 ? "bg-amber-500" : "bg-rose-500"
+                      }`}
+                      style={{ width: `${Math.min(100, val)}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
-          {/* Keywords Section */}
+          {/* Keywords Match & Missing */}
           {(keywords.matched.length > 0 || keywords.missing.length > 0) && (
-            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 mb-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">
-                Keyword Match
+            <div className="p-6 bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] space-y-5">
+              <h2 className="text-sm font-black text-white uppercase tracking-wider">
+                Keyword Matching Breakdown
               </h2>
               {keywords.matched.length > 0 && (
-                <div className="mb-4">
-                  <p className="text-sm font-medium text-green-700 dark:text-green-400 mb-2">
-                    ✅ Matched ({keywords.matched.length})
+                <div className="space-y-2">
+                  <p className="text-xs font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <span>✅ Matched Keywords ({keywords.matched.length}):</span>
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {keywords.matched.map((kw) => (
@@ -641,10 +632,11 @@ function AnalysisDetailContent() {
                   </div>
                 </div>
               )}
+
               {keywords.missing.length > 0 && (
-                <div>
-                  <p className="text-sm font-medium text-red-700 dark:text-red-400 mb-2">
-                    ❌ Missing ({keywords.missing.length})
+                <div className="space-y-2 pt-2 border-t border-[#242834]">
+                  <p className="text-xs font-black text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <span>❌ Missing Keywords to Add ({keywords.missing.length}):</span>
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {keywords.missing.map((kw) => (
@@ -653,48 +645,42 @@ function AnalysisDetailContent() {
                   </div>
                 </div>
               )}
-              {keywords.matched.length === 0 &&
-                keywords.missing.length === 0 && (
-                  <p className="text-sm text-gray-500 dark:text-slate-400">
-                    No keyword data available.
-                  </p>
-                )}
             </div>
           )}
 
-          {/* Skills Gap */}
+          {/* Skills Gap Analysis */}
           {(skillsGap.present.length > 0 || skillsGap.missing.length > 0) && (
-            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 mb-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">
-                Skills Gap Analysis
+            <div className="p-6 bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] space-y-4">
+              <h2 className="text-sm font-black text-white uppercase tracking-wider">
+                Technical Skills Gap Analysis
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800">
-                  <p className="text-sm font-semibold text-green-800 dark:text-green-300 mb-2">
-                    Skills You Have
+                <div className="p-4 bg-emerald-950/30 border border-emerald-800/50 rounded-2xl space-y-2">
+                  <p className="text-xs font-black text-emerald-400 uppercase tracking-wider">
+                    Skills Found in Resume
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {skillsGap.present.map((s) => (
                       <span
                         key={s}
-                        className="px-2 py-0.5 bg-green-100 dark:bg-green-800/50 text-green-800 dark:text-green-300 text-xs rounded-md"
+                        className="px-2.5 py-1 bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 text-[11px] font-bold rounded-xl"
                       >
-                        {s}
+                        ✓ {s}
                       </span>
                     ))}
                   </div>
                 </div>
-                <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800">
-                  <p className="text-sm font-semibold text-red-800 dark:text-red-300 mb-2">
-                    Skills to Add
+                <div className="p-4 bg-rose-950/30 border border-rose-800/50 rounded-2xl space-y-2">
+                  <p className="text-xs font-black text-rose-400 uppercase tracking-wider">
+                    Missing Target Skills
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {skillsGap.missing.map((s) => (
                       <span
                         key={s}
-                        className="px-2 py-0.5 bg-red-100 dark:bg-red-800/50 text-red-800 dark:text-red-300 text-xs rounded-md"
+                        className="px-2.5 py-1 bg-rose-500/10 text-rose-300 border border-rose-500/30 text-[11px] font-bold rounded-xl"
                       >
-                        {s}
+                        + {s}
                       </span>
                     ))}
                   </div>
@@ -703,127 +689,71 @@ function AnalysisDetailContent() {
             </div>
           )}
 
-          {/* Skill Bridge */}
+          {/* Skill Bridge Card */}
           {(skillsGap.missing.length > 0 || keywords.missing.length > 0) && (
-            <div className="mb-6">
-              <SkillBridgeCard
-                missingSkills={Array.from(
-                  new Set([...skillsGap.missing, ...keywords.missing])
-                )}
-              />
-            </div>
+            <SkillBridgeCard
+              missingSkills={Array.from(
+                new Set([...skillsGap.missing, ...keywords.missing])
+              )}
+            />
           )}
 
           {/* Keyword Density Heatmap */}
           {keywordFrequencies.length > 0 && (
-            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 mb-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">
-                Keyword Density Heatmap
+            <div className="p-6 bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] space-y-4">
+              <h2 className="text-sm font-black text-white uppercase tracking-wider">
+                Keyword Frequency Heatmap
               </h2>
-              <div className="flex flex-wrap gap-1.5">
-                {keywordFrequencies.map((kw) => {
-                  const intensity = Math.max(0.25, kw.count / maxFreq);
-                  if (kw.matched) {
-                    const green = Math.round(200 - intensity * 160);
-                    return (
-                      <span
-                        key={kw.word}
-                        className="px-3 py-1 rounded-full text-xs font-medium border"
-                        style={{
-                          backgroundColor: `rgb(220, ${green + 30}, 220)`,
-                          color: `rgb(0, ${Math.round(100 - intensity * 60)}, 0)`,
-                          borderColor: `rgb(150, ${green + 20}, 150)`,
-                          opacity: 0.65 + intensity * 0.35,
-                        }}
-                        title={`${kw.word} (${kw.count}x)`}
-                      >
-                        ✓ {kw.word}
-                        {kw.count > 1 && (
-                          <span className="ml-1 text-[10px] opacity-70">
-                            ×{kw.count}
-                          </span>
-                        )}
-                      </span>
-                    );
-                  }
-                  return (
-                    <span
-                      key={kw.word}
-                      className="px-3 py-1 rounded-full text-xs font-medium border"
-                      style={{
-                        backgroundColor: `rgb(255, ${Math.round(230 - intensity * 80)}, ${Math.round(230 - intensity * 80)})`,
-                        color: `rgb(180, ${Math.round(40 - intensity * 30)}, ${Math.round(40 - intensity * 30)})`,
-                        borderColor: `rgb(250, ${Math.round(180 - intensity * 60)}, ${Math.round(180 - intensity * 60)})`,
-                      }}
-                      title={`${kw.word} (missing)`}
-                    >
-                      ✗ {kw.word}
-                    </span>
-                  );
-                })}
+              <div className="flex flex-wrap gap-2">
+                {keywordFrequencies.map((kw) => (
+                  <span
+                    key={kw.word}
+                    className={`px-3 py-1 rounded-xl text-xs font-bold border transition-all ${
+                      kw.matched
+                        ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/30"
+                        : "bg-rose-500/10 text-rose-300 border-rose-500/30"
+                    }`}
+                  >
+                    {kw.matched ? "✓" : "×"} {kw.word}
+                    {kw.count > 1 && <span className="ml-1 opacity-70">({kw.count}x)</span>}
+                  </span>
+                ))}
               </div>
             </div>
           )}
         </div>
       )}
 
-      {/* ============ SUGGESTIONS TAB ============ */}
+      {/* ============ SUGGESTIONS / BULLET FIXES TAB ============ */}
       {activeTab === "suggestions" && (
-        <div
-          id="panel-suggestions"
-          role="tabpanel"
-          aria-labelledby="tab-suggestions"
-          className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 mb-6 shadow-sm space-y-4"
-        >
-          {/* Target Score Goal & Projection Banner */}
-          <div className="p-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl border border-indigo-500/30 shadow-md space-y-2">
+        <div className="p-6 bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] space-y-6 text-white">
+          <div className="p-5 bg-[#090A0C] border border-amber-500/30 rounded-2xl space-y-2">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 bg-emerald-500 text-slate-950 font-extrabold text-[10px] uppercase rounded-full">
-                  🎯 Target Goal: 75%–80%+ ATS Score
+              <span className="text-xs font-black text-amber-300 uppercase tracking-wider">
+                ⚡ Tailored STAR Bullet Rewrites ({suggestions.length})
+              </span>
+              <span className="text-xs font-bold text-emerald-400">
+                Current: {overallScoreVal}% ➔ Projected:{" "}
+                <span className="text-white underline font-extrabold">
+                  {Math.min(95, Math.max(78, overallScoreVal + suggestions.length * 3))}% Match
                 </span>
-                <span className="text-xs text-indigo-300 font-semibold">
-                  {suggestions.length} Tailored Suggestions
-                </span>
-              </div>
-              {analysis?.overallScore !== null && analysis?.overallScore !== undefined && (
-                <div className="text-xs font-bold text-emerald-400">
-                  Current Score: {analysis.overallScore}% ➔ Projected Score:{" "}
-                  <span className="text-sm font-extrabold text-white underline">
-                    {Math.min(95, Math.max(78, analysis.overallScore + suggestions.length * 3))}%
-                  </span>{" "}
-                  (+{Math.min(95, Math.max(78, analysis.overallScore + suggestions.length * 3)) - analysis.overallScore}% Boost)
-                </div>
-              )}
+              </span>
             </div>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              These suggestions are generated strictly by matching your uploaded resume against this target Job Description. Accept and apply these targeted bullet rewrites to push your resume into the <strong>75%–80%+ top ATS match bracket</strong>.
+            <p className="text-xs text-zinc-400 leading-relaxed">
+              These suggestions are generated specifically by comparing your resume against this job posting. Apply these STAR bullets to boost your score to 80%+.
             </p>
           </div>
 
-          <div className="flex items-center justify-between mb-2">
-            <div>
-              <h2 className="text-base font-bold text-gray-900 dark:text-slate-100">
-                Section-by-Section ATS Rewrites ({suggestions.length})
-              </h2>
-              <p className="text-xs text-gray-500 dark:text-slate-400">
-                Accept suggestions to apply them automatically to your downloadable optimized resume.
-              </p>
-            </div>
-          </div>
-
           {suggestions.length === 0 ? (
-            <div className="py-4">
-              <InlineAiFixer
-                missingSkills={skillsGap.missing}
-                suggestions={[]}
-                onApplyFix={(orig: string, _updated: string) => {
-                  toast(`Accepted fix for "${orig.slice(0, 20)}..."`, "success");
-                }}
-              />
-            </div>
+            <InlineAiFixer
+              missingSkills={skillsGap.missing}
+              suggestions={[]}
+              onApplyFix={(orig: string) => {
+                toast(`Accepted fix for "${orig.slice(0, 20)}..."`, "success");
+              }}
+            />
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {suggestions.map((sug) => (
                 <SuggestionCard
                   key={sug.id}
@@ -838,190 +768,165 @@ function AnalysisDetailContent() {
 
       {/* ============ COVER LETTER TAB ============ */}
       {activeTab === "coverletter" && (
-        <div
-          id="panel-coverletter"
-          role="tabpanel"
-          aria-labelledby="tab-coverletter"
-          className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 mb-6 shadow-sm"
-        >
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
-              Cover Letter Generator
-            </h2>
+        <div className="p-6 bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] space-y-5 text-white">
+          <div className="flex items-center justify-between border-b border-[#242834] pb-4">
+            <div>
+              <h2 className="text-sm font-black text-white uppercase tracking-wider">
+                ✉️ Tailored Cover Letter Generator
+              </h2>
+              <p className="text-xs text-zinc-400 mt-1">
+                Generates a 3-paragraph executive cover letter customized for this job posting.
+              </p>
+            </div>
             {!showCoverLetter && (
               <button
                 onClick={handleGenerateCoverLetter}
                 disabled={generatingCoverLetter}
-                className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="px-5 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black rounded-2xl transition-all shadow-md flex items-center gap-2"
               >
                 {generatingCoverLetter ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Generating...
+                    <span className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                    <span>Generating...</span>
                   </>
                 ) : (
-                  "Generate Cover Letter"
+                  <span>⚡ Generate Cover Letter</span>
                 )}
               </button>
             )}
           </div>
 
           {showCoverLetter && (
-            <>
+            <div>
               {generatingCoverLetter ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-                  <span className="ml-3 text-sm text-gray-500 dark:text-slate-400">
-                    Generating cover letter...
+                <div className="flex items-center justify-center py-12">
+                  <span className="w-6 h-6 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+                  <span className="ml-3 text-xs font-bold text-amber-300 uppercase tracking-wider">
+                    Drafting custom cover letter...
                   </span>
                 </div>
               ) : coverLetterText ? (
-                <div>
-                  <div className="p-4 bg-gray-50 dark:bg-slate-700/50 rounded-xl border border-gray-200 dark:border-slate-600 max-h-96 overflow-y-auto">
-                    <pre className="text-sm text-gray-700 dark:text-slate-300 whitespace-pre-wrap font-sans leading-relaxed">
+                <div className="space-y-4">
+                  <div className="p-5 bg-[#090A0C] border border-[#242834] rounded-2xl max-h-96 overflow-y-auto">
+                    <pre className="text-xs text-zinc-300 whitespace-pre-wrap font-sans leading-relaxed">
                       {coverLetterText}
                     </pre>
                   </div>
-                  <div className="flex items-center gap-3 mt-3">
+                  <div className="flex items-center gap-3">
                     <button
                       onClick={handleCopyCoverLetter}
-                      className="px-4 py-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 border border-indigo-300 dark:border-indigo-700 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors flex items-center gap-1.5"
+                      className="px-5 py-2.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold rounded-xl transition-colors flex items-center gap-2"
                     >
-                      {coverLetterCopied ? (
-                        <>✓ Copied!</>
-                      ) : (
-                        <>
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                          </svg>
-                          Copy to Clipboard
-                        </>
-                      )}
+                      <span>{coverLetterCopied ? "✓ Copied!" : "📋 Copy to Clipboard"}</span>
                     </button>
                     <button
                       onClick={() => {
                         setShowCoverLetter(false);
                         setCoverLetterText(null);
                       }}
-                      className="px-4 py-1.5 text-sm font-medium text-gray-600 dark:text-slate-400 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+                      className="px-4 py-2.5 text-xs text-zinc-400 hover:text-white transition-colors"
                     >
                       Regenerate
                     </button>
                   </div>
                 </div>
               ) : (
-                <p className="text-sm text-red-600 dark:text-red-400 py-4">
+                <p className="text-xs text-rose-400 py-4">
                   Failed to generate cover letter. Please try again.
                 </p>
               )}
-            </>
+            </div>
           )}
         </div>
       )}
 
-      {/* ============ INTERVIEW TAB ============ */}
+      {/* ============ INTERVIEW COACH TAB ============ */}
       {activeTab === "interview" && (
-        <div
-          id="panel-interview"
-          role="tabpanel"
-          aria-labelledby="tab-interview"
-          className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 mb-6 shadow-sm space-y-4"
-        >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-700 pb-4">
+        <div className="p-6 bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] space-y-5 text-white">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#242834] pb-4">
             <div>
-              <h2 className="text-lg font-bold text-gray-900 dark:text-slate-100">
-                🎯 Stage-Wise Interview Coach & Model Answers
+              <h2 className="text-sm font-black text-white uppercase tracking-wider">
+                🎙️ Stage-Wise Interview Coach & STAR Answers
               </h2>
-              <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
-                Generate questions and high-scoring STAR-method model responses tailored by interview stage.
+              <p className="text-xs text-zinc-400 mt-1">
+                Predicted questions and STAR model answers tailored for this job description.
               </p>
             </div>
-
             <button
               onClick={() => handleGenerateQuestions(selectedStage)}
               disabled={generatingQuestions}
-              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-colors disabled:opacity-50 flex items-center gap-2 shrink-0"
+              className="px-5 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black rounded-2xl transition-all shadow-md flex items-center gap-2 shrink-0"
             >
               {generatingQuestions ? (
                 <>
-                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Generating Q&As...
+                  <span className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                  <span>Generating...</span>
                 </>
               ) : (
-                "🔄 Generate Questions & Answers"
+                <span>🔄 Generate Questions</span>
               )}
             </button>
           </div>
 
           {/* Stage Filter Buttons */}
-          <div className="flex flex-wrap gap-2 pt-1">
+          <div className="flex flex-wrap gap-2">
             {[
               { id: "all", label: "🌐 All Stages" },
               { id: "hr", label: "💼 HR Screening" },
-              { id: "technical", label: "💻 Technical Deep-Dive" },
-              { id: "coding", label: "⚡ Live Coding / System Design" },
-              { id: "behavioral", label: "🤝 Behavioral & Leadership" },
-              { id: "ceo", label: "👑 CEO / Executive Round" },
-            ].map((stage) => {
-              const active = selectedStage === stage.id;
-              return (
-                <button
-                  key={stage.id}
-                  onClick={() => handleGenerateQuestions(stage.id)}
-                  disabled={generatingQuestions}
-                  className={`px-3 py-1.5 text-xs font-bold rounded-xl transition-all ${
-                    active
-                      ? "bg-indigo-600 text-white shadow-sm"
-                      : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600"
-                  }`}
-                >
-                  {stage.label}
-                </button>
-              );
-            })}
+              { id: "technical", label: "💻 Technical Round" },
+              { id: "coding", label: "⚡ System Design" },
+              { id: "behavioral", label: "🤝 Behavioral" },
+              { id: "ceo", label: "👑 Executive Round" },
+            ].map((stage) => (
+              <button
+                key={stage.id}
+                onClick={() => handleGenerateQuestions(stage.id)}
+                disabled={generatingQuestions}
+                className={`px-3 py-1.5 text-xs font-bold rounded-xl transition-all ${
+                  selectedStage === stage.id
+                    ? "bg-amber-500 text-slate-950 font-black"
+                    : "bg-[#090A0C] border border-[#242834] text-zinc-400 hover:text-white"
+                }`}
+              >
+                {stage.label}
+              </button>
+            ))}
           </div>
 
           {showQuestions && (
             <>
               {generatingQuestions ? (
                 <div className="flex flex-col items-center justify-center py-12 space-y-3">
-                  <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-                  <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
-                    Analyzing resume & JD to build model answers for <strong>{selectedStage.toUpperCase()}</strong> stage...
+                  <span className="w-8 h-8 border-3 border-amber-400 border-t-transparent rounded-full animate-spin" />
+                  <span className="text-xs font-bold text-amber-300 uppercase tracking-wider">
+                    Generating Q&As for {selectedStage.toUpperCase()} round...
                   </span>
                 </div>
               ) : interviewQuestions && interviewQuestions.length > 0 ? (
                 <div className="space-y-4 pt-2">
                   {interviewQuestions.map((q, idx) => {
-                    const isAnswerExpanded = Boolean(expandedAnswers[idx]);
+                    const isExpanded = Boolean(expandedAnswers[idx]);
                     return (
                       <div
                         key={idx}
-                        className="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600 space-y-3"
+                        className="p-4 bg-[#090A0C] border border-[#242834] rounded-2xl space-y-3"
                       >
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <div className="flex items-center gap-2">
-                            {q.stage && (
-                              <span className="px-2.5 py-0.5 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-800 dark:text-indigo-300 font-extrabold text-[10px] rounded-full uppercase">
-                                📌 {q.stage}
-                              </span>
-                            )}
-                            <span className="px-2 py-0.5 bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-300 font-semibold text-[10px] rounded-full">
-                              {q.category}
+                        <div className="flex items-center gap-2">
+                          {q.stage && (
+                            <span className="px-2 py-0.5 bg-amber-500/10 text-amber-300 border border-amber-500/30 text-[10px] font-black rounded-lg uppercase">
+                              {q.stage}
                             </span>
-                          </div>
+                          )}
+                          <span className="text-xs font-mono text-zinc-400">{q.category}</span>
                         </div>
-
-                        <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 leading-snug">
+                        <h3 className="text-xs font-bold text-white leading-relaxed">
                           ❓ {q.question}
                         </h3>
-
-                        <p className="text-xs text-slate-500 dark:text-slate-400 italic">
+                        <p className="text-[11px] text-zinc-400 italic">
                           💡 <strong>Why Asked:</strong> {q.rationale}
                         </p>
 
-                        {/* Model Answer Expander Toggle */}
-                        <div className="pt-2 border-t border-slate-200/60 dark:border-slate-600/60">
+                        <div className="pt-2 border-t border-[#242834]">
                           <button
                             onClick={() =>
                               setExpandedAnswers((prev) => ({
@@ -1029,33 +934,32 @@ function AnalysisDetailContent() {
                                 [idx]: !prev[idx],
                               }))
                             }
-                            className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1.5"
+                            className="text-xs font-bold text-amber-400 hover:underline flex items-center gap-1"
                           >
-                            <span>{isAnswerExpanded ? "▼ Hide Model Answer" : "► View High-Scoring STAR Model Answer & Talking Points"}</span>
+                            <span>{isExpanded ? "▼ Hide Model STAR Answer" : "► View STAR Model Answer & Talking Points"}</span>
                           </button>
 
-                          {isAnswerExpanded && (
-                            <div className="mt-3 p-3.5 bg-white dark:bg-slate-800 rounded-xl border border-indigo-100 dark:border-indigo-900/50 space-y-3 animate-fadeIn">
+                          {isExpanded && (
+                            <div className="mt-3 p-4 bg-[#14161D] border border-amber-500/20 rounded-xl space-y-3">
                               {q.answer && (
-                                <div>
-                                  <p className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide mb-1">
-                                    ⭐ STAR Sample Response (Targeting Resume Experience)
+                                <div className="space-y-1">
+                                  <p className="text-[10px] font-black text-emerald-400 uppercase tracking-wider">
+                                    ⭐ Sample STAR Answer:
                                   </p>
-                                  <p className="text-xs text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed">
+                                  <p className="text-xs text-zinc-300 leading-relaxed whitespace-pre-wrap">
                                     {q.answer}
                                   </p>
                                 </div>
                               )}
-
                               {q.keyTalkingPoints && q.keyTalkingPoints.length > 0 && (
-                                <div>
-                                  <p className="text-[11px] font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wide mb-1">
-                                    🎯 Key Talking Points to Mention
+                                <div className="space-y-1">
+                                  <p className="text-[10px] font-black text-amber-300 uppercase tracking-wider">
+                                    🎯 Key Talking Points:
                                   </p>
-                                  <ul className="space-y-1 text-xs text-slate-600 dark:text-slate-300">
+                                  <ul className="space-y-1 text-xs text-zinc-400">
                                     {q.keyTalkingPoints.map((tp, tpIdx) => (
                                       <li key={tpIdx} className="flex items-start gap-1.5">
-                                        <span className="text-indigo-500 font-bold">•</span>
+                                        <span className="text-amber-400">•</span>
                                         <span>{tp}</span>
                                       </li>
                                     ))}
@@ -1070,8 +974,8 @@ function AnalysisDetailContent() {
                   })}
                 </div>
               ) : (
-                <p className="text-xs text-slate-500 dark:text-slate-400 py-6 text-center">
-                  Click a stage above to generate tailored interview questions and model answers.
+                <p className="text-xs text-zinc-500 py-6 text-center">
+                  Click a stage above to generate tailored interview questions.
                 </p>
               )}
             </>
@@ -1079,31 +983,77 @@ function AnalysisDetailContent() {
         </div>
       )}
 
-      {/* ============ SHARE TAB ============ */}
+      {/* ============ SALARY GUIDE TAB ============ */}
+      {activeTab === "salary" && (
+        <div className="p-6 bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] space-y-5 text-white">
+          <h2 className="text-sm font-black text-white uppercase tracking-wider">
+            💰 Salary Negotiation Script & Market Guide
+          </h2>
+          <div className="flex gap-3">
+            <input
+              value={targetSalary}
+              onChange={(e) => setTargetSalary(e.target.value)}
+              placeholder="Target salary (e.g. $120,000)"
+              className="flex-1 px-4 py-3 bg-[#090A0C] border border-[#242834] rounded-2xl text-xs font-bold text-white placeholder-zinc-500 focus:border-amber-500 focus:outline-none"
+            />
+            <button
+              onClick={handleNegotiate}
+              disabled={negotiating || !targetSalary.trim()}
+              className="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black uppercase rounded-2xl transition-all disabled:opacity-50"
+            >
+              {negotiating ? "Generating..." : "Generate Guide"}
+            </button>
+          </div>
+
+          {negotiationResult?.marketRange && (
+            <div className="p-4 bg-[#090A0C] border border-amber-500/30 rounded-2xl space-y-1">
+              <p className="text-xs font-black text-amber-300 uppercase tracking-wider">
+                📊 Estimated Market Salary Range:
+              </p>
+              <p className="text-xs text-zinc-300 font-medium">
+                {negotiationResult.marketRange}
+              </p>
+            </div>
+          )}
+
+          {negotiationResult?.negotiationScript && (
+            <div className="p-4 bg-[#090A0C] border border-emerald-500/30 rounded-2xl space-y-1">
+              <p className="text-xs font-black text-emerald-400 uppercase tracking-wider">
+                🎙️ Counter-Offer Script:
+              </p>
+              <p className="text-xs text-zinc-300 leading-relaxed whitespace-pre-wrap font-sans">
+                {negotiationResult.negotiationScript}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ============ SHARE REPORT TAB ============ */}
       {activeTab === "share" && (
-        <div
-          id="panel-share"
-          role="tabpanel"
-          aria-labelledby="tab-share"
-          className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 shadow-sm"
-        >
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
-              Share Analysis
-            </h2>
+        <div className="p-6 bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] space-y-5 text-white">
+          <div className="flex items-center justify-between border-b border-[#242834] pb-4">
+            <div>
+              <h2 className="text-sm font-black text-white uppercase tracking-wider">
+                🔗 Share Public Analysis Report
+              </h2>
+              <p className="text-xs text-zinc-400 mt-1">
+                Creates a read-only public share link for career coaches or recruiters.
+              </p>
+            </div>
             {!shareUrl && (
               <button
                 onClick={handleShare}
                 disabled={sharing}
-                className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="px-5 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black rounded-2xl transition-all shadow-md flex items-center gap-2"
               >
                 {sharing ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Creating link...
+                    <span className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                    <span>Creating Link...</span>
                   </>
                 ) : (
-                  "Share Analysis"
+                  <span>🔗 Create Share Link</span>
                 )}
               </button>
             )}
@@ -1111,76 +1061,17 @@ function AnalysisDetailContent() {
 
           {shareUrl && (
             <div className="flex items-center gap-3">
-              <div className="flex-1 p-3 bg-gray-50 dark:bg-slate-700/50 rounded-lg border border-gray-200 dark:border-slate-600">
-                <p className="text-sm text-gray-700 dark:text-slate-300 font-mono break-all">
-                  {shareUrl}
-                </p>
-              </div>
+              <input
+                readOnly
+                value={shareUrl}
+                className="flex-1 px-4 py-3 bg-[#090A0C] border border-[#242834] rounded-2xl text-xs font-mono text-amber-300 focus:outline-none"
+              />
               <button
                 onClick={handleCopyShareLink}
-                className="px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 border border-indigo-300 dark:border-indigo-700 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors flex items-center gap-1.5 shrink-0"
+                className="px-5 py-3 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold rounded-2xl transition-colors shrink-0"
               >
-                {shareCopied ? (
-                  <>✓ Copied!</>
-                ) : (
-                  <>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
-                    Copy Link
-                  </>
-                )}
+                {shareCopied ? "✓ Copied!" : "📋 Copy Link"}
               </button>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ============ SALARY TAB ============ */}
-      {activeTab === "salary" && (
-        <div
-          id="panel-salary"
-          role="tabpanel"
-          aria-labelledby="tab-salary"
-          className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-6 shadow-sm"
-        >
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">
-            💰 Salary Negotiation Guide
-          </h2>
-          <div className="flex gap-3 mb-4">
-            <input
-              value={targetSalary}
-              onChange={(e) => setTargetSalary(e.target.value)}
-              placeholder="Target salary (e.g. $120,000)"
-              className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-700 outline-none"
-              aria-label="Target salary"
-            />
-            <button
-              onClick={handleNegotiate}
-              disabled={negotiating || !targetSalary.trim()}
-              className="px-6 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50"
-            >
-              {negotiating ? "..." : "Generate"}
-            </button>
-          </div>
-          {negotiationResult?.marketRange && (
-            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg mb-3">
-              <p className="text-sm font-semibold text-blue-800 dark:text-blue-300">
-                📊 Market Range
-              </p>
-              <p className="text-sm text-blue-700 dark:text-blue-300">
-                {negotiationResult.marketRange}
-              </p>
-            </div>
-          )}
-          {negotiationResult?.negotiationScript && (
-            <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg mb-3">
-              <p className="text-sm font-semibold text-green-800 dark:text-green-300">
-                🎙️ Script
-              </p>
-              <p className="text-sm text-green-700 dark:text-green-300 whitespace-pre-wrap">
-                {negotiationResult.negotiationScript}
-              </p>
             </div>
           )}
         </div>
@@ -1193,8 +1084,8 @@ export default function AnalysisDetailPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex items-center justify-center min-h-[80vh]">
-          <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+        <div className="flex items-center justify-center min-h-[80vh] bg-[#090A0C]">
+          <div className="w-8 h-8 border-3 border-amber-400 border-t-transparent rounded-full animate-spin" />
         </div>
       }
     >
