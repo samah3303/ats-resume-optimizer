@@ -34,9 +34,11 @@ Generate a complete candidate outreach pack as a JSON object with EXACTLY the fo
 {
   "coverLetter": "<A 300-word highly tailored, persuasive cover letter highlighting key matches and enthusiasm>",
   "linkedinMessage": "<A high-converting 250-character max LinkedIn connection note to a recruiter or peer at ${company || "the target company"}>",
+  "whatsappMessage": "<A short 2-3 sentence professional WhatsApp direct message to a recruiter or hiring contact>",
   "coldEmailSubject": "<An attention-grabbing email subject line, e.g., 'Experienced ${jobTitle || "Engineer"} passionate about ${company || "your team"}'s growth'>",
   "coldEmailBody": "<A concise 4-paragraph cold outreach email to a hiring manager pitch asking for a brief intro call>",
   "followupEmailBody": "<A polite follow-up email to send 5-7 days after applying, reaffirming value>",
+  "postInterviewEmailBody": "<A warm, appreciative post-interview thank you email highlighting 2 key discussion takeaways>",
   "elevatorPitch": "<A 60-second spoken elevator pitch answering 'Tell me about yourself' for an interview>"
 }
 
@@ -56,9 +58,11 @@ Guidelines:
   return parseJsonSafely<OutreachPack>(content, {
     coverLetter: "Dear Hiring Manager,\n\nI am writing to express my strong interest...",
     linkedinMessage: "Hi, I saw your opening and would love to connect!",
+    whatsappMessage: `Hi ${recruiterName || "there"}, I recently applied for the ${jobTitle || "open"} role at ${company || "your company"}. I would love to connect briefly!`,
     coldEmailSubject: `Application for ${jobTitle || "Role"} at ${company || "Company"}`,
     coldEmailBody: "Dear Hiring Manager,\n\nI am reaching out regarding...",
     followupEmailBody: "Dear Hiring Manager,\n\nI wanted to follow up on my recent application...",
+    postInterviewEmailBody: "Dear Team,\n\nThank you for the insightful conversation today...",
     elevatorPitch: "I am a dedicated professional with experience in...",
   });
 }

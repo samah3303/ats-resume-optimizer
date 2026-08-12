@@ -53,9 +53,11 @@ export interface RecommendedJob {
 export interface OutreachPack {
   coverLetter: string;
   linkedinMessage: string;
+  whatsappMessage?: string;
   coldEmailSubject: string;
   coldEmailBody: string;
   followupEmailBody: string;
+  postInterviewEmailBody?: string;
   elevatorPitch: string;
 }
 

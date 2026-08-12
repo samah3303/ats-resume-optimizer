@@ -4,11 +4,14 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import { useToast } from "@/components/Toast";
 
 interface JDInfo {
+  id: string;
   title: string;
   company: string | null;
   sourceUrl: string | null;
+  rawText?: string;
 }
 
 interface Application {
@@ -19,6 +22,16 @@ interface Application {
   appliedAt: string | null;
   createdAt: string;
   jobDescription: JDInfo;
+}
+
+interface OutreachPack {
+  coverLetter?: string;
+  linkedinMessage?: string;
+  whatsappMessage?: string;
+  coldEmailSubject?: string;
+  coldEmailBody?: string;
+  followupEmailBody?: string;
+  postInterviewEmailBody?: string;
 }
 
 const STATUSES = [
@@ -33,10 +46,18 @@ const STATUSES = [
 export default function TrackerPage() {
   const { status } = useSession();
   const router = useRouter();
+  const { toast } = useToast();
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [movingId, setMovingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // Outreach Modal State
+  const [activeOutreachApp, setActiveOutreachApp] = useState<Application | null>(null);
+  const [generatingOutreach, setGeneratingOutreach] = useState(false);
+  const [outreachPack, setOutreachPack] = useState<OutreachPack | null>(null);
+  const [activeChannelTab, setActiveChannelTab] = useState<"linkedin" | "whatsapp" | "email">("linkedin");
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   const fetchApplications = useCallback(async () => {
     try {
@@ -74,9 +95,10 @@ export default function TrackerPage() {
         setApplications((prev) =>
           prev.map((a) => (a.id === appId ? { ...a, status: newStatus } : a))
         );
+        toast(`Moved to ${STATUSES.find(s => s.key === newStatus)?.label}`, "info");
       }
     } catch {
-      // silently fail
+      toast("Failed to update status", "error");
     } finally {
       setMovingId(null);
     }
@@ -89,12 +111,57 @@ export default function TrackerPage() {
       const res = await fetch(`/api/tracker?id=${appId}`, { method: "DELETE" });
       if (res.ok) {
         setApplications((prev) => prev.filter((a) => a.id !== appId));
+        toast("Application removed", "success");
       }
     } catch {
-      // silently fail
+      toast("Failed to remove application", "error");
     } finally {
       setDeletingId(null);
     }
+  };
+
+  const handleOpenOutreach = async (app: Application) => {
+    setActiveOutreachApp(app);
+    setOutreachPack(null);
+    setGeneratingOutreach(true);
+
+    try {
+      // Get primary resume ID if available
+      const rRes = await fetch("/api/resumes/primary");
+      let primaryResumeId: string | undefined;
+      if (rRes.ok) {
+        const rData = await rRes.json();
+        primaryResumeId = rData.resume?.id;
+      }
+
+      const res = await fetch("/api/outreach", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          resumeId: primaryResumeId,
+          resumeText: "Experienced Software & AI Engineer",
+          jdId: app.jdId,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setOutreachPack(data.pack);
+      } else {
+        toast("Failed to generate outreach templates", "error");
+      }
+    } catch {
+      toast("Failed to generate outreach templates", "error");
+    } finally {
+      setGeneratingOutreach(false);
+    }
+  };
+
+  const copyToClipboard = async (text: string, key: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopiedKey(key);
+    toast("Copied to clipboard!", "success");
+    setTimeout(() => setCopiedKey(null), 2000);
   };
 
   const getAppsByStatus = (statusKey: string) =>
@@ -129,13 +196,13 @@ export default function TrackerPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <Link href="/dashboard/tools" className="text-xs font-bold text-amber-400 hover:underline">
-                ← Back to All Tools
+              <Link href="/dashboard" className="text-xs font-bold text-amber-400 hover:underline">
+                ← Back to Dashboard
               </Link>
             </div>
             <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight mt-1">Application Kanban Tracker</h1>
             <p className="text-xs sm:text-sm text-zinc-400 mt-1">
-              {applications.length} application{applications.length !== 1 ? "s" : ""} tracked across active hiring stages
+              {applications.length} application{applications.length !== 1 ? "s" : ""} tracked with 1-click multi-channel outreach
             </p>
           </div>
         </div>
@@ -181,21 +248,14 @@ export default function TrackerPage() {
                                 {app.jobDescription.company}
                               </p>
                             )}
-                            {app.notes && (
-                              <p className="text-[11px] text-zinc-400 line-clamp-2 italic">
-                                {app.notes}
-                              </p>
-                            )}
-                            {app.jobDescription.sourceUrl && (
-                              <a
-                                href={app.jobDescription.sourceUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-block text-[10px] font-bold text-amber-400 hover:underline"
-                              >
-                                View Job ↗
-                              </a>
-                            )}
+                            
+                            <button
+                              onClick={() => handleOpenOutreach(app)}
+                              className="w-full mt-1 px-2.5 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-bold rounded-xl transition-colors flex items-center justify-center gap-1"
+                            >
+                              <span>🚀 Multi-Channel Outreach</span>
+                            </button>
+
                             <div className="flex items-center justify-between pt-2 border-t border-[#242834]">
                               <div className="flex gap-1">
                                 {idx > 0 && (
@@ -242,6 +302,138 @@ export default function TrackerPage() {
           </div>
         </div>
       </div>
+
+      {/* Multi-Channel Outreach Modal */}
+      {activeOutreachApp && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="bg-[#14161D] border border-[#242834] rounded-3xl p-6 max-w-xl w-full text-white shadow-2xl space-y-5 animate-fadeIn">
+            <div className="flex items-center justify-between border-b border-[#242834] pb-4">
+              <div>
+                <span className="text-[10px] font-black text-amber-300 uppercase tracking-wider">
+                  Outreach Assistant
+                </span>
+                <h3 className="text-base font-black text-white">
+                  {activeOutreachApp.jobDescription.title}
+                </h3>
+                <p className="text-xs text-zinc-400">
+                  {activeOutreachApp.jobDescription.company || "Target Company"}
+                </p>
+              </div>
+              <button
+                onClick={() => setActiveOutreachApp(null)}
+                className="text-xs font-bold text-zinc-400 hover:text-white"
+              >
+                ✕ Close
+              </button>
+            </div>
+
+            {generatingOutreach ? (
+              <div className="flex flex-col items-center justify-center py-12 space-y-3">
+                <span className="w-8 h-8 border-3 border-amber-400 border-t-transparent rounded-full animate-spin" />
+                <span className="text-xs font-bold text-amber-300 uppercase tracking-wider">
+                  Drafting LinkedIn, WhatsApp & Email messages...
+                </span>
+              </div>
+            ) : outreachPack ? (
+              <div className="space-y-4">
+                {/* Channel Selector */}
+                <div className="flex gap-2 bg-[#090A0C] border border-[#242834] rounded-2xl p-1.5">
+                  <button
+                    onClick={() => setActiveChannelTab("linkedin")}
+                    className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${
+                      activeChannelTab === "linkedin"
+                        ? "bg-amber-500 text-slate-950 font-black"
+                        : "text-zinc-400 hover:text-white"
+                    }`}
+                  >
+                    💼 LinkedIn InMail
+                  </button>
+                  <button
+                    onClick={() => setActiveChannelTab("whatsapp")}
+                    className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${
+                      activeChannelTab === "whatsapp"
+                        ? "bg-emerald-500 text-slate-950 font-black"
+                        : "text-zinc-400 hover:text-white"
+                    }`}
+                  >
+                    📱 WhatsApp DM
+                  </button>
+                  <button
+                    onClick={() => setActiveChannelTab("email")}
+                    className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${
+                      activeChannelTab === "email"
+                        ? "bg-purple-500 text-slate-950 font-black"
+                        : "text-zinc-400 hover:text-white"
+                    }`}
+                  >
+                    ✉️ Follow-Up Email
+                  </button>
+                </div>
+
+                {/* Tab Content */}
+                {activeChannelTab === "linkedin" && (
+                  <div className="p-4 bg-[#090A0C] border border-[#242834] rounded-2xl space-y-3">
+                    <p className="text-[11px] font-bold text-amber-300 uppercase tracking-wider">
+                      LinkedIn Connection / InMail Note (Max 250 chars):
+                    </p>
+                    <p className="text-xs text-zinc-300 font-sans leading-relaxed whitespace-pre-wrap">
+                      {outreachPack.linkedinMessage}
+                    </p>
+                    <button
+                      onClick={() => copyToClipboard(outreachPack.linkedinMessage || "", "li")}
+                      className="px-4 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold rounded-xl transition-colors"
+                    >
+                      {copiedKey === "li" ? "✓ Copied!" : "📋 Copy LinkedIn Message"}
+                    </button>
+                  </div>
+                )}
+
+                {activeChannelTab === "whatsapp" && (
+                  <div className="p-4 bg-[#090A0C] border border-[#242834] rounded-2xl space-y-3">
+                    <p className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">
+                      WhatsApp Direct Message (Short & Professional):
+                    </p>
+                    <p className="text-xs text-zinc-300 font-sans leading-relaxed whitespace-pre-wrap">
+                      {outreachPack.whatsappMessage}
+                    </p>
+                    <button
+                      onClick={() => copyToClipboard(outreachPack.whatsappMessage || "", "wa")}
+                      className="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold rounded-xl transition-colors"
+                    >
+                      {copiedKey === "wa" ? "✓ Copied!" : "📋 Copy WhatsApp Message"}
+                    </button>
+                  </div>
+                )}
+
+                {activeChannelTab === "email" && (
+                  <div className="p-4 bg-[#090A0C] border border-[#242834] rounded-2xl space-y-3">
+                    <p className="text-[11px] font-bold text-purple-300 uppercase tracking-wider">
+                      Follow-up Email (Day 3-7 After Applying):
+                    </p>
+                    <div className="space-y-1 border-b border-[#242834] pb-2">
+                      <span className="text-[10px] text-zinc-400 font-mono block">Subject:</span>
+                      <p className="text-xs font-bold text-white">{outreachPack.coldEmailSubject}</p>
+                    </div>
+                    <p className="text-xs text-zinc-300 font-sans leading-relaxed whitespace-pre-wrap">
+                      {outreachPack.followupEmailBody}
+                    </p>
+                    <button
+                      onClick={() => copyToClipboard(`${outreachPack.coldEmailSubject}\n\n${outreachPack.followupEmailBody}`, "em")}
+                      className="px-4 py-2 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs font-bold rounded-xl transition-colors"
+                    >
+                      {copiedKey === "em" ? "✓ Copied!" : "📋 Copy Email Template"}
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <p className="text-xs text-rose-400 py-4 text-center">
+                Failed to generate outreach messages. Please try again.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
