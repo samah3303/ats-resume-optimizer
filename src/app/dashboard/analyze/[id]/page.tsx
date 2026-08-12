@@ -284,7 +284,9 @@ function AnalysisDetailContent() {
     }
   };
 
-  const handleDownloadOptimized = async () => {
+  const [selectedTemplate, setSelectedTemplate] = useState<"emerald_tech" | "classic_corporate">("emerald_tech");
+
+  const handleDownloadOptimized = async (targetFormat: "pdf" | "docx" = "pdf") => {
     const safeSugs = Array.isArray(suggestions) ? suggestions : [];
     let acceptedIds = safeSugs.filter((s) => s.accepted).map((s) => s.id);
     if (acceptedIds.length === 0) {
@@ -299,6 +301,8 @@ function AnalysisDetailContent() {
         body: JSON.stringify({
           analysisId: id,
           acceptedSuggestionIds: acceptedIds,
+          format: targetFormat,
+          template: selectedTemplate,
         }),
       });
 
@@ -310,13 +314,7 @@ function AnalysisDetailContent() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      const contentType = res.headers.get("Content-Type") || "";
-      const ext =
-        contentType.includes("docx") ||
-        contentType.includes("vnd.openxmlformats")
-          ? ".docx"
-          : ".pdf";
-      a.download = `optimized-resume-${analysis?.resume?.name || "resume"}${ext}`;
+      a.download = `optimized-resume-${analysis?.resume?.name || "resume"}.${targetFormat}`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -326,7 +324,7 @@ function AnalysisDetailContent() {
       const boost = Math.min(acceptedCount * 5, 25);
       setScoreBoost(boost);
       setDownloadSuccess(true);
-      toast("Resume downloaded successfully!", "success");
+      toast(`Optimized ${targetFormat.toUpperCase()} downloaded successfully!`, "success");
     } catch (err) {
       toast(
         err instanceof Error ? err.message : "Failed to download optimized resume",
@@ -506,11 +504,21 @@ function AnalysisDetailContent() {
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 w-full lg:w-auto">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full lg:w-auto">
+            {/* Template Selector Dropdown */}
+            <select
+              value={selectedTemplate}
+              onChange={(e) => setSelectedTemplate(e.target.value as "emerald_tech" | "classic_corporate")}
+              className="px-3.5 py-3 bg-[#090A0C] border border-[#242834] text-amber-300 text-xs font-bold rounded-2xl outline-none cursor-pointer hover:border-amber-500/50 transition-colors"
+            >
+              <option value="emerald_tech">🎨 Template: Emerald Tech</option>
+              <option value="classic_corporate">🏛️ Template: Classic Corporate</option>
+            </select>
+
             <button
-              onClick={handleDownloadOptimized}
+              onClick={() => handleDownloadOptimized("pdf")}
               disabled={downloading}
-              className="px-6 py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black uppercase tracking-wider rounded-2xl shadow-lg shadow-amber-500/20 transition-all disabled:opacity-50 flex items-center gap-2"
+              className="px-5 py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black uppercase tracking-wider rounded-2xl shadow-lg shadow-amber-500/20 transition-all disabled:opacity-50 flex items-center gap-2"
             >
               {downloading ? (
                 <>
@@ -523,12 +531,21 @@ function AnalysisDetailContent() {
                 </>
               )}
             </button>
+
+            <button
+              onClick={() => handleDownloadOptimized("docx")}
+              disabled={downloading}
+              className="px-5 py-3.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-wider rounded-2xl shadow-lg shadow-blue-500/20 transition-all disabled:opacity-50 flex items-center gap-2"
+            >
+              <span>📝 Download Editable DOCX</span>
+            </button>
+
             <button
               onClick={handleShare}
               disabled={sharing}
-              className="px-5 py-3.5 bg-[#090A0C] hover:bg-[#1A1D27] text-white border border-[#242834] text-xs font-bold rounded-2xl transition-all flex items-center gap-2"
+              className="px-4 py-3.5 bg-[#090A0C] hover:bg-[#1A1D27] text-white border border-[#242834] text-xs font-bold rounded-2xl transition-all flex items-center gap-2"
             >
-              <span>🔗 Share Report</span>
+              <span>🔗 Share</span>
             </button>
           </div>
         </div>

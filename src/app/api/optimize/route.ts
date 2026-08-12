@@ -2,10 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-// Agent dynamically imported to avoid Vercel ai SDK bundling issues
 import { generateOptimizedResumePdf } from "@/lib/pdf-generator";
-import { modifyDocxText } from "@/lib/docx-modifier";
-import { loadOriginalFile, getOriginalFormat } from "@/lib/storage";
+import { generateDocxResume, TemplateType } from "@/lib/docx-generator";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -17,7 +15,12 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { analysisId, acceptedSuggestionIds } = body;
+    const {
+      analysisId,
+      acceptedSuggestionIds,
+      format = "pdf",
+      template = "emerald_tech",
+    } = body;
 
     if (!analysisId || !acceptedSuggestionIds?.length) {
       return NextResponse.json(
@@ -60,42 +63,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    let originalFormat: string | null = null;
-    try {
-      originalFormat = await getOriginalFormat(resume.id);
-    } catch {
-      // original file not stored — will fall through to PDF path
-    }
-
-    const isDocx =
-      originalFormat ===
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-
-    if (isDocx) {
-      // ── DOCX path: modify the original file in-place ──
-      try {
-        const docxBuffer = await loadOriginalFile(resume.id);
-        const modifiedBuffer = await modifyDocxText(
-          docxBuffer,
-          analysis.suggestions.map((s) => ({
-            originalText: s.originalText,
-            suggestedText: s.suggestedText,
-          }))
-        );
-
-        return new NextResponse(new Uint8Array(modifiedBuffer), {
-          headers: {
-            "Content-Type": originalFormat ?? "application/octet-stream",
-            "Content-Disposition": `attachment; filename="optimized-${sanitizeFilename(resume.name)}.docx"`,
-          },
-        });
-      } catch (err) {
-        console.error("DOCX modification failed, falling back to PDF:", err);
-        // Fall through to PDF generation below
-      }
-    }
-
-    // ── PDF path: AI agent rewrite + pdfkit (fallback for .pdf, .doc, and failed docx) ──
+    // AI agent rewrite to preserve candidate identity & apply STAR fixes
     const { runResumeWriterAgent } = await import("@/lib/agents/resume-writer-agent");
     const writerResult = await runResumeWriterAgent({
       resumeText: resume.parsedText,
@@ -109,6 +77,21 @@ export async function POST(req: NextRequest) {
       })),
     });
 
+    if (format === "docx") {
+      const docxBuffer = await generateDocxResume(
+        writerResult.finalResume,
+        template as TemplateType
+      );
+
+      return new NextResponse(new Uint8Array(docxBuffer), {
+        headers: {
+          "Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "Content-Disposition": `attachment; filename="optimized-${sanitizeFilename(resume.name)}.docx"`,
+        },
+      });
+    }
+
+    // PDF path
     const pdfBuffer = await generateOptimizedResumePdf(
       writerResult.finalResume,
       resume.name

@@ -54,8 +54,20 @@ export function isHumanReadableText(str: string): boolean {
   const normalRatio = normalCount / clean.length;
   const noiseRatio = symbolNoiseCount / clean.length;
 
-  // Real human text must be at least 70% normal letters/digits/spaces AND less than 15% symbol noise!
-  return normalRatio >= 0.70 && noiseRatio < 0.15;
+  return normalRatio >= 0.65 && noiseRatio < 0.20;
+}
+
+/**
+ * Strips out font subset noise symbols and extracts clean alphanumeric words
+ */
+function cleanAndExtractReadableWords(rawText: string): string {
+  if (!rawText || rawText.length < 10) return "";
+  const words = rawText.match(/[a-zA-Z0-9.,\-_@:\/()+|]{2,}/g) || [];
+  const cleaned = words.join(" ").replace(/\s+/g, " ").trim();
+  if (cleaned.length > 20 && isHumanReadableText(cleaned)) {
+    return cleaned;
+  }
+  return "";
 }
 
 /**
@@ -112,6 +124,9 @@ function parsePdfFlateStreams(buffer: Buffer): string {
     if (isHumanReadableText(result)) {
       return result;
     }
+    const sanitized = cleanAndExtractReadableWords(result);
+    if (sanitized) return sanitized;
+
     return "";
   } catch (err) {
     console.warn("Flate stream extraction error:", err);
@@ -137,8 +152,12 @@ async function parsePdf(buffer: Buffer): Promise<string> {
     // Clean up page markers like "-- 1 of 2 --"
     text = text.replace(/--\s*\d+\s*of\s*\d+\s*--/gi, "").trim();
 
-    if (text && text.length > 15 && isHumanReadableText(text)) {
-      return text;
+    if (text && text.length > 15) {
+      if (isHumanReadableText(text)) {
+        return text;
+      }
+      const sanitized = cleanAndExtractReadableWords(text);
+      if (sanitized) return sanitized;
     }
   } catch (v2Err) {
     console.warn("PDFParse v2 primary failed:", v2Err);
@@ -146,8 +165,10 @@ async function parsePdf(buffer: Buffer): Promise<string> {
 
   // 2. Fallback: Decompress FlateDecode streams and parse text
   const flateText = parsePdfFlateStreams(buffer);
-  if (flateText && flateText.length > 10 && isHumanReadableText(flateText)) {
-    return flateText;
+  if (flateText && flateText.length > 10) {
+    if (isHumanReadableText(flateText)) return flateText;
+    const sanitizedFlate = cleanAndExtractReadableWords(flateText);
+    if (sanitizedFlate) return sanitizedFlate;
   }
 
   throw new Error(
