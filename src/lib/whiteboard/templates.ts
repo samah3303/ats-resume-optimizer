@@ -1,0 +1,73 @@
+import { ArchitectureGraph } from "./types";
+
+export const ARCHITECTURE_BLUEPRINTS: Record<string, ArchitectureGraph> = {
+  tinyurl: {
+    title: "Design a Global URL Shortener (TinyURL)",
+    targetScaleQps: 50000,
+    nodes: [
+      { id: "node-1", type: "client", label: "Global Web/Mobile Clients", x: 60, y: 180, config: { technology: "React / iOS / Android" } },
+      { id: "node-2", type: "cdn", label: "Cloudflare Edge CDN", x: 260, y: 180, config: { technology: "Cloudflare Workers" } },
+      { id: "node-3", type: "load_balancer", label: "NGINX Load Balancer", x: 460, y: 180, config: { technology: "AWS ALB / NGINX" } },
+      { id: "node-4", type: "api_gateway", label: "API Gateway & Rate Limiter", x: 660, y: 180, config: { technology: "Kong / Envoy" } },
+      { id: "node-5", type: "service", label: "URL Redirection Service", x: 880, y: 100, config: { technology: "Go Microservice (Stateless)" } },
+      { id: "node-6", type: "service", label: "URL Creation & Analytics", x: 880, y: 260, config: { technology: "Node.js / Python" } },
+      { id: "node-7", type: "cache", label: "Redis URL Cache (LRU)", x: 1120, y: 100, config: { technology: "Redis Cluster (Read-Heavy 80/20)" } },
+      { id: "node-8", type: "database", label: "PostgreSQL Primary-Replica", x: 1120, y: 260, config: { technology: "PostgreSQL + DynamoDB Shards" } },
+      { id: "node-9", type: "queue", label: "Kafka Click Analytics Event Bus", x: 880, y: 400, config: { technology: "Apache Kafka" } },
+    ],
+    edges: [
+      { id: "edge-1", sourceId: "node-1", targetId: "node-2", label: "HTTPS / TLS 1.3" },
+      { id: "edge-2", sourceId: "node-2", targetId: "node-3", label: "Cache Miss" },
+      { id: "edge-3", sourceId: "node-3", targetId: "node-4", label: "TCP / HTTP/2" },
+      { id: "edge-4", sourceId: "node-4", targetId: "node-5", label: "GET /:shortUrl" },
+      { id: "edge-5", sourceId: "node-4", targetId: "node-6", label: "POST /api/shorten" },
+      { id: "edge-6", sourceId: "node-5", targetId: "node-7", label: "O(1) Cache Lookup" },
+      { id: "edge-7", sourceId: "node-6", targetId: "node-8", label: "Write Key-Value" },
+      { id: "edge-8", sourceId: "node-6", targetId: "node-9", label: "Async Click Log", isAsync: true },
+    ],
+  },
+  uber: {
+    title: "Global Ride-Sharing & Geospatial Tracking (Uber)",
+    targetScaleQps: 100000,
+    nodes: [
+      { id: "u-1", type: "client", label: "Driver & Rider Mobile Apps", x: 60, y: 200, config: { technology: "WebSocket Client" } },
+      { id: "u-2", type: "load_balancer", label: "Envoy Load Balancer", x: 280, y: 200, config: { technology: "Layer 7 Envoy" } },
+      { id: "u-3", type: "service", label: "Geospatial Ingestion Gateway", x: 500, y: 120, config: { technology: "Netty / Go (TCP/WSS)" } },
+      { id: "u-4", type: "service", label: "Ride Matching & Dispatch Engine", x: 500, y: 280, config: { technology: "Java / C++ (H3 Spatial Index)" } },
+      { id: "u-5", type: "cache", label: "Redis H3 Geospatial Shards", x: 740, y: 120, config: { technology: "Redis In-Memory Spatial Grid" } },
+      { id: "u-6", type: "queue", label: "Kafka Location Event Stream", x: 740, y: 280, config: { technology: "Kafka 100k msg/sec" } },
+      { id: "u-7", type: "database", label: "Cassandra Long-Term Trip Store", x: 980, y: 280, config: { technology: "Apache Cassandra / ScyllaDB" } },
+    ],
+    edges: [
+      { id: "ue-1", sourceId: "u-1", targetId: "u-2", label: "WSS (1 location ping / 4s)" },
+      { id: "ue-2", sourceId: "u-2", targetId: "u-3", label: "Persistent WebSocket" },
+      { id: "ue-3", sourceId: "u-2", targetId: "u-4", label: "Request Ride" },
+      { id: "ue-4", sourceId: "u-3", targetId: "u-5", label: "GEOADD / H3 Cell Update" },
+      { id: "ue-5", sourceId: "u-4", targetId: "u-5", label: "GEORADIUS Match Drivers" },
+      { id: "ue-6", sourceId: "u-3", targetId: "u-6", label: "Publish Location Telemetry", isAsync: true },
+      { id: "ue-7", sourceId: "u-6", targetId: "u-7", label: "Batch Persist Trip History", isAsync: true },
+    ],
+  },
+  streaming: {
+    title: "Video Streaming & Transcoding Pipeline (Netflix / YouTube)",
+    targetScaleQps: 75000,
+    nodes: [
+      { id: "s-1", type: "client", label: "Smart TVs / Web / iOS Clients", x: 60, y: 180 },
+      { id: "s-2", type: "cdn", label: "Global Edge CDN (HLS/DASH Chunks)", x: 280, y: 180 },
+      { id: "s-3", type: "api_gateway", label: "API Gateway", x: 500, y: 180 },
+      { id: "s-4", type: "service", label: "Video Metadata & Recommendation", x: 740, y: 100 },
+      { id: "s-5", type: "queue", label: "Transcoding Task Queue (Kafka/SQS)", x: 740, y: 280 },
+      { id: "s-6", type: "service", label: "FFmpeg Transcoder Workers", x: 960, y: 280 },
+      { id: "s-7", type: "storage", label: "AWS S3 / Blob Object Store", x: 1180, y: 280 },
+    ],
+    edges: [
+      { id: "se-1", sourceId: "s-1", targetId: "s-2", label: "Fetch Video Chunk (HLS)" },
+      { id: "se-2", sourceId: "s-1", targetId: "s-3", label: "Browse Catalog / Metadata" },
+      { id: "se-3", sourceId: "s-3", targetId: "s-4", label: "User Preferences" },
+      { id: "se-4", sourceId: "s-3", targetId: "s-5", label: "Upload Video Trigger" },
+      { id: "se-5", sourceId: "s-5", targetId: "s-6", label: "Poll Chunk Job", isAsync: true },
+      { id: "se-6", sourceId: "s-6", targetId: "s-7", label: "Store 4k/1080p/720p/480p Chunks" },
+      { id: "se-7", sourceId: "s-7", targetId: "s-2", label: "CDN Origin Pull" },
+    ],
+  },
+};
