@@ -70,7 +70,7 @@ export default function IndustrySelector({ onSelectDomain }: IndustrySelectorPro
   const [selectedDomainId, setSelectedDomainId] = useState<string>("software");
 
   useEffect(() => {
-    const saved = typeof window !== "undefined" ? localStorage.getItem("resumatch_industry_domain") : null;
+    const saved = typeof window !== "undefined" ? localStorage.getItem("kyro_industry_domain") || localStorage.getItem("resumatch_industry_domain") : null;
     if (saved) {
       setSelectedDomainId(saved);
     }
@@ -79,7 +79,7 @@ export default function IndustrySelector({ onSelectDomain }: IndustrySelectorPro
   const handleSelect = (domain: IndustryDomain) => {
     setSelectedDomainId(domain.id);
     if (typeof window !== "undefined") {
-      localStorage.setItem("resumatch_industry_domain", domain.id);
+      localStorage.setItem("kyro_industry_domain", domain.id);
     }
     if (onSelectDomain) {
       onSelectDomain(domain);

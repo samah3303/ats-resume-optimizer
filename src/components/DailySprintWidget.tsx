@@ -13,7 +13,7 @@ export default function DailySprintWidget() {
   const TARGET_OUTREACH = 2;
 
   useEffect(() => {
-    const saved = localStorage.getItem("resumatch_daily_sprint");
+    const saved = localStorage.getItem("kyro_daily_sprint") || localStorage.getItem("resumatch_daily_sprint");
     if (saved) {
       try {
         const data = JSON.parse(saved);
@@ -37,7 +37,7 @@ export default function DailySprintWidget() {
     const today = new Date().toDateString();
     const isCompleted = newApps >= TARGET_APPS && newOutreach >= TARGET_OUTREACH && newPrep;
     localStorage.setItem(
-      "resumatch_daily_sprint",
+      "kyro_daily_sprint",
       JSON.stringify({
         date: today,
         appsCount: newApps,

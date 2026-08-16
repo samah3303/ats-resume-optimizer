@@ -294,7 +294,7 @@ export default function CommandPalette() {
                 </span>
               </div>
               <div className="flex items-center gap-1">
-                <span>ResuMatch</span>
+                <span>KYRO</span>
                 <kbd className="px-1.5 py-0.5 rounded bg-zinc-100 border border-zinc-200 text-black font-bold">⌘K</kbd>
               </div>
             </div>

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'resumatch-v1';
+const CACHE_NAME = 'kyro-v1';
 const STATIC_ASSETS = [
   '/',
   '/dashboard',

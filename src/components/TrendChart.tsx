@@ -4,12 +4,6 @@ interface TrendChartProps {
   data: Array<{ date: string; score: number }>;
 }
 
-function getBarColor(score: number): string {
-  if (score >= 70) return "#22c55e"; // green-500
-  if (score >= 50) return "#eab308"; // yellow-500
-  return "#ef4444"; // red-500
-}
-
 function formatDateLabel(dateStr: string): string {
   try {
     const d = new Date(dateStr);
@@ -22,8 +16,8 @@ function formatDateLabel(dateStr: string): string {
 export default function TrendChart({ data }: TrendChartProps) {
   if (!data || data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-[200px] bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
-        <p className="text-xs text-slate-400">No score trend data available</p>
+      <div className="flex items-center justify-center h-[200px] bg-zinc-50 rounded-2xl border border-zinc-200">
+        <p className="text-xs text-zinc-400 font-bold uppercase tracking-wider">No score trend data available</p>
       </div>
     );
   }
@@ -60,7 +54,7 @@ export default function TrendChart({ data }: TrendChartProps) {
                 y1={y}
                 x2={100 - padRight}
                 y2={y}
-                stroke="#e2e8f0"
+                stroke="#E4E4E7"
                 strokeWidth="0.5"
                 strokeDasharray="2,2"
               />
@@ -68,8 +62,8 @@ export default function TrendChart({ data }: TrendChartProps) {
                 x={padLeft - 2}
                 y={y + 1}
                 textAnchor="end"
-                className="fill-slate-400"
-                style={{ fontSize: "3.5px", fontFamily: "system-ui" }}
+                className="fill-zinc-400 font-mono"
+                style={{ fontSize: "3.5px" }}
               >
                 {tick}
               </text>
@@ -83,7 +77,6 @@ export default function TrendChart({ data }: TrendChartProps) {
           const barW = Math.max(1, barWidth * 0.7);
           const scaledHeight = Math.max(1, (entry.score / maxScore) * (100 - padTop - padBottom));
           const y = padTop + (100 - padTop - padBottom) - scaledHeight;
-          const color = getBarColor(entry.score);
 
           return (
             <g key={i}>
@@ -93,18 +86,18 @@ export default function TrendChart({ data }: TrendChartProps) {
                 y={y}
                 width={barW}
                 height={scaledHeight}
-                fill={color}
+                fill="#000000"
                 rx="0.8"
                 ry="0.8"
-                className="transition-all duration-300 hover:opacity-80"
+                className="transition-all duration-300 hover:fill-zinc-700"
               />
               {/* Score label */}
               <text
                 x={x + barW / 2}
                 y={Math.max(4, y - 2)}
                 textAnchor="middle"
-                className="fill-slate-700 font-bold"
-                style={{ fontSize: "3px", fontFamily: "system-ui" }}
+                className="fill-black font-black font-mono"
+                style={{ fontSize: "3px" }}
               >
                 {entry.score}
               </text>
@@ -113,8 +106,8 @@ export default function TrendChart({ data }: TrendChartProps) {
                 x={x + barW / 2}
                 y={95}
                 textAnchor="middle"
-                className="fill-slate-400"
-                style={{ fontSize: "2.5px", fontFamily: "system-ui" }}
+                className="fill-zinc-500 font-mono font-bold"
+                style={{ fontSize: "2.5px" }}
               >
                 {formatDateLabel(entry.date)}
               </text>

@@ -82,12 +82,14 @@ export default function SharedAnalysisPage() {
       <header className="bg-white border-b border-zinc-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center text-white font-black text-sm">
-              ATS
-            </div>
-            <span className="text-lg font-black text-black">
-              ResuMatch
-            </span>
+            <Link href="/" className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center font-black text-xs">
+                K
+              </div>
+              <span className="text-lg font-black text-black">
+                KYRO
+              </span>
+            </Link>
           </div>
           <span className="px-3 py-1 bg-zinc-100 text-black border border-zinc-300 text-xs font-bold rounded-full">
             Shared Analysis
@@ -192,7 +194,7 @@ export default function SharedAnalysisPage() {
               href="/"
               className="text-black hover:underline font-bold"
             >
-              ResuMatch ATS
+              KYRO AI
             </Link>
           </p>
         </div>

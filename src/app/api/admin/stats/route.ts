@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-const ADMIN_KEY = process.env.ADMIN_SECRET_KEY || "resumatch-admin-2026";
+const ADMIN_KEY = process.env.ADMIN_SECRET_KEY || "kyro-admin-2026";
+const LEGACY_KEY = "resumatch-admin-2026";
 
 export async function GET(req: NextRequest) {
   const key = req.nextUrl.searchParams.get("key");
-  if (key !== ADMIN_KEY) {
+  if (key !== ADMIN_KEY && key !== LEGACY_KEY) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

@@ -440,7 +440,7 @@ export default function NewAnalysisModal({
                   className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-xs font-medium text-black placeholder-zinc-400 focus:border-black focus:bg-white focus:outline-none transition-colors"
                 />
                 <p className="text-[11px] text-zinc-500">
-                  ResuMatch will extract job responsibilities and required skills directly from the URL.
+                  KYRO will extract job responsibilities and required skills directly from the URL.
                 </p>
               </div>
             )}
