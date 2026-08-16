@@ -22,7 +22,7 @@ const STEPS: Step[] = [
     title: "Upload Primary Resume & Target Goals",
     subtitle: "Establish baseline ATS score & target country",
     description:
-      "Upload your primary resume in PDF or DOCX format. ResuMatch automatically extracts your core skills, work history, target roles, and country preferences, establishing your General ATS baseline score.",
+      "Upload your primary resume in PDF or DOCX format. KYRO automatically extracts your core skills, work history, target roles, and country preferences, establishing your General ATS baseline score.",
     actionText: "Upload Primary Resume",
     actionHref: "/dashboard/resumes",
     icon: "📄",
@@ -30,7 +30,7 @@ const STEPS: Step[] = [
     tips: [
       "Set your primary resume to drive your onboarding analysis baseline.",
       "Specify your target country (UAE, India, US, etc.) for region-specific ATS algorithms.",
-      "ResuMatch auto-populates target positions and skills directly from your uploaded document.",
+      "KYRO auto-populates target positions and skills directly from your uploaded document.",
     ],
   },
   {
@@ -205,7 +205,7 @@ export default function HowToUseSection() {
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight text-black">
-            How to Master ResuMatch to Land Your Dream Job
+            How to Master KYRO to Land Your Dream Job
           </h1>
 
           <p className="text-sm sm:text-base text-zinc-600 leading-relaxed font-medium">
@@ -232,13 +232,13 @@ export default function HowToUseSection() {
       {/* Founder's Story Banner */}
       <div className="p-6 bg-zinc-50 text-black rounded-3xl border border-zinc-200 shadow-sm space-y-3">
         <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-black">
-          <span>❤️ Why ResuMatch Was Built</span>
+          <span>❤️ Why KYRO Was Built</span>
         </div>
         <h3 className="text-base sm:text-lg font-black text-black">
           Built From 8 Months of Job Hunt Struggle to Make Sure Everyone Lands Interviews
         </h3>
         <p className="text-xs text-zinc-600 leading-relaxed font-medium">
-          &quot;After suffering through 8 months of ghosting and automated ATS rejection emails, I created ResuMatch to break open the black box of corporate hiring algorithms. We keep this platform 100% free for job seekers right now so no candidate suffers alone.&quot;
+          &quot;After suffering through 8 months of ghosting and automated ATS rejection emails, I created KYRO to break open the black box of corporate hiring algorithms. We keep this platform 100% free for job seekers right now so no candidate suffers alone.&quot;
         </p>
       </div>
 

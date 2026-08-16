@@ -1,29 +1,20 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Minimalist Carbon Black Container -->
-  <rect width="512" height="512" rx="128" fill="#0D0E11"/>
-  <rect x="8" y="8" width="496" height="496" rx="120" stroke="#F59E0B" stroke-width="4" stroke-opacity="0.25"/>
+  <!-- Solid Black Rounded Square Container -->
+  <rect width="512" height="512" rx="128" fill="#000000"/>
+  <rect x="8" y="8" width="496" height="496" rx="120" stroke="#27272A" stroke-width="4"/>
 
-  <!-- Electric Amber Yellow Geometric AI Emblem (Perplexity / Claude style Spark) -->
-  <g transform="translate(256, 256)">
-    <!-- Central Diamond AI Spark -->
-    <path d="M0 -140 L36 -36 L140 0 L36 36 L0 140 L-36 36 L-140 0 L-36 -36 Z" fill="url(#amber-gradient)" />
+  <!-- KYRO Geometric Monogram in Pure White -->
+  <g transform="translate(112, 112) scale(9.0)">
+    <!-- Vertical Monolith Pillar -->
+    <rect x="6" y="6" width="4.5" height="20" rx="1" fill="#FFFFFF" />
     
-    <!-- Minimalist Orbital Dots -->
-    <circle cx="0" cy="0" r="28" fill="#0D0E11" />
-    <circle cx="0" cy="0" r="16" fill="#FDE047" />
+    <!-- Upper Kinetic Vector Arm -->
+    <polygon points="12.5,15.5 24,6 26,6 26,8 14.5,17.5" fill="#FFFFFF" />
 
-    <!-- Corner Accents -->
-    <circle cx="-100" cy="-100" r="12" fill="#F59E0B" opacity="0.6" />
-    <circle cx="100" cy="-100" r="8" fill="#FDE047" opacity="0.8" />
-    <circle cx="100" cy="100" r="12" fill="#F59E0B" opacity="0.6" />
-    <circle cx="-100" cy="100" r="8" fill="#FDE047" opacity="0.8" />
+    <!-- Lower Kinetic Vector Arm -->
+    <polygon points="13.5,15.5 24,26 26,26 26,24 16,14" fill="#FFFFFF" />
+
+    <!-- Kinetic Diamond Spark -->
+    <polygon points="21,5 23,3 25,5 23,7" fill="#FFFFFF" />
   </g>
-
-  <defs>
-    <linearGradient id="amber-gradient" x1="-140" y1="-140" x2="140" y2="140" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#FDE047"/>
-      <stop offset="0.5" stop-color="#F59E0B"/>
-      <stop offset="1" stop-color="#D97706"/>
-    </linearGradient>
-  </defs>
 </svg>

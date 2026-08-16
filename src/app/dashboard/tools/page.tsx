@@ -118,7 +118,7 @@ export default function ToolsHubPage() {
             <span>Simple Guides & Tools</span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-black">
-            All ResuMatch Tools & Features
+            All KYRO Tools & Features
           </h1>
           <p className="text-xs sm:text-sm text-zinc-600 max-w-2xl leading-relaxed font-medium">
             Every tool is designed to solve a specific barrier in your job search. Below is what each tool does, why you need it, and how to use it in simple terms.

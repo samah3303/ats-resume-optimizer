@@ -45,8 +45,8 @@ const REVIEWS: Review[] = [
     badge: "Hired in 14 Days",
     headline: "From 4 months of silence to 3 offer letters!",
     content:
-      "I was unemployed for 4 months applying blindly on LinkedIn with zero callbacks. ResuMatch's ATS scanner showed my resume was missing 12 key hard skills and had table formatting bugs. Using the STAR bullet rewriter and Cold Email generator got me 3 interviews in my first week!",
-    timeframe: "2 weeks after using ResuMatch",
+      "I was unemployed for 4 months applying blindly on LinkedIn with zero callbacks. KYRO's ATS scanner showed my resume was missing 12 key hard skills and had table formatting bugs. Using the STAR bullet rewriter and Cold Email generator got me 3 interviews in my first week!",
+    timeframe: "2 weeks after using KYRO",
   },
   {
     name: "Priya Sharma",
@@ -58,7 +58,7 @@ const REVIEWS: Review[] = [
     headline: "The Cold Outreach scripts & Interview prep are gold!",
     content:
       "Getting past ATS is step 1, but the LinkedIn outreach note generator and predicted interview questions gave me immense confidence. I reached out directly to the hiring manager with the generated pitch and got hired within 3 weeks.",
-    timeframe: "3 weeks after using ResuMatch",
+    timeframe: "3 weeks after using KYRO",
   },
   {
     name: "Marcus Vance",
@@ -69,8 +69,8 @@ const REVIEWS: Review[] = [
     badge: "Career Switcher",
     headline: "The free Skill Gap links helped me learn SQL fast!",
     content:
-      "Switching careers while unemployed was terrifying. When ResuMatch flagged SQL & Tableau as missing gaps, it immediately gave me free YouTube crash courses and weekend project blueprints. Added the project to my resume and passed ATS easily!",
-    timeframe: "1 month after using ResuMatch",
+      "Switching careers while unemployed was terrifying. When KYRO flagged SQL & Tableau as missing gaps, it immediately gave me free YouTube crash courses and weekend project blueprints. Added the project to my resume and passed ATS easily!",
+    timeframe: "1 month after using KYRO",
   },
   {
     name: "Samantha Taylor",
@@ -82,7 +82,7 @@ const REVIEWS: Review[] = [
     headline: "The Daily Sprint tracker kept me sane & disciplined.",
     content:
       "Job hunting after a layoff causes so much anxiety. The Daily Sprint tracker gave me a structured daily routine (3 applications, 2 outreaches). The 1-click ATS PDF exporter ensured my formatting was 100% clean every single time.",
-    timeframe: "10 days after using ResuMatch",
+    timeframe: "10 days after using KYRO",
   },
 ];
 
@@ -96,7 +96,7 @@ export default function StatsAndReviewsSection() {
             <span>📊 Proven Job-Landing Results</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-black text-black tracking-tight">
-            ResuMatch by the <span className="underline decoration-zinc-400 decoration-2 underline-offset-4">Numbers</span>
+            KYRO by the <span className="underline decoration-zinc-400 decoration-2 underline-offset-4">Numbers</span>
           </h2>
           <p className="text-xs sm:text-sm text-zinc-600">
             Real impact measured across thousands of job applications and successful hires.

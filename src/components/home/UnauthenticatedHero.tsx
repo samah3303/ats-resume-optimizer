@@ -19,7 +19,7 @@ export default function UnauthenticatedHero() {
           </h1>
 
           <p className="text-sm md:text-base text-zinc-600 max-w-2xl mx-auto leading-relaxed">
-            75% of resumes are rejected by ATS bots before a human sees them. ResuMatch uses{" "}
+            75% of resumes are rejected by ATS bots before a human sees them. KYRO uses{" "}
             <strong className="text-black">6 AI agents</strong>, RAG semantic search, and ML score prediction to analyze,
             rewrite, and optimize every line — so you reach <strong className="text-black">75-80%+ ATS match score</strong> on every application and land more interviews.
           </p>
@@ -67,7 +67,7 @@ export default function UnauthenticatedHero() {
               Built From <span className="text-zinc-900 underline decoration-zinc-400 underline-offset-4">8 Months</span> of Job Hunt Struggle
             </h2>
             <p className="text-xs md:text-sm text-zinc-600 leading-relaxed">
-              ResuMatch was not born in a corporate boardroom. It was created out of deep frustration with a broken hiring system.
+              KYRO was not born in a corporate boardroom. It was created out of deep frustration with a broken hiring system.
             </p>
           </div>
 
@@ -85,7 +85,7 @@ export default function UnauthenticatedHero() {
                 </p>
               </div>
               <div className="pt-4 border-t border-zinc-100 text-xs font-bold text-zinc-900">
-                — ResuMatch Founder & Engineer
+                — KYRO Founder & Engineer
               </div>
             </div>
 
@@ -108,7 +108,7 @@ export default function UnauthenticatedHero() {
                   </span>
                   <h4 className="text-base font-black text-black">100% Free Access for Job Seekers</h4>
                   <p className="text-xs text-zinc-600 leading-relaxed">
-                    Even though multi-agent AI and RAG vector searches cost real server resources, ResuMatch is kept <strong className="text-black">100% FREE for job seekers</strong> right now so no candidate suffers in silence.
+                    Even though multi-agent AI and RAG vector searches cost real server resources, KYRO is kept <strong className="text-black">100% FREE for job seekers</strong> right now so no candidate suffers in silence.
                   </p>
                 </div>
               </div>
@@ -126,7 +126,7 @@ export default function UnauthenticatedHero() {
         <div className="max-w-5xl mx-auto space-y-12">
           <div className="text-center max-w-3xl mx-auto space-y-3">
             <span className="px-3.5 py-1.5 bg-zinc-100 text-zinc-900 border border-zinc-200 text-xs font-bold uppercase rounded-full tracking-wider">
-              📖 How ResuMatch Works
+              📖 How KYRO Works
             </span>
             <h2 className="text-3xl md:text-4xl font-black text-black">
               The 4-Step System to Beat ATS & Land Interviews
@@ -183,13 +183,13 @@ export default function UnauthenticatedHero() {
         <div className="max-w-5xl mx-auto space-y-12">
           <div className="text-center max-w-3xl mx-auto space-y-3">
             <span className="px-3.5 py-1.5 bg-zinc-100 text-zinc-900 border border-zinc-200 text-xs font-bold uppercase rounded-full tracking-wider">
-              ⚔️ Why ResuMatch Differs
+              ⚔️ Why KYRO Differs
             </span>
             <h2 className="text-3xl md:text-4xl font-black text-black">
-              Generic Resume Scanners vs. <span className="underline decoration-zinc-400">ResuMatch</span>
+              Generic Resume Scanners vs. <span className="underline decoration-zinc-400">KYRO</span>
             </h2>
             <p className="text-xs text-zinc-600">
-              Why candidates using single-prompt AI get rejected while ResuMatch users land 4x more interviews.
+              Why candidates using single-prompt AI get rejected while KYRO users land 4x more interviews.
             </p>
           </div>
 
@@ -199,7 +199,7 @@ export default function UnauthenticatedHero() {
                 <tr className="bg-zinc-100 text-black text-left border-b border-zinc-200">
                   <th className="p-4 font-extrabold uppercase tracking-wider">Feature & Capability</th>
                   <th className="p-4 font-bold uppercase tracking-wider text-zinc-500">Generic Resume Wrappers</th>
-                  <th className="p-4 font-extrabold uppercase tracking-wider text-black bg-zinc-50">ResuMatch Multi-Agent Engine</th>
+                  <th className="p-4 font-extrabold uppercase tracking-wider text-black bg-zinc-50">KYRO Multi-Agent Engine</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-200">
@@ -391,7 +391,7 @@ export default function UnauthenticatedHero() {
       </section>
 
       <footer className="py-8 px-4 text-center text-xs text-zinc-500 bg-white border-t border-zinc-200">
-        &copy; {new Date().getFullYear()} ResuMatch.ai. All rights reserved. Built with ❤️ for job seekers worldwide — 100% Free Multi-Agent AI & RAG Engine.
+        &copy; {new Date().getFullYear()} KYRO.ai. All rights reserved. Built with ❤️ for job seekers worldwide — 100% Free Multi-Agent AI & RAG Engine.
       </footer>
     </div>
   );

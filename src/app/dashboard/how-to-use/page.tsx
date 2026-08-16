@@ -2,9 +2,9 @@ import HowToUseSection from "@/components/HowToUseSection";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "How to Use - ResuMatch ATS Optimizer",
+  title: "How to Use - KYRO ATS Optimizer",
   description:
-    "Learn how to use ResuMatch to parse resumes, match against job descriptions, optimize ATS scores, and track your job applications.",
+    "Learn how to use KYRO to parse resumes, match against job descriptions, optimize ATS scores, and track your job applications.",
 };
 
 export default function HowToUsePage() {

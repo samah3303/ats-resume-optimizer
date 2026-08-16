@@ -20,32 +20,33 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ResuMatch — Multi-Agent AI ATS Resume Optimizer & Career Coach",
+  title: "KYRO — The Complete 1-Stop AI Career & Talent Operating System",
   description:
-    "Beat Applicant Tracking Systems (ATS) with 6 Multi-Agent AI models, RAG semantic matching, and ML score prediction. Optimize your resume for 75-80%+ ATS score on every job application to land 4x more interviews.",
+    "Universal AI platform for job seekers and recruiters: Semantic Job Matching, ATS Resume Studio, In-Browser Coding Sandbox, AI Voice Mock Interviews, LinkedIn Outreach, and Salary Negotiation War Room.",
   keywords: [
-    "ATS resume optimizer",
-    "resume score predictor",
-    "beat applicant tracking system",
-    "multi-agent AI resume rewriter",
-    "career roadmap generator",
-    "ATS keyword matcher",
-    "job search AI coach",
+    "KYRO AI",
+    "career operating system",
+    "ATS resume studio",
+    "AI mock interview voice",
+    "in-browser coding challenge",
+    "recruiter talent OS",
+    "salary negotiation simulator",
+    "job search AI",
   ],
-  authors: [{ name: "ResuMatch Team" }],
+  authors: [{ name: "KYRO Team" }],
   openGraph: {
-    title: "ResuMatch — Multi-Agent AI ATS Resume Optimizer",
+    title: "KYRO — The Complete 1-Stop AI Career & Talent Operating System",
     description:
-      "Stop getting auto-rejected by ATS bots. Analyze & optimize your resume for 75-80%+ ATS score for every job application.",
-    url: "https://ats-resume-optimizer.vercel.app",
-    siteName: "ResuMatch",
+      "All-in-one AI platform for job search, ATS resume building, coding challenges, conversational voice mock interviews, and recruiter talent pipelines.",
+    url: "https://kyro-ai.vercel.app",
+    siteName: "KYRO",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ResuMatch — Multi-Agent AI ATS Resume Optimizer",
+    title: "KYRO — The Complete 1-Stop AI Career & Talent Operating System",
     description:
-      "Stop getting auto-rejected by ATS bots. Optimize your resume for 75-80%+ ATS score every application.",
+      "All-in-one AI platform for job search, ATS resume building, coding challenges, conversational voice mock interviews, and recruiter talent pipelines.",
   },
   icons: {
     icon: "/icon.svg",
@@ -53,8 +54,8 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
-    title: "ResuMatch",
+    statusBarStyle: "default",
+    title: "KYRO",
   },
   other: {
     "mobile-web-app-capable": "yes",

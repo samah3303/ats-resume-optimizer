@@ -2,13 +2,13 @@ import { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'ResuMatch — AI Job Search Platform',
-    short_name: 'ResuMatch',
-    description: 'AI-powered job search platform. Optimize resumes, track applications, and ace interviews.',
+    name: 'KYRO — AI Career & Talent Operating System',
+    short_name: 'KYRO',
+    description: 'The Complete 1-Stop AI Career Platform: Resume Studio, Coding Sandbox, Spoken Mock Interviews, Recruiter OS, and Salary War Room.',
     start_url: '/dashboard',
     display: 'standalone',
-    background_color: '#090A0C',
-    theme_color: '#F59E0B',
+    background_color: '#FFFFFF',
+    theme_color: '#000000',
     orientation: 'portrait-primary',
     categories: ['productivity', 'business'],
     icons: [

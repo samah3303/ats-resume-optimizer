@@ -6,25 +6,49 @@ interface LogoProps {
 }
 
 export default function Logo({ size = "md", showText = true }: LogoProps) {
-  const iconSize = size === "sm" ? "w-7 h-7" : size === "lg" ? "w-10 h-10" : "w-8 h-8";
-  const textSize = size === "sm" ? "text-base" : size === "lg" ? "text-xl" : "text-lg";
+  const iconBox = size === "sm" ? "w-7 h-7 rounded-lg" : size === "lg" ? "w-11 h-11 rounded-2xl" : "w-8 h-8 rounded-xl";
+  const iconSvg = size === "sm" ? "w-4 h-4" : size === "lg" ? "w-6 h-6" : "w-4.5 h-4.5";
+  const textSize = size === "sm" ? "text-base" : size === "lg" ? "text-2xl" : "text-lg";
 
   return (
-    <Link href="/" className="inline-flex items-center gap-2.5 group">
-      {/* Minimalist Crisp Black Emblem */}
-      <div className={`${iconSize} rounded-xl bg-black border border-black flex items-center justify-center shadow-sm group-hover:bg-zinc-800 transition-all`}>
-        <svg viewBox="0 0 100 100" className="w-5 h-5 fill-white group-hover:scale-110 transition-transform">
-          <path d="M50 10 L61 39 L90 50 L61 61 L50 90 L39 61 L10 50 L39 39 Z" />
-          <circle cx="50" cy="50" r="8" fill="#000000" />
-          <circle cx="50" cy="50" r="4" fill="#FFFFFF" />
+    <Link href="/" className="inline-flex items-center gap-2.5 group select-none">
+      {/* KYRO Geometric Monogram Icon */}
+      <div
+        className={`${iconBox} bg-black border border-black flex items-center justify-center shadow-sm group-hover:bg-zinc-800 transition-all duration-200 shrink-0`}
+      >
+        <svg
+          viewBox="0 0 32 32"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className={`${iconSvg} transition-transform duration-200 group-hover:scale-105`}
+        >
+          {/* Vertical Monolith Pillar */}
+          <rect x="6" y="6" width="4.5" height="20" rx="1" fill="#FFFFFF" />
+          
+          {/* Upper Kinetic Vector Arm */}
+          <path
+            d="M24.5 7.5L12.5 17.5H16.5L26 9.5V7.5H24.5Z"
+            fill="#FFFFFF"
+          />
+          <polygon points="12.5,15.5 24,6 26,6 26,8 14.5,17.5" fill="#FFFFFF" />
+
+          {/* Lower Kinetic Vector Arm */}
+          <polygon points="13.5,15.5 24,26 26,26 26,24 16,14" fill="#FFFFFF" />
+
+          {/* Kinetic Diamond Spark */}
+          <polygon points="21,5 23,3 25,5 23,7" fill="#FFFFFF" />
         </svg>
       </div>
 
       {showText && (
-        <span className={`${textSize} font-extrabold tracking-tight text-black flex items-center gap-1`}>
-          <span>ResuMatch</span>
-          <span className="text-zinc-500 font-black">.ai</span>
-        </span>
+        <div className="flex items-center gap-1.5">
+          <span className={`${textSize} font-black tracking-tight text-black flex items-center`}>
+            KYRO
+          </span>
+          <span className="text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-md bg-zinc-100 border border-zinc-300 text-black leading-none shadow-xs">
+            AI
+          </span>
+        </div>
       )}
     </Link>
   );
