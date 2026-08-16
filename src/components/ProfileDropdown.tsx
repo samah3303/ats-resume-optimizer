@@ -145,6 +145,13 @@ export default function ProfileDropdown() {
             </button>
             <button
               role="menuitem"
+              onClick={() => { setOpen(false); router.push("/dashboard/video-analytics"); }}
+              className="w-full text-left px-4 py-2 text-xs font-semibold text-zinc-700 hover:text-black hover:bg-zinc-100 transition-colors flex items-center gap-2"
+            >
+              <span aria-hidden="true">👁️</span> Video Composure
+            </button>
+            <button
+              role="menuitem"
               onClick={() => { setOpen(false); router.push("/dashboard/challenges"); }}
               className="w-full text-left px-4 py-2 text-xs font-semibold text-zinc-700 hover:text-black hover:bg-zinc-100 transition-colors flex items-center gap-2"
             >
