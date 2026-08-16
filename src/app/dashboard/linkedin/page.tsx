@@ -1,60 +1,78 @@
-import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
+import { LinkedInOptimizer } from "@/components/linkedin/LinkedInOptimizer";
+import { OutreachSequenceBuilder } from "@/components/linkedin/OutreachSequenceBuilder";
+import { ProfileChecklist } from "@/components/linkedin/ProfileChecklist";
 
-export default function LinkedInPage() {
+export const metadata = {
+  title: "LinkedIn Brand Optimizer & Outreach Suite | OmniJob AI",
+  description: "AI-powered LinkedIn profile rewriter, top 50 ranked skills for recruiter SEO, and 3-step cold outreach sequence generator.",
+};
+
+export default async function LinkedInPage() {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    redirect("/login");
+  }
+
+  const userId = (session.user as { id: string }).id;
+
+  // Fetch user's resumes for easy selector
+  const resumes = await prisma.resume.findMany({
+    where: { userId },
+    select: { id: true, name: true, parsedText: true },
+    orderBy: { createdAt: "desc" },
+    take: 5,
+  });
+
+  const primaryResume = resumes[0];
+
   return (
-    <div className="min-h-screen bg-white text-zinc-900 flex flex-col items-center justify-center p-6 pb-24">
-      <div className="bg-white border border-zinc-200 hover:border-black rounded-3xl p-8 sm:p-10 max-w-lg w-full text-center shadow-sm transition-all space-y-6">
-        <div className="w-16 h-16 rounded-2xl bg-zinc-100 border border-zinc-300 flex items-center justify-center text-3xl mx-auto shadow-sm">
-          🔗
+    <div className="min-h-screen bg-white text-zinc-950 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-8 pb-28">
+      {/* Top Breadcrumb & Hero Header */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2 text-xs font-bold text-zinc-500 uppercase tracking-wider">
+          <span>Dashboard</span>
+          <span>/</span>
+          <span className="text-black">LinkedIn Brand & Outreach</span>
         </div>
-        <div className="space-y-2">
-          <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-zinc-100 text-zinc-900 border border-zinc-300 font-bold text-xs">
-            Profile Optimization
+
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-black tracking-tight flex items-center gap-3">
+              <span>LinkedIn Brand & Outreach Suite</span>
+            </h1>
+            <p className="text-xs sm:text-sm text-zinc-600 max-w-3xl mt-1.5 leading-relaxed">
+              Transform your LinkedIn profile into a recruiter magnet with keyword-indexed headlines, high-engagement story summaries, and 3-step personalized cold outreach sequences.
+            </p>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-black tracking-tight">
-            LinkedIn Profile Optimizer
-          </h1>
-          <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed">
-            Get section-by-section LinkedIn profile enhancements with AI-generated headlines, About summaries, and 1-click InMail outreach notes.
-          </p>
-        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left pt-2">
-          <Link
-            href="/dashboard/outreach"
-            className="p-4 bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 hover:border-black rounded-2xl transition-all shadow-sm group"
-          >
-            <span className="text-[10px] font-black uppercase tracking-wider text-zinc-500 block">Outreach</span>
-            <span className="text-xs font-bold text-black block mt-0.5 group-hover:underline">
-              Connection Notes Studio &rarr;
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="px-3 py-1 bg-zinc-100 border border-zinc-300 text-zinc-900 text-xs font-black rounded-xl uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-black" />
+              {resumes.length} Resumes Linked
             </span>
-          </Link>
-          <Link
-            href="/dashboard/tools"
-            className="p-4 bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 hover:border-black rounded-2xl transition-all shadow-sm group"
-          >
-            <span className="text-[10px] font-black uppercase tracking-wider text-zinc-500 block">Career Tools</span>
-            <span className="text-xs font-bold text-black block mt-0.5 group-hover:underline">
-              View All 9 Tools &rarr;
-            </span>
-          </Link>
+          </div>
         </div>
+      </div>
 
-        <div className="pt-4 border-t border-zinc-200 flex items-center justify-between">
-          <Link
-            href="/dashboard"
-            className="text-xs font-bold text-zinc-600 hover:text-black transition-colors flex items-center gap-1"
-          >
-            <span>&larr;</span> Back to Dashboard
-          </Link>
+      {/* Main Suite Container */}
+      <div className="space-y-8">
+        {/* Module 1: Profile Optimizer */}
+        <LinkedInOptimizer
+          resumes={resumes.map((r) => ({ id: r.id, name: r.name }))}
+          defaultRole={primaryResume ? primaryResume.name.replace(/\.[^/.]+$/, "") : "Senior Software Engineer"}
+        />
 
-          <Link
-            href="/dashboard/outreach"
-            className="px-4 py-2 bg-black hover:bg-zinc-800 text-white text-xs font-black rounded-xl border border-black shadow-sm transition-all"
-          >
-            Open Outreach Studio &rarr;
-          </Link>
-        </div>
+        {/* Module 2: Cold Outreach Sequence Generator */}
+        <OutreachSequenceBuilder
+          defaultCandidateName={session.user.name || "Candidate"}
+        />
+
+        {/* Module 3: Profile Audit & SEO Checklist */}
+        <ProfileChecklist />
       </div>
     </div>
   );
