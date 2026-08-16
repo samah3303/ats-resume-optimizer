@@ -159,6 +159,13 @@ export default function ProfileDropdown() {
             </button>
             <button
               role="menuitem"
+              onClick={() => { setOpen(false); router.push("/dashboard/interview-rooms"); }}
+              className="w-full text-left px-4 py-2 text-xs font-semibold text-zinc-700 hover:text-black hover:bg-zinc-100 transition-colors flex items-center gap-2"
+            >
+              <span aria-hidden="true">📹</span> WebRTC Video Rooms
+            </button>
+            <button
+              role="menuitem"
               onClick={() => { setOpen(false); router.push("/dashboard/recruiter"); }}
               className="w-full text-left px-4 py-2 text-xs font-semibold text-zinc-700 hover:text-black hover:bg-zinc-100 transition-colors flex items-center gap-2"
             >
