@@ -9,10 +9,10 @@ import Logo from "./Logo";
 const navLinks = [
   { href: "/dashboard", label: "Home" },
   { href: "/dashboard/jobs", label: "Jobs" },
-  { href: "/dashboard/resumes", label: "Resumes" },
+  { href: "/dashboard/builder", label: "Studio" },
+  { href: "/dashboard/challenges", label: "Code" },
   { href: "/dashboard/tools", label: "Prep" },
   { href: "/dashboard/tracker", label: "Track" },
-  { href: "/dashboard/journey", label: "Journey" },
   { href: "/dashboard/recruiter", label: "Recruiter" },
 ];
 
