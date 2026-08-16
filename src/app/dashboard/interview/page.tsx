@@ -155,16 +155,26 @@ export default function InterviewPage() {
   return (
     <div className="min-h-screen bg-white text-zinc-900 py-8 px-4 sm:px-6 lg:px-8 space-y-8 pb-24">
       <div className="max-w-6xl mx-auto space-y-8">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-zinc-600 mb-1">
-            <span>Interview Readiness Studio</span>
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-zinc-600 mb-1">
+              <span>Interview Readiness Studio</span>
+            </div>
+            <h1 className="text-2xl sm:text-4xl font-black text-black tracking-tight">
+              AI Interview Question Predictor & Roleplay
+            </h1>
+            <p className="text-xs sm:text-sm text-zinc-600 mt-1 max-w-3xl">
+              Predict high-probability technical, behavioral, and gap questions tailored specifically to your resume and target job posting.
+            </p>
           </div>
-          <h1 className="text-2xl sm:text-4xl font-black text-black tracking-tight">
-            AI Interview Question Predictor & Roleplay
-          </h1>
-          <p className="text-xs sm:text-sm text-zinc-600 mt-1 max-w-3xl">
-            Predict high-probability technical, behavioral, and gap questions tailored specifically to your resume and target job posting.
-          </p>
+
+          <Link
+            href="/dashboard/mock-interview"
+            className="touch-target px-6 py-3.5 bg-black hover:bg-zinc-800 text-white font-black text-xs rounded-2xl border border-black shadow-md transition-all flex items-center gap-2 shrink-0 active:scale-95"
+          >
+            <span className="text-base">🎙️</span>
+            <span>Launch Live Voice Mock Room &rarr;</span>
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
