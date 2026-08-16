@@ -176,13 +176,13 @@ export default function CommandPalette() {
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-4 right-4 z-40 hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#14161D]/80 backdrop-blur-xl border border-amber-500/20 text-slate-400 hover:text-amber-300 hover:border-amber-500/40 shadow-xl transition-all duration-200 text-xs font-mono group cursor-pointer"
+        className="fixed bottom-4 right-4 z-40 hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-zinc-200 text-zinc-600 hover:text-black hover:border-black shadow-md transition-all duration-200 text-xs font-mono group cursor-pointer"
         title="Open Command Palette (⌘K / Ctrl+K)"
         aria-label="Open Command Palette"
       >
-        <span className="text-amber-400 text-sm group-hover:rotate-12 transition-transform">⚡</span>
-        <span className="font-sans font-medium text-slate-300 text-xs">Commands</span>
-        <kbd className="bg-[#090A0C] border border-[#242834] px-1.5 py-0.5 rounded text-[10px] text-amber-300/90 font-mono shadow-inner">
+        <span className="text-black text-sm group-hover:rotate-12 transition-transform" aria-hidden="true">⚡</span>
+        <span className="font-sans font-semibold text-zinc-800 text-xs">Commands</span>
+        <kbd className="bg-zinc-100 border border-zinc-200 px-1.5 py-0.5 rounded text-[10px] text-zinc-600 font-mono shadow-sm">
           ⌘K
         </kbd>
       </button>
@@ -190,7 +190,7 @@ export default function CommandPalette() {
       {/* Modal Dialog */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 px-4 bg-black/70 backdrop-blur-md transition-opacity duration-200"
+          className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 px-4 bg-black/40 backdrop-blur-sm transition-opacity duration-200"
           onClick={() => setIsOpen(false)}
           role="dialog"
           aria-modal="true"
@@ -198,12 +198,12 @@ export default function CommandPalette() {
         >
           {/* Centered Modal Content Card */}
           <div
-            className="w-full max-w-xl bg-[#14161D] border border-amber-500/30 rounded-3xl shadow-2xl backdrop-blur-2xl text-white overflow-hidden flex flex-col p-4 sm:p-6 gap-4 animate-in fade-in zoom-in-95 duration-200"
+            className="w-full max-w-xl bg-white border border-zinc-200 rounded-3xl shadow-2xl text-zinc-900 overflow-hidden flex flex-col p-4 sm:p-6 gap-4 animate-in fade-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header / Search Input */}
             <div className="relative flex items-center">
-              <span className="absolute left-4 text-amber-400 text-lg pointer-events-none">
+              <span className="absolute left-4 text-zinc-400 text-base pointer-events-none" aria-hidden="true">
                 🔍
               </span>
               <input
@@ -212,9 +212,9 @@ export default function CommandPalette() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Type a command or search..."
-                className="w-full bg-[#090A0C] border border-[#242834] text-white focus:border-amber-500 outline-none pl-11 pr-12 py-3.5 rounded-2xl placeholder-slate-500 text-sm font-sans transition-colors duration-200 shadow-inner"
+                className="w-full bg-zinc-50 border border-zinc-200 text-black focus:border-black focus:bg-white outline-none pl-11 pr-12 py-3 rounded-2xl placeholder-zinc-400 text-sm font-sans transition-colors duration-200"
               />
-              <kbd className="absolute right-4 px-2 py-0.5 rounded bg-[#14161D] border border-[#242834] text-[11px] text-slate-400 font-mono pointer-events-none">
+              <kbd className="absolute right-4 px-2 py-0.5 rounded bg-zinc-100 border border-zinc-200 text-[10px] text-zinc-500 font-mono pointer-events-none">
                 ESC
               </kbd>
             </div>
@@ -222,7 +222,7 @@ export default function CommandPalette() {
             {/* Command List */}
             <div
               ref={listRef}
-              className="max-h-80 overflow-y-auto space-y-1.5 pr-1 text-sm scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent"
+              className="max-h-80 overflow-y-auto space-y-1.5 pr-1 text-sm"
               role="listbox"
             >
               {filteredCommands.length > 0 ? (
@@ -237,25 +237,25 @@ export default function CommandPalette() {
                       onMouseEnter={() => setSelectedIndex(index)}
                       className={`flex items-center justify-between p-3 rounded-2xl transition-all duration-150 cursor-pointer ${
                         isSelected
-                          ? "bg-amber-500/20 border-amber-500/30 text-amber-300 font-semibold border"
-                          : "text-slate-300 border border-transparent hover:bg-[#1A1D26] hover:text-white"
+                          ? "bg-black text-white border border-black shadow-sm"
+                          : "text-zinc-700 border border-transparent hover:bg-zinc-100 hover:text-black"
                       }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <div
-                          className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0 transition-colors ${
+                          className={`w-9 h-9 rounded-xl flex items-center justify-center text-base shrink-0 transition-colors ${
                             isSelected
-                              ? "bg-amber-500/30 text-amber-300"
-                              : "bg-[#090A0C] text-slate-300 border border-[#242834]"
+                              ? "bg-zinc-800 text-white"
+                              : "bg-zinc-100 text-zinc-700 border border-zinc-200"
                           }`}
                         >
                           {command.icon}
                         </div>
                         <div className="flex flex-col min-w-0">
-                          <span className="text-sm font-medium truncate">
+                          <span className={`text-sm font-bold truncate ${isSelected ? "text-white" : "text-black"}`}>
                             {command.title}
                           </span>
-                          <span className="text-xs text-slate-400 truncate">
+                          <span className={`text-xs truncate ${isSelected ? "text-zinc-300" : "text-zinc-500"}`}>
                             {command.description}
                           </span>
                         </div>
@@ -263,11 +263,11 @@ export default function CommandPalette() {
 
                       <div className="flex items-center gap-2 shrink-0 ml-2">
                         {isSelected && (
-                          <span className="text-xs font-mono text-amber-400/90 bg-amber-500/10 px-2 py-0.5 rounded-lg border border-amber-500/20 hidden sm:inline-block">
+                          <span className="text-xs font-mono text-zinc-300 bg-zinc-800 px-2 py-0.5 rounded-lg border border-zinc-700 hidden sm:inline-block">
                             ↵ Select
                           </span>
                         )}
-                        <span className="text-[11px] font-mono text-slate-500 group-hover:text-slate-400">
+                        <span className={`text-[11px] font-mono ${isSelected ? "text-zinc-400" : "text-zinc-400"}`}>
                           {command.href}
                         </span>
                       </div>
@@ -275,7 +275,7 @@ export default function CommandPalette() {
                   );
                 })
               ) : (
-                <div className="py-8 text-center text-slate-400 text-sm">
+                <div className="py-8 text-center text-zinc-400 text-sm">
                   <p className="text-2xl mb-1">🔍</p>
                   <p>No matching commands found for &quot;{query}&quot;</p>
                 </div>
@@ -283,19 +283,19 @@ export default function CommandPalette() {
             </div>
 
             {/* Modal Footer Hints */}
-            <div className="pt-2 border-t border-[#242834]/60 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+            <div className="pt-3 border-t border-zinc-100 flex items-center justify-between text-[11px] text-zinc-500 font-mono">
               <div className="flex items-center gap-3">
                 <span className="flex items-center gap-1">
-                  <kbd className="px-1 py-0.5 rounded bg-[#090A0C] border border-[#242834]">↑</kbd>
-                  <kbd className="px-1 py-0.5 rounded bg-[#090A0C] border border-[#242834]">↓</kbd> Navigate
+                  <kbd className="px-1.5 py-0.5 rounded bg-zinc-100 border border-zinc-200 text-zinc-700">↑</kbd>
+                  <kbd className="px-1.5 py-0.5 rounded bg-zinc-100 border border-zinc-200 text-zinc-700">↓</kbd> Navigate
                 </span>
                 <span className="flex items-center gap-1">
-                  <kbd className="px-1 py-0.5 rounded bg-[#090A0C] border border-[#242834]">↵</kbd> Open
+                  <kbd className="px-1.5 py-0.5 rounded bg-zinc-100 border border-zinc-200 text-zinc-700">↵</kbd> Open
                 </span>
               </div>
               <div className="flex items-center gap-1">
-                <span>ResuMatch Palette</span>
-                <kbd className="px-1.5 py-0.5 rounded bg-[#090A0C] border border-[#242834] text-amber-400">⌘K</kbd>
+                <span>ResuMatch</span>
+                <kbd className="px-1.5 py-0.5 rounded bg-zinc-100 border border-zinc-200 text-black font-bold">⌘K</kbd>
               </div>
             </div>
           </div>

@@ -20,9 +20,9 @@ interface Resume {
 
 function getDocTypeBadge(docType: string | null, name: string) {
   const type = docType || name.split(".").pop()?.toLowerCase() || null;
-  if (type === "pdf") return { label: "PDF", color: "bg-rose-950 text-rose-300 border border-rose-800" };
-  if (type === "docx") return { label: "DOCX", color: "bg-blue-950 text-blue-300 border border-blue-800" };
-  if (type === "doc") return { label: "DOC", color: "bg-amber-950 text-amber-300 border border-amber-800" };
+  if (type === "pdf") return { label: "PDF", color: "bg-zinc-100 text-black border border-zinc-300" };
+  if (type === "docx") return { label: "DOCX", color: "bg-zinc-100 text-black border border-zinc-300" };
+  if (type === "doc") return { label: "DOC", color: "bg-zinc-100 text-black border border-zinc-300" };
   return null;
 }
 
@@ -128,8 +128,8 @@ export default function ResumesPage() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#090A0C]">
-        <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+      <div className="flex items-center justify-center min-h-screen bg-white">
+        <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -137,17 +137,17 @@ export default function ResumesPage() {
   if (status === "unauthenticated") return null;
 
   return (
-    <div className="min-h-screen bg-[#090A0C] text-white py-8 px-4 sm:px-6 lg:px-8 space-y-6 pb-24">
+    <div className="min-h-screen bg-white text-black py-8 px-4 sm:px-6 lg:px-8 space-y-6 pb-24">
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <Link href="/dashboard" className="text-xs font-bold text-amber-400 hover:underline">
+              <Link href="/dashboard" className="text-xs font-bold text-black hover:underline">
                 ← Back to Dashboard
               </Link>
             </div>
-            <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight mt-1">Resume Vault & Document Viewer</h1>
-            <p className="text-xs sm:text-sm text-zinc-400 mt-1">
+            <h1 className="text-2xl sm:text-4xl font-black text-black tracking-tight mt-1">Resume Vault & Document Viewer</h1>
+            <p className="text-xs sm:text-sm text-zinc-500 mt-1">
               {resumes.length} resume{resumes.length !== 1 ? "s" : ""} stored with Google Drive-style document content preview
             </p>
           </div>
@@ -170,30 +170,30 @@ export default function ResumesPage() {
             />
             <label
               htmlFor="resume-upload"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-500 text-slate-950 text-xs font-black rounded-xl hover:bg-amber-400 transition-all cursor-pointer shadow-lg shadow-amber-500/20 disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-black text-white text-xs font-bold rounded-xl hover:bg-zinc-800 transition-all cursor-pointer shadow-sm disabled:opacity-50 border border-black"
             >
               {compactUploading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
-                  Uploading...
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Uploading...</span>
                 </>
               ) : (
                 <>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
-                  Browse & Upload New Resume
+                  <span>Browse & Upload New Resume</span>
                 </>
               )}
             </label>
-            <span className="text-xs text-zinc-400 font-mono">PDF, DOC, or DOCX up to 5MB</span>
+            <span className="text-xs text-zinc-500 font-mono">PDF, DOC, or DOCX up to 5MB</span>
           </div>
         )}
 
         {/* Resume Cards Grid */}
         {resumes.length === 0 ? (
-          <div className="text-center py-12 bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] p-8 space-y-3">
-            <p className="text-xs text-zinc-400">
+          <div className="text-center py-12 bg-zinc-50 rounded-3xl border border-zinc-200 p-8 space-y-3">
+            <p className="text-xs text-zinc-500 font-medium">
               No resumes yet. Upload your primary resume above to get started.
             </p>
           </div>
@@ -204,20 +204,20 @@ export default function ResumesPage() {
               return (
                 <div
                   key={resume.id}
-                  className="bg-[#14161D]/90 backdrop-blur-xl rounded-3xl border border-[#242834] hover:border-amber-500/40 p-6 shadow-xl transition-all flex flex-col justify-between space-y-4 group"
+                  className="bg-white rounded-3xl border border-zinc-200 hover:border-black p-6 shadow-sm transition-all flex flex-col justify-between space-y-4 group"
                 >
                   <div className="space-y-3">
                     {/* Tile Header */}
-                    <div className="flex items-start justify-between border-b border-[#242834] pb-3">
+                    <div className="flex items-start justify-between border-b border-zinc-100 pb-3">
                       <div className="flex items-center gap-2.5 min-w-0">
                         <span className="text-2xl">📄</span>
                         <div className="min-w-0">
-                          <h3 className="font-extrabold text-white text-sm truncate group-hover:text-amber-400 transition-colors">
+                          <h3 className="font-extrabold text-black text-sm truncate group-hover:text-zinc-700 transition-colors">
                             {resume.name}
                           </h3>
                           <div className="flex items-center gap-1.5 mt-0.5">
                             {badge && (
-                              <span className={`px-2 py-0.5 text-[10px] font-black rounded-md ${badge.color}`}>
+                              <span className={`px-2 py-0.5 text-[10px] font-bold rounded-md ${badge.color}`}>
                                 {badge.label}
                               </span>
                             )}
@@ -228,28 +228,28 @@ export default function ResumesPage() {
                         </div>
                       </div>
                       {resume.isPrimary && (
-                        <span className="px-2.5 py-1 bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black rounded-full shrink-0">
+                        <span className="px-2.5 py-1 bg-black text-white text-[10px] font-bold rounded-full shrink-0 shadow-sm">
                           PRIMARY
                         </span>
                       )}
                     </div>
 
                     {/* Google Drive Style Document Sheet Container inside Tile */}
-                    <div className="relative rounded-2xl bg-[#090A0C] border border-[#242834] p-4 h-52 overflow-y-auto space-y-2 group-hover:border-amber-500/30 transition-colors">
-                      <div className="flex items-center justify-between border-b border-[#1E2230] pb-2 text-[10px] font-mono text-amber-400">
-                        <span className="font-black uppercase tracking-wider">Document Preview Page</span>
-                        <span className="text-zinc-500">Google Drive Style</span>
+                    <div className="relative rounded-2xl bg-zinc-50 border border-zinc-200 p-4 h-52 overflow-y-auto space-y-2 group-hover:border-zinc-400 transition-colors">
+                      <div className="flex items-center justify-between border-b border-zinc-200 pb-2 text-[10px] font-mono text-zinc-700">
+                        <span className="font-bold uppercase tracking-wider">Document Preview Page</span>
+                        <span className="text-zinc-400">Drive Style</span>
                       </div>
                       {resume.parsedText && isHumanReadableText(resume.parsedText) ? (
-                        <p className="text-xs text-zinc-300 font-sans leading-relaxed whitespace-pre-wrap break-words">
+                        <p className="text-xs text-zinc-700 font-sans leading-relaxed whitespace-pre-wrap break-words">
                           {resume.parsedText}
                         </p>
                       ) : (
-                        <div className="p-3 bg-rose-950/40 border border-rose-800/50 rounded-xl space-y-1.5 text-center my-4">
-                          <p className="text-xs font-black text-rose-300">
+                        <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl space-y-1.5 text-center my-4">
+                          <p className="text-xs font-bold text-rose-800">
                             ⚠️ Unreadable Custom Font Subset PDF
                           </p>
-                          <p className="text-[10px] text-zinc-400 leading-snug">
+                          <p className="text-[10px] text-zinc-600 leading-snug">
                             This PDF was saved using custom font encodings (e.g. Canva/Figma subset fonts). Please re-upload as DOCX or a standard text PDF.
                           </p>
                         </div>
@@ -262,32 +262,32 @@ export default function ResumesPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => setPreviewResume(resume)}
-                        className="flex-1 px-3 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1"
+                        className="flex-1 px-3 py-2 bg-black text-white hover:bg-zinc-800 text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1 border border-black shadow-sm"
                       >
                         <span>🔍 Drive Full Page View</span>
                       </button>
                       <Link
                         href="/dashboard"
-                        className="px-3 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1"
+                        className="px-3 py-2 bg-zinc-100 hover:bg-zinc-200 text-black border border-zinc-300 hover:border-black text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1 shadow-sm"
                       >
                         <span>⚡ Run Scan</span>
                       </Link>
                     </div>
 
-                    <div className="flex items-center justify-between pt-2 border-t border-[#242834]">
-                      <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-zinc-300">
+                    <div className="flex items-center justify-between pt-2 border-t border-zinc-100">
+                      <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-zinc-700">
                         <input
                           type="checkbox"
                           checked={resume.isPrimary}
                           onChange={(e) => handleSetPrimary(resume.id, e.target.checked)}
-                          className="w-4 h-4 rounded text-amber-500 accent-amber-500"
+                          className="w-4 h-4 rounded text-black accent-black focus:ring-0"
                         />
                         <span>Set Primary</span>
                       </label>
                       <button
                         onClick={() => handleDelete(resume.id)}
                         disabled={deletingId === resume.id}
-                        className="px-3 py-1.5 text-xs font-bold text-rose-400 hover:bg-rose-950/50 rounded-xl transition-colors disabled:opacity-50"
+                        className="px-3 py-1.5 text-xs font-bold text-zinc-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors disabled:opacity-50"
                       >
                         {deletingId === resume.id ? "Deleting..." : "Delete"}
                       </button>
@@ -300,10 +300,10 @@ export default function ResumesPage() {
             {/* Inline Add Card */}
             <label
               htmlFor="resume-upload"
-              className="bg-[#14161D]/40 rounded-3xl border-2 border-dashed border-[#242834] hover:border-amber-500/50 flex flex-col items-center justify-center p-6 min-h-[300px] text-zinc-400 hover:text-amber-300 transition-all cursor-pointer group"
+              className="bg-zinc-50 rounded-3xl border-2 border-dashed border-zinc-300 hover:border-black flex flex-col items-center justify-center p-6 min-h-[300px] text-zinc-500 hover:text-black transition-all cursor-pointer group shadow-sm"
             >
-              <span className="text-4xl mb-2 group-hover:scale-110 transition-transform text-amber-400">+</span>
-              <span className="text-xs font-extrabold uppercase tracking-wider text-white">Upload New Resume</span>
+              <span className="text-4xl mb-2 group-hover:scale-110 transition-transform text-black">+</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-black">Upload New Resume</span>
             </label>
           </div>
         )}

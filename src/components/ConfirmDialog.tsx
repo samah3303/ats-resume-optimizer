@@ -91,16 +91,16 @@ export default function ConfirmDialog({
       />
 
       {/* Dialog */}
-      <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 max-w-md w-full p-6 animate-in zoom-in">
+      <div className="relative bg-white rounded-2xl shadow-2xl border border-zinc-200 max-w-md w-full p-6 animate-in zoom-in">
         <h2
           id="confirm-title"
-          className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2"
+          className="text-lg font-bold text-black mb-2"
         >
           {title}
         </h2>
         <p
           id="confirm-message"
-          className="text-sm text-slate-600 dark:text-slate-400 mb-6"
+          className="text-xs sm:text-sm text-zinc-600 mb-6 leading-relaxed"
         >
           {message}
         </p>
@@ -108,17 +108,17 @@ export default function ConfirmDialog({
           <button
             ref={cancelRef}
             onClick={onCancel}
-            className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors min-h-[44px] sm:min-h-0"
+            className="px-4 py-2 text-xs sm:text-sm font-semibold text-zinc-700 hover:text-black border border-zinc-300 rounded-xl hover:bg-zinc-100 transition-colors min-h-[44px] sm:min-h-0"
           >
             {cancelLabel}
           </button>
           <button
             ref={confirmRef}
             onClick={onConfirm}
-            className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors min-h-[44px] sm:min-h-0 ${
+            className={`px-4 py-2 text-xs sm:text-sm font-bold text-white rounded-xl transition-all shadow-sm min-h-[44px] sm:min-h-0 ${
               variant === "danger"
-                ? "bg-red-600 hover:bg-red-700"
-                : "bg-indigo-600 hover:bg-indigo-700"
+                ? "bg-rose-600 hover:bg-rose-700 border border-rose-700"
+                : "bg-black hover:bg-zinc-800 border border-black"
             }`}
           >
             {confirmLabel}

@@ -12,10 +12,10 @@ export default function OnboardingStepper({ step }: OnboardingStepperProps) {
           {/* Step circle */}
           <div className="flex flex-col items-center">
             <div
-              className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
+              className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-black transition-colors ${
                 step >= s.num
-                  ? "bg-indigo-600 text-white"
-                  : "bg-gray-200 text-gray-500"
+                  ? "bg-black text-white"
+                  : "bg-zinc-100 text-zinc-400 border border-zinc-200"
               }`}
             >
               {step > s.num ? (
@@ -37,8 +37,8 @@ export default function OnboardingStepper({ step }: OnboardingStepperProps) {
               )}
             </div>
             <span
-              className={`text-xs mt-1.5 font-medium ${
-                step >= s.num ? "text-indigo-700" : "text-gray-400"
+              className={`text-xs mt-1.5 font-bold ${
+                step >= s.num ? "text-black" : "text-zinc-400"
               }`}
             >
               {s.label}
@@ -48,7 +48,7 @@ export default function OnboardingStepper({ step }: OnboardingStepperProps) {
           {i < STEPS.length - 1 && (
             <div
               className={`w-12 sm:w-20 h-0.5 mx-1 mt-[-14px] transition-colors ${
-                step > s.num ? "bg-indigo-600" : "bg-gray-200"
+                step > s.num ? "bg-black" : "bg-zinc-200"
               }`}
             />
           )}

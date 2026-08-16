@@ -81,50 +81,50 @@ export default function BatchComparePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#090A0C] text-white py-8 px-4 sm:px-6 lg:px-8 space-y-6 pb-24">
+    <div className="min-h-screen bg-white text-zinc-900 py-8 px-4 sm:px-6 lg:px-8 space-y-6 pb-24">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#242834]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-200">
           <div>
             <div className="flex items-center gap-2">
               <Link
                 href="/dashboard/tools"
-                className="text-xs font-bold text-amber-400 hover:underline"
+                className="text-xs font-bold text-zinc-600 hover:text-black hover:underline"
               >
                 ← Back to All Tools
               </Link>
             </div>
-            <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight flex items-center gap-2 mt-1">
+            <h1 className="text-2xl sm:text-4xl font-black text-black tracking-tight flex items-center gap-2 mt-1">
               <span>⚖️</span> Batch Resume Comparison Tool
             </h1>
-            <p className="text-xs sm:text-sm text-zinc-400 mt-1">
+            <p className="text-xs sm:text-sm text-zinc-600 mt-1">
               Compare multiple resume versions side-by-side to evaluate strengths, weak spots, and ATS readiness.
             </p>
           </div>
         </div>
 
         {/* Resume Selection Card */}
-        <div className="bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-amber-500/20 p-6 shadow-2xl space-y-4">
+        <div className="bg-white rounded-3xl border border-zinc-200 p-6 shadow-sm space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xs font-black uppercase tracking-wider text-amber-300">
+            <h2 className="text-xs font-black uppercase tracking-wider text-black">
               Select Resumes to Compare ({selectedIds.length} of 4 Selected)
             </h2>
-            <span className="text-xs text-zinc-400">Select 2 to 4 resumes</span>
+            <span className="text-xs text-zinc-500 font-medium">Select 2 to 4 resumes</span>
           </div>
 
           {loadingResumes ? (
-            <div className="py-8 text-center text-xs text-zinc-400">
-              <div className="w-5 h-5 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+            <div className="py-8 text-center text-xs text-zinc-500">
+              <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin mx-auto mb-2" />
               Loading uploaded resumes...
             </div>
           ) : resumes.length === 0 ? (
-            <div className="py-8 text-center px-4 bg-[#090A0C] border border-[#242834] rounded-2xl space-y-3">
-              <p className="text-xs text-zinc-400">
+            <div className="py-8 text-center px-4 bg-zinc-50 border border-zinc-200 rounded-2xl space-y-3 shadow-sm">
+              <p className="text-xs text-zinc-600">
                 No resumes uploaded yet. Upload at least 2 resumes to run batch comparison.
               </p>
               <Link
                 href="/dashboard/resumes"
-                className="px-5 py-2.5 bg-amber-500 text-slate-950 text-xs font-black rounded-xl inline-block"
+                className="px-5 py-2.5 bg-black hover:bg-zinc-800 text-white text-xs font-black rounded-xl inline-block border border-black shadow-sm transition-all"
               >
                 Upload Resumes →
               </Link>
@@ -137,14 +137,14 @@ export default function BatchComparePage() {
                   <div
                     key={r.id}
                     onClick={() => toggleSelect(r.id)}
-                    className={`p-4 rounded-2xl border cursor-pointer transition-all flex items-start justify-between gap-3 ${
+                    className={`p-4 rounded-2xl border cursor-pointer transition-all flex items-start justify-between gap-3 shadow-sm ${
                       selected
-                        ? "bg-amber-500/10 border-amber-500/40 text-white shadow-md"
-                        : "bg-[#090A0C] border-[#242834] hover:border-amber-500/30 text-zinc-300"
+                        ? "bg-zinc-100 border-black text-black font-semibold"
+                        : "bg-zinc-50 border-zinc-200 hover:border-zinc-400 text-zinc-800"
                     }`}
                   >
                     <div className="truncate">
-                      <p className="text-xs font-bold text-white truncate">
+                      <p className="text-xs font-bold text-black truncate">
                         📄 {r.name}
                       </p>
                       <p className="text-[10px] text-zinc-500 font-mono mt-1">
@@ -155,7 +155,7 @@ export default function BatchComparePage() {
                       type="checkbox"
                       checked={selected}
                       onChange={() => {}}
-                      className="h-4 w-4 text-amber-500 accent-amber-500 rounded cursor-pointer shrink-0 mt-0.5"
+                      className="h-4 w-4 text-black accent-black rounded cursor-pointer shrink-0 mt-0.5"
                     />
                   </div>
                 );
@@ -167,11 +167,11 @@ export default function BatchComparePage() {
             <button
               onClick={handleRunComparison}
               disabled={comparing || selectedIds.length < 2}
-              className="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-amber-500/20 disabled:opacity-50 flex items-center gap-2"
+              className="px-6 py-3 bg-black hover:bg-zinc-800 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-sm border border-black disabled:opacity-50 flex items-center gap-2 transition-all"
             >
               {comparing ? (
                 <>
-                  <div className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   Comparing Resumes...
                 </>
               ) : (
@@ -184,7 +184,7 @@ export default function BatchComparePage() {
         {/* Results View */}
         {results && results.length > 0 && (
           <div className="space-y-4 animate-fadeIn">
-            <h2 className="text-sm font-black uppercase tracking-wider text-amber-400">
+            <h2 className="text-sm font-black uppercase tracking-wider text-black">
               📊 Comparison Breakdown
             </h2>
 
@@ -192,19 +192,19 @@ export default function BatchComparePage() {
               {results.map((item, idx) => (
                 <div
                   key={idx}
-                  className="bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] p-6 shadow-xl space-y-4"
+                  className="bg-white rounded-3xl border border-zinc-200 p-6 shadow-sm space-y-4 hover:border-black transition-all"
                 >
-                  <div className="flex items-center justify-between border-b border-[#242834] pb-3">
-                    <h3 className="text-sm font-bold text-white truncate">
+                  <div className="flex items-center justify-between border-b border-zinc-200 pb-3">
+                    <h3 className="text-sm font-bold text-black truncate">
                       📄 {item.name}
                     </h3>
                     <span
-                      className={`px-2.5 py-0.5 rounded-full text-xs font-black ${
+                      className={`px-2.5 py-0.5 rounded-full text-xs font-black border shadow-sm ${
                         item.overallScore >= 75
-                          ? "bg-emerald-950 text-emerald-300 border border-emerald-800"
+                          ? "bg-black text-white border-black"
                           : item.overallScore >= 60
-                          ? "bg-amber-950 text-amber-300 border border-amber-800"
-                          : "bg-rose-950 text-rose-300 border border-rose-800"
+                          ? "bg-zinc-100 text-zinc-900 border-zinc-300"
+                          : "bg-zinc-50 text-zinc-600 border-zinc-200"
                       }`}
                     >
                       {item.overallScore}/100 Rating
@@ -213,13 +213,13 @@ export default function BatchComparePage() {
 
                   {/* Strengths */}
                   <div>
-                    <p className="text-xs font-black uppercase tracking-wider text-emerald-400 mb-2">
+                    <p className="text-xs font-black uppercase tracking-wider text-black mb-2">
                       ✅ Key Strengths
                     </p>
-                    <ul className="space-y-1.5 text-xs text-zinc-300">
+                    <ul className="space-y-1.5 text-xs text-zinc-700">
                       {item.strengths.map((str, sIdx) => (
                         <li key={sIdx} className="flex items-start gap-1.5">
-                          <span className="text-emerald-400 font-bold">•</span>
+                          <span className="text-black font-bold">•</span>
                           <span>{str}</span>
                         </li>
                       ))}
@@ -228,13 +228,13 @@ export default function BatchComparePage() {
 
                   {/* Improvements */}
                   <div>
-                    <p className="text-xs font-black uppercase tracking-wider text-amber-400 mb-2">
+                    <p className="text-xs font-black uppercase tracking-wider text-zinc-600 mb-2">
                       ⚠️ Improvement Opportunities
                     </p>
-                    <ul className="space-y-1.5 text-xs text-zinc-300">
+                    <ul className="space-y-1.5 text-xs text-zinc-700">
                       {item.improvements.map((imp, iIdx) => (
                         <li key={iIdx} className="flex items-start gap-1.5">
-                          <span className="text-amber-400 font-bold">•</span>
+                          <span className="text-zinc-500 font-bold">•</span>
                           <span>{imp}</span>
                         </li>
                       ))}

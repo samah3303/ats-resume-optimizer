@@ -94,23 +94,33 @@ const TOOLS: ToolExplanation[] = [
     what: "A side-by-side comparison score grid ranking your primary resume against multiple job descriptions.",
     how: "Select 2-5 saved job descriptions, run batch comparison, and prioritize applying to roles with 75%+ scores.",
   },
+  {
+    title: "Recruiter Command Center",
+    category: "Talent & Hiring",
+    emoji: "👔",
+    href: "/dashboard/recruiter",
+    badge: "Recruiter AI",
+    why: "Recruiters and hiring managers need autonomous ATS resume screening, 8-stage Kanban pipelines, and structured interview scorecards.",
+    what: "An end-to-end recruitment studio featuring AI batch screening, stage distributions, and 1-click candidate advancement.",
+    how: "Post job openings, view incoming applicants, execute AI ATS screenings, and move candidates through interview stages.",
+  },
 ];
 
 export default function ToolsHubPage() {
   return (
-    <div className="min-h-screen bg-[#090A0C] text-white py-8 px-4 sm:px-6 lg:px-8 space-y-8 pb-24">
+    <div className="min-h-screen bg-white text-black py-8 px-4 sm:px-6 lg:px-8 space-y-8 pb-24">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header Banner */}
-        <div className="bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-amber-500/20 p-6 sm:p-8 text-white shadow-2xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-amber-500/10 border border-amber-500/30 text-amber-300">
+        <div className="bg-zinc-50 rounded-3xl border border-zinc-200 p-6 sm:p-8 text-black shadow-sm space-y-3">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-zinc-200 text-black border border-zinc-300">
             <span>🧩 Features Directory</span>
             <span>•</span>
             <span>Simple Guides & Tools</span>
           </div>
-          <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-white">
+          <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-black">
             All ResuMatch Tools & Features
           </h1>
-          <p className="text-xs sm:text-sm text-zinc-400 max-w-2xl leading-relaxed">
+          <p className="text-xs sm:text-sm text-zinc-600 max-w-2xl leading-relaxed font-medium">
             Every tool is designed to solve a specific barrier in your job search. Below is what each tool does, why you need it, and how to use it in simple terms.
           </p>
         </div>
@@ -120,24 +130,24 @@ export default function ToolsHubPage() {
           {TOOLS.map((tool) => (
             <div
               key={tool.title}
-              className="bg-[#14161D]/80 backdrop-blur-2xl border border-[#242834] hover:border-amber-500/40 rounded-3xl p-6 text-white shadow-xl transition-all flex flex-col justify-between space-y-5"
+              className="bg-white border border-zinc-200 hover:border-black rounded-3xl p-6 text-black shadow-sm transition-all flex flex-col justify-between space-y-5"
             >
               <div className="space-y-4">
                 {/* Header */}
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <span className="w-12 h-12 rounded-2xl bg-[#090A0C] text-2xl flex items-center justify-center shrink-0 border border-[#242834]">
+                    <span className="w-12 h-12 rounded-2xl bg-zinc-100 text-2xl flex items-center justify-center shrink-0 border border-zinc-200">
                       {tool.emoji}
                     </span>
                     <div>
                       <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block">
                         {tool.category}
                       </span>
-                      <h2 className="text-lg font-black text-white">{tool.title}</h2>
+                      <h2 className="text-lg font-black text-black">{tool.title}</h2>
                     </div>
                   </div>
                   {tool.badge && (
-                    <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30 shrink-0">
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-zinc-100 text-black border border-zinc-300 shrink-0">
                       {tool.badge}
                     </span>
                   )}
@@ -146,27 +156,27 @@ export default function ToolsHubPage() {
                 {/* Why? What? How? Section */}
                 <div className="space-y-3 text-xs">
                   {/* Why */}
-                  <div className="p-3 bg-[#090A0C] rounded-2xl border border-[#242834] space-y-1">
-                    <span className="font-black text-rose-400 uppercase tracking-wider text-[10px] block">
+                  <div className="p-3 bg-zinc-50 rounded-2xl border border-zinc-200 space-y-1">
+                    <span className="font-bold text-rose-800 uppercase tracking-wider text-[10px] block">
                       ❓ Why Use This?
                     </span>
-                    <p className="text-zinc-300 font-medium leading-relaxed">{tool.why}</p>
+                    <p className="text-zinc-700 font-medium leading-relaxed">{tool.why}</p>
                   </div>
 
                   {/* What */}
-                  <div className="p-3 bg-[#090A0C] rounded-2xl border border-[#242834] space-y-1">
-                    <span className="font-black text-amber-300 uppercase tracking-wider text-[10px] block">
+                  <div className="p-3 bg-zinc-50 rounded-2xl border border-zinc-200 space-y-1">
+                    <span className="font-bold text-zinc-900 uppercase tracking-wider text-[10px] block">
                       💡 What Is It?
                     </span>
-                    <p className="text-zinc-300 font-medium leading-relaxed">{tool.what}</p>
+                    <p className="text-zinc-700 font-medium leading-relaxed">{tool.what}</p>
                   </div>
 
                   {/* How */}
-                  <div className="p-3 bg-[#090A0C] rounded-2xl border border-[#242834] space-y-1">
-                    <span className="font-black text-emerald-400 uppercase tracking-wider text-[10px] block">
+                  <div className="p-3 bg-zinc-50 rounded-2xl border border-zinc-200 space-y-1">
+                    <span className="font-bold text-emerald-800 uppercase tracking-wider text-[10px] block">
                       🚀 How To Use It?
                     </span>
-                    <p className="text-zinc-300 font-medium leading-relaxed">{tool.how}</p>
+                    <p className="text-zinc-700 font-medium leading-relaxed">{tool.how}</p>
                   </div>
                 </div>
               </div>
@@ -175,7 +185,7 @@ export default function ToolsHubPage() {
               <div className="pt-2">
                 <Link
                   href={tool.href}
-                  className="w-full py-3 px-4 bg-amber-500/10 hover:bg-amber-500 hover:text-slate-950 border border-amber-500/30 rounded-2xl text-xs font-black text-amber-300 transition-all flex items-center justify-center gap-2 group shadow-md"
+                  className="w-full py-3 px-4 bg-black hover:bg-zinc-800 text-white rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-2 group shadow-sm border border-black"
                 >
                   <span>Open {tool.title}</span>
                   <span className="group-hover:translate-x-1 transition-transform">→</span>

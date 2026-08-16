@@ -27,49 +27,49 @@ export default function StepAnalyzingProgress({
             {[0, 1, 2].map((i) => (
               <div
                 key={i}
-                className="w-2.5 h-2.5 bg-indigo-600 rounded-full animate-bounce"
+                className="w-2.5 h-2.5 bg-black rounded-full animate-bounce"
                 style={{ animationDelay: `${i * 0.15}s` }}
               />
             ))}
           </div>
-          <h2 className="text-lg font-bold text-gray-900 mb-2">
+          <h2 className="text-lg font-black text-black mb-2">
             Analyzing Your Resume
           </h2>
-          <p className="text-sm text-gray-500 max-w-sm mx-auto">
+          <p className="text-xs text-zinc-600 max-w-sm mx-auto">
             Our AI is reviewing your experience against your target positions in{" "}
             {country}. This takes about 15–30 seconds.
           </p>
         </div>
       ) : (
         <div className="py-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-2">
+          <h2 className="text-xl font-black text-black mb-2">
             Ready to Analyze
           </h2>
-          <p className="text-sm text-gray-500 mb-6">
+          <p className="text-xs text-zinc-600 mb-6">
             We&apos;ll analyze your resume and generate a personalized 8-week
             career roadmap.
           </p>
 
           {/* Summary */}
-          <div className="bg-gray-50 rounded-lg p-4 text-left mb-6 space-y-2 text-sm">
+          <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-5 text-left mb-6 space-y-2.5 text-xs">
             <div className="flex justify-between">
-              <span className="text-gray-500">Resume</span>
-              <span className="font-medium text-gray-900">{resumeName}</span>
+              <span className="text-zinc-500 font-medium">Resume</span>
+              <span className="font-bold text-black">{resumeName}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500">Target Positions</span>
-              <span className="font-medium text-gray-900 truncate max-w-[200px]">
+              <span className="text-zinc-500 font-medium">Target Positions</span>
+              <span className="font-bold text-black truncate max-w-[200px]">
                 {positions}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500">Target Country</span>
-              <span className="font-medium text-gray-900">{country}</span>
+              <span className="text-zinc-500 font-medium">Target Country</span>
+              <span className="font-bold text-black">{country}</span>
             </div>
             {linkedin && (
               <div className="flex justify-between">
-                <span className="text-gray-500">LinkedIn</span>
-                <span className="font-medium text-gray-900 truncate max-w-[200px]">
+                <span className="text-zinc-500 font-medium">LinkedIn</span>
+                <span className="font-bold text-black truncate max-w-[200px]">
                   {linkedin}
                 </span>
               </div>
@@ -77,7 +77,7 @@ export default function StepAnalyzingProgress({
           </div>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs font-semibold text-red-700">
               {error}
             </div>
           )}
@@ -85,13 +85,13 @@ export default function StepAnalyzingProgress({
           <div className="flex items-center justify-center gap-3">
             <button
               onClick={onBack}
-              className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+              className="px-4 py-2 text-xs font-bold text-zinc-600 hover:text-black transition-colors"
             >
               ← Edit
             </button>
             <button
               onClick={onSubmit}
-              className="px-6 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
+              className="px-6 py-2.5 bg-black text-white text-xs font-bold rounded-xl hover:bg-zinc-800 transition-colors shadow-sm border border-black"
             >
               Generate Roadmap
             </button>

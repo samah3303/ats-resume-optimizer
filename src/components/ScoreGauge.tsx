@@ -12,17 +12,12 @@ export default function ScoreGauge({ score, size = 120 }: ScoreGaugeProps) {
 
   const color =
     clampedScore >= 70
-      ? "stroke-emerald-400"
+      ? "stroke-black"
       : clampedScore >= 50
-        ? "stroke-amber-400"
-        : "stroke-rose-500";
+        ? "stroke-zinc-700"
+        : "stroke-zinc-400";
 
-  const textColor =
-    clampedScore >= 70
-      ? "text-emerald-400"
-      : clampedScore >= 50
-        ? "text-amber-400"
-        : "text-rose-400";
+  const textColor = "text-black";
 
   return (
     <div className="flex flex-col items-center gap-2">
@@ -41,7 +36,7 @@ export default function ScoreGauge({ score, size = 120 }: ScoreGaugeProps) {
             fill="none"
             stroke="currentColor"
             strokeWidth={strokeWidth}
-            className="text-[#242834]"
+            className="text-zinc-200"
           />
           {/* Progress circle */}
           <circle

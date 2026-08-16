@@ -4,12 +4,19 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const mobileLinks = [
+interface MobileLink {
+  href: string;
+  label: string;
+  emoji: string;
+  badgeCount?: number;
+}
+
+const mobileLinks: MobileLink[] = [
   { href: "/dashboard", label: "Home", emoji: "🏠" },
-  { href: "/dashboard/roadmap", label: "Plan", emoji: "🗺️" },
-  { href: "/dashboard/resumes", label: "Resumes", emoji: "📄" },
-  { href: "/dashboard/jds", label: "Jobs", emoji: "💼" },
-  { href: "/dashboard/tools", label: "Tools", emoji: "🧩" },
+  { href: "/dashboard/jobs", label: "Jobs", emoji: "🔍" },
+  { href: "/dashboard/resumes", label: "Resume", emoji: "📝" },
+  { href: "/dashboard/tools", label: "Prep", emoji: "🎯" },
+  { href: "/dashboard/tracker", label: "Track", emoji: "📋" },
 ];
 
 export default function MobileNav() {
@@ -27,8 +34,8 @@ export default function MobileNav() {
       role="navigation"
       aria-label="Mobile main navigation"
     >
-      {/* Glassmorphic backdrop with carbon black / warm yellow theme */}
-      <div className="absolute inset-0 bg-white/95 dark:bg-[#0D0E11]/95 backdrop-blur-xl border-t border-amber-500/20 shadow-2xl" />
+      {/* Pure white backdrop */}
+      <div className="absolute inset-0 bg-white/95 backdrop-blur-lg border-t border-zinc-200 shadow-md" />
 
       {/* Fixed 5-Column Touch Target Grid */}
       <div
@@ -38,11 +45,36 @@ export default function MobileNav() {
           height: "calc(60px + env(safe-area-inset-bottom, 0px))",
         }}
       >
-        {mobileLinks.map((link) => {
+        {mobileLinks.map((link, index) => {
           const isActive =
             link.href === "/dashboard"
               ? pathname === "/dashboard"
               : pathname.startsWith(link.href);
+
+          const isCenterTab = index === 2;
+
+          if (isCenterTab) {
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-label={link.label}
+                aria-current={isActive ? "page" : undefined}
+                className="flex flex-col items-center justify-center -translate-y-2 min-h-[48px] active:scale-95 transition-transform"
+              >
+                <div className={`w-11 h-11 rounded-full flex items-center justify-center shadow-md transition-all ${
+                  isActive
+                    ? "bg-black text-white border-2 border-black"
+                    : "bg-black text-white hover:bg-zinc-800 border border-black"
+                }`}>
+                  <span className="text-xl" aria-hidden="true">{link.emoji}</span>
+                </div>
+                <span className={`text-[10px] mt-0.5 ${isActive ? "font-bold text-black" : "font-medium text-zinc-500"}`}>
+                  {link.label}
+                </span>
+              </Link>
+            );
+          }
 
           return (
             <Link
@@ -50,15 +82,20 @@ export default function MobileNav() {
               href={link.href}
               aria-label={link.label}
               aria-current={isActive ? "page" : undefined}
-              className={`flex flex-col items-center justify-center gap-0.5 py-1 px-1 rounded-xl transition-all duration-200 min-h-[48px] ${
+              className={`flex flex-col items-center justify-center gap-0.5 py-1 px-1 rounded-xl transition-all duration-200 min-h-[48px] active:scale-95 ${
                 isActive
-                  ? "bg-slate-900 text-amber-400 dark:bg-amber-500/20 dark:text-amber-300 font-bold shadow-sm"
-                  : "text-slate-500 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white"
+                  ? "text-black font-bold"
+                  : "text-zinc-400 hover:text-black"
               }`}
             >
               <span className="relative flex items-center justify-center">
                 {isActive && (
-                  <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-4 h-1 rounded-full bg-amber-500 shadow-sm" />
+                  <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-3.5 h-1 rounded-full bg-black shadow-sm" />
+                )}
+                {link.badgeCount !== undefined && link.badgeCount > 0 && (
+                  <span className="absolute -top-1.5 -right-2.5 bg-black text-white text-[9px] font-bold px-1.5 min-w-[16px] h-[16px] rounded-full flex items-center justify-center shadow-sm z-10">
+                    {link.badgeCount > 99 ? '99+' : link.badgeCount}
+                  </span>
                 )}
                 <span className="text-lg" aria-hidden="true">
                   {link.emoji}
@@ -67,8 +104,8 @@ export default function MobileNav() {
               <span
                 className={`text-[10px] leading-none ${
                   isActive
-                    ? "font-extrabold text-amber-500 dark:text-amber-300"
-                    : "font-semibold text-slate-600 dark:text-slate-400"
+                    ? "font-extrabold text-black"
+                    : "font-semibold text-zinc-500"
                 }`}
               >
                 {link.label}

@@ -151,9 +151,9 @@ function DashboardContent() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="min-h-screen bg-[#090A0C] text-white py-8 px-4 sm:px-6 lg:px-8 space-y-6">
+      <div className="min-h-screen bg-white text-zinc-950 py-8 px-4 sm:px-6 lg:px-8 space-y-6">
         <div className="max-w-7xl mx-auto space-y-6">
-          <div className="h-8 bg-[#14161D] rounded w-48 animate-pulse mb-8" />
+          <div className="h-8 bg-zinc-100 rounded-xl w-48 animate-pulse mb-8" />
           <SkeletonGrid count={4} />
         </div>
       </div>
@@ -183,7 +183,7 @@ function DashboardContent() {
   })();
 
   return (
-    <div className="min-h-screen bg-[#090A0C] text-white py-8 px-4 sm:px-6 lg:px-8 space-y-6 pb-24">
+    <div className="min-h-screen bg-white text-zinc-950 py-8 px-4 sm:px-6 lg:px-8 space-y-6 pb-24">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Single Hero Header */}
         <DashboardHeader
@@ -198,11 +198,11 @@ function DashboardContent() {
 
         {/* Error banner */}
         {dataError && (
-          <div className="p-4 bg-rose-950/80 border border-rose-800 rounded-2xl text-xs text-rose-300 font-bold flex items-center justify-between">
+          <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-xs text-rose-800 font-bold flex items-center justify-between">
             <span>{dataError}</span>
             <button
               onClick={fetchData}
-              className="px-3 py-1.5 text-xs font-bold bg-rose-900 text-rose-200 rounded-xl hover:bg-rose-800 transition-colors"
+              className="px-3 py-1.5 text-xs font-bold bg-rose-100 text-rose-900 rounded-xl hover:bg-rose-200 transition-colors"
             >
               Retry
             </button>
@@ -253,8 +253,8 @@ export default function DashboardPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex items-center justify-center min-h-screen bg-[#090A0C]">
-          <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+        <div className="flex items-center justify-center min-h-screen bg-white">
+          <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin" />
         </div>
       }
     >

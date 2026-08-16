@@ -283,8 +283,8 @@ function AnalyzePageContent() {
 
   if (status === "loading" || loadingData) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#090A0C]">
-        <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+      <div className="flex items-center justify-center min-h-screen bg-white">
+        <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -292,33 +292,33 @@ function AnalyzePageContent() {
   if (status === "unauthenticated") return null;
 
   return (
-    <div className="min-h-screen bg-[#090A0C] text-white py-8 px-4 sm:px-6 lg:px-8 pb-24">
+    <div className="min-h-screen bg-white text-black py-8 px-4 sm:px-6 lg:px-8 pb-24">
       <div className="max-w-4xl mx-auto space-y-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">Run ATS Analysis</h1>
-          <p className="text-xs sm:text-sm text-zinc-400 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-black text-black tracking-tight">Run ATS Analysis</h1>
+          <p className="text-xs sm:text-sm text-zinc-500 mt-1">
             Compare your resume against a target job posting using Multi-Agent RAG evaluation.
           </p>
         </div>
 
-        {/* Glassmorphic Form Container */}
-        <div className="bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-amber-500/20 p-6 sm:p-8 shadow-2xl space-y-6">
+        {/* Form Container */}
+        <div className="bg-white rounded-3xl border border-zinc-200 p-6 sm:p-8 shadow-sm space-y-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className="p-3.5 rounded-xl bg-rose-950/80 border border-rose-800 text-xs text-rose-300 font-bold animate-fadeIn">
+              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800 font-bold animate-fadeIn">
                 ⚠️ {error}
               </div>
             )}
 
             {/* Profile & Target Info */}
             {onboardingProfile && (
-              <div className="p-5 bg-[#090A0C] rounded-2xl border border-[#242834] space-y-4">
-                <h3 className="text-xs font-black uppercase tracking-wider text-amber-300">📋 Your Target Profile</h3>
+              <div className="p-5 bg-zinc-50 rounded-2xl border border-zinc-200 space-y-4">
+                <h3 className="text-xs font-black uppercase tracking-wider text-black">📋 Your Target Profile</h3>
 
                 {/* Target Positions Checkboxes */}
                 {onboardingProfile.targetPositions && onboardingProfile.targetPositions.length > 0 && (
                   <div>
-                    <label className="block text-[11px] font-bold text-zinc-400 mb-1.5 uppercase">
+                    <label className="block text-[11px] font-bold text-zinc-600 mb-1.5 uppercase">
                       Target Roles:
                     </label>
                     <div className="flex flex-wrap gap-2">
@@ -327,10 +327,10 @@ function AnalyzePageContent() {
                         return (
                           <label
                             key={pos}
-                            className={`px-3 py-1.5 rounded-xl text-xs font-extrabold cursor-pointer transition-all border ${
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer transition-all border ${
                               isChecked
-                                ? "bg-amber-500 text-slate-950 border-amber-400 shadow-md"
-                                : "bg-[#14161D] text-zinc-300 border-[#242834] hover:border-amber-500/50"
+                                ? "bg-black text-white border-black shadow-sm"
+                                : "bg-white text-zinc-700 border-zinc-300 hover:border-black"
                             }`}
                           >
                             <input
@@ -356,8 +356,8 @@ function AnalyzePageContent() {
                 {/* Country Badge */}
                 {onboardingProfile.country && (
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-semibold text-zinc-400">Target Country:</span>
-                    <span className="px-2.5 py-1 bg-emerald-950 text-emerald-300 text-xs font-black rounded-full border border-emerald-800">
+                    <span className="text-xs font-semibold text-zinc-600">Target Country:</span>
+                    <span className="px-2.5 py-1 bg-zinc-100 text-black text-xs font-bold rounded-full border border-zinc-300">
                       {onboardingProfile.country}
                     </span>
                   </div>
@@ -365,17 +365,17 @@ function AnalyzePageContent() {
 
                 {/* Job Type */}
                 <div>
-                  <label className="block text-[11px] font-bold text-zinc-400 mb-1.5 uppercase">
+                  <label className="block text-[11px] font-bold text-zinc-600 mb-1.5 uppercase">
                     Job Type Preference:
                   </label>
                   <div className="flex flex-wrap gap-2">
                     {JOB_TYPES.map((jt) => (
                       <label
                         key={jt}
-                        className={`px-3 py-1 rounded-xl text-xs font-extrabold cursor-pointer transition-all border ${
+                        className={`px-3 py-1 rounded-xl text-xs font-bold cursor-pointer transition-all border ${
                           selectedJobType === jt
-                            ? "bg-amber-500 text-slate-950 border-amber-400 shadow-md"
-                            : "bg-[#14161D] text-zinc-300 border-[#242834] hover:border-amber-500/50"
+                            ? "bg-black text-white border-black shadow-sm"
+                            : "bg-white text-zinc-700 border-zinc-300 hover:border-black"
                         }`}
                       >
                         <input
@@ -396,15 +396,15 @@ function AnalyzePageContent() {
 
             {/* Step 1: Select Resume */}
             <div className="space-y-2">
-              <label className="block text-xs font-black uppercase tracking-wider text-amber-300">
+              <label className="block text-xs font-black uppercase tracking-wider text-black">
                 Step 1: Select Resume
               </label>
               {resumes.length === 0 ? (
-                <div className="p-4 bg-[#090A0C] rounded-2xl border border-[#242834] text-center space-y-2">
-                  <p className="text-xs text-zinc-400">No resumes uploaded yet.</p>
+                <div className="p-4 bg-zinc-50 rounded-2xl border border-zinc-200 text-center space-y-2">
+                  <p className="text-xs text-zinc-500">No resumes uploaded yet.</p>
                   <Link
                     href="/dashboard/resumes"
-                    className="text-xs text-amber-400 font-bold hover:underline inline-block"
+                    className="text-xs text-black font-bold hover:underline inline-block"
                   >
                     Upload a resume first →
                   </Link>
@@ -413,7 +413,7 @@ function AnalyzePageContent() {
                 <select
                   value={resumeId}
                   onChange={(e) => setResumeId(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl text-xs bg-[#090A0C] border border-[#242834] text-white focus:outline-none focus:border-amber-500"
+                  className="w-full px-4 py-3 rounded-xl text-xs bg-white border border-zinc-300 text-black focus:outline-none focus:border-black shadow-sm font-medium"
                 >
                   <option value="">Select a resume...</option>
                   {resumes.map((r) => (
@@ -427,26 +427,26 @@ function AnalyzePageContent() {
 
             {/* Step 2: Select or Paste JD */}
             <div className="space-y-3">
-              <label className="block text-xs font-black uppercase tracking-wider text-amber-300">
+              <label className="block text-xs font-black uppercase tracking-wider text-black">
                 Step 2: Select Job Description(s)
               </label>
 
               <div className="flex items-center gap-4">
-                <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-zinc-200">
+                <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-zinc-800">
                   <input
                     type="radio"
                     checked={!usePastedJd}
                     onChange={() => setUsePastedJd(false)}
-                    className="w-4 h-4 text-amber-500 accent-amber-500"
+                    className="w-4 h-4 text-black accent-black focus:ring-0"
                   />
                   <span>Saved JD</span>
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-zinc-200">
+                <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-zinc-800">
                   <input
                     type="radio"
                     checked={usePastedJd}
                     onChange={() => setUsePastedJd(true)}
-                    className="w-4 h-4 text-amber-500 accent-amber-500"
+                    className="w-4 h-4 text-black accent-black focus:ring-0"
                   />
                   <span>Paste New JD</span>
                 </label>
@@ -454,20 +454,20 @@ function AnalyzePageContent() {
 
               {!usePastedJd ? (
                 jds.length === 0 ? (
-                  <div className="p-4 bg-[#090A0C] rounded-2xl border border-[#242834] text-center space-y-2">
-                    <p className="text-xs text-zinc-400">
+                  <div className="p-4 bg-zinc-50 rounded-2xl border border-zinc-200 text-center space-y-2">
+                    <p className="text-xs text-zinc-500">
                       No saved JDs found. Switch to &ldquo;Paste New JD&rdquo; or add one first.
                     </p>
                     <Link
                       href="/dashboard/jds"
-                      className="text-xs text-amber-400 font-bold hover:underline inline-block"
+                      className="text-xs text-black font-bold hover:underline inline-block"
                     >
                       Save a JD →
                     </Link>
                   </div>
                 ) : (
-                  <div className="space-y-2 max-h-60 overflow-y-auto p-2 bg-[#090A0C] border border-[#242834] rounded-2xl">
-                    <p className="text-[10px] text-zinc-500 px-2 pb-1 font-mono uppercase">
+                  <div className="space-y-2 max-h-60 overflow-y-auto p-2 bg-zinc-50 border border-zinc-200 rounded-2xl">
+                    <p className="text-[10px] text-zinc-500 px-2 pb-1 font-mono uppercase font-bold">
                       {selectedJdIds.length} selected
                       {selectedJdIds.length > 1 && " (batch scan)"}
                     </p>
@@ -476,20 +476,20 @@ function AnalyzePageContent() {
                         key={j.id}
                         className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all border ${
                           selectedJdIds.includes(j.id)
-                            ? "bg-amber-500/10 border-amber-500/40 text-white"
-                            : "hover:bg-[#14161D] border-transparent text-zinc-300"
+                            ? "bg-white border-black text-black shadow-sm font-bold"
+                            : "hover:bg-white border-transparent text-zinc-700"
                         }`}
                       >
                         <input
                           type="checkbox"
                           checked={selectedJdIds.includes(j.id)}
                           onChange={() => handleJdToggle(j.id)}
-                          className="w-4 h-4 rounded text-amber-500 accent-amber-500"
+                          className="w-4 h-4 rounded text-black accent-black focus:ring-0"
                         />
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs font-bold text-white truncate">{j.title}</p>
+                          <p className="text-xs font-bold text-black truncate">{j.title}</p>
                           {j.company && (
-                            <p className="text-[11px] text-zinc-400 truncate">{j.company}</p>
+                            <p className="text-[11px] text-zinc-500 truncate">{j.company}</p>
                           )}
                         </div>
                       </label>
@@ -499,8 +499,8 @@ function AnalyzePageContent() {
               ) : (
                 <div className="space-y-3">
                   {/* URL Importer Bar */}
-                  <div className="p-4 bg-[#090A0C] border border-amber-500/30 rounded-2xl space-y-2">
-                    <label className="block text-xs font-black uppercase text-amber-300 tracking-wider">
+                  <div className="p-4 bg-zinc-50 border border-zinc-200 rounded-2xl space-y-2">
+                    <label className="block text-xs font-black uppercase text-black tracking-wider">
                       ⚡ Auto-Fetch Job Details From Web URL
                     </label>
                     <div className="flex flex-col sm:flex-row gap-2">
@@ -512,19 +512,19 @@ function AnalyzePageContent() {
                           setUrlFetchError("");
                         }}
                         placeholder="Paste job URL (LinkedIn, Indeed, Company careers)..."
-                        className="flex-1 px-3.5 py-2.5 rounded-xl text-xs bg-[#14161D] border border-[#242834] text-white focus:outline-none focus:border-amber-500"
+                        className="flex-1 px-3.5 py-2.5 rounded-xl text-xs bg-white border border-zinc-300 text-black focus:outline-none focus:border-black shadow-sm"
                       />
                       <button
                         type="button"
                         onClick={handleFetchUrlDetails}
                         disabled={urlFetching || !fetchUrlInput.trim()}
-                        className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-1.5 shrink-0"
+                        className="px-5 py-2.5 bg-black hover:bg-zinc-800 text-white font-bold text-xs rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-1.5 shrink-0 border border-black shadow-sm"
                       >
                         {urlFetching ? "Fetching..." : "📥 Fetch Details"}
                       </button>
                     </div>
                     {urlFetchError && (
-                      <p className="text-[11px] text-rose-400 font-medium">{urlFetchError}</p>
+                      <p className="text-[11px] text-rose-600 font-medium">{urlFetchError}</p>
                     )}
                   </div>
 
@@ -532,14 +532,14 @@ function AnalyzePageContent() {
                     type="text"
                     value={pasteJdTitle}
                     onChange={(e) => setPasteJdTitle(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-[#090A0C] border border-[#242834] text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500 text-xs font-semibold"
+                    className="w-full px-4 py-3 rounded-xl bg-white border border-zinc-300 text-black placeholder-zinc-400 focus:outline-none focus:border-black text-xs font-semibold shadow-sm"
                     placeholder="Job title (e.g. Senior Frontend Developer)"
                   />
                   <textarea
                     value={pasteJdText}
                     onChange={(e) => setPasteJdText(e.target.value)}
                     rows={8}
-                    className="w-full p-4 rounded-xl bg-[#090A0C] border border-[#242834] text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500 resize-y text-xs"
+                    className="w-full p-4 rounded-xl bg-white border border-zinc-300 text-black placeholder-zinc-400 focus:outline-none focus:border-black resize-y text-xs shadow-sm leading-relaxed"
                     placeholder="Paste the full job description here..."
                   />
                 </div>
@@ -548,14 +548,14 @@ function AnalyzePageContent() {
 
             {/* Summary */}
             {selectedResume && (
-              <div className="p-4 bg-amber-500/10 rounded-2xl border border-amber-500/30 text-xs text-amber-200">
-                Ready to analyze <strong className="text-white">{selectedResume.name}</strong> against{" "}
+              <div className="p-4 bg-zinc-100 rounded-2xl border border-zinc-200 text-xs text-zinc-900">
+                Ready to analyze <strong className="text-black">{selectedResume.name}</strong> against{" "}
                 {usePastedJd ? (
-                  <strong className="text-white">{pasteJdTitle || "(new JD)"}</strong>
+                  <strong className="text-black">{pasteJdTitle || "(new JD)"}</strong>
                 ) : selectedJdIds.length > 1 ? (
-                  <strong className="text-white">{selectedJdIds.length} job descriptions</strong>
+                  <strong className="text-black">{selectedJdIds.length} job descriptions</strong>
                 ) : (
-                  <strong className="text-white">
+                  <strong className="text-black">
                     {jds.find((j) => j.id === selectedJdIds[0])?.title || "(select a JD)"}
                   </strong>
                 )}
@@ -566,12 +566,12 @@ function AnalyzePageContent() {
             <button
               type="submit"
               disabled={submitting || batchInProgress}
-              className="w-full py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider rounded-2xl transition-all shadow-lg shadow-amber-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full py-3.5 bg-black hover:bg-zinc-800 text-white font-bold text-xs uppercase tracking-wider rounded-2xl transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 border border-black"
             >
               {submitting || batchInProgress ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
-                  Running AI Analysis...
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Running AI Analysis...</span>
                 </>
               ) : selectedJdIds.length > 1 ? (
                 `Analyze All ${selectedJdIds.length} Selected`
@@ -583,14 +583,14 @@ function AnalyzePageContent() {
 
           {/* Batch Results */}
           {batchResults && batchResults.length > 0 && (
-            <div className="mt-8 pt-6 border-t border-[#242834] space-y-4">
-              <h2 className="text-sm font-black text-white uppercase tracking-wider">
+            <div className="mt-8 pt-6 border-t border-zinc-200 space-y-4">
+              <h2 className="text-sm font-black text-black uppercase tracking-wider">
                 Batch Analysis Results
               </h2>
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse">
                   <thead>
-                    <tr className="border-b border-[#242834] text-[11px] font-bold text-zinc-400 uppercase">
+                    <tr className="border-b border-zinc-200 text-[11px] font-bold text-zinc-500 uppercase">
                       <th className="text-left px-4 py-2">Job Description</th>
                       <th className="text-center px-4 py-2">Overall Score</th>
                       <th className="text-center px-4 py-2">Keyword Match</th>
@@ -599,45 +599,45 @@ function AnalyzePageContent() {
                       <th className="text-right px-4 py-2">Details</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#242834] text-xs">
+                  <tbody className="divide-y divide-zinc-200 text-xs">
                     {batchResults.map((br, idx) => (
-                      <tr key={idx} className="hover:bg-[#1C1F2B] transition-colors">
-                        <td className="px-4 py-3 font-bold text-white">{br.jdTitle}</td>
+                      <tr key={idx} className="hover:bg-zinc-50 transition-colors">
+                        <td className="px-4 py-3 font-bold text-black">{br.jdTitle}</td>
                         {br.analysis ? (
                           <>
                             <td className="px-4 py-3 text-center">
                               <span
-                                className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-black ${
+                                className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-bold ${
                                   br.analysis.overallScore >= 75
-                                    ? "bg-emerald-950 text-emerald-300 border border-emerald-800"
+                                    ? "bg-emerald-50 text-emerald-900 border border-emerald-300"
                                     : br.analysis.overallScore >= 60
-                                      ? "bg-amber-950 text-amber-300 border border-amber-800"
-                                      : "bg-rose-950 text-rose-300 border border-rose-800"
+                                      ? "bg-amber-50 text-amber-900 border border-amber-300"
+                                      : "bg-rose-50 text-rose-900 border border-rose-300"
                                 }`}
                               >
                                 {br.analysis.overallScore}%
                               </span>
                             </td>
-                            <td className="px-4 py-3 text-center font-bold text-zinc-300">
+                            <td className="px-4 py-3 text-center font-bold text-zinc-800">
                               {Math.round(br.analysis.keywordsMatchPct)}%
                             </td>
-                            <td className="px-4 py-3 text-center text-zinc-400">
+                            <td className="px-4 py-3 text-center text-zinc-600">
                               {br.analysis.formatScore}/100
                             </td>
-                            <td className="px-4 py-3 text-center text-zinc-400">
+                            <td className="px-4 py-3 text-center text-zinc-600">
                               {br.analysis.impactScore}/100
                             </td>
                             <td className="px-4 py-3 text-right">
                               <Link
                                 href={`/dashboard/analyze/${br.analysis.id}`}
-                                className="text-xs text-amber-400 hover:underline font-bold"
+                                className="text-xs text-black hover:underline font-bold"
                               >
                                 View →
                               </Link>
                             </td>
                           </>
                         ) : (
-                          <td colSpan={5} className="px-4 py-3 text-rose-400 text-xs font-bold">
+                          <td colSpan={5} className="px-4 py-3 text-rose-600 text-xs font-bold">
                             {br.error || "Analysis failed"}
                           </td>
                         )}
@@ -658,8 +658,8 @@ export default function AnalyzePage() {
   return (
     <Suspense
       fallback={
-        <div className="flex items-center justify-center min-h-screen bg-[#090A0C]">
-          <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+        <div className="flex items-center justify-center min-h-screen bg-white">
+          <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin" />
         </div>
       }
     >

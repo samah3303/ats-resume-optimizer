@@ -10,8 +10,10 @@ export default function DashboardLayout({
   return (
     <ErrorBoundary>
       <ToastProvider>
-        {children}
-        <FloatingActionButton />
+        <div className="bg-white min-h-screen text-zinc-900">
+          {children}
+          <FloatingActionButton />
+        </div>
       </ToastProvider>
     </ErrorBoundary>
   );

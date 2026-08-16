@@ -29,7 +29,7 @@ export default function DashboardHeader({
 
   return (
     <>
-      <div className="bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-amber-500/20 p-6 sm:p-8 text-white shadow-2xl space-y-6">
+      <div className="bg-white rounded-3xl border border-zinc-200 p-6 sm:p-8 text-black shadow-sm space-y-6">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           
           {/* Left: Score Gauge + Welcome Message */}
@@ -41,14 +41,14 @@ export default function DashboardHeader({
             )}
             <div className="space-y-2 text-center sm:text-left">
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                <h1 className="text-2xl sm:text-3xl font-black text-black tracking-tight">
                   Welcome back, {userName?.split(" ")[0] || "Candidate"}!
                 </h1>
                 {generalAtsScore !== null && (
                   <TrafficLightStatus score={generalAtsScore} size="sm" />
                 )}
               </div>
-              <p className="text-xs sm:text-sm text-zinc-400 max-w-xl leading-relaxed">
+              <p className="text-xs sm:text-sm text-zinc-600 max-w-xl leading-relaxed">
                 {generalAtsScore !== null
                   ? `Your baseline resume score is ${generalAtsScore}%. Target a specific job posting or follow your 2-Month Plan.`
                   : "Upload your resume to get your baseline ATS score and start applying."}
@@ -61,14 +61,14 @@ export default function DashboardHeader({
             {onNewAnalysis ? (
               <button
                 onClick={onNewAnalysis}
-                className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-5 py-3 text-xs rounded-2xl shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2"
+                className="bg-black hover:bg-zinc-800 text-white font-bold px-5 py-3 text-xs rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 border border-black"
               >
                 <span>⚡ + Run New Analysis</span>
               </button>
             ) : (
               <Link
                 href="/dashboard/analyze"
-                className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-5 py-3 text-xs rounded-2xl shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2"
+                className="bg-black hover:bg-zinc-800 text-white font-bold px-5 py-3 text-xs rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 border border-black"
               >
                 <span>⚡ + Run New Analysis</span>
               </Link>
@@ -76,7 +76,7 @@ export default function DashboardHeader({
 
             <button
               onClick={() => setShowFixWizard(true)}
-              className="px-5 py-3 text-xs font-black text-slate-950 bg-amber-500 hover:bg-amber-400 rounded-2xl shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-1.5"
+              className="px-5 py-3 text-xs font-bold text-black bg-white hover:bg-zinc-100 border border-zinc-300 rounded-xl transition-all flex items-center justify-center gap-1.5"
             >
               <span>⚡ Fix My Resume</span>
             </button>
@@ -84,7 +84,7 @@ export default function DashboardHeader({
             {onEditOnboarding && (
               <button
                 onClick={onEditOnboarding}
-                className="px-4 py-3 text-xs font-black text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-2xl transition-all flex items-center justify-center gap-1.5"
+                className="px-4 py-3 text-xs font-bold text-zinc-700 bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 rounded-xl transition-all flex items-center justify-center gap-1.5"
                 title="Edit target positions, country, or primary resume"
               >
                 <span>✏️ Edit Target</span>
@@ -94,31 +94,31 @@ export default function DashboardHeader({
         </div>
 
         {/* Bottom meta row */}
-        <div className="pt-4 border-t border-[#242834] flex flex-wrap items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-4 text-zinc-400 font-medium">
-            <span>📄 <strong>{resumeCount}</strong> Resume{resumeCount !== 1 ? "s" : ""}</span>
+        <div className="pt-4 border-t border-zinc-100 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-4 text-zinc-600 font-medium">
+            <span>📄 <strong className="text-black">{resumeCount}</strong> Resume{resumeCount !== 1 ? "s" : ""}</span>
             <span>•</span>
-            <span>🔍 <strong>{analysisCount}</strong> Job Scan{analysisCount !== 1 ? "s" : ""}</span>
+            <span>🔍 <strong className="text-black">{analysisCount}</strong> Job Scan{analysisCount !== 1 ? "s" : ""}</span>
           </div>
 
           <div className="flex items-center gap-3">
             <Link
               href="/dashboard/roadmap"
-              className="text-amber-400 hover:underline text-xs font-black transition-colors flex items-center gap-1"
+              className="text-black hover:underline text-xs font-bold transition-colors flex items-center gap-1"
             >
               <span>🗺️ 2-Month Plan</span>
             </Link>
-            <span className="text-zinc-700">•</span>
+            <span className="text-zinc-300">•</span>
             <Link
               href="/dashboard/how-to-use"
-              className="text-zinc-400 hover:text-amber-300 text-xs font-bold transition-colors"
+              className="text-zinc-600 hover:text-black text-xs font-medium transition-colors"
             >
               📖 System Guide
             </Link>
-            <span className="text-zinc-700">•</span>
+            <span className="text-zinc-300">•</span>
             <button
               onClick={() => setShowResetConfirm(true)}
-              className="text-zinc-400 hover:text-rose-400 text-xs font-bold transition-colors"
+              className="text-zinc-500 hover:text-red-600 text-xs font-medium transition-colors"
             >
               🔄 Reset Target
             </button>

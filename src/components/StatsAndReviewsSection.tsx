@@ -88,17 +88,17 @@ const REVIEWS: Review[] = [
 
 export default function StatsAndReviewsSection() {
   return (
-    <div className="space-y-20 py-12 bg-[#090A0C]">
+    <div className="space-y-20 py-12 bg-white">
       {/* ─── Numbers / Impact Stats Section ──────────────────────────────── */}
       <div className="space-y-8">
         <div className="text-center max-w-2xl mx-auto space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-amber-500/10 border border-amber-500/30 text-amber-300 rounded-full text-xs font-black uppercase tracking-wider">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-zinc-100 border border-zinc-200 text-zinc-900 rounded-full text-xs font-bold uppercase tracking-wider">
             <span>📊 Proven Job-Landing Results</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            ResuMatch by the <span className="bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 bg-clip-text text-transparent">Numbers</span>
+          <h2 className="text-3xl sm:text-4xl font-black text-black tracking-tight">
+            ResuMatch by the <span className="underline decoration-zinc-400 decoration-2 underline-offset-4">Numbers</span>
           </h2>
-          <p className="text-xs sm:text-sm text-zinc-400">
+          <p className="text-xs sm:text-sm text-zinc-600">
             Real impact measured across thousands of job applications and successful hires.
           </p>
         </div>
@@ -107,16 +107,16 @@ export default function StatsAndReviewsSection() {
           {STATS.map((stat, idx) => (
             <div
               key={idx}
-              className="relative overflow-hidden rounded-3xl bg-[#14161D] border border-[#242834] p-6 shadow-xl hover:border-amber-500/60 transition-all hover:-translate-y-1"
+              className="relative overflow-hidden rounded-3xl bg-white border border-zinc-200 p-6 shadow-sm hover:border-black transition-all hover:-translate-y-0.5"
             >
               <div className="flex items-center justify-between mb-4">
                 <span className="text-3xl">{stat.icon}</span>
-                <div className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-sm" />
+                <div className="w-2 h-2 rounded-full bg-black shadow-sm" />
               </div>
-              <p className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 bg-clip-text text-transparent">
+              <p className="text-3xl sm:text-4xl font-black text-black">
                 {stat.value}
               </p>
-              <p className="text-xs font-bold text-zinc-300 mt-2">
+              <p className="text-xs font-bold text-zinc-600 mt-2">
                 {stat.label}
               </p>
             </div>
@@ -127,13 +127,13 @@ export default function StatsAndReviewsSection() {
       {/* ─── User Reviews & Success Stories ───────────────────────────────── */}
       <div className="space-y-10">
         <div className="text-center max-w-2xl mx-auto space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-amber-500/10 border border-amber-500/30 text-amber-300 rounded-full text-xs font-black uppercase tracking-wider">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-zinc-100 border border-zinc-200 text-zinc-900 rounded-full text-xs font-bold uppercase tracking-wider">
             <span>⭐ Real Success Stories</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Loved by <span className="text-amber-400">45,000+</span> Job Seekers
+          <h2 className="text-3xl sm:text-4xl font-black text-black tracking-tight">
+            Loved by <span className="underline decoration-zinc-400">45,000+</span> Job Seekers
           </h2>
-          <p className="text-xs sm:text-sm text-zinc-400">
+          <p className="text-xs sm:text-sm text-zinc-600">
             See how unemployed job seekers turned application silence into multiple job offers.
           </p>
         </div>
@@ -142,43 +142,43 @@ export default function StatsAndReviewsSection() {
           {REVIEWS.map((rev, idx) => (
             <div
               key={idx}
-              className="bg-[#14161D] rounded-3xl border border-[#242834] p-6 sm:p-8 shadow-xl hover:border-amber-500/40 transition-all space-y-4 flex flex-col justify-between"
+              className="bg-white rounded-3xl border border-zinc-200 p-6 sm:p-8 shadow-sm hover:border-black transition-all space-y-4 flex flex-col justify-between"
             >
               <div className="space-y-3">
                 {/* Rating & Badge */}
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1 text-amber-400">
+                  <div className="flex items-center gap-1 text-black">
                     {Array.from({ length: rev.rating }).map((_, i) => (
                       <span key={i} className="text-base">★</span>
                     ))}
                   </div>
-                  <span className="px-3 py-1 rounded-full text-[11px] font-extrabold bg-emerald-950/80 text-emerald-300 border border-emerald-800/60">
+                  <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-zinc-100 text-zinc-900 border border-zinc-200">
                     ✓ {rev.badge}
                   </span>
                 </div>
 
-                <h3 className="text-base font-bold text-amber-300">
+                <h3 className="text-base font-black text-black">
                   &ldquo;{rev.headline}&rdquo;
                 </h3>
 
-                <p className="text-xs text-zinc-300 leading-relaxed font-sans">
+                <p className="text-xs text-zinc-600 leading-relaxed font-sans">
                   {rev.content}
                 </p>
               </div>
 
               {/* User Profile Footer */}
-              <div className="flex items-center gap-3 pt-4 border-t border-[#242834]">
+              <div className="flex items-center gap-3 pt-4 border-t border-zinc-100">
                 <img
                   src={rev.avatar}
                   alt={rev.name}
-                  className="w-11 h-11 rounded-full object-cover border-2 border-amber-500"
+                  className="w-11 h-11 rounded-full object-cover border-2 border-black"
                 />
                 <div>
-                  <h4 className="text-xs font-bold text-white">
+                  <h4 className="text-xs font-bold text-black">
                     {rev.name}
                   </h4>
-                  <p className="text-[11px] text-zinc-400">
-                    {rev.role} at <strong className="text-amber-300">{rev.company}</strong>
+                  <p className="text-[11px] text-zinc-500">
+                    {rev.role} at <strong className="text-black font-semibold">{rev.company}</strong>
                   </p>
                 </div>
               </div>

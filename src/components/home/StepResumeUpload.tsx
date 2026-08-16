@@ -13,10 +13,10 @@ export default function StepResumeUpload({
 }: StepResumeUploadProps) {
   return (
     <div>
-      <h2 className="text-xl font-bold text-gray-900 mb-2">
+      <h2 className="text-xl font-black text-black mb-2">
         Upload Your Resume
       </h2>
-      <p className="text-sm text-gray-500 mb-6">
+      <p className="text-sm text-zinc-600 mb-6">
         We&apos;ll analyze your resume to identify strengths, gaps, and
         opportunities for your target roles.
       </p>
@@ -28,14 +28,14 @@ export default function StepResumeUpload({
 
       {/* PDF Disclaimer */}
       {resumeFormat === "pdf" && (
-        <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start gap-3">
-          <span className="text-yellow-600 text-lg shrink-0">⚠️</span>
-          <p className="text-sm text-yellow-800">
-            <strong>PDF uploaded:</strong> Generated optimizations will use a
+        <div className="mt-4 p-3.5 bg-zinc-50 border border-zinc-200 rounded-xl flex items-start gap-3">
+          <span className="text-zinc-900 text-lg shrink-0">ℹ️</span>
+          <p className="text-xs text-zinc-700 leading-relaxed">
+            <strong className="text-black">PDF uploaded:</strong> Generated optimizations will use a
             standard structural layout. For custom designer-layout generation,
             please upload a{" "}
-            <code className="bg-yellow-100 px-1 rounded">.doc</code> or{" "}
-            <code className="bg-yellow-100 px-1 rounded">.docx</code> file.
+            <code className="bg-zinc-200 px-1 py-0.5 rounded text-black font-mono text-[11px]">.doc</code> or{" "}
+            <code className="bg-zinc-200 px-1 py-0.5 rounded text-black font-mono text-[11px]">.docx</code> file.
           </p>
         </div>
       )}

@@ -11,24 +11,30 @@ interface QuickAction {
 
 const quickActions: QuickAction[] = [
   {
-    label: "View Score",
-    emoji: "📊",
-    href: "/dashboard",
-  },
-  {
-    label: "View Jobs",
-    emoji: "💼",
-    href: "/dashboard/jds",
+    label: "Find Jobs",
+    emoji: "🔍",
+    href: "/dashboard/jobs",
   },
   {
     label: "Scan Resume",
-    emoji: "📸",
-    href: "/dashboard",
+    emoji: "⚡",
+    href: "/dashboard/analyze",
+  },
+  {
+    label: "Track App",
+    emoji: "📋",
+    href: "/dashboard/tracker",
+  },
+  {
+    label: "Mock Interview",
+    emoji: "🎤",
+    href: "/dashboard/interview",
   },
 ];
 
 export default function FloatingActionButton() {
   const [isOpen, setIsOpen] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
 
   // Close on Escape key press
   useEffect(() => {
@@ -43,9 +49,20 @@ export default function FloatingActionButton() {
 
   return (
     <>
+      <style>{`
+        @keyframes gentle-pulse {
+          0% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.25); }
+          70% { box-shadow: 0 0 0 10px rgba(0, 0, 0, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
+        }
+        .animate-gentle-pulse {
+          animation: gentle-pulse 2.5s infinite;
+        }
+      `}</style>
+
       {/* Semi-transparent backdrop overlay when expanded */}
       <div
-        className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300 ${
+        className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300 ${
           isOpen
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"
@@ -75,7 +92,7 @@ export default function FloatingActionButton() {
                 href={action.href}
                 onClick={() => setIsOpen(false)}
                 tabIndex={isOpen ? 0 : -1}
-                className={`bg-[#14161D]/90 backdrop-blur-2xl border border-amber-500/30 text-white font-medium shadow-2xl hover:bg-[#1E222D] hover:border-amber-400/60 hover:text-amber-300 flex items-center gap-2.5 px-4 py-2.5 rounded-full text-sm whitespace-nowrap active:scale-95 transition-all duration-300 ease-out group ${
+                className={`bg-white border border-zinc-200 text-zinc-900 font-semibold shadow-lg hover:border-black hover:bg-zinc-50 flex items-center gap-2.5 px-4 py-2.5 rounded-2xl text-sm whitespace-nowrap active:scale-95 transition-all duration-300 ease-out group ${
                   isOpen
                     ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
                     : "opacity-0 translate-y-4 scale-90 pointer-events-none"
@@ -88,7 +105,7 @@ export default function FloatingActionButton() {
                 >
                   {action.emoji}
                 </span>
-                <span className="font-semibold text-slate-100 group-hover:text-amber-300">
+                <span className="font-semibold text-zinc-900 group-hover:text-black">
                   {action.label}
                 </span>
               </Link>
@@ -99,12 +116,15 @@ export default function FloatingActionButton() {
         {/* Main Floating Action Button */}
         <button
           type="button"
-          onClick={() => setIsOpen((prev) => !prev)}
+          onClick={() => {
+            setIsOpen((prev) => !prev);
+            setHasInteracted(true);
+          }}
           aria-expanded={isOpen}
           aria-label={isOpen ? "Close quick actions menu" : "Open quick actions menu"}
-          className={`w-14 h-14 rounded-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black shadow-2xl flex items-center justify-center border border-amber-400/50 text-2xl pointer-events-auto active:scale-95 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-[#090A0C] ${
-            isOpen ? "rotate-90 shadow-amber-500/30" : "rotate-0 shadow-amber-500/20"
-          }`}
+          className={`w-14 h-14 rounded-full bg-black text-white hover:bg-zinc-800 font-black shadow-xl flex items-center justify-center border border-black text-2xl pointer-events-auto active:scale-95 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-white ${
+            isOpen ? "rotate-90" : "rotate-0"
+          } ${!hasInteracted && !isOpen ? "animate-gentle-pulse" : ""}`}
         >
           <span
             className={`transition-transform duration-300 inline-block ${

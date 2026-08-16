@@ -51,32 +51,32 @@ export default function StepTargetPreferences({
 }: StepTargetPreferencesProps) {
   return (
     <div>
-      <h2 className="text-xl font-bold text-gray-900 mb-2">
+      <h2 className="text-xl font-black text-black mb-2">
         Tell Us About Your Goals
       </h2>
-      <p className="text-sm text-gray-500 mb-4">
+      <p className="text-sm text-zinc-600 mb-4">
         This helps us tailor the analysis and roadmap to your specific career
         ambitions.
       </p>
 
       {/* Auto-fill indicator */}
       {autoFilling && (
-        <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg mb-4 text-sm text-blue-700">
-          <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+        <div className="flex items-center gap-2 p-3 bg-zinc-50 border border-zinc-200 rounded-xl mb-4 text-xs font-semibold text-black">
+          <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
           AI is extracting details from your resume...
         </div>
       )}
 
       {/* Uploaded resume info */}
       {resumeName && (
-        <div className="flex items-center gap-2 p-3 bg-indigo-50 border border-indigo-100 rounded-lg mb-4">
-          <span className="text-indigo-600">📄</span>
-          <span className="text-sm font-medium text-indigo-700">
+        <div className="flex items-center gap-2 p-3 bg-zinc-50 border border-zinc-200 rounded-xl mb-4">
+          <span className="text-black text-base">📄</span>
+          <span className="text-xs font-bold text-black truncate">
             {resumeName}
           </span>
           <button
             onClick={onChangeResume}
-            className="ml-auto text-xs text-indigo-500 hover:text-indigo-700 underline"
+            className="ml-auto text-xs text-zinc-600 hover:text-black font-semibold underline"
           >
             Change
           </button>
@@ -88,7 +88,7 @@ export default function StepTargetPreferences({
         <div>
           <label
             htmlFor="positions"
-            className="block text-sm font-medium text-gray-700 mb-1.5"
+            className="block text-xs font-bold text-black mb-1.5 uppercase tracking-wide"
           >
             Target Job Positions <span className="text-red-500">*</span>
           </label>
@@ -98,17 +98,15 @@ export default function StepTargetPreferences({
             value={positions}
             onChange={(e) => setPositions(e.target.value)}
             placeholder="e.g. Senior Software Engineer, Engineering Manager"
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none transition-colors"
+            className="w-full px-4 py-2.5 bg-white text-black border border-zinc-300 rounded-xl text-sm focus:border-black focus:outline-none transition-colors"
           />
-          <p className="text-xs text-gray-400 mt-1">
-            💡 We already extracted what you&apos;ve done. Tell us where you
-            want to go — this helps find gaps between your current profile and
-            your dream roles.
+          <p className="text-xs text-zinc-500 mt-1">
+            💡 Tell us where you want to go — this helps find gaps between your current profile and your dream roles.
           </p>
           {/* Suggested position chips */}
           {suggestedPositions.length > 0 && (
             <div className="mt-2">
-              <p className="text-xs text-gray-500 mb-1.5">
+              <p className="text-xs text-zinc-600 font-medium mb-1.5">
                 🤖 AI-suggested from your resume — click to add/remove:
               </p>
               <div className="flex flex-wrap gap-2">
@@ -122,10 +120,10 @@ export default function StepTargetPreferences({
                       key={pos}
                       type="button"
                       onClick={() => togglePosition(pos)}
-                      className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+                      className={`px-3 py-1 text-xs rounded-full border transition-colors font-medium ${
                         isSelected
-                          ? "bg-indigo-600 text-white border-indigo-600"
-                          : "bg-white text-gray-700 border-gray-300 hover:border-indigo-400 hover:text-indigo-600"
+                          ? "bg-black text-white border-black"
+                          : "bg-white text-zinc-800 border-zinc-300 hover:border-black"
                       }`}
                     >
                       {isSelected ? "✓ " : "+ "}
@@ -143,15 +141,15 @@ export default function StepTargetPreferences({
           <div>
             <label
               htmlFor="industry"
-              className="block text-sm font-medium text-gray-700 mb-1.5"
+              className="block text-xs font-bold text-black mb-1.5 uppercase tracking-wide"
             >
-              Target Industry <span className="text-gray-400">(optional)</span>
+              Target Industry <span className="text-zinc-400 font-normal lowercase">(optional)</span>
             </label>
             <select
               id="industry"
               value={industry}
               onChange={(e) => setIndustry(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none bg-white transition-colors"
+              className="w-full px-4 py-2.5 bg-white text-black border border-zinc-300 rounded-xl text-sm focus:border-black focus:outline-none transition-colors"
             >
               <option value="">Select industry...</option>
               {INDUSTRIES.map((i) => (
@@ -164,7 +162,7 @@ export default function StepTargetPreferences({
           <div>
             <label
               htmlFor="country"
-              className="block text-sm font-medium text-gray-700 mb-1.5"
+              className="block text-xs font-bold text-black mb-1.5 uppercase tracking-wide"
             >
               Target Country <span className="text-red-500">*</span>
             </label>
@@ -172,7 +170,7 @@ export default function StepTargetPreferences({
               id="country"
               value={country}
               onChange={(e) => setCountry(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none bg-white transition-colors"
+              className="w-full px-4 py-2.5 bg-white text-black border border-zinc-300 rounded-xl text-sm focus:border-black focus:outline-none transition-colors"
             >
               <option value="">Select a country...</option>
               {COUNTRIES.map((c) => (
@@ -186,9 +184,9 @@ export default function StepTargetPreferences({
 
         {/* Job Type (multi-select checkboxes) */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+          <label className="block text-xs font-bold text-black mb-1.5 uppercase tracking-wide">
             Job Type Preferences{" "}
-            <span className="text-gray-400">(optional)</span>
+            <span className="text-zinc-400 font-normal lowercase">(optional)</span>
           </label>
           <div className="flex flex-wrap gap-2">
             {JOB_TYPES.map((jt) => {
@@ -211,10 +209,10 @@ export default function StepTargetPreferences({
                       setJobType([...current, jt].join(", "));
                     }
                   }}
-                  className={`px-3 py-1.5 text-xs rounded-full border transition-colors ${
+                  className={`px-3 py-1.5 text-xs rounded-full border transition-colors font-medium ${
                     selected
-                      ? "bg-indigo-600 text-white border-indigo-600"
-                      : "bg-white text-gray-700 border-gray-300 hover:border-indigo-400 hover:text-indigo-600"
+                      ? "bg-black text-white border-black"
+                      : "bg-white text-zinc-800 border-zinc-300 hover:border-black"
                   }`}
                 >
                   {selected ? "✓ " : "+ "}
@@ -230,9 +228,9 @@ export default function StepTargetPreferences({
           <div>
             <label
               htmlFor="linkedin"
-              className="block text-sm font-medium text-gray-700 mb-1.5"
+              className="block text-xs font-bold text-black mb-1.5 uppercase tracking-wide"
             >
-              LinkedIn URL <span className="text-gray-400">(optional)</span>
+              LinkedIn URL <span className="text-zinc-400 font-normal lowercase">(optional)</span>
             </label>
             <input
               id="linkedin"
@@ -240,15 +238,15 @@ export default function StepTargetPreferences({
               value={linkedin}
               onChange={(e) => setLinkedin(e.target.value)}
               placeholder="linkedin.com/in/..."
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none transition-colors"
+              className="w-full px-4 py-2.5 bg-white text-black border border-zinc-300 rounded-xl text-sm focus:border-black focus:outline-none transition-colors"
             />
           </div>
           <div>
             <label
               htmlFor="portfolio"
-              className="block text-sm font-medium text-gray-700 mb-1.5"
+              className="block text-xs font-bold text-black mb-1.5 uppercase tracking-wide"
             >
-              Portfolio URL <span className="text-gray-400">(optional)</span>
+              Portfolio URL <span className="text-zinc-400 font-normal lowercase">(optional)</span>
             </label>
             <input
               id="portfolio"
@@ -256,15 +254,15 @@ export default function StepTargetPreferences({
               value={portfolioUrl}
               onChange={(e) => setPortfolioUrl(e.target.value)}
               placeholder="yourportfolio.com"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none transition-colors"
+              className="w-full px-4 py-2.5 bg-white text-black border border-zinc-300 rounded-xl text-sm focus:border-black focus:outline-none transition-colors"
             />
           </div>
           <div>
             <label
               htmlFor="github"
-              className="block text-sm font-medium text-gray-700 mb-1.5"
+              className="block text-xs font-bold text-black mb-1.5 uppercase tracking-wide"
             >
-              GitHub URL <span className="text-gray-400">(optional)</span>
+              GitHub URL <span className="text-zinc-400 font-normal lowercase">(optional)</span>
             </label>
             <input
               id="github"
@@ -272,7 +270,7 @@ export default function StepTargetPreferences({
               value={githubUrl}
               onChange={(e) => setGithubUrl(e.target.value)}
               placeholder="github.com/username"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none transition-colors"
+              className="w-full px-4 py-2.5 bg-white text-black border border-zinc-300 rounded-xl text-sm focus:border-black focus:outline-none transition-colors"
             />
           </div>
         </div>
@@ -282,13 +280,13 @@ export default function StepTargetPreferences({
         <div className="flex gap-3">
           <button
             onClick={onBack}
-            className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+            className="px-4 py-2 text-xs font-bold text-zinc-600 hover:text-black transition-colors"
           >
             ← Back
           </button>
           <button
             onClick={onSkip}
-            className="px-4 py-2 text-sm font-medium text-gray-400 hover:text-gray-600 transition-colors"
+            className="px-4 py-2 text-xs font-bold text-zinc-400 hover:text-black transition-colors"
           >
             Skip for now
           </button>
@@ -296,7 +294,7 @@ export default function StepTargetPreferences({
         <button
           onClick={onNext}
           disabled={!positions.trim() || !country}
-          className="px-6 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
+          className="px-6 py-2.5 bg-black text-white text-xs font-bold rounded-xl hover:bg-zinc-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm border border-black"
         >
           Start Analysis
         </button>

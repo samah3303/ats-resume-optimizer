@@ -71,34 +71,30 @@ export default function RegisterPage() {
 
   if (status === "loading" || status === "authenticated") {
     return (
-      <div className="flex items-center justify-center min-h-[85vh] bg-[#090A0C]">
-        <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+      <div className="flex items-center justify-center min-h-[85vh] bg-white">
+        <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-[85vh] flex items-center justify-center px-4 py-12 bg-[#090A0C] overflow-hidden">
-      {/* Ambient Glassmorphic Background Blur Orbs */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none" />
-
+    <div className="relative min-h-[85vh] flex items-center justify-center px-4 py-12 bg-white">
       <div className="relative z-10 w-full max-w-md">
-        {/* Glassmorphic Form Card */}
-        <div className="bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-amber-500/30 p-8 shadow-2xl space-y-6">
+        {/* Form Card */}
+        <div className="bg-white rounded-3xl border border-zinc-200 p-8 shadow-sm space-y-6 text-black">
           <div className="text-center space-y-3">
             <div className="flex justify-center mb-2">
               <Logo size="lg" showText={false} />
             </div>
-            <h1 className="text-2xl font-black text-white tracking-tight">Create Account</h1>
-            <p className="text-xs text-zinc-400">
+            <h1 className="text-2xl font-black text-black tracking-tight">Create Account</h1>
+            <p className="text-xs text-zinc-500 font-medium">
               Start optimizing your resume 100% free with Multi-Agent AI
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="p-3.5 rounded-xl bg-rose-950/80 border border-rose-800/80 text-xs text-rose-300 font-semibold animate-fadeIn">
+              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800 font-semibold animate-fadeIn">
                 ⚠️ {error}
               </div>
             )}
@@ -106,7 +102,7 @@ export default function RegisterPage() {
             <div>
               <label
                 htmlFor="name"
-                className="block text-xs font-bold text-amber-300 mb-1.5"
+                className="block text-xs font-black text-black mb-1.5"
               >
                 Full Name
               </label>
@@ -116,7 +112,7 @@ export default function RegisterPage() {
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl text-xs bg-[#090A0C]/80 border border-[#242834] text-white placeholder-zinc-500 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl text-xs bg-white border border-zinc-300 text-black placeholder-zinc-400 focus:border-black outline-none transition-all shadow-sm"
                 placeholder="Alex Rivera"
               />
             </div>
@@ -124,7 +120,7 @@ export default function RegisterPage() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-xs font-bold text-amber-300 mb-1.5"
+                className="block text-xs font-black text-black mb-1.5"
               >
                 Email Address
               </label>
@@ -134,7 +130,7 @@ export default function RegisterPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl text-xs bg-[#090A0C]/80 border border-[#242834] text-white placeholder-zinc-500 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl text-xs bg-white border border-zinc-300 text-black placeholder-zinc-400 focus:border-black outline-none transition-all shadow-sm"
                 placeholder="you@example.com"
               />
             </div>
@@ -142,7 +138,7 @@ export default function RegisterPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-xs font-bold text-amber-300 mb-1.5"
+                className="block text-xs font-black text-black mb-1.5"
               >
                 Password
               </label>
@@ -152,7 +148,7 @@ export default function RegisterPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl text-xs bg-[#090A0C]/80 border border-[#242834] text-white placeholder-zinc-500 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl text-xs bg-white border border-zinc-300 text-black placeholder-zinc-400 focus:border-black outline-none transition-all shadow-sm"
                 placeholder="Min. 6 characters"
               />
             </div>
@@ -160,7 +156,7 @@ export default function RegisterPage() {
             <div>
               <label
                 htmlFor="confirmPassword"
-                className="block text-xs font-bold text-amber-300 mb-1.5"
+                className="block text-xs font-black text-black mb-1.5"
               >
                 Confirm Password
               </label>
@@ -170,7 +166,7 @@ export default function RegisterPage() {
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl text-xs bg-[#090A0C]/80 border border-[#242834] text-white placeholder-zinc-500 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl text-xs bg-white border border-zinc-300 text-black placeholder-zinc-400 focus:border-black outline-none transition-all shadow-sm"
                 placeholder="••••••••"
               />
             </div>
@@ -178,11 +174,11 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl transition-all shadow-lg shadow-amber-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full py-3.5 bg-black hover:bg-zinc-800 text-white font-bold text-xs rounded-xl transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 border border-black"
             >
               {loading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   Creating Account...
                 </>
               ) : (
@@ -191,11 +187,11 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          <p className="text-center text-xs text-zinc-400 pt-2 border-t border-[#242834]">
+          <p className="text-center text-xs text-zinc-500 pt-2 border-t border-zinc-200">
             Already have an account?{" "}
             <Link
               href="/login"
-              className="text-amber-400 font-bold hover:underline"
+              className="text-black font-bold hover:underline"
             >
               Sign in
             </Link>

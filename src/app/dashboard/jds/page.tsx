@@ -195,13 +195,13 @@ export default function JDsPage() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="min-h-screen bg-[#090A0C] text-white py-8 px-4 sm:px-6 lg:px-8 space-y-6">
+      <div className="min-h-screen bg-white text-black py-8 px-4 sm:px-6 lg:px-8 space-y-6">
         <div className="flex items-center justify-between mb-8 max-w-7xl mx-auto">
           <div>
-            <div className="h-8 bg-[#14161D] rounded w-32 animate-pulse" />
-            <div className="h-4 bg-[#14161D] rounded w-24 mt-2 animate-pulse" />
+            <div className="h-8 bg-zinc-100 rounded w-32 animate-pulse" />
+            <div className="h-4 bg-zinc-100 rounded w-24 mt-2 animate-pulse" />
           </div>
-          <div className="h-10 bg-[#14161D] rounded w-32 animate-pulse" />
+          <div className="h-10 bg-zinc-100 rounded w-32 animate-pulse" />
         </div>
         <div className="max-w-7xl mx-auto">
           <SkeletonGrid count={6} />
@@ -213,13 +213,13 @@ export default function JDsPage() {
   if (status === "unauthenticated") return null;
 
   return (
-    <div className="min-h-screen bg-[#090A0C] text-white py-8 px-4 sm:px-6 lg:px-8 space-y-6 pb-24">
+    <div className="min-h-screen bg-white text-black py-8 px-4 sm:px-6 lg:px-8 space-y-6 pb-24">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight">Saved Job Descriptions</h1>
-            <p className="text-xs sm:text-sm text-zinc-400 mt-1">
+            <h1 className="text-2xl sm:text-4xl font-black text-black tracking-tight">Saved Job Descriptions</h1>
+            <p className="text-xs sm:text-sm text-zinc-500 mt-1 font-medium">
               {jds.length} Job Description{jds.length !== 1 ? "s" : ""} saved for ATS scans & application tracking
             </p>
           </div>
@@ -228,15 +228,15 @@ export default function JDsPage() {
               resetForm();
               setShowForm(true);
             }}
-            className="w-full sm:w-auto px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black rounded-xl transition-all shadow-lg shadow-amber-500/20 flex items-center justify-center gap-1.5"
+            className="w-full sm:w-auto px-5 py-2.5 bg-black hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 border border-black"
           >
             <span>+ Add Job Manually</span>
           </button>
         </div>
 
-        {/* URL Quick Add Bar (Glassmorphic Carbon Black & Amber) */}
-        <div className="bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-amber-500/20 p-5 shadow-2xl space-y-3">
-          <label className="block text-xs font-black uppercase text-amber-300 tracking-wider">
+        {/* URL Quick Add Bar */}
+        <div className="bg-zinc-50 rounded-3xl border border-zinc-200 p-5 shadow-sm space-y-3">
+          <label className="block text-xs font-black uppercase text-black tracking-wider">
             ⚡ Quick Add Job From Web URL
           </label>
           <div className="flex flex-col sm:flex-row gap-2">
@@ -251,16 +251,16 @@ export default function JDsPage() {
                 if (e.key === "Enter") handleQuickAdd();
               }}
               placeholder="Paste job posting URL (LinkedIn, Indeed, Company Careers page)..."
-              className="flex-1 w-full min-w-0 px-4 py-3 rounded-xl bg-[#090A0C] border border-[#242834] text-white placeholder-zinc-500 focus:border-amber-500 focus:outline-none text-xs font-semibold"
+              className="flex-1 w-full min-w-0 px-4 py-3 rounded-xl bg-white border border-zinc-300 text-black placeholder-zinc-400 focus:border-black focus:outline-none text-xs font-medium shadow-sm"
             />
             <button
               onClick={handleQuickAdd}
               disabled={quickFetching || !quickUrl.trim()}
-              className="w-full sm:w-auto shrink-0 px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black rounded-xl transition-all shadow-lg shadow-amber-500/20 disabled:opacity-50 flex items-center justify-center gap-1.5"
+              className="w-full sm:w-auto shrink-0 px-6 py-3 bg-black hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all shadow-sm disabled:opacity-50 flex items-center justify-center gap-1.5 border border-black"
             >
               {quickFetching ? (
                 <>
-                  <div className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   Fetching Job...
                 </>
               ) : (
@@ -269,19 +269,19 @@ export default function JDsPage() {
             </button>
           </div>
           {quickError && (
-            <p className="text-xs text-rose-400 font-semibold">{quickError}</p>
+            <p className="text-xs text-rose-600 font-bold">{quickError}</p>
           )}
         </div>
 
         {/* Add Job Modal */}
         {showForm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md">
-            <div className="bg-[#14161D] rounded-3xl border border-amber-500/30 w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto space-y-4 shadow-2xl">
-              <div className="flex items-center justify-between border-b border-[#242834] pb-3">
-                <h2 className="text-base font-black text-white">Add Job Description</h2>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/50 backdrop-blur-sm">
+            <div className="bg-white rounded-3xl border border-zinc-200 w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto space-y-4 shadow-2xl text-black">
+              <div className="flex items-center justify-between border-b border-zinc-200 pb-3">
+                <h2 className="text-base font-black text-black">Add Job Description</h2>
                 <button
                   onClick={resetForm}
-                  className="w-8 h-8 rounded-full bg-[#090A0C] border border-[#242834] text-zinc-400 hover:text-white flex items-center justify-center text-sm font-bold"
+                  className="w-8 h-8 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-500 hover:text-black flex items-center justify-center text-sm font-bold"
                 >
                   ✕
                 </button>
@@ -289,13 +289,13 @@ export default function JDsPage() {
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 {error && (
-                  <div className="p-3 rounded-xl bg-rose-950/80 border border-rose-800 text-xs text-rose-300 font-bold">
+                  <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800 font-bold">
                     ⚠️ {error}
                   </div>
                 )}
 
                 <div>
-                  <label className="block text-xs font-bold text-amber-300 mb-1">
+                  <label className="block text-xs font-black text-black mb-1">
                     Job Title *
                   </label>
                   <input
@@ -303,26 +303,26 @@ export default function JDsPage() {
                     required
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-[#090A0C] border border-[#242834] text-xs text-white focus:outline-none focus:border-amber-500 font-semibold"
+                    className="w-full px-4 py-3 rounded-xl bg-white border border-zinc-300 text-xs text-black focus:outline-none focus:border-black font-medium shadow-sm"
                     placeholder="e.g. Senior Frontend Engineer"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-amber-300 mb-1">
+                  <label className="block text-xs font-black text-black mb-1">
                     Company Name (Optional)
                   </label>
                   <input
                     type="text"
                     value={company}
                     onChange={(e) => setCompany(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-[#090A0C] border border-[#242834] text-xs text-white focus:outline-none focus:border-amber-500 font-semibold"
+                    className="w-full px-4 py-3 rounded-xl bg-white border border-zinc-300 text-xs text-black focus:outline-none focus:border-black font-medium shadow-sm"
                     placeholder="e.g. Google / Stripe"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-amber-300 mb-1">
+                  <label className="block text-xs font-black text-black mb-1">
                     Full Job Description Text *
                   </label>
                   <textarea
@@ -330,7 +330,7 @@ export default function JDsPage() {
                     value={rawText}
                     onChange={(e) => setRawText(e.target.value)}
                     rows={8}
-                    className="w-full p-4 rounded-xl bg-[#090A0C] border border-[#242834] text-xs text-white focus:outline-none focus:border-amber-500 resize-y"
+                    className="w-full p-4 rounded-xl bg-white border border-zinc-300 text-xs text-black focus:outline-none focus:border-black resize-y font-medium shadow-sm"
                     placeholder="Paste the full job requirements, responsibilities, and qualifications..."
                   />
                 </div>
@@ -339,14 +339,14 @@ export default function JDsPage() {
                   <button
                     type="button"
                     onClick={resetForm}
-                    className="flex-1 py-3 border border-[#242834] text-zinc-300 text-xs font-bold rounded-xl hover:bg-[#090A0C] transition-colors"
+                    className="flex-1 py-3 border border-zinc-300 text-zinc-700 text-xs font-bold rounded-xl hover:bg-zinc-100 transition-colors shadow-sm"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="flex-1 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black rounded-xl transition-all disabled:opacity-50"
+                    className="flex-1 py-3 bg-black hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all disabled:opacity-50 border border-black shadow-sm"
                   >
                     {submitting ? "Saving..." : "Save Job Description"}
                   </button>
@@ -358,17 +358,17 @@ export default function JDsPage() {
 
         {/* List / Empty State */}
         {jds.length === 0 ? (
-          <div className="text-center py-12 bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] p-8 space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center justify-center text-2xl font-bold mx-auto">
+          <div className="text-center py-12 bg-zinc-50 rounded-3xl border border-zinc-200 p-8 space-y-3">
+            <div className="w-12 h-12 rounded-2xl bg-zinc-200 text-black border border-zinc-300 flex items-center justify-center text-2xl font-bold mx-auto">
               💼
             </div>
-            <h3 className="text-base font-black text-white">No Job Descriptions Saved Yet</h3>
-            <p className="text-xs text-zinc-400 max-w-sm mx-auto">
+            <h3 className="text-base font-black text-black">No Job Descriptions Saved Yet</h3>
+            <p className="text-xs text-zinc-500 max-w-sm mx-auto font-medium">
               Paste job requirements or paste a job posting URL to analyze your resume against target roles.
             </p>
             <button
               onClick={() => setShowForm(true)}
-              className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black rounded-xl transition-all shadow-lg inline-block"
+              className="px-5 py-2.5 bg-black hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all shadow-sm border border-black inline-block"
             >
               Add Your First Job
             </button>
@@ -378,22 +378,22 @@ export default function JDsPage() {
             {jds.map((jd) => (
               <div
                 key={jd.id}
-                className="bg-[#14161D]/80 backdrop-blur-xl rounded-3xl border border-[#242834] hover:border-amber-500/40 p-6 shadow-xl transition-all flex flex-col justify-between space-y-4 group"
+                className="bg-white rounded-3xl border border-zinc-200 hover:border-black p-6 shadow-sm transition-all flex flex-col justify-between space-y-4 group text-black"
               >
                 <div className="space-y-3">
-                  <div className="flex items-start justify-between gap-2 border-b border-[#242834] pb-3">
+                  <div className="flex items-start justify-between gap-2 border-b border-zinc-200 pb-3">
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-extrabold text-white text-sm truncate group-hover:text-amber-400 transition-colors">{jd.title}</h3>
+                      <h3 className="font-bold text-black text-sm truncate group-hover:underline transition-colors">{jd.title}</h3>
                       {jd.company && (
-                        <p className="text-xs font-semibold text-amber-300/80 truncate">{jd.company}</p>
+                        <p className="text-xs font-medium text-zinc-500 truncate">{jd.company}</p>
                       )}
                     </div>
-                    <span className="text-[10px] text-zinc-500 font-mono shrink-0">
+                    <span className="text-[10px] text-zinc-400 font-mono shrink-0 font-bold">
                       {new Date(jd.createdAt).toLocaleDateString()}
                     </span>
                   </div>
 
-                  <p className="text-xs text-zinc-300 line-clamp-3 leading-relaxed break-words">
+                  <p className="text-xs text-zinc-600 line-clamp-3 leading-relaxed break-words font-medium">
                     {jd.rawText.slice(0, 180)}...
                   </p>
 
@@ -401,17 +401,17 @@ export default function JDsPage() {
                     href={jd.sourceUrl || `https://www.google.com/search?q=${encodeURIComponent(jd.title + (jd.company ? " " + jd.company : "") + " job posting")}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-[11px] font-extrabold text-emerald-300 hover:text-emerald-200 bg-emerald-950/80 px-3 py-1.5 rounded-xl border border-emerald-800 transition-colors shadow-sm self-start"
+                    className="inline-flex items-center gap-1.5 text-[11px] font-bold text-black bg-zinc-100 hover:bg-zinc-200 px-3 py-1.5 rounded-xl border border-zinc-300 transition-colors shadow-sm self-start"
                   >
                     <span>🔗 View Job Posting</span>
                   </a>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-[#242834]">
+                <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-zinc-200">
                   <Link
                     href={`/dashboard/analyze?jdId=${jd.id}`}
-                    className="flex-1 min-w-[90px] py-2.5 px-3 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black rounded-xl transition-all text-center flex items-center justify-center shadow-sm"
+                    className="flex-1 min-w-[90px] py-2.5 px-3 bg-black hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all text-center flex items-center justify-center shadow-sm border border-black"
                   >
                     Run Scan 🔍
                   </Link>
@@ -420,9 +420,9 @@ export default function JDsPage() {
                     disabled={trackingId === jd.id}
                     className={`py-2.5 px-3 text-xs font-bold rounded-xl transition-all border ${
                       trackedIds.has(jd.id)
-                        ? "bg-emerald-950 text-emerald-300 border-emerald-800"
-                        : "bg-[#090A0C] text-zinc-300 border-[#242834] hover:border-amber-500/50 hover:text-white"
-                    } disabled:opacity-50`}
+                        ? "bg-zinc-200 text-black border-zinc-400"
+                        : "bg-white text-zinc-800 border-zinc-300 hover:border-black"
+                    } disabled:opacity-50 shadow-sm`}
                   >
                     {trackingId === jd.id
                       ? "..."
@@ -433,7 +433,7 @@ export default function JDsPage() {
                   <button
                     onClick={() => handleDelete(jd.id)}
                     disabled={deletingId === jd.id}
-                    className="py-2.5 px-2.5 text-xs font-bold text-rose-400 hover:bg-rose-950/50 rounded-xl transition-colors disabled:opacity-50"
+                    className="py-2.5 px-2.5 text-xs font-bold text-zinc-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors disabled:opacity-50"
                   >
                     {deletingId === jd.id ? "..." : "🗑️"}
                   </button>

@@ -177,8 +177,8 @@ export default function HomePage() {
 
   if (status === "loading" || checkingOnboarding) {
     return (
-      <div className="flex items-center justify-center min-h-[80vh]">
-        <div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+      <div className="flex items-center justify-center min-h-[80vh] bg-white">
+        <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -190,11 +190,11 @@ export default function HomePage() {
   if (onboardingDone) return null;
 
   return (
-    <div className="min-h-[85vh] bg-[#090A0C] py-8 md:py-12 px-4">
+    <div className="min-h-[85vh] bg-white py-8 md:py-12 px-4">
       <div className="max-w-2xl mx-auto space-y-6">
         <OnboardingStepper step={step} />
 
-        <div className="bg-[#14161D] rounded-3xl border border-[#242834] p-6 md:p-8 shadow-2xl">
+        <div className="bg-white rounded-3xl border border-zinc-200 p-6 md:p-8 shadow-sm">
           {step === 1 && (
             <StepResumeUpload
               resumeFormat={resumeFormat}

@@ -97,36 +97,36 @@ export default function EditOnboardingModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn text-white">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fadeIn text-zinc-900">
       <div
-        className="bg-[#14161D] rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-amber-500/20 max-h-[90vh] overflow-y-auto space-y-4"
+        className="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-zinc-200 max-h-[90vh] overflow-y-auto space-y-4 text-zinc-900"
         role="dialog"
         aria-modal="true"
       >
-        <div className="flex items-center justify-between pb-4 border-b border-[#242834]">
+        <div className="flex items-center justify-between pb-4 border-b border-zinc-100">
           <div>
-            <h2 className="text-lg font-black text-white flex items-center gap-2">
+            <h2 className="text-lg font-black text-black flex items-center gap-2">
               <span>✏️</span> Edit Onboarding & Target Goals
             </h2>
-            <p className="text-xs text-zinc-400 mt-0.5">
+            <p className="text-xs text-zinc-500 mt-0.5">
               Update your primary resume and target preferences to recalculate your baseline ATS score.
             </p>
           </div>
           <button
             onClick={onClose}
-            className="text-zinc-400 hover:text-white text-xl font-bold p-1"
+            className="text-zinc-400 hover:text-black text-xl font-bold p-1 transition-colors"
           >
             ✕
           </button>
         </div>
 
         {/* Informational notification banner */}
-        <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl text-xs text-amber-300 leading-relaxed">
+        <div className="p-4 bg-zinc-50 border border-zinc-200 rounded-2xl text-xs text-zinc-700 leading-relaxed">
           <strong>ℹ️ Re-Analysis Notice:</strong> Saving changes will mark your selected resume as your <strong>Primary Resume</strong>, re-run AI onboarding analysis, update your General ATS Baseline score, and regenerate your 8-week career roadmap.
         </div>
 
         {error && (
-          <div className="p-3 bg-rose-950/80 border border-rose-800 rounded-xl text-xs text-rose-300 font-bold">
+          <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 font-bold">
             ⚠️ {error}
           </div>
         )}
@@ -134,13 +134,13 @@ export default function EditOnboardingModal({
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Primary Resume Selector */}
           <div>
-            <label className="block text-xs font-black uppercase tracking-wider text-amber-300 mb-1.5">
-              Primary Resume <span className="text-rose-400">*</span>
+            <label className="block text-xs font-bold uppercase tracking-wider text-zinc-900 mb-1.5">
+              Primary Resume <span className="text-rose-500">*</span>
             </label>
             <select
               value={selectedResumeId}
               onChange={(e) => setSelectedResumeId(e.target.value)}
-              className="w-full px-4 py-3 bg-[#090A0C] border border-[#242834] rounded-xl text-xs font-semibold text-white focus:outline-none focus:border-amber-500"
+              className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-semibold text-black focus:outline-none focus:border-black focus:bg-white transition-colors"
             >
               {resumes.map((r) => (
                 <option key={r.id} value={r.id}>
@@ -149,7 +149,7 @@ export default function EditOnboardingModal({
               ))}
             </select>
             {isChangingPrimary && (
-              <p className="text-xs text-amber-400 mt-1 font-bold">
+              <p className="text-xs text-zinc-700 mt-1 font-bold">
                 ⚠️ Changing your Primary Resume will re-analyze your profile baseline and regenerate your roadmap.
               </p>
             )}
@@ -157,28 +157,28 @@ export default function EditOnboardingModal({
 
           {/* Target Job Positions */}
           <div>
-            <label className="block text-xs font-black uppercase tracking-wider text-amber-300 mb-1.5">
-              Target Job Positions <span className="text-rose-400">*</span>
+            <label className="block text-xs font-bold uppercase tracking-wider text-zinc-900 mb-1.5">
+              Target Job Positions <span className="text-rose-500">*</span>
             </label>
             <input
               type="text"
               value={positions}
               onChange={(e) => setPositions(e.target.value)}
               placeholder="e.g. Senior Software Engineer, Founding Engineer"
-              className="w-full px-4 py-3 bg-[#090A0C] border border-[#242834] rounded-xl text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500"
+              className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-black placeholder-zinc-400 focus:outline-none focus:border-black focus:bg-white transition-colors"
             />
           </div>
 
           {/* Country + Industry */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-black uppercase tracking-wider text-amber-300 mb-1.5">
-                Target Country <span className="text-rose-400">*</span>
+              <label className="block text-xs font-bold uppercase tracking-wider text-zinc-900 mb-1.5">
+                Target Country <span className="text-rose-500">*</span>
               </label>
               <select
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
-                className="w-full px-4 py-3 bg-[#090A0C] border border-[#242834] rounded-xl text-xs text-white focus:outline-none focus:border-amber-500"
+                className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-black focus:outline-none focus:border-black focus:bg-white transition-colors"
               >
                 {COUNTRIES.map((c) => (
                   <option key={c} value={c}>
@@ -189,13 +189,13 @@ export default function EditOnboardingModal({
             </div>
 
             <div>
-              <label className="block text-xs font-black uppercase tracking-wider text-amber-300 mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-zinc-900 mb-1.5">
                 Target Industry
               </label>
               <select
                 value={industry}
                 onChange={(e) => setIndustry(e.target.value)}
-                className="w-full px-4 py-3 bg-[#090A0C] border border-[#242834] rounded-xl text-xs text-white focus:outline-none focus:border-amber-500"
+                className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-black focus:outline-none focus:border-black focus:bg-white transition-colors"
               >
                 <option value="">Select industry...</option>
                 {INDUSTRIES.map((i) => (
@@ -209,7 +209,7 @@ export default function EditOnboardingModal({
 
           {/* Job Type Preferences */}
           <div>
-            <label className="block text-xs font-black uppercase tracking-wider text-amber-300 mb-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-zinc-900 mb-1.5">
               Job Types
             </label>
             <div className="flex flex-wrap gap-2">
@@ -233,10 +233,10 @@ export default function EditOnboardingModal({
                         setJobType([...current, jt].join(", "));
                       }
                     }}
-                    className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+                    className={`px-3 py-1.5 text-xs rounded-full border transition-colors ${
                       selected
-                        ? "bg-amber-500 text-slate-950 border-amber-500 font-black"
-                        : "bg-[#090A0C] text-zinc-300 border-[#242834] hover:text-white"
+                        ? "bg-black text-white border-black font-bold shadow-sm"
+                        : "bg-zinc-50 text-zinc-700 border-zinc-200 hover:border-black"
                     }`}
                   >
                     {selected ? "✓ " : "+ "}
@@ -250,7 +250,7 @@ export default function EditOnboardingModal({
           {/* URLs */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs font-bold text-amber-300 mb-1">
+              <label className="block text-xs font-bold text-zinc-900 mb-1">
                 LinkedIn URL
               </label>
               <input
@@ -258,11 +258,11 @@ export default function EditOnboardingModal({
                 value={linkedin}
                 onChange={(e) => setLinkedin(e.target.value)}
                 placeholder="linkedin.com/in/..."
-                className="w-full px-3 py-2 bg-[#090A0C] border border-[#242834] rounded-lg text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500"
+                className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-xs text-black placeholder-zinc-400 focus:outline-none focus:border-black focus:bg-white transition-colors"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-amber-300 mb-1">
+              <label className="block text-xs font-bold text-zinc-900 mb-1">
                 Portfolio URL
               </label>
               <input
@@ -270,11 +270,11 @@ export default function EditOnboardingModal({
                 value={portfolioUrl}
                 onChange={(e) => setPortfolioUrl(e.target.value)}
                 placeholder="yourportfolio.com"
-                className="w-full px-3 py-2 bg-[#090A0C] border border-[#242834] rounded-lg text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500"
+                className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-xs text-black placeholder-zinc-400 focus:outline-none focus:border-black focus:bg-white transition-colors"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-amber-300 mb-1">
+              <label className="block text-xs font-bold text-zinc-900 mb-1">
                 GitHub URL
               </label>
               <input
@@ -282,28 +282,28 @@ export default function EditOnboardingModal({
                 value={githubUrl}
                 onChange={(e) => setGithubUrl(e.target.value)}
                 placeholder="github.com/..."
-                className="w-full px-3 py-2 bg-[#090A0C] border border-[#242834] rounded-lg text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500"
+                className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-xs text-black placeholder-zinc-400 focus:outline-none focus:border-black focus:bg-white transition-colors"
               />
             </div>
           </div>
 
           {/* Buttons */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#242834]">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-zinc-100">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-bold text-zinc-400 hover:text-white"
+              className="px-4 py-2 text-xs font-bold text-zinc-600 hover:text-black transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-amber-500/20 disabled:opacity-50 flex items-center gap-2"
+              className="px-5 py-2.5 bg-black hover:bg-zinc-800 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-sm disabled:opacity-50 flex items-center gap-2 transition-all"
             >
               {saving ? (
                 <>
-                  <div className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   Regenerating Analysis...
                 </>
               ) : (

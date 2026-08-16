@@ -8,3 +8,5 @@ export * from "./onboarding";
 export * from "./recommendations";
 export * from "./outreach";
 export * from "./star-bullets";
+export * from "./recruiter";
+

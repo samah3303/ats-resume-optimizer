@@ -70,3 +70,42 @@ export interface StarBulletOption {
     resultMetrics: string;
   };
 }
+
+export interface JobDescriptionGenerationParams {
+  title: string;
+  department?: string;
+  location?: string;
+  seniority?: string;
+  keySkills?: string[];
+  userId?: string;
+}
+
+export interface GeneratedJobDescription {
+  title: string;
+  description: string;
+  requirements: string;
+  suggestedSalaryMin: number;
+  suggestedSalaryMax: number;
+  screeningQuestions: string[];
+}
+
+export type CandidateRecommendation = "strong_hire" | "hire" | "hold" | "reject";
+
+export interface CandidateScreenResult {
+  fitScore: number;
+  fitSummary: string;
+  matchedSkills: string[];
+  missingSkills: string[];
+  recommendation: CandidateRecommendation;
+}
+
+export interface CandidateScorecardInput {
+  applicationId: string;
+  stage: string;
+  overallScore: number;
+  criteriaJson?: string;
+  criteria?: Record<string, number | string>;
+  feedback: string;
+  recommendation?: CandidateRecommendation;
+}
+

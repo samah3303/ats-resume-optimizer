@@ -338,10 +338,10 @@ function AnalysisDetailContent() {
   // --- Loading state ---
   if (status === "loading" || loading) {
     return (
-      <div className="flex items-center justify-center min-h-[80vh] bg-[#090A0C]">
+      <div className="flex items-center justify-center min-h-[80vh] bg-white">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-3 border-amber-400 border-t-transparent rounded-full animate-spin" />
-          <p className="text-xs font-bold text-amber-300 uppercase tracking-wider">
+          <div className="w-10 h-10 border-2 border-black border-t-transparent rounded-full animate-spin" />
+          <p className="text-xs font-bold text-black uppercase tracking-wider">
             Loading Analysis Report...
           </p>
         </div>
@@ -352,22 +352,22 @@ function AnalysisDetailContent() {
   // --- Error state ---
   if (fetchError || !analysis) {
     return (
-      <div className="max-w-xl mx-auto my-16 p-8 bg-[#14161D] border border-rose-500/30 rounded-3xl text-center space-y-4 text-white shadow-2xl">
+      <div className="max-w-xl mx-auto my-16 p-8 bg-white border border-rose-200 rounded-3xl text-center space-y-4 text-black shadow-sm">
         <span className="text-4xl" aria-hidden="true">⚠️</span>
-        <h2 className="text-lg font-black text-white">Analysis Report Not Found</h2>
-        <p className="text-xs text-zinc-400 leading-relaxed">
+        <h2 className="text-lg font-black text-black">Analysis Report Not Found</h2>
+        <p className="text-xs text-zinc-600 leading-relaxed">
           {fetchError || "The requested analysis details could not be retrieved."}
         </p>
         <div className="pt-2 flex items-center justify-center gap-3">
           <button
             onClick={fetchAnalysis}
-            className="px-5 py-2.5 bg-amber-500 text-slate-950 text-xs font-black rounded-xl hover:bg-amber-400 transition-colors"
+            className="px-5 py-2.5 bg-black text-white text-xs font-bold rounded-xl hover:bg-zinc-800 transition-colors shadow-sm"
           >
             Try Again
           </button>
           <Link
             href="/dashboard"
-            className="px-5 py-2.5 bg-[#090A0C] border border-[#242834] text-zinc-300 text-xs font-bold rounded-xl hover:text-white transition-colors"
+            className="px-5 py-2.5 bg-white border border-zinc-300 text-zinc-800 text-xs font-bold rounded-xl hover:border-black transition-colors shadow-sm"
           >
             Back to Dashboard
           </Link>
@@ -449,22 +449,22 @@ function AnalysisDetailContent() {
   const isMediumMatch = overallScoreVal >= 50 && overallScoreVal < 75;
 
   return (
-    <div className="min-h-screen bg-[#090A0C] text-white p-4 sm:p-6 md:p-8 max-w-6xl mx-auto space-y-6">
+    <div className="min-h-screen bg-white text-black p-4 sm:p-6 md:p-8 max-w-6xl mx-auto space-y-6">
       {/* Top Navigation / Back Link */}
       <div className="flex items-center justify-between">
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-2 text-xs font-black text-amber-400 hover:text-amber-300 transition-colors uppercase tracking-wider"
+          className="inline-flex items-center gap-2 text-xs font-bold text-black hover:underline transition-colors uppercase tracking-wider"
         >
           <span>← Back to Dashboard</span>
         </Link>
-        <span className="text-[11px] font-mono text-zinc-500">
+        <span className="text-[11px] font-mono text-zinc-500 font-bold">
           Scanned {new Date(analysis.createdAt).toLocaleDateString()}
         </span>
       </div>
 
       {/* Main Analysis Header Card */}
-      <div className="bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] p-6 sm:p-8 text-white shadow-2xl space-y-6">
+      <div className="bg-white rounded-3xl border border-zinc-200 p-6 sm:p-8 text-black shadow-sm space-y-6">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
             <div className="shrink-0">
@@ -473,30 +473,30 @@ function AnalysisDetailContent() {
             <div className="space-y-2">
               <div className="flex items-center justify-center sm:justify-start gap-2">
                 <span
-                  className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                  className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                     isHighMatch
-                      ? "bg-emerald-950 text-emerald-300 border border-emerald-800"
+                      ? "bg-emerald-50 text-emerald-950 border border-emerald-300"
                       : isMediumMatch
-                      ? "bg-amber-950 text-amber-300 border border-amber-800"
-                      : "bg-rose-950 text-rose-300 border border-rose-800"
+                      ? "bg-amber-50 text-amber-950 border border-amber-300"
+                      : "bg-rose-50 text-rose-950 border border-rose-300"
                   }`}
                 >
                   {isHighMatch ? "🟢 Ready to Apply" : isMediumMatch ? "🟡 Quick Fixes Needed" : "🔴 High ATS Rejection Risk"}
                 </span>
               </div>
-              <h1 className="text-xl sm:text-2xl font-black text-white leading-tight">
+              <h1 className="text-xl sm:text-2xl font-black text-black leading-tight">
                 {analysis.jobDescription?.title || "Job Analysis Report"}
               </h1>
-              <p className="text-xs text-zinc-400 font-medium">
-                Comparing <span className="text-white font-bold">{analysis.resume?.name || "Resume"}</span> against{" "}
-                <span className="text-white font-bold">{analysis.jobDescription?.company || "Target Job Posting"}</span>
+              <p className="text-xs text-zinc-500 font-medium">
+                Comparing <span className="text-black font-bold">{analysis.resume?.name || "Resume"}</span> against{" "}
+                <span className="text-black font-bold">{analysis.jobDescription?.company || "Target Job Posting"}</span>
               </p>
               {analysis.jobDescription?.sourceUrl && (
                 <a
                   href={analysis.jobDescription.sourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold rounded-xl transition-colors"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-100 hover:bg-zinc-200 text-black border border-zinc-300 text-xs font-bold rounded-xl transition-colors"
                 >
                   <span>🔗 View Original Posting</span>
                 </a>
@@ -509,7 +509,7 @@ function AnalysisDetailContent() {
             <select
               value={selectedTemplate}
               onChange={(e) => setSelectedTemplate(e.target.value as "emerald_tech" | "classic_corporate")}
-              className="px-3.5 py-3 bg-[#090A0C] border border-[#242834] text-amber-300 text-xs font-bold rounded-2xl outline-none cursor-pointer hover:border-amber-500/50 transition-colors"
+              className="px-3.5 py-3 bg-white border border-zinc-300 text-black text-xs font-bold rounded-2xl outline-none cursor-pointer hover:border-black transition-colors shadow-sm"
             >
               <option value="emerald_tech">🎨 Template: Emerald Tech</option>
               <option value="classic_corporate">🏛️ Template: Classic Corporate</option>
@@ -518,11 +518,11 @@ function AnalysisDetailContent() {
             <button
               onClick={() => handleDownloadOptimized("pdf")}
               disabled={downloading}
-              className="px-5 py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black uppercase tracking-wider rounded-2xl shadow-lg shadow-amber-500/20 transition-all disabled:opacity-50 flex items-center gap-2"
+              className="px-5 py-3.5 bg-black hover:bg-zinc-800 text-white text-xs font-bold uppercase tracking-wider rounded-2xl shadow-sm transition-all disabled:opacity-50 flex items-center gap-2 border border-black"
             >
               {downloading ? (
                 <>
-                  <span className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   <span>Generating PDF...</span>
                 </>
               ) : (
@@ -535,7 +535,7 @@ function AnalysisDetailContent() {
             <button
               onClick={() => handleDownloadOptimized("docx")}
               disabled={downloading}
-              className="px-5 py-3.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-wider rounded-2xl shadow-lg shadow-blue-500/20 transition-all disabled:opacity-50 flex items-center gap-2"
+              className="px-5 py-3.5 bg-white hover:bg-zinc-100 text-black border border-zinc-300 text-xs font-bold uppercase tracking-wider rounded-2xl shadow-sm transition-all disabled:opacity-50 flex items-center gap-2"
             >
               <span>📝 Download Editable DOCX</span>
             </button>
@@ -543,7 +543,7 @@ function AnalysisDetailContent() {
             <button
               onClick={handleShare}
               disabled={sharing}
-              className="px-4 py-3.5 bg-[#090A0C] hover:bg-[#1A1D27] text-white border border-[#242834] text-xs font-bold rounded-2xl transition-all flex items-center gap-2"
+              className="px-4 py-3.5 bg-zinc-100 hover:bg-zinc-200 text-black border border-zinc-300 text-xs font-bold rounded-2xl transition-all flex items-center gap-2 shadow-sm"
             >
               <span>🔗 Share</span>
             </button>
@@ -551,11 +551,11 @@ function AnalysisDetailContent() {
         </div>
 
         {/* Smart Executive Guidance Banner */}
-        <div className="p-4 bg-[#090A0C] border border-[#242834] rounded-2xl text-xs space-y-1">
-          <p className="font-bold text-amber-300 flex items-center gap-1.5">
+        <div className="p-4 bg-zinc-50 border border-zinc-200 rounded-2xl text-xs space-y-1">
+          <p className="font-bold text-black flex items-center gap-1.5">
             <span>💡 Strategic Recommendation:</span>
           </p>
-          <p className="text-zinc-300 leading-relaxed font-medium">
+          <p className="text-zinc-700 leading-relaxed font-medium">
             {isHighMatch
               ? "Your resume shows strong ATS alignment (75%+). Download your ATS PDF and submit your application with confidence!"
               : `Your resume currently matches ${overallScoreVal}% of the job requirements. Accept the tailored bullet rewrites on the 'Bullet Fixes' tab to boost your score to 80%+.`}
@@ -565,20 +565,20 @@ function AnalysisDetailContent() {
 
       {/* Download Success Banner */}
       {downloadSuccess && (
-        <div className="p-5 bg-emerald-950/80 border border-emerald-800 rounded-3xl text-white space-y-3 shadow-xl animate-fadeIn">
+        <div className="p-5 bg-emerald-50 border border-emerald-200 rounded-3xl text-emerald-950 space-y-3 shadow-sm animate-fadeIn">
           <div className="flex items-start gap-3">
             <span className="text-2xl">🎉</span>
             <div className="flex-1 space-y-1">
-              <h3 className="text-sm font-black text-emerald-300">
+              <h3 className="text-sm font-black text-emerald-900">
                 Optimized Resume PDF Downloaded!
               </h3>
-              <p className="text-xs text-zinc-300">
-                Estimated ATS score boost: <strong className="text-emerald-300">+{scoreBoost}%</strong> (Projected Score: ~{Math.min(100, overallScoreVal + scoreBoost)}%)
+              <p className="text-xs text-emerald-800">
+                Estimated ATS score boost: <strong className="text-black font-bold">+{scoreBoost}%</strong> (Projected Score: ~{Math.min(100, overallScoreVal + scoreBoost)}%)
               </p>
             </div>
             <button
               onClick={() => setDownloadSuccess(false)}
-              className="text-xs font-bold text-zinc-400 hover:text-white"
+              className="text-xs font-bold text-emerald-700 hover:text-black"
             >
               ✕ Dismiss
             </button>
@@ -588,7 +588,7 @@ function AnalysisDetailContent() {
 
       {/* Tab Navigation */}
       <div
-        className="flex gap-2 bg-[#14161D] border border-[#242834] rounded-2xl p-1.5 overflow-x-auto"
+        className="flex gap-2 bg-zinc-100 border border-zinc-200 rounded-2xl p-1.5 overflow-x-auto"
         role="tablist"
         aria-label="Analysis sections"
       >
@@ -602,16 +602,16 @@ function AnalysisDetailContent() {
               aria-selected={isActive}
               className={`flex-1 min-w-fit px-4 py-2.5 text-xs font-bold rounded-xl transition-all whitespace-nowrap flex items-center justify-center gap-2 ${
                 isActive
-                  ? "bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-500/20"
-                  : "text-zinc-400 hover:text-white hover:bg-[#1C1F2B]"
+                  ? "bg-black text-white font-bold shadow-sm"
+                  : "text-zinc-600 hover:text-black hover:bg-white"
               }`}
             >
               <span>{tab.icon}</span>
               <span>{tab.label}</span>
               {tab.id === "suggestions" && safeSuggestions.length > 0 && (
                 <span
-                  className={`ml-1 px-2 py-0.5 text-[10px] font-black rounded-full ${
-                    isActive ? "bg-slate-950 text-amber-400" : "bg-amber-500/20 text-amber-300"
+                  className={`ml-1 px-2 py-0.5 text-[10px] font-bold rounded-full ${
+                    isActive ? "bg-white text-black" : "bg-zinc-200 text-black"
                   }`}
                 >
                   {safeSuggestions.length}
@@ -639,16 +639,16 @@ function AnalysisDetailContent() {
               return (
                 <div
                   key={sec.label}
-                  className="p-5 bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] space-y-3"
+                  className="p-5 bg-white rounded-3xl border border-zinc-200 shadow-sm space-y-3"
                 >
-                  <div className="flex items-center justify-between text-xs text-zinc-400 font-bold">
+                  <div className="flex items-center justify-between text-xs text-zinc-600 font-bold">
                     <span>{sec.label}</span>
-                    <span className="text-white font-mono">{sec.isPct ? `${val}%` : `${val}/100`}</span>
+                    <span className="text-black font-mono font-bold">{sec.isPct ? `${val}%` : `${val}/100`}</span>
                   </div>
-                  <div className="w-full bg-[#090A0C] rounded-full h-2 overflow-hidden border border-[#242834]">
+                  <div className="w-full bg-zinc-100 rounded-full h-2 overflow-hidden border border-zinc-200">
                     <div
                       className={`h-full transition-all duration-500 ${
-                        val >= 75 ? "bg-emerald-500" : val >= 50 ? "bg-amber-500" : "bg-rose-500"
+                        val >= 75 ? "bg-black" : val >= 50 ? "bg-zinc-700" : "bg-zinc-400"
                       }`}
                       style={{ width: `${Math.min(100, val)}%` }}
                     />
@@ -660,13 +660,13 @@ function AnalysisDetailContent() {
 
           {/* Keywords Match & Missing */}
           {(safeMatchedKeywords.length > 0 || safeMissingKeywords.length > 0) && (
-            <div className="p-6 bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] space-y-5">
-              <h2 className="text-sm font-black text-white uppercase tracking-wider">
+            <div className="p-6 bg-white rounded-3xl border border-zinc-200 shadow-sm space-y-5">
+              <h2 className="text-sm font-black text-black uppercase tracking-wider">
                 Keyword Matching Breakdown
               </h2>
               {safeMatchedKeywords.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-xs font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <p className="text-xs font-bold text-emerald-800 uppercase tracking-wider flex items-center gap-1.5">
                     <span>✅ Matched Keywords ({safeMatchedKeywords.length}):</span>
                   </p>
                   <div className="flex flex-wrap gap-2">
@@ -678,8 +678,8 @@ function AnalysisDetailContent() {
               )}
 
               {safeMissingKeywords.length > 0 && (
-                <div className="space-y-2 pt-2 border-t border-[#242834]">
-                  <p className="text-xs font-black text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
+                <div className="space-y-2 pt-2 border-t border-zinc-200">
+                  <p className="text-xs font-bold text-rose-800 uppercase tracking-wider flex items-center gap-1.5">
                     <span>❌ Missing Keywords to Add ({safeMissingKeywords.length}):</span>
                   </p>
                   <div className="flex flex-wrap gap-2">
@@ -694,35 +694,35 @@ function AnalysisDetailContent() {
 
           {/* Skills Gap Analysis */}
           {(safePresentSkills.length > 0 || safeMissingSkills.length > 0) && (
-            <div className="p-6 bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] space-y-4">
-              <h2 className="text-sm font-black text-white uppercase tracking-wider">
+            <div className="p-6 bg-white rounded-3xl border border-zinc-200 shadow-sm space-y-4">
+              <h2 className="text-sm font-black text-black uppercase tracking-wider">
                 Technical Skills Gap Analysis
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 bg-emerald-950/30 border border-emerald-800/50 rounded-2xl space-y-2">
-                  <p className="text-xs font-black text-emerald-400 uppercase tracking-wider">
+                <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl space-y-2">
+                  <p className="text-xs font-bold text-emerald-950 uppercase tracking-wider">
                     Skills Found in Resume
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {safePresentSkills.map((s) => (
                       <span
                         key={s}
-                        className="px-2.5 py-1 bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 text-[11px] font-bold rounded-xl"
+                        className="px-2.5 py-1 bg-white text-emerald-950 border border-emerald-200 text-[11px] font-bold rounded-xl shadow-sm"
                       >
                         ✓ {s}
                       </span>
                     ))}
                   </div>
                 </div>
-                <div className="p-4 bg-rose-950/30 border border-rose-800/50 rounded-2xl space-y-2">
-                  <p className="text-xs font-black text-rose-400 uppercase tracking-wider">
+                <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl space-y-2">
+                  <p className="text-xs font-bold text-rose-950 uppercase tracking-wider">
                     Missing Target Skills
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {safeMissingSkills.map((s) => (
                       <span
                         key={s}
-                        className="px-2.5 py-1 bg-rose-500/10 text-rose-300 border border-rose-500/30 text-[11px] font-bold rounded-xl"
+                        className="px-2.5 py-1 bg-white text-rose-950 border border-rose-200 text-[11px] font-bold rounded-xl shadow-sm"
                       >
                         + {s}
                       </span>
@@ -744,8 +744,8 @@ function AnalysisDetailContent() {
 
           {/* Keyword Density Heatmap */}
           {keywordFrequencies.length > 0 && (
-            <div className="p-6 bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] space-y-4">
-              <h2 className="text-sm font-black text-white uppercase tracking-wider">
+            <div className="p-6 bg-white rounded-3xl border border-zinc-200 shadow-sm space-y-4">
+              <h2 className="text-sm font-black text-black uppercase tracking-wider">
                 Keyword Frequency Heatmap
               </h2>
               <div className="flex flex-wrap gap-2">
@@ -754,8 +754,8 @@ function AnalysisDetailContent() {
                     key={kw.word}
                     className={`px-3 py-1 rounded-xl text-xs font-bold border transition-all ${
                       kw.matched
-                        ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/30"
-                        : "bg-rose-500/10 text-rose-300 border-rose-500/30"
+                        ? "bg-emerald-50 text-emerald-950 border-emerald-200"
+                        : "bg-rose-50 text-rose-950 border-rose-200"
                     }`}
                   >
                     {kw.matched ? "✓" : "×"} {kw.word}
@@ -770,20 +770,20 @@ function AnalysisDetailContent() {
 
       {/* ============ SUGGESTIONS / BULLET FIXES TAB ============ */}
       {activeTab === "suggestions" && (
-        <div className="p-6 bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] space-y-6 text-white">
-          <div className="p-5 bg-[#090A0C] border border-amber-500/30 rounded-2xl space-y-2">
+        <div className="p-6 bg-white rounded-3xl border border-zinc-200 shadow-sm space-y-6 text-black">
+          <div className="p-5 bg-zinc-50 border border-zinc-200 rounded-2xl space-y-2">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <span className="text-xs font-black text-amber-300 uppercase tracking-wider">
+              <span className="text-xs font-black text-black uppercase tracking-wider">
                 ⚡ Tailored STAR Bullet Rewrites ({safeSuggestions.length})
               </span>
-              <span className="text-xs font-bold text-emerald-400">
+              <span className="text-xs font-bold text-black">
                 Current: {overallScoreVal}% ➔ Projected:{" "}
-                <span className="text-white underline font-extrabold">
+                <span className="text-black underline font-extrabold">
                   {Math.min(95, Math.max(78, overallScoreVal + safeSuggestions.length * 3))}% Match
                 </span>
               </span>
             </div>
-            <p className="text-xs text-zinc-400 leading-relaxed">
+            <p className="text-xs text-zinc-600 leading-relaxed">
               These suggestions are generated specifically by comparing your resume against this job posting. Apply these STAR bullets to boost your score to 80%+.
             </p>
           </div>
@@ -812,13 +812,13 @@ function AnalysisDetailContent() {
 
       {/* ============ COVER LETTER TAB ============ */}
       {activeTab === "coverletter" && (
-        <div className="p-6 bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] space-y-5 text-white">
-          <div className="flex items-center justify-between border-b border-[#242834] pb-4">
+        <div className="p-6 bg-white rounded-3xl border border-zinc-200 shadow-sm space-y-5 text-black">
+          <div className="flex items-center justify-between border-b border-zinc-200 pb-4">
             <div>
-              <h2 className="text-sm font-black text-white uppercase tracking-wider">
+              <h2 className="text-sm font-black text-black uppercase tracking-wider">
                 ✉️ Tailored Cover Letter Generator
               </h2>
-              <p className="text-xs text-zinc-400 mt-1">
+              <p className="text-xs text-zinc-500 mt-1">
                 Generates a 3-paragraph executive cover letter customized for this job posting.
               </p>
             </div>
@@ -826,11 +826,11 @@ function AnalysisDetailContent() {
               <button
                 onClick={handleGenerateCoverLetter}
                 disabled={generatingCoverLetter}
-                className="px-5 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black rounded-2xl transition-all shadow-md flex items-center gap-2"
+                className="px-5 py-3 bg-black hover:bg-zinc-800 text-white text-xs font-bold rounded-2xl transition-all shadow-sm flex items-center gap-2 border border-black"
               >
                 {generatingCoverLetter ? (
                   <>
-                    <span className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                    <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     <span>Generating...</span>
                   </>
                 ) : (
@@ -844,22 +844,22 @@ function AnalysisDetailContent() {
             <div>
               {generatingCoverLetter ? (
                 <div className="flex items-center justify-center py-12">
-                  <span className="w-6 h-6 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
-                  <span className="ml-3 text-xs font-bold text-amber-300 uppercase tracking-wider">
+                  <span className="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                  <span className="ml-3 text-xs font-bold text-black uppercase tracking-wider">
                     Drafting custom cover letter...
                   </span>
                 </div>
               ) : coverLetterText ? (
                 <div className="space-y-4">
-                  <div className="p-5 bg-[#090A0C] border border-[#242834] rounded-2xl max-h-96 overflow-y-auto">
-                    <pre className="text-xs text-zinc-300 whitespace-pre-wrap font-sans leading-relaxed">
+                  <div className="p-5 bg-zinc-50 border border-zinc-200 rounded-2xl max-h-96 overflow-y-auto shadow-sm">
+                    <pre className="text-xs text-zinc-800 whitespace-pre-wrap font-sans leading-relaxed">
                       {coverLetterText}
                     </pre>
                   </div>
                   <div className="flex items-center gap-3">
                     <button
                       onClick={handleCopyCoverLetter}
-                      className="px-5 py-2.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold rounded-xl transition-colors flex items-center gap-2"
+                      className="px-5 py-2.5 bg-black text-white hover:bg-zinc-800 text-xs font-bold rounded-xl transition-colors flex items-center gap-2 border border-black shadow-sm"
                     >
                       <span>{coverLetterCopied ? "✓ Copied!" : "📋 Copy to Clipboard"}</span>
                     </button>
@@ -868,14 +868,14 @@ function AnalysisDetailContent() {
                         setShowCoverLetter(false);
                         setCoverLetterText(null);
                       }}
-                      className="px-4 py-2.5 text-xs text-zinc-400 hover:text-white transition-colors"
+                      className="px-4 py-2.5 text-xs text-zinc-500 hover:text-black font-bold transition-colors"
                     >
                       Regenerate
                     </button>
                   </div>
                 </div>
               ) : (
-                <p className="text-xs text-rose-400 py-4">
+                <p className="text-xs text-rose-600 font-bold py-4">
                   Failed to generate cover letter. Please try again.
                 </p>
               )}
@@ -886,24 +886,24 @@ function AnalysisDetailContent() {
 
       {/* ============ INTERVIEW COACH TAB ============ */}
       {activeTab === "interview" && (
-        <div className="p-6 bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] space-y-5 text-white">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#242834] pb-4">
+        <div className="p-6 bg-white rounded-3xl border border-zinc-200 shadow-sm space-y-5 text-black">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-200 pb-4">
             <div>
-              <h2 className="text-sm font-black text-white uppercase tracking-wider">
+              <h2 className="text-sm font-black text-black uppercase tracking-wider">
                 🎙️ Stage-Wise Interview Coach & STAR Answers
               </h2>
-              <p className="text-xs text-zinc-400 mt-1">
+              <p className="text-xs text-zinc-500 mt-1">
                 Predicted questions and STAR model answers tailored for this job description.
               </p>
             </div>
             <button
               onClick={() => handleGenerateQuestions(selectedStage)}
               disabled={generatingQuestions}
-              className="px-5 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black rounded-2xl transition-all shadow-md flex items-center gap-2 shrink-0"
+              className="px-5 py-3 bg-black hover:bg-zinc-800 text-white text-xs font-bold rounded-2xl transition-all shadow-sm flex items-center gap-2 shrink-0 border border-black"
             >
               {generatingQuestions ? (
                 <>
-                  <span className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                  <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   <span>Generating...</span>
                 </>
               ) : (
@@ -928,8 +928,8 @@ function AnalysisDetailContent() {
                 disabled={generatingQuestions}
                 className={`px-3 py-1.5 text-xs font-bold rounded-xl transition-all ${
                   selectedStage === stage.id
-                    ? "bg-amber-500 text-slate-950 font-black"
-                    : "bg-[#090A0C] border border-[#242834] text-zinc-400 hover:text-white"
+                    ? "bg-black text-white font-bold"
+                    : "bg-white border border-zinc-300 text-zinc-700 hover:border-black shadow-sm"
                 }`}
               >
                 {stage.label}
@@ -941,8 +941,8 @@ function AnalysisDetailContent() {
             <>
               {generatingQuestions ? (
                 <div className="flex flex-col items-center justify-center py-12 space-y-3">
-                  <span className="w-8 h-8 border-3 border-amber-400 border-t-transparent rounded-full animate-spin" />
-                  <span className="text-xs font-bold text-amber-300 uppercase tracking-wider">
+                  <span className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                  <span className="text-xs font-bold text-black uppercase tracking-wider">
                     Generating Q&As for {selectedStage.toUpperCase()} round...
                   </span>
                 </div>
@@ -953,24 +953,24 @@ function AnalysisDetailContent() {
                     return (
                       <div
                         key={idx}
-                        className="p-4 bg-[#090A0C] border border-[#242834] rounded-2xl space-y-3"
+                        className="p-4 bg-zinc-50 border border-zinc-200 rounded-2xl space-y-3"
                       >
                         <div className="flex items-center gap-2">
                           {q.stage && (
-                            <span className="px-2 py-0.5 bg-amber-500/10 text-amber-300 border border-amber-500/30 text-[10px] font-black rounded-lg uppercase">
+                            <span className="px-2 py-0.5 bg-zinc-200 text-black text-[10px] font-bold rounded-lg uppercase">
                               {q.stage}
                             </span>
                           )}
-                          <span className="text-xs font-mono text-zinc-400">{q.category}</span>
+                          <span className="text-xs font-mono text-zinc-500 font-bold">{q.category}</span>
                         </div>
-                        <h3 className="text-xs font-bold text-white leading-relaxed">
+                        <h3 className="text-xs font-bold text-black leading-relaxed">
                           ❓ {q.question}
                         </h3>
-                        <p className="text-[11px] text-zinc-400 italic">
-                          💡 <strong>Why Asked:</strong> {q.rationale}
+                        <p className="text-[11px] text-zinc-600 italic">
+                          💡 <strong className="text-black">Why Asked:</strong> {q.rationale}
                         </p>
 
-                        <div className="pt-2 border-t border-[#242834]">
+                        <div className="pt-2 border-t border-zinc-200">
                           <button
                             onClick={() =>
                               setExpandedAnswers((prev) => ({
@@ -978,32 +978,32 @@ function AnalysisDetailContent() {
                                 [idx]: !prev[idx],
                               }))
                             }
-                            className="text-xs font-bold text-amber-400 hover:underline flex items-center gap-1"
+                            className="text-xs font-bold text-black hover:underline flex items-center gap-1"
                           >
                             <span>{isExpanded ? "▼ Hide Model STAR Answer" : "► View STAR Model Answer & Talking Points"}</span>
                           </button>
 
                           {isExpanded && (
-                            <div className="mt-3 p-4 bg-[#14161D] border border-amber-500/20 rounded-xl space-y-3">
+                            <div className="mt-3 p-4 bg-white border border-zinc-200 rounded-xl space-y-3 shadow-sm">
                               {q.answer && (
                                 <div className="space-y-1">
-                                  <p className="text-[10px] font-black text-emerald-400 uppercase tracking-wider">
+                                  <p className="text-[10px] font-bold text-emerald-950 uppercase tracking-wider">
                                     ⭐ Sample STAR Answer:
                                   </p>
-                                  <p className="text-xs text-zinc-300 leading-relaxed whitespace-pre-wrap">
+                                  <p className="text-xs text-zinc-800 leading-relaxed whitespace-pre-wrap font-medium">
                                     {q.answer}
                                   </p>
                                 </div>
                               )}
                               {q.keyTalkingPoints && q.keyTalkingPoints.length > 0 && (
                                 <div className="space-y-1">
-                                  <p className="text-[10px] font-black text-amber-300 uppercase tracking-wider">
+                                  <p className="text-[10px] font-bold text-black uppercase tracking-wider">
                                     🎯 Key Talking Points:
                                   </p>
-                                  <ul className="space-y-1 text-xs text-zinc-400">
+                                  <ul className="space-y-1 text-xs text-zinc-700">
                                     {q.keyTalkingPoints.map((tp, tpIdx) => (
                                       <li key={tpIdx} className="flex items-start gap-1.5">
-                                        <span className="text-amber-400">•</span>
+                                        <span className="text-black font-bold">•</span>
                                         <span>{tp}</span>
                                       </li>
                                     ))}
@@ -1018,7 +1018,7 @@ function AnalysisDetailContent() {
                   })}
                 </div>
               ) : (
-                <p className="text-xs text-zinc-500 py-6 text-center">
+                <p className="text-xs text-zinc-500 py-6 text-center font-medium">
                   Click a stage above to generate tailored interview questions.
                 </p>
               )}
@@ -1029,8 +1029,8 @@ function AnalysisDetailContent() {
 
       {/* ============ SALARY GUIDE TAB ============ */}
       {activeTab === "salary" && (
-        <div className="p-6 bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] space-y-5 text-white">
-          <h2 className="text-sm font-black text-white uppercase tracking-wider">
+        <div className="p-6 bg-white rounded-3xl border border-zinc-200 shadow-sm space-y-5 text-black">
+          <h2 className="text-sm font-black text-black uppercase tracking-wider">
             💰 Salary Negotiation Script & Market Guide
           </h2>
           <div className="flex gap-3">
@@ -1038,34 +1038,34 @@ function AnalysisDetailContent() {
               value={targetSalary}
               onChange={(e) => setTargetSalary(e.target.value)}
               placeholder="Target salary (e.g. $120,000)"
-              className="flex-1 px-4 py-3 bg-[#090A0C] border border-[#242834] rounded-2xl text-xs font-bold text-white placeholder-zinc-500 focus:border-amber-500 focus:outline-none"
+              className="flex-1 px-4 py-3 bg-white border border-zinc-300 rounded-2xl text-xs font-bold text-black placeholder-zinc-400 focus:border-black focus:outline-none shadow-sm"
             />
             <button
               onClick={handleNegotiate}
               disabled={negotiating || !targetSalary.trim()}
-              className="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black uppercase rounded-2xl transition-all disabled:opacity-50"
+              className="px-6 py-3 bg-black hover:bg-zinc-800 text-white text-xs font-bold uppercase rounded-2xl transition-all disabled:opacity-50 border border-black shadow-sm"
             >
               {negotiating ? "Generating..." : "Generate Guide"}
             </button>
           </div>
 
           {negotiationResult?.marketRange && (
-            <div className="p-4 bg-[#090A0C] border border-amber-500/30 rounded-2xl space-y-1">
-              <p className="text-xs font-black text-amber-300 uppercase tracking-wider">
+            <div className="p-4 bg-zinc-50 border border-zinc-200 rounded-2xl space-y-1">
+              <p className="text-xs font-black text-black uppercase tracking-wider">
                 📊 Estimated Market Salary Range:
               </p>
-              <p className="text-xs text-zinc-300 font-medium">
+              <p className="text-xs text-zinc-800 font-medium">
                 {negotiationResult.marketRange}
               </p>
             </div>
           )}
 
           {negotiationResult?.negotiationScript && (
-            <div className="p-4 bg-[#090A0C] border border-emerald-500/30 rounded-2xl space-y-1">
-              <p className="text-xs font-black text-emerald-400 uppercase tracking-wider">
+            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl space-y-1">
+              <p className="text-xs font-bold text-emerald-950 uppercase tracking-wider">
                 🎙️ Counter-Offer Script:
               </p>
-              <p className="text-xs text-zinc-300 leading-relaxed whitespace-pre-wrap font-sans">
+              <p className="text-xs text-emerald-950 leading-relaxed whitespace-pre-wrap font-sans font-medium">
                 {negotiationResult.negotiationScript}
               </p>
             </div>
@@ -1075,13 +1075,13 @@ function AnalysisDetailContent() {
 
       {/* ============ SHARE REPORT TAB ============ */}
       {activeTab === "share" && (
-        <div className="p-6 bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-[#242834] space-y-5 text-white">
-          <div className="flex items-center justify-between border-b border-[#242834] pb-4">
+        <div className="p-6 bg-white rounded-3xl border border-zinc-200 shadow-sm space-y-5 text-black">
+          <div className="flex items-center justify-between border-b border-zinc-200 pb-4">
             <div>
-              <h2 className="text-sm font-black text-white uppercase tracking-wider">
+              <h2 className="text-sm font-black text-black uppercase tracking-wider">
                 🔗 Share Public Analysis Report
               </h2>
-              <p className="text-xs text-zinc-400 mt-1">
+              <p className="text-xs text-zinc-500 mt-1">
                 Creates a read-only public share link for career coaches or recruiters.
               </p>
             </div>
@@ -1089,11 +1089,11 @@ function AnalysisDetailContent() {
               <button
                 onClick={handleShare}
                 disabled={sharing}
-                className="px-5 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black rounded-2xl transition-all shadow-md flex items-center gap-2"
+                className="px-5 py-3 bg-black hover:bg-zinc-800 text-white text-xs font-bold rounded-2xl transition-all shadow-sm flex items-center gap-2 border border-black"
               >
                 {sharing ? (
                   <>
-                    <span className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                    <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     <span>Creating Link...</span>
                   </>
                 ) : (
@@ -1108,11 +1108,11 @@ function AnalysisDetailContent() {
               <input
                 readOnly
                 value={shareUrl}
-                className="flex-1 px-4 py-3 bg-[#090A0C] border border-[#242834] rounded-2xl text-xs font-mono text-amber-300 focus:outline-none"
+                className="flex-1 px-4 py-3 bg-zinc-50 border border-zinc-300 rounded-2xl text-xs font-mono text-black focus:outline-none"
               />
               <button
                 onClick={handleCopyShareLink}
-                className="px-5 py-3 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold rounded-2xl transition-colors shrink-0"
+                className="px-5 py-3 bg-black text-white hover:bg-zinc-800 border border-black text-xs font-bold rounded-2xl transition-colors shrink-0 shadow-sm"
               >
                 {shareCopied ? "✓ Copied!" : "📋 Copy Link"}
               </button>
@@ -1128,8 +1128,8 @@ export default function AnalysisDetailPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex items-center justify-center min-h-[80vh] bg-[#090A0C]">
-          <div className="w-8 h-8 border-3 border-amber-400 border-t-transparent rounded-full animate-spin" />
+        <div className="flex items-center justify-center min-h-[80vh] bg-white">
+          <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin" />
         </div>
       }
     >

@@ -57,11 +57,11 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   const styleMap = {
     success:
-      "bg-[#14161D]/95 text-emerald-300 border-emerald-500/40 shadow-emerald-500/10",
+      "bg-white text-zinc-900 border-black shadow-xl",
     error:
-      "bg-[#14161D]/95 text-rose-300 border-rose-500/40 shadow-rose-500/10",
+      "bg-white text-zinc-900 border-black shadow-xl",
     info:
-      "bg-[#14161D]/95 text-amber-300 border-amber-500/40 shadow-amber-500/10",
+      "bg-white text-zinc-900 border-black shadow-xl",
   };
 
   const iconMap = {
@@ -83,15 +83,15 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           <div
             key={t.id}
             role="alert"
-            className={`px-4 py-3 rounded-2xl shadow-2xl backdrop-blur-2xl border text-xs font-bold flex items-center justify-between gap-3 animate-in slide-in-from-right transition-all ${styleMap[t.type]}`}
+            className={`px-4 py-3.5 rounded-2xl shadow-xl border text-xs font-bold flex items-center justify-between gap-3 animate-in slide-in-from-right transition-all ${styleMap[t.type]}`}
           >
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               <span className="text-base">{iconMap[t.type]}</span>
-              <span className="leading-snug">{t.message}</span>
+              <span className="leading-snug text-zinc-900">{t.message}</span>
             </div>
             <button
               onClick={() => dismiss(t.id)}
-              className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/10 transition-colors"
+              className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-zinc-500 hover:text-black hover:bg-zinc-100 transition-colors"
               aria-label="Dismiss notification"
             >
               ✕

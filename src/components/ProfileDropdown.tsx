@@ -80,7 +80,7 @@ export default function ProfileDropdown() {
         aria-expanded={open}
         aria-haspopup="true"
         aria-label="Profile menu"
-        className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-600 to-violet-500 text-white text-sm font-bold flex items-center justify-center shadow-sm hover:shadow-md transition-shadow"
+        className="w-9 h-9 rounded-full bg-black text-white text-xs font-black flex items-center justify-center shadow-sm hover:bg-zinc-800 transition-colors border border-black"
       >
         {initials}
       </button>
@@ -88,31 +88,31 @@ export default function ProfileDropdown() {
       {open && (
         <div
           role="menu"
-          className="absolute right-0 top-12 w-64 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xl z-50 py-2 animate-in fade-in"
+          className="absolute right-0 top-12 w-64 bg-white rounded-2xl border border-zinc-200 shadow-xl z-50 py-2 animate-in fade-in"
         >
           {/* User info */}
-          <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-700">
-            <p className="font-semibold text-slate-900 dark:text-slate-100 text-sm">
+          <div className="px-4 py-3 border-b border-zinc-100">
+            <p className="font-bold text-zinc-900 text-sm">
               {session?.user?.name || "User"}
             </p>
-            <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+            <p className="text-xs text-zinc-500 truncate">
               {session?.user?.email}
             </p>
           </div>
 
           {/* Stats */}
-          <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-700">
+          <div className="px-4 py-2.5 border-b border-zinc-100">
             {statsError ? (
-              <p className="text-xs text-red-500 text-center">{statsError}</p>
+              <p className="text-xs text-rose-500 text-center">{statsError}</p>
             ) : (
               <div className="grid grid-cols-2 gap-2 text-center">
-                <div>
-                  <p className="text-lg font-bold text-indigo-600 dark:text-indigo-400">{resumeCount}</p>
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Resumes</p>
+                <div className="bg-zinc-50 rounded-xl py-1.5 border border-zinc-100">
+                  <p className="text-base font-black text-black">{resumeCount}</p>
+                  <p className="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold">Resumes</p>
                 </div>
-                <div>
-                  <p className="text-lg font-bold text-indigo-600 dark:text-indigo-400">{jobCount}</p>
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Jobs</p>
+                <div className="bg-zinc-50 rounded-xl py-1.5 border border-zinc-100">
+                  <p className="text-base font-black text-black">{jobCount}</p>
+                  <p className="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold">Jobs</p>
                 </div>
               </div>
             )}
@@ -124,34 +124,41 @@ export default function ProfileDropdown() {
               ref={firstMenuItemRef}
               role="menuitem"
               onClick={() => { setOpen(false); router.push("/"); }}
-              className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-700 transition-colors"
+              className="w-full text-left px-4 py-2 text-xs font-semibold text-zinc-700 hover:text-black hover:bg-zinc-100 transition-colors flex items-center gap-2"
             >
-              <span aria-hidden="true">✏️ </span>Edit Onboarding
+              <span aria-hidden="true">✏️</span> Edit Onboarding
             </button>
             <button
               role="menuitem"
               onClick={() => { setOpen(false); toggle(); }}
-              className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-700 transition-colors"
+              className="w-full text-left px-4 py-2 text-xs font-semibold text-zinc-700 hover:text-black hover:bg-zinc-100 transition-colors flex items-center gap-2"
             >
-              <span aria-hidden="true">{dark ? "☀️ " : "🌙 "}</span>
+              <span aria-hidden="true">{dark ? "☀️" : "🌙"}</span>
               {dark ? "Light Mode" : "Dark Mode"}
             </button>
             <button
               role="menuitem"
-              onClick={() => { setOpen(false); router.push("/dashboard"); }}
-              className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-700 transition-colors"
+              onClick={() => { setOpen(false); router.push("/dashboard/recruiter"); }}
+              className="w-full text-left px-4 py-2 text-xs font-semibold text-zinc-700 hover:text-black hover:bg-zinc-100 transition-colors flex items-center gap-2"
             >
-              <span aria-hidden="true">🏠 </span>Dashboard
+              <span aria-hidden="true">👔</span> Recruiter Hub
+            </button>
+            <button
+              role="menuitem"
+              onClick={() => { setOpen(false); router.push("/dashboard"); }}
+              className="w-full text-left px-4 py-2 text-xs font-semibold text-zinc-700 hover:text-black hover:bg-zinc-100 transition-colors flex items-center gap-2"
+            >
+              <span aria-hidden="true">🏠</span> Dashboard
             </button>
           </div>
 
-          <div className="border-t border-slate-100 dark:border-slate-700 pt-1 pb-1">
+          <div className="border-t border-zinc-100 pt-1 pb-1">
             <button
               role="menuitem"
               onClick={() => signOut({ callbackUrl: "/" })}
-              className="w-full text-left px-4 py-2 text-sm text-slate-500 dark:text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 dark:hover:text-red-400 transition-colors"
+              className="w-full text-left px-4 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors flex items-center gap-2"
             >
-              Logout
+              <span aria-hidden="true">🚪</span> Logout
             </button>
           </div>
         </div>

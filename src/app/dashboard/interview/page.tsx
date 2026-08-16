@@ -136,53 +136,57 @@ export default function InterviewPage() {
 
   const filteredQuestions = questions
     ? activeCategory === "All"
-      ? questions
-      : questions.filter((q) => q.category === activeCategory)
     : [];
 
   if (status === "loading" || loadingData) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#090A0C]">
-        <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+      <div className="flex items-center justify-center min-h-screen bg-white">
+        <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
+  const renderedQuestions = questions
+    ? activeCategory === "All"
+      ? questions
+      : questions.filter((q) => q.category === activeCategory)
+    : [];
+
   return (
-    <div className="min-h-screen bg-[#090A0C] text-white py-8 px-4 sm:px-6 lg:px-8 space-y-8 pb-24">
+    <div className="min-h-screen bg-white text-zinc-900 py-8 px-4 sm:px-6 lg:px-8 space-y-8 pb-24">
       <div className="max-w-6xl mx-auto space-y-8">
         <div>
-          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-amber-400 mb-1">
+          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-zinc-600 mb-1">
             <span>Interview Readiness Studio</span>
           </div>
-          <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+          <h1 className="text-2xl sm:text-4xl font-black text-black tracking-tight">
             AI Interview Question Predictor & Roleplay
           </h1>
-          <p className="text-xs sm:text-sm text-zinc-400 mt-1 max-w-3xl">
+          <p className="text-xs sm:text-sm text-zinc-600 mt-1 max-w-3xl">
             Predict high-probability technical, behavioral, and gap questions tailored specifically to your resume and target job posting.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Form */}
-          <div className="lg:col-span-4 bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-amber-500/20 p-6 shadow-2xl space-y-5">
-            <h2 className="text-base font-black text-white">1. Setup Practice Session</h2>
+          <div className="lg:col-span-4 bg-white rounded-3xl border border-zinc-200 p-6 shadow-sm space-y-5">
+            <h2 className="text-base font-black text-black">1. Setup Practice Session</h2>
 
             <form onSubmit={handleGenerate} className="space-y-4">
               {error && (
-                <div className="p-3 bg-rose-950/80 border border-rose-800 rounded-xl text-xs text-rose-300 font-bold">
+                <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 font-bold">
                   ⚠️ {error}
                 </div>
               )}
 
               <div>
-                <label className="block text-xs font-bold text-amber-300 mb-1.5">
+                <label className="block text-xs font-bold text-zinc-700 mb-1.5">
                   Select Your Resume
                 </label>
                 <select
                   value={resumeId}
                   onChange={(e) => setResumeId(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-[#090A0C] border border-[#242834] text-xs font-semibold text-white focus:outline-none focus:border-amber-500"
+                  className="w-full px-4 py-3 rounded-xl bg-white border border-zinc-300 text-xs font-semibold text-black focus:outline-none focus:border-black shadow-sm cursor-pointer"
                 >
                   <option value="">-- Choose Resume --</option>
                   {resumes.map((r) => (
@@ -192,13 +196,13 @@ export default function InterviewPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-amber-300 mb-1.5">
+                <label className="block text-xs font-bold text-zinc-700 mb-1.5">
                   Select Job Posting
                 </label>
                 <select
                   value={jdId}
                   onChange={(e) => setJdId(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-[#090A0C] border border-[#242834] text-xs font-semibold text-white focus:outline-none focus:border-amber-500"
+                  className="w-full px-4 py-3 rounded-xl bg-white border border-zinc-300 text-xs font-semibold text-black focus:outline-none focus:border-black shadow-sm cursor-pointer"
                 >
                   <option value="">-- Choose Job Description --</option>
                   {jds.map((j) => (
@@ -212,11 +216,11 @@ export default function InterviewPage() {
               <button
                 type="submit"
                 disabled={generating || !resumeId || !jdId}
-                className="w-full py-3.5 px-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider rounded-2xl shadow-lg shadow-amber-500/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full py-3.5 px-4 bg-black hover:bg-zinc-800 text-white font-black text-xs uppercase tracking-wider rounded-2xl shadow-sm border border-black transition-all disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {generating ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     Predicting Questions...
                   </>
                 ) : (
@@ -238,8 +242,8 @@ export default function InterviewPage() {
                       onClick={() => setActiveCategory(cat)}
                       className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
                         activeCategory === cat
-                          ? "bg-amber-500 text-slate-950 shadow-md"
-                          : "bg-[#14161D] border border-[#242834] text-zinc-300 hover:text-white"
+                          ? "bg-black text-white border border-black shadow-sm"
+                          : "bg-zinc-100 border border-zinc-200 text-zinc-800 hover:border-black"
                       }`}
                     >
                       {cat}
@@ -249,30 +253,30 @@ export default function InterviewPage() {
 
                 {/* Question Cards */}
                 <div className="space-y-4">
-                  {filteredQuestions.map((q, idx) => (
+                  {renderedQuestions.map((q, idx) => (
                     <div
                       key={idx}
-                      className="bg-[#14161D]/80 backdrop-blur-xl rounded-3xl border border-[#242834] p-6 shadow-xl space-y-4 hover:border-amber-500/40 transition-all"
+                      className="bg-white rounded-3xl border border-zinc-200 p-6 shadow-sm space-y-4 hover:border-black transition-all"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="px-3 py-1 rounded-full text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                        <span className="px-3 py-1 rounded-full text-[10px] font-black bg-zinc-100 text-zinc-900 border border-zinc-300">
                           {q.category}
                         </span>
                         <span className="text-[10px] text-zinc-500 font-mono">Question {idx + 1}</span>
                       </div>
 
                       <div>
-                        <h3 className="text-sm font-black text-white leading-snug">
+                        <h3 className="text-sm font-black text-black leading-snug">
                           &ldquo;{q.question}&rdquo;
                         </h3>
-                        <p className="text-xs text-zinc-400 mt-1 italic">
+                        <p className="text-xs text-zinc-600 mt-1 italic">
                           Why recruiter asks this: {q.rationale}
                         </p>
                       </div>
 
                       {/* Interactive Practice Box */}
-                      <div className="space-y-2 pt-3 border-t border-[#242834]">
-                        <label className="block text-[10px] font-black text-amber-300 uppercase tracking-wider">
+                      <div className="space-y-2 pt-3 border-t border-zinc-200">
+                        <label className="block text-[10px] font-black text-zinc-700 uppercase tracking-wider">
                           Practice Your Answer (STAR Method):
                         </label>
                         <textarea
@@ -282,16 +286,16 @@ export default function InterviewPage() {
                           }
                           placeholder="Type your response here..."
                           rows={3}
-                          className="w-full p-4 rounded-xl bg-[#090A0C] border border-[#242834] text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500"
+                          className="w-full p-4 rounded-xl bg-white border border-zinc-300 text-xs text-black placeholder-zinc-400 focus:outline-none focus:border-black shadow-sm"
                         />
                         <button
                           onClick={() => handleEvaluateAnswer(idx, q.question)}
                           disabled={evaluatingIndex === idx || !practiceAnswer[idx]?.trim()}
-                          className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black rounded-xl disabled:opacity-40 transition-all flex items-center gap-1.5"
+                          className="px-4 py-2 bg-black hover:bg-zinc-800 text-white text-xs font-black rounded-xl border border-black disabled:opacity-40 transition-all flex items-center gap-1.5 shadow-sm"
                         >
                           {evaluatingIndex === idx ? (
                             <>
-                              <div className="w-3 h-3 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                              <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
                               Evaluating Answer...
                             </>
                           ) : (
@@ -300,7 +304,7 @@ export default function InterviewPage() {
                         </button>
 
                         {feedback[idx] && (
-                          <div className="p-4 bg-emerald-950/80 border border-emerald-800 rounded-2xl text-xs text-emerald-300 whitespace-pre-wrap font-sans mt-2">
+                          <div className="p-4 bg-zinc-50 border border-zinc-200 rounded-2xl text-xs text-zinc-900 whitespace-pre-wrap font-sans mt-2 shadow-sm">
                             {feedback[idx]}
                           </div>
                         )}
@@ -310,12 +314,12 @@ export default function InterviewPage() {
                 </div>
               </div>
             ) : (
-              <div className="bg-[#14161D]/80 backdrop-blur-2xl rounded-3xl border border-dashed border-[#242834] p-12 text-center space-y-3">
-                <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center justify-center font-bold text-xl mx-auto">
+              <div className="bg-zinc-50 rounded-3xl border border-dashed border-zinc-300 p-12 text-center space-y-3 shadow-sm">
+                <div className="w-12 h-12 rounded-2xl bg-zinc-100 text-black border border-zinc-300 flex items-center justify-center font-bold text-xl mx-auto shadow-sm">
                   🎙️
                 </div>
-                <h3 className="text-base font-black text-white">Your Predicted Interview Questions</h3>
-                <p className="text-xs text-zinc-400 max-w-md mx-auto">
+                <h3 className="text-base font-black text-black">Your Predicted Interview Questions</h3>
+                <p className="text-xs text-zinc-500 max-w-md mx-auto">
                   Select a resume and job description to get tailored questions and practice your STAR answers with AI feedback.
                 </p>
               </div>

@@ -35,12 +35,12 @@ interface OutreachPack {
 }
 
 const STATUSES = [
-  { key: "wishlist", label: "Wishlist", color: "bg-zinc-800 text-zinc-300 border border-zinc-700" },
-  { key: "applied", label: "Applied", color: "bg-blue-950 text-blue-300 border border-blue-800" },
-  { key: "phone_screen", label: "Phone Screen", color: "bg-amber-950 text-amber-300 border border-amber-800" },
-  { key: "interview", label: "Interview", color: "bg-purple-950 text-purple-300 border border-purple-800" },
-  { key: "offer", label: "Offer", color: "bg-emerald-950 text-emerald-300 border border-emerald-800" },
-  { key: "rejected", label: "Rejected", color: "bg-rose-950 text-rose-300 border border-rose-800" },
+  { key: "wishlist", label: "Wishlist", color: "bg-zinc-100 text-zinc-800 border border-zinc-200" },
+  { key: "applied", label: "Applied", color: "bg-zinc-200 text-black border border-zinc-300" },
+  { key: "phone_screen", label: "Phone Screen", color: "bg-zinc-800 text-white" },
+  { key: "interview", label: "Interview", color: "bg-black text-white" },
+  { key: "offer", label: "Offer", color: "bg-emerald-50 text-emerald-950 border border-emerald-300" },
+  { key: "rejected", label: "Rejected", color: "bg-rose-50 text-rose-950 border border-rose-300" },
 ] as const;
 
 export default function TrackerPage() {
@@ -172,14 +172,14 @@ export default function TrackerPage() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="min-h-screen bg-[#090A0C] text-white py-8 px-4 sm:px-6 lg:px-8 space-y-6">
-        <div className="h-8 bg-[#14161D] rounded w-48 animate-pulse mb-8 max-w-7xl mx-auto" />
+      <div className="min-h-screen bg-white text-black py-8 px-4 sm:px-6 lg:px-8 space-y-6">
+        <div className="h-8 bg-zinc-100 rounded w-48 animate-pulse mb-8 max-w-7xl mx-auto" />
         <div className="grid grid-cols-1 md:grid-cols-6 gap-4 max-w-7xl mx-auto">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="bg-[#14161D] rounded-2xl p-4 border border-[#242834]">
-              <div className="h-6 bg-[#090A0C] rounded w-20 animate-pulse mb-4" />
+            <div key={i} className="bg-zinc-50 rounded-2xl p-4 border border-zinc-200">
+              <div className="h-6 bg-zinc-200 rounded w-20 animate-pulse mb-4" />
               {[...Array(2)].map((_, j) => (
-                <div key={j} className="h-24 bg-[#090A0C] rounded-xl mb-3 animate-pulse" />
+                <div key={j} className="h-24 bg-white rounded-xl mb-3 animate-pulse border border-zinc-200" />
               ))}
             </div>
           ))}
@@ -191,17 +191,17 @@ export default function TrackerPage() {
   if (status === "unauthenticated") return null;
 
   return (
-    <div className="min-h-screen bg-[#090A0C] text-white py-8 px-4 sm:px-6 lg:px-8 space-y-6 pb-24">
+    <div className="min-h-screen bg-white text-black py-8 px-4 sm:px-6 lg:px-8 space-y-6 pb-24">
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <Link href="/dashboard" className="text-xs font-bold text-amber-400 hover:underline">
+              <Link href="/dashboard" className="text-xs font-bold text-black hover:underline">
                 ← Back to Dashboard
               </Link>
             </div>
-            <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight mt-1">Application Kanban Tracker</h1>
-            <p className="text-xs sm:text-sm text-zinc-400 mt-1">
+            <h1 className="text-2xl sm:text-4xl font-black text-black tracking-tight mt-1">Application Kanban Tracker</h1>
+            <p className="text-xs sm:text-sm text-zinc-500 mt-1 font-medium">
               {applications.length} application{applications.length !== 1 ? "s" : ""} tracked with 1-click multi-channel outreach
             </p>
           </div>
@@ -217,52 +217,52 @@ export default function TrackerPage() {
               return (
                 <div
                   key={statusCol.key}
-                  className="flex-1 md:flex-none min-w-[260px] md:min-w-0 bg-[#14161D]/80 backdrop-blur-xl rounded-3xl border border-[#242834] p-4 shadow-xl flex flex-col justify-between"
+                  className="flex-1 md:flex-none min-w-[260px] md:min-w-0 bg-zinc-50 rounded-3xl border border-zinc-200 p-4 shadow-sm flex flex-col justify-between"
                 >
                   <div>
-                    <div className="flex items-center justify-between mb-3 border-b border-[#242834] pb-2.5">
-                      <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full ${statusCol.color}`}>
+                    <div className="flex items-center justify-between mb-3 border-b border-zinc-200 pb-2.5">
+                      <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${statusCol.color}`}>
                         {statusCol.label}
                       </span>
-                      <span className="text-xs text-amber-400 font-mono font-bold">
+                      <span className="text-xs text-black font-mono font-bold">
                         {apps.length}
                       </span>
                     </div>
 
                     <div className="space-y-3">
                       {apps.length === 0 ? (
-                        <p className="text-xs text-zinc-500 text-center py-6 italic font-medium">
+                        <p className="text-xs text-zinc-400 text-center py-6 italic font-medium">
                           No applications
                         </p>
                       ) : (
                         apps.map((app) => (
                           <div
                             key={app.id}
-                            className="bg-[#090A0C] rounded-2xl border border-[#242834] hover:border-amber-500/40 p-4 shadow-md transition-all space-y-2 group"
+                            className="bg-white rounded-2xl border border-zinc-200 hover:border-black p-4 shadow-sm transition-all space-y-2 group"
                           >
-                            <h4 className="font-extrabold text-xs text-white truncate group-hover:text-amber-400 transition-colors">
+                            <h4 className="font-bold text-xs text-black truncate group-hover:underline transition-colors">
                               {app.jobDescription.title}
                             </h4>
                             {app.jobDescription.company && (
-                              <p className="text-[11px] font-semibold text-zinc-400 truncate">
+                              <p className="text-[11px] font-medium text-zinc-500 truncate">
                                 {app.jobDescription.company}
                               </p>
                             )}
                             
                             <button
                               onClick={() => handleOpenOutreach(app)}
-                              className="w-full mt-1 px-2.5 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-bold rounded-xl transition-colors flex items-center justify-center gap-1"
+                              className="w-full mt-1 px-2.5 py-1.5 bg-black hover:bg-zinc-800 text-white border border-black text-[10px] font-bold rounded-xl transition-colors flex items-center justify-center gap-1 shadow-sm"
                             >
                               <span>🚀 Multi-Channel Outreach</span>
                             </button>
 
-                            <div className="flex items-center justify-between pt-2 border-t border-[#242834]">
+                            <div className="flex items-center justify-between pt-2 border-t border-zinc-200">
                               <div className="flex gap-1">
                                 {idx > 0 && (
                                   <button
                                     onClick={() => moveApplication(app.id, STATUSES[idx - 1].key)}
                                     disabled={movingId === app.id}
-                                    className="p-1 text-zinc-400 hover:text-white hover:bg-[#14161D] rounded-lg transition-colors"
+                                    className="p-1 text-zinc-400 hover:text-black hover:bg-zinc-100 rounded-lg transition-colors"
                                     title={`Move to ${STATUSES[idx - 1].label}`}
                                   >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -274,7 +274,7 @@ export default function TrackerPage() {
                                   <button
                                     onClick={() => moveApplication(app.id, STATUSES[idx + 1].key)}
                                     disabled={movingId === app.id}
-                                    className="p-1 text-zinc-400 hover:text-white hover:bg-[#14161D] rounded-lg transition-colors"
+                                    className="p-1 text-zinc-400 hover:text-black hover:bg-zinc-100 rounded-lg transition-colors"
                                     title={`Move to ${STATUSES[idx + 1].label}`}
                                   >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -286,7 +286,7 @@ export default function TrackerPage() {
                               <button
                                 onClick={() => deleteApplication(app.id)}
                                 disabled={deletingId === app.id}
-                                className="text-xs font-bold text-rose-400 hover:bg-rose-950/50 px-2 py-0.5 rounded-lg transition-colors disabled:opacity-50"
+                                className="text-xs font-bold text-zinc-400 hover:text-rose-600 hover:bg-rose-50 px-2 py-0.5 rounded-lg transition-colors disabled:opacity-50"
                               >
                                 {deletingId === app.id ? "..." : "✕"}
                               </button>
@@ -305,23 +305,23 @@ export default function TrackerPage() {
 
       {/* Multi-Channel Outreach Modal */}
       {activeOutreachApp && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="bg-[#14161D] border border-[#242834] rounded-3xl p-6 max-w-xl w-full text-white shadow-2xl space-y-5 animate-fadeIn">
-            <div className="flex items-center justify-between border-b border-[#242834] pb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white border border-zinc-200 rounded-3xl p-6 max-w-xl w-full text-black shadow-2xl space-y-5 animate-fadeIn">
+            <div className="flex items-center justify-between border-b border-zinc-200 pb-4">
               <div>
-                <span className="text-[10px] font-black text-amber-300 uppercase tracking-wider">
+                <span className="text-[10px] font-black text-zinc-500 uppercase tracking-wider">
                   Outreach Assistant
                 </span>
-                <h3 className="text-base font-black text-white">
+                <h3 className="text-base font-black text-black">
                   {activeOutreachApp.jobDescription.title}
                 </h3>
-                <p className="text-xs text-zinc-400">
+                <p className="text-xs text-zinc-500 font-medium">
                   {activeOutreachApp.jobDescription.company || "Target Company"}
                 </p>
               </div>
               <button
                 onClick={() => setActiveOutreachApp(null)}
-                className="text-xs font-bold text-zinc-400 hover:text-white"
+                className="text-xs font-bold text-zinc-400 hover:text-black"
               >
                 ✕ Close
               </button>
@@ -329,21 +329,21 @@ export default function TrackerPage() {
 
             {generatingOutreach ? (
               <div className="flex flex-col items-center justify-center py-12 space-y-3">
-                <span className="w-8 h-8 border-3 border-amber-400 border-t-transparent rounded-full animate-spin" />
-                <span className="text-xs font-bold text-amber-300 uppercase tracking-wider">
+                <span className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                <span className="text-xs font-bold text-black uppercase tracking-wider">
                   Drafting LinkedIn, WhatsApp & Email messages...
                 </span>
               </div>
             ) : outreachPack ? (
               <div className="space-y-4">
                 {/* Channel Selector */}
-                <div className="flex gap-2 bg-[#090A0C] border border-[#242834] rounded-2xl p-1.5">
+                <div className="flex gap-2 bg-zinc-100 border border-zinc-200 rounded-2xl p-1.5">
                   <button
                     onClick={() => setActiveChannelTab("linkedin")}
                     className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${
                       activeChannelTab === "linkedin"
-                        ? "bg-amber-500 text-slate-950 font-black"
-                        : "text-zinc-400 hover:text-white"
+                        ? "bg-black text-white font-bold shadow-sm"
+                        : "text-zinc-600 hover:text-black"
                     }`}
                   >
                     💼 LinkedIn InMail
@@ -352,8 +352,8 @@ export default function TrackerPage() {
                     onClick={() => setActiveChannelTab("whatsapp")}
                     className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${
                       activeChannelTab === "whatsapp"
-                        ? "bg-emerald-500 text-slate-950 font-black"
-                        : "text-zinc-400 hover:text-white"
+                        ? "bg-black text-white font-bold shadow-sm"
+                        : "text-zinc-600 hover:text-black"
                     }`}
                   >
                     📱 WhatsApp DM
@@ -362,8 +362,8 @@ export default function TrackerPage() {
                     onClick={() => setActiveChannelTab("email")}
                     className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${
                       activeChannelTab === "email"
-                        ? "bg-purple-500 text-slate-950 font-black"
-                        : "text-zinc-400 hover:text-white"
+                        ? "bg-black text-white font-bold shadow-sm"
+                        : "text-zinc-600 hover:text-black"
                     }`}
                   >
                     ✉️ Follow-Up Email
@@ -372,16 +372,16 @@ export default function TrackerPage() {
 
                 {/* Tab Content */}
                 {activeChannelTab === "linkedin" && (
-                  <div className="p-4 bg-[#090A0C] border border-[#242834] rounded-2xl space-y-3">
-                    <p className="text-[11px] font-bold text-amber-300 uppercase tracking-wider">
+                  <div className="p-4 bg-zinc-50 border border-zinc-200 rounded-2xl space-y-3">
+                    <p className="text-[11px] font-black text-black uppercase tracking-wider">
                       LinkedIn Connection / InMail Note (Max 250 chars):
                     </p>
-                    <p className="text-xs text-zinc-300 font-sans leading-relaxed whitespace-pre-wrap">
+                    <p className="text-xs text-zinc-800 font-sans leading-relaxed whitespace-pre-wrap font-medium">
                       {outreachPack.linkedinMessage}
                     </p>
                     <button
                       onClick={() => copyToClipboard(outreachPack.linkedinMessage || "", "li")}
-                      className="px-4 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold rounded-xl transition-colors"
+                      className="px-4 py-2 bg-black hover:bg-zinc-800 text-white border border-black text-xs font-bold rounded-xl transition-colors shadow-sm"
                     >
                       {copiedKey === "li" ? "✓ Copied!" : "📋 Copy LinkedIn Message"}
                     </button>
@@ -389,16 +389,16 @@ export default function TrackerPage() {
                 )}
 
                 {activeChannelTab === "whatsapp" && (
-                  <div className="p-4 bg-[#090A0C] border border-[#242834] rounded-2xl space-y-3">
-                    <p className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">
+                  <div className="p-4 bg-zinc-50 border border-zinc-200 rounded-2xl space-y-3">
+                    <p className="text-[11px] font-black text-black uppercase tracking-wider">
                       WhatsApp Direct Message (Short & Professional):
                     </p>
-                    <p className="text-xs text-zinc-300 font-sans leading-relaxed whitespace-pre-wrap">
+                    <p className="text-xs text-zinc-800 font-sans leading-relaxed whitespace-pre-wrap font-medium">
                       {outreachPack.whatsappMessage}
                     </p>
                     <button
                       onClick={() => copyToClipboard(outreachPack.whatsappMessage || "", "wa")}
-                      className="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold rounded-xl transition-colors"
+                      className="px-4 py-2 bg-black hover:bg-zinc-800 text-white border border-black text-xs font-bold rounded-xl transition-colors shadow-sm"
                     >
                       {copiedKey === "wa" ? "✓ Copied!" : "📋 Copy WhatsApp Message"}
                     </button>
@@ -406,20 +406,20 @@ export default function TrackerPage() {
                 )}
 
                 {activeChannelTab === "email" && (
-                  <div className="p-4 bg-[#090A0C] border border-[#242834] rounded-2xl space-y-3">
-                    <p className="text-[11px] font-bold text-purple-300 uppercase tracking-wider">
+                  <div className="p-4 bg-zinc-50 border border-zinc-200 rounded-2xl space-y-3">
+                    <p className="text-[11px] font-black text-black uppercase tracking-wider">
                       Follow-up Email (Day 3-7 After Applying):
                     </p>
-                    <div className="space-y-1 border-b border-[#242834] pb-2">
-                      <span className="text-[10px] text-zinc-400 font-mono block">Subject:</span>
-                      <p className="text-xs font-bold text-white">{outreachPack.coldEmailSubject}</p>
+                    <div className="space-y-1 border-b border-zinc-200 pb-2">
+                      <span className="text-[10px] text-zinc-500 font-mono block font-bold">Subject:</span>
+                      <p className="text-xs font-bold text-black">{outreachPack.coldEmailSubject}</p>
                     </div>
-                    <p className="text-xs text-zinc-300 font-sans leading-relaxed whitespace-pre-wrap">
+                    <p className="text-xs text-zinc-800 font-sans leading-relaxed whitespace-pre-wrap font-medium">
                       {outreachPack.followupEmailBody}
                     </p>
                     <button
                       onClick={() => copyToClipboard(`${outreachPack.coldEmailSubject}\n\n${outreachPack.followupEmailBody}`, "em")}
-                      className="px-4 py-2 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs font-bold rounded-xl transition-colors"
+                      className="px-4 py-2 bg-black hover:bg-zinc-800 text-white border border-black text-xs font-bold rounded-xl transition-colors shadow-sm"
                     >
                       {copiedKey === "em" ? "✓ Copied!" : "📋 Copy Email Template"}
                     </button>
@@ -427,7 +427,7 @@ export default function TrackerPage() {
                 )}
               </div>
             ) : (
-              <p className="text-xs text-rose-400 py-4 text-center">
+              <p className="text-xs text-rose-600 font-bold py-4 text-center">
                 Failed to generate outreach messages. Please try again.
               </p>
             )}
