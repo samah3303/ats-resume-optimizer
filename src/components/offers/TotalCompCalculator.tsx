@@ -81,13 +81,49 @@ export function TotalCompCalculator() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Form: Inputs & Sliders (7 cols) */}
         <div className="lg:col-span-7 bg-white border border-zinc-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm">
-          <div className="pb-4 border-b border-zinc-200">
-            <h3 className="text-base sm:text-lg font-black text-black">
-              Compensation Variables
-            </h3>
-            <p className="text-xs text-zinc-600">
-              Adjust offer levers to simulate total take-home pay and equity value.
-            </p>
+          <div className="pb-4 border-b border-zinc-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 className="text-base sm:text-lg font-black text-black">
+                Compensation Variables
+              </h3>
+              <p className="text-xs text-zinc-600">
+                Adjust offer levers or load instant industry benchmark packages.
+              </p>
+            </div>
+
+            {/* 1-Click Industry Presets */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <button
+                type="button"
+                onClick={() => {
+                  setCompanyName("Meta");
+                  setRoleTitle("E5 Senior Software Engineer");
+                  setBaseSalary(205000);
+                  setAnnualBonusPercent(15);
+                  setSignOnBonus(35000);
+                  setEquityTotalGrant(320000);
+                  setEquityVestingType("standard_4yr_cliff");
+                }}
+                className="px-2.5 py-1 bg-zinc-100 hover:bg-black hover:text-white border border-zinc-300 rounded-lg text-[10px] font-bold text-black transition-all"
+              >
+                ⚡ Load Meta E5
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setCompanyName("Stripe");
+                  setRoleTitle("Staff Infrastructure Lead");
+                  setBaseSalary(240000);
+                  setAnnualBonusPercent(20);
+                  setSignOnBonus(50000);
+                  setEquityTotalGrant(450000);
+                  setEquityVestingType("standard_4yr_cliff");
+                }}
+                className="px-2.5 py-1 bg-zinc-100 hover:bg-black hover:text-white border border-zinc-300 rounded-lg text-[10px] font-bold text-black transition-all"
+              >
+                ⚡ Load Stripe Staff
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

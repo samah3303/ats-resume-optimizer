@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import Navbar from "@/components/Navbar";
 import MobileNav from "@/components/MobileNav";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
+import { UndoToastContainer } from "@/components/ui/UndoToast";
 import "./globals.css";
 
 const sora = Sora({
@@ -101,6 +102,7 @@ export default function RootLayout({
           </SessionProvider>
         </ThemeProvider>
         <ServiceWorkerRegistration />
+        <UndoToastContainer />
       </body>
     </html>
   );
