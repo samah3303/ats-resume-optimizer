@@ -13,6 +13,7 @@ import OnboardingInsights from "@/components/dashboard/OnboardingInsights";
 import EditOnboardingModal from "@/components/dashboard/EditOnboardingModal";
 import NextBestActionBanner from "@/components/NextBestActionBanner";
 import NewAnalysisModal from "@/components/dashboard/NewAnalysisModal";
+import { CareerReadinessDock } from "@/components/dashboard/CareerReadinessDock";
 import {
   Resume,
   Analysis,
@@ -195,6 +196,9 @@ function DashboardContent() {
           onNewAnalysis={() => setShowNewAnalysisModal(true)}
           onEditOnboarding={() => setShowEditModal(true)}
         />
+
+        {/* 3-Step Career Readiness Onboarding Dock */}
+        <CareerReadinessDock />
 
         {/* Error banner */}
         {dataError && (

@@ -28,29 +28,56 @@ export default function Navbar() {
           {/* Logo */}
           <Logo size="md" />
 
-          {/* Nav links — only when logged in */}
+          {/* Nav links & Persona Mode Switcher — only when logged in */}
           {session && (
-            <div className="hidden md:flex items-center gap-1.5">
-              {navLinks.map((link) => {
-                const isActive =
-                  link.href === "/dashboard"
-                    ? pathname === "/dashboard"
-                    : pathname.startsWith(link.href);
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    aria-current={isActive ? "page" : undefined}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                      isActive
-                        ? "bg-black text-white border border-black shadow-sm"
-                        : "text-zinc-600 hover:text-black hover:bg-zinc-100 border border-transparent"
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                );
-              })}
+            <div className="hidden md:flex items-center gap-3">
+              {/* Persona Switcher Pill */}
+              <div className="flex items-center p-1 bg-zinc-100 border border-zinc-300 rounded-2xl text-[11px] font-bold">
+                <Link
+                  href="/dashboard"
+                  className={`px-3 py-1 rounded-xl transition-all ${
+                    !pathname.startsWith("/dashboard/recruiter")
+                      ? "bg-black text-white shadow-xs"
+                      : "text-zinc-600 hover:text-black"
+                  }`}
+                >
+                  👤 Candidate
+                </Link>
+                <Link
+                  href="/dashboard/recruiter"
+                  className={`px-3 py-1 rounded-xl transition-all ${
+                    pathname.startsWith("/dashboard/recruiter")
+                      ? "bg-black text-white shadow-xs"
+                      : "text-zinc-600 hover:text-black"
+                  }`}
+                >
+                  👔 Recruiter
+                </Link>
+              </div>
+
+              {/* Standard Nav Links */}
+              <div className="flex items-center gap-1">
+                {navLinks.map((link) => {
+                  const isActive =
+                    link.href === "/dashboard"
+                      ? pathname === "/dashboard"
+                      : pathname.startsWith(link.href);
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      aria-current={isActive ? "page" : undefined}
+                      className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all ${
+                        isActive
+                          ? "bg-zinc-200 text-black font-black"
+                          : "text-zinc-600 hover:text-black hover:bg-zinc-100"
+                      }`}
+                    >
+                      {link.label}
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
           )}
 
