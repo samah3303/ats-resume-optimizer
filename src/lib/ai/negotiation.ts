@@ -1,4 +1,4 @@
-import { getDeepSeek, getAiModelName, parseJsonSafely } from "./client";
+import { getDeepSeek, getAiModelName, parseJsonSafely, buildCachedPrompt } from "./client";
 
 export interface CompensationPackage {
   companyName: string;
@@ -176,48 +176,30 @@ export async function simulateRecruiterNegotiationTurn(params: {
     latestCandidateMessage,
   } = params;
 
-  const prompt = `You are an expert Salary Negotiation Simulator with a dual-brain:
-1. Act as the REALISTIC RECRUITER negotiating compensation for ${companyName} (${roleTitle}).
-2. Act as the SECRET EXECUTIVE COACH providing candid, tactical advice to the candidate.
+  const recentHistory = conversationHistory.slice(-6);
 
-## Context:
-- Company: ${companyName}
-- Role: ${roleTitle}
-- Initial Offer Details: ${currentOffer}
-- Candidate Target / Goal: ${candidateGoal}
-- Recruiter Persona: ${recruiterPersona}
+  const featureSystemPrompt = `Role: Real-time Salary Negotiation Simulator. Provide:
+1. In-character Recruiter response (firm, realistic compensation levers).
+2. Secret Coach Insight with tacticDetected, leverageAnalysis, suggestedResponses (2 options), riskLevel (low|medium|high), and successProbability (0-100).
+Output JSON: {"recruiterMessage": string, "coachInsight": {"tacticDetected": string, "leverageAnalysis": string, "suggestedResponses": string[], "riskLevel": string, "successProbability": number}}`;
 
-## Conversation History so far:
-${conversationHistory
-  .map((m) => `${m.role === "user" ? "Candidate" : "Recruiter"}: ${m.content}`)
-  .join("\n")}
-Candidate: ${latestCandidateMessage}
+  const dynamicPayload = `Company: ${companyName} | Role: ${roleTitle}
+Initial Offer: ${currentOffer}
+Candidate Goal: ${candidateGoal}
+Recruiter Persona: ${recruiterPersona}
 
-Instructions:
-- Provide the recruiter's realistic in-character response. Don't fold immediately; use industry compensation logic (bands, internal equity, signing bonus levers, trade-offs).
-- Provide the secret "Coach Insight" analyzing what tactic the recruiter just used, what leverage the candidate holds, 2 suggested exact script options for the candidate's next reply, risk level, and current success probability score (0-100).
+Recent Conversation:
+${recentHistory.map((m) => `${m.role === "user" ? "Candidate" : "Recruiter"}: ${m.content}`).join("\n")}
+Candidate: ${latestCandidateMessage}`;
 
-Return JSON format:
-{
-  "recruiterMessage": "<Realistic, in-character recruiter message>",
-  "coachInsight": {
-    "tacticDetected": "<e.g., Band Anchoring / Equity Tradeoff / Exploding Timeline>",
-    "leverageAnalysis": "<Detailed analysis of where the candidate has strong leverage>",
-    "suggestedResponses": [
-      "<Option 1: Assertive value-anchored response>",
-      "<Option 2: Collaborative trade-off response focusing on sign-on or equity>"
-    ],
-    "riskLevel": "<"low" | "medium" | "high">",
-    "successProbability": <Integer 0 to 100>
-  }
-}`;
+  const messages = buildCachedPrompt(featureSystemPrompt, dynamicPayload);
 
   try {
     const response = await getDeepSeek().chat.completions.create({
       model: getAiModelName(),
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.4,
-      max_tokens: 1800,
+      messages: messages as any,
+      temperature: 0.3,
+      max_tokens: 1200,
     });
 
     const content = response.choices[0]?.message?.content || "{}";

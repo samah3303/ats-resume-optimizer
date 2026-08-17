@@ -5,7 +5,6 @@ let _aiModel = "deepseek-v4-flash";
 
 export function getDeepSeek(): OpenAI {
   if (!_deepseek) {
-    // Strategy 1: Flexible Multi-Provider LLM Client (Groq, Gemini, OpenRouter, DeepSeek)
     const groqKey = process.env.GROQ_API_KEY;
     const geminiKey = process.env.GEMINI_API_KEY;
     const openrouterKey = process.env.OPENROUTER_API_KEY;
@@ -45,6 +44,69 @@ export function getDeepSeek(): OpenAI {
 export function getAiModelName(): string {
   getDeepSeek();
   return _aiModel;
+}
+
+/**
+ * Static frozen system prompt prefix to maximize LLM Prompt Cache hits (75-90% discount).
+ */
+export const STATIC_SYSTEM_PREFIX = `You are KYRO AI, the Universal Career & Talent Operating System. Output strict, valid JSON matching requested schemas without markdown wrapper formatting unless requested.`;
+
+/**
+ * Builds a prompt array structured to maximize LLM Prompt Caching.
+ */
+export function buildCachedPrompt(featureInstructions: string, dynamicPayload: string) {
+  return [
+    { role: "system" as const, content: `${STATIC_SYSTEM_PREFIX}\n${featureInstructions}` },
+    { role: "user" as const, content: dynamicPayload },
+  ];
+}
+
+/**
+ * Deterministically prunes conversational history to a sliding window of maxTurns.
+ */
+export function pruneConversationHistory(
+  messages: Array<{ role: "system" | "user" | "assistant"; content: string }>,
+  maxTurns: number = 4
+) {
+  const nonSystem = messages.filter((m) => m.role !== "system");
+  const systemMsg = messages.find((m) => m.role === "system");
+
+  if (nonSystem.length <= maxTurns * 2) {
+    return messages;
+  }
+
+  const pruned = nonSystem.slice(-maxTurns * 2);
+  return systemMsg ? [systemMsg, ...pruned] : pruned;
+}
+
+/**
+ * Deterministically sanitizes Job Descriptions to remove legal boilerplate, EEO statements,
+ * benefits clauses, and duplicate whitespace before LLM input.
+ */
+export function sanitizeJdPayload(rawJd: string, maxChars: number = 3000): string {
+  if (!rawJd) return "";
+  return rawJd
+    .replace(/Equal Opportunity Employer[\s\S]*?(?=\n\n|$)/gi, "")
+    .replace(/EEO is the Law[\s\S]*?(?=\n\n|$)/gi, "")
+    .replace(/We celebrate diversity[\s\S]*?(?=\n\n|$)/gi, "")
+    .replace(/Benefits package includes[\s\S]*?(?=\n\n|$)/gi, "")
+    .replace(/Comprehensive health, dental[\s\S]*?(?=\n\n|$)/gi, "")
+    .replace(/\s{2,}/g, " ")
+    .trim()
+    .slice(0, maxChars);
+}
+
+/**
+ * Sanitizes raw resume text before sending to LLM (strips excessive spacing & phone/addresses).
+ */
+export function sanitizeResumePayload(rawResume: string, maxChars: number = 4000): string {
+  if (!rawResume) return "";
+  return rawResume
+    .replace(/\b\d{3}[-.]?\d{3}[-.]?\d{4}\b/g, "[PHONE]")
+    .replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g, "[EMAIL]")
+    .replace(/\s{2,}/g, " ")
+    .trim()
+    .slice(0, maxChars);
 }
 
 /**

@@ -1,4 +1,11 @@
-import { getDeepSeek, getAiModelName, parseJsonSafely } from "./client";
+import {
+  getDeepSeek,
+  getAiModelName,
+  parseJsonSafely,
+  buildCachedPrompt,
+  sanitizeJdPayload,
+  sanitizeResumePayload,
+} from "./client";
 import { extractLocalKeywordMatch, pruneJobDescription } from "../keyword-matcher";
 
 // Simple in-memory cache to prevent duplicate API calls for identical scans
@@ -79,46 +86,29 @@ export async function analyzeResumeAgainstJD({
     return localResult;
   }
 
-  // Strategy 4: Pruned Prompt (Passing Pre-Extracted Gaps)
-  const prompt = `You are an expert ATS resume coach. Your objective is to generate 7 to 10 COMPREHENSIVE, section-by-section suggestions to elevate this candidate's ATS score to 75%–80%+.
+  const cleanJd = sanitizeJdPayload(jobDescriptionText, 2200);
+  const cleanResume = sanitizeResumePayload(resumeText, 2500);
 
-CRITICAL INSTRUCTIONS:
-1. Every suggestion MUST be strictly derived from this specific resume and Job Description.
-2. "originalText" MUST quote an actual weak sentence or bullet directly from the candidate's resume.
-3. "suggestedText" MUST incorporate missing hard skills, frameworks, tools, or qualification keywords directly requested in the Job Description, rewritten using the STAR method with numbers & ROI.
-4. Output 7 to 10 suggestions spanning Summary, Work Experience, Technical Skills, Projects, and Education/Certifications.
+  const featureSystemInstructions = `Role: ATS Resume Specialist. Generate 6 to 9 high-impact suggestions elevating ATS resume scores to 80%+ using STAR metrics. Output strict JSON: {"overallScore": number, "summaryText": string, "suggestions": [{"section": string, "originalText": string, "suggestedText": string, "rationale": string}]}`;
 
-${positionTitle ? `Target Position: ${positionTitle}` : ""}
-Pre-analyzed Keyword Match %: ${localMatch.keywordsMatchPct}%
-Missing Keywords to Target: ${localMatch.keywords.missing.join(", ")}
+  const dynamicPayload = `Target Position: ${positionTitle || "Software Engineer"}
+Pre-analyzed Match %: ${localMatch.keywordsMatchPct}%
+Missing Keywords: ${localMatch.keywords.missing.join(", ")}
 Missing Skills: ${localMatch.skills.missing.join(", ")}
 
-## Job Description Excerpt:
-${prunedJd.slice(0, 2000)}
+## Job Description:
+${cleanJd}
 
-## Full Candidate Resume Text:
-${resumeText.slice(0, 3000)}
+## Candidate Resume:
+${cleanResume}`;
 
-Output a JSON object with EXACTLY this structure:
-
-{
-  "overallScore": ${Math.round((localMatch.keywordsMatchPct + localMatch.formatScore + localMatch.impactScore) / 3)},
-  "summaryText": "<2 sentence assessment highlighting how these changes reach 75-80%+ score>",
-  "suggestions": [
-    {
-      "section": "Experience",
-      "originalText": "<exact weak sentence from resume>",
-      "suggestedText": "<rewritten bullet point incorporating missing skills & metrics>",
-      "rationale": "<why this improves ATS match for this specific JD>"
-    }
-  ]
-}`;
+  const messages = buildCachedPrompt(featureSystemInstructions, dynamicPayload);
 
   const response = await getDeepSeek().chat.completions.create({
     model: getAiModelName(),
-    messages: [{ role: "user", content: prompt }],
-    temperature: 0.3,
-    max_tokens: 3500,
+    messages: messages as any,
+    temperature: 0.2,
+    max_tokens: 2200,
   });
 
   const content = response.choices[0]?.message?.content || "{}";
