@@ -1,63 +1,64 @@
 import Link from "next/link";
 import StatsAndReviewsSection from "@/components/StatsAndReviewsSection";
 import Logo from "@/components/Logo";
+import { LiveHeroDemoWidget } from "./LiveHeroDemoWidget";
 
 export default function UnauthenticatedHero() {
   const PLATFORM_MODULES = [
     {
       id: "resume-studio",
-      tag: "CANDIDATE SUITE",
-      title: "ATS Resume Studio & 6+ Template Gallery",
+      tag: "RESUME STUDIO",
+      title: "ATS Resume Builder & 6 Pro Templates",
       description:
-        "Build pixel-perfect, ATS-verified resumes with 6 curated design templates, STAR bullet rewriters, and 1-click vector optimization.",
+        "Build pixel-perfect, ATS-verified resumes with 6 design templates, inline STAR metric rewriters, and instant PDF/DOCX downloads.",
       icon: "📄",
       href: "/dashboard/builder",
-      highlights: ["6 Curated ATS Templates", "STAR Method Enhancer", "Vector ATS Pre-Flight Scan", "PDF & DOCX Exports"],
+      highlights: ["6 Tested ATS Templates", "STAR Metric Diff Enhancer", "Target Keyword Checklist", "Instant PDF & DOCX Export"],
     },
     {
       id: "coding-sandbox",
-      tag: "ENGINEERING SUITE",
-      title: "In-Browser Coding Challenge Sandbox",
+      tag: "CODING IDE",
+      title: "In-Browser Coding Practice & Big-O Analyzer",
       description:
-        "Multi-language coding playground in JavaScript, TypeScript, and Python with live unit test assertions and automated Big-O complexity analysis.",
+        "Full Monaco IDE in JS, TS, and Python with live unit test assertions, pointer visualizers, and instant Big-O complexity feedback.",
       icon: "💻",
       href: "/dashboard/challenges",
-      highlights: ["Multi-Language Monaco Editor", "Automated Assertion Runner", "Big-O Time/Space Analyzer", "Runtime & Memory Benchmarks"],
+      highlights: ["Multi-Language Monaco IDE", "Step Pointer Visualizer", "Big-O Time/Space Reviewer", "Runtime & Memory Profiling"],
     },
     {
       id: "voice-interviewer",
-      tag: "AI ROLEPLAY",
-      title: "Conversational Spoken Mock Interviewer",
+      tag: "VOICE COACH",
+      title: "Live Spoken Mock Interviews & Audio Waveforms",
       description:
-        "Practice real-time spoken interviews across 8 personas with live audio waveforms, speech cadence tracking, and post-session diagnostic scorecards.",
+        "Practice realistic spoken interviews across 8 personas with live audio waveforms, filler-word tracking, and instant STAR scorecards.",
       icon: "🎙️",
       href: "/dashboard/mock-interview",
-      highlights: ["8 Stage Persona Modes", "Real-Time Web Speech Audio", "Live Audio Waveform Canvas", "Turn-by-Turn STAR Coaching"],
+      highlights: ["8 Interviewer Personas", "Real-Time Audio Waveforms", "Filler-Word Counter HUD", "Turn-by-Turn STAR Coaching"],
     },
     {
-      id: "recruiter-os",
-      tag: "HR & RECRUITING",
-      title: "Recruiter Talent Operating System",
+      id: "video-analytics",
+      tag: "VIDEO PRESENCE",
+      title: "Webcam Gaze & Executive Composure Coach",
       description:
-        "All-in-one recruiting pipeline with AI job description generation, 8-stage candidate Kanban boards, and bulk AI ATS candidate screening.",
-      icon: "👔",
-      href: "/dashboard/recruiter",
-      highlights: ["AI Job Description Architect", "8-Stage Pipeline Kanban", "Bulk Candidate ATS Screener", "Multi-Criteria Scorecards"],
+        "Camera HUD tracking real-time eye contact directness, posture stability, and executive presence to ensure you look confident.",
+      icon: "👁️",
+      href: "/dashboard/video-analytics",
+      highlights: ["Direct Eye Contact %", "Posture Stability Meter", "Lighting Pre-Flight Check", "Executive Presence Report"],
     },
     {
       id: "job-hub",
-      tag: "JOB DISCOVERY",
-      title: "Multi-Platform Semantic Job Aggregator",
+      tag: "JOB RADAR",
+      title: "Smart Job Discovery & Autonomous Hunter Swarm",
       description:
-        "Unified job stream aggregating listings across major platforms with 384-dimensional pgvector resume semantic matching.",
-      icon: "🔍",
-      href: "/dashboard/jobs",
-      highlights: ["Unified Multi-Board Aggregator", "pgvector Semantic Match %", "Salary Transparency Radar", "1-Click Bookmark & Track"],
+        "Automatically scan 140k+ live job openings, match your exact skills, and generate tailored application packets 24/7.",
+      icon: "🤖",
+      href: "/dashboard/agents",
+      highlights: ["Autonomous Hunter Agent", "Skill Match Accuracy", "Salary Surge Insights", "1-Click Tracker Sync"],
     },
     {
       id: "negotiation-war-room",
-      tag: "COMPENSATION",
-      title: "Salary Negotiation War Room & Offer Comparator",
+      tag: "SALARY WAR ROOM",
+      title: "Salary Negotiation Simulator & 4-Year Equity",
       description:
         "Calculate 4-year total compensation with equity vesting curves, simulate live negotiations against an AI recruiter bot, and compare competing offers.",
       icon: "💰",
@@ -69,25 +70,25 @@ export default function UnauthenticatedHero() {
   return (
     <div className="flex flex-col bg-white text-zinc-950 font-sans">
       {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center text-center px-4 py-20 md:py-32 bg-white border-b border-zinc-200">
-        <div className="max-w-5xl mx-auto space-y-6">
+      <section className="flex flex-col items-center justify-center text-center px-4 py-16 md:py-24 bg-white border-b border-zinc-200">
+        <div className="max-w-5xl mx-auto space-y-8">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-zinc-100 border border-zinc-300 text-zinc-900 rounded-full text-xs font-black uppercase tracking-wider shadow-sm">
-            <span>⚡</span> THE UNIVERSAL AI CAREER & TALENT OPERATING SYSTEM
+            <span>⚡</span> THE 1-STOP AI CAREER & TALENT OPERATING SYSTEM
           </div>
 
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-black leading-[1.08]">
-            One Unified Platform for Your{" "}
+            Land Your Dream Job Faster — Powered by{" "}
             <span className="underline decoration-black decoration-3 underline-offset-8">
-              Entire Career Lifecycle.
+              Your All-in-One AI Suite.
             </span>
           </h1>
 
           <p className="text-sm sm:text-base md:text-lg text-zinc-600 max-w-3xl mx-auto leading-relaxed font-medium">
-            From <strong className="text-black">ATS Resume Engineering</strong> & <strong className="text-black">In-Browser Coding Sandboxes</strong> to <strong className="text-black">Conversational Spoken Mock Interviews</strong>, <strong className="text-black">Recruiter Talent Pipelines</strong>, and <strong className="text-black">Salary Negotiation War Rooms</strong>.
+            Beat ATS screening bots with 6 tailored resume templates, practice live spoken mock interviews with dynamic coaching, and auto-discover high-paying roles 24/7.
           </p>
 
-          {/* Dual Action CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+          {/* Primary Action CTAs */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
             <Link
               href="/login"
               className="touch-target w-full sm:w-auto px-8 py-4 bg-black hover:bg-zinc-800 text-white font-black text-xs rounded-2xl transition-all shadow-md border border-black flex items-center justify-center gap-2 active:scale-95"
@@ -100,27 +101,13 @@ export default function UnauthenticatedHero() {
               className="touch-target w-full sm:w-auto px-8 py-4 border border-zinc-300 bg-white text-black hover:bg-zinc-100 font-bold text-xs rounded-2xl transition-all shadow-sm flex items-center justify-center gap-2 active:scale-95"
             >
               <span>👔</span>
-              <span>Launch Recruiter Talent OS</span>
+              <span>For Hiring & Recruiter Teams</span>
             </Link>
           </div>
 
-          {/* Pillar Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-2 pt-6 text-xs text-zinc-700">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-zinc-50 border border-zinc-200 rounded-full font-bold text-black shadow-xs">
-              📄 ATS Resume Studio
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-zinc-50 border border-zinc-200 rounded-full font-bold text-black shadow-xs">
-              💻 Coding Sandbox & Big-O
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-zinc-50 border border-zinc-200 rounded-full font-bold text-black shadow-xs">
-              🎙️ Spoken Voice Mock Interviews
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-zinc-50 border border-zinc-200 rounded-full font-bold text-black shadow-xs">
-              👔 Recruiter Pipeline Kanban
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-zinc-50 border border-zinc-200 rounded-full font-bold text-black shadow-xs">
-              💰 Salary War Room
-            </span>
+          {/* Interactive Live Hero Demo */}
+          <div className="pt-6">
+            <LiveHeroDemoWidget />
           </div>
         </div>
       </section>
@@ -130,13 +117,13 @@ export default function UnauthenticatedHero() {
         <div className="max-w-7xl mx-auto space-y-12">
           <div className="text-center max-w-3xl mx-auto space-y-3">
             <span className="px-3.5 py-1.5 bg-zinc-100 text-zinc-900 border border-zinc-300 text-xs font-black uppercase rounded-full tracking-wider shadow-sm">
-              🛠️ FULL-SPECTRUM CAPABILITIES
+              🛠️ EVERYTHING YOU NEED TO GET HIRED
             </span>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-black tracking-tight">
-              The Complete 1-Stop AI Command Center
+              Six Specialized AI Engines in One Clean Command Center
             </h2>
             <p className="text-xs sm:text-sm text-zinc-600">
-              Explore the interconnected tools powering candidates and recruiters through every phase of the hiring process.
+              No more juggling 6 different subscriptions for resumes, LeetCode, mock interviews, and job trackers.
             </p>
           </div>
 
@@ -167,7 +154,7 @@ export default function UnauthenticatedHero() {
 
                   <div className="space-y-1.5 pt-2 border-t border-zinc-100">
                     <span className="text-[10px] uppercase font-bold text-zinc-400 block mb-1">
-                      Core Modules:
+                      Key Highlights:
                     </span>
                     <ul className="space-y-1 text-xs text-zinc-800 font-medium">
                       {mod.highlights.map((h, idx) => (
@@ -180,105 +167,112 @@ export default function UnauthenticatedHero() {
                   </div>
                 </div>
 
-                <Link
-                  href={mod.href}
-                  className="touch-target w-full py-2.5 bg-zinc-50 hover:bg-black hover:text-white border border-zinc-200 hover:border-black rounded-xl text-xs font-black text-black transition-all flex items-center justify-center gap-1.5 shadow-sm active:scale-95"
-                >
-                  <span>Launch Tool</span>
-                  <span>&rarr;</span>
-                </Link>
+                <div className="pt-4 border-t border-zinc-100">
+                  <Link
+                    href={mod.href}
+                    className="touch-target w-full py-2.5 bg-zinc-50 hover:bg-black hover:text-white border border-zinc-300 rounded-xl text-xs font-black text-black transition-all flex items-center justify-center gap-1.5 shadow-2xs group-hover:border-black"
+                  >
+                    <span>Launch Module</span>
+                    <span>&rarr;</span>
+                  </Link>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Why KYRO Differs From Competitors */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white border-b border-zinc-200">
-        <div className="max-w-5xl mx-auto space-y-12">
-          <div className="text-center max-w-3xl mx-auto space-y-3">
+      {/* Architectural Superiority Matrix */}
+      <section className="py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-white border-b border-zinc-200">
+        <div className="max-w-5xl mx-auto space-y-10">
+          <div className="text-center space-y-3">
             <span className="px-3.5 py-1.5 bg-zinc-100 text-zinc-900 border border-zinc-300 text-xs font-black uppercase rounded-full tracking-wider shadow-sm">
-              ⚔️ ARCHITECTURAL SUPERIORITY
+              ⚡ ARCHITECTURAL SUPERIORITY
             </span>
-            <h2 className="text-3xl md:text-4xl font-black text-black">
-              Generic Point Solutions vs. <span className="underline decoration-zinc-400">KYRO Ecosystem</span>
+            <h2 className="text-3xl sm:text-4xl font-black text-black tracking-tight">
+              Why KYRO Outperforms Fragmented Single-Purpose Tools
             </h2>
-            <p className="text-xs text-zinc-600">
-              Why stitching together 5 fragmented tools fails while KYRO delivers a seamless, end-to-end talent workflow.
-            </p>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full bg-white rounded-3xl border border-zinc-200 overflow-hidden shadow-sm text-xs">
+          <div className="border border-zinc-300 rounded-3xl overflow-hidden shadow-sm">
+            <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="bg-zinc-100 text-black text-left border-b border-zinc-200">
-                  <th className="p-4 font-extrabold uppercase tracking-wider">Capability</th>
-                  <th className="p-4 font-bold uppercase tracking-wider text-zinc-500">Fragmented Point Apps</th>
-                  <th className="p-4 font-extrabold uppercase tracking-wider text-black bg-zinc-50">KYRO Unified Ecosystem</th>
+                <tr className="bg-zinc-100 border-b border-zinc-300 text-black">
+                  <th className="p-4 sm:p-5 font-black uppercase tracking-wider">Capability</th>
+                  <th className="p-4 sm:p-5 font-black uppercase tracking-wider text-black bg-zinc-200/60">
+                    KYRO AI System
+                  </th>
+                  <th className="p-4 sm:p-5 font-bold uppercase tracking-wider text-zinc-500">
+                    Legacy Job Sites / Tools
+                  </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-200">
-                {[
-                  {
-                    feature: "Unified Talent Ecosystem",
-                    generic: "Separate paywalled apps for resume, jobs, coding, and mock interviews",
-                    kyro: "All 1-stop: Resume Studio, Coding Sandbox, Spoken Voice Mocks, Recruiter OS",
-                  },
-                  {
-                    feature: "Spoken Voice Mock Interviews",
-                    generic: "Static text lists of 5 generic behavioral questions",
-                    kyro: "8 Spoken Persona Modes with live audio waveforms & STAR coaching",
-                  },
-                  {
-                    feature: "In-Browser Technical Sandbox",
-                    generic: "External link to LeetCode / HackerRank with no resume sync",
-                    kyro: "Multi-language editor with unit assertions & automated Big-O analyzer",
-                  },
-                  {
-                    feature: "Recruiter & Candidate Symmetry",
-                    generic: "Candidate-only tools that ignore how recruiters screen",
-                    kyro: "Full Recruiter OS with AI Job Architect, 8-stage Kanban & ATS scorecards",
-                  },
-                  {
-                    feature: "Salary Negotiation War Room",
-                    generic: "Vague crowdsourced salary averages with no roleplay",
-                    kyro: "4-Year Equity Vesting schedules & live AI Recruiter negotiation bot",
-                  },
-                  {
-                    feature: "Pricing Transparency",
-                    generic: "High recurring paywalls ($29–$59/month)",
-                    kyro: "100% Free full access for job seekers and candidates",
-                  },
-                ].map((row, idx) => (
-                  <tr key={idx} className="hover:bg-zinc-50 transition-colors">
-                    <td className="p-4 font-bold text-black">{row.feature}</td>
-                    <td className="p-4 text-zinc-500">{row.generic}</td>
-                    <td className="p-4 font-bold text-black bg-zinc-50/50">
-                      ✓ {row.kyro}
-                    </td>
-                  </tr>
-                ))}
+              <tbody className="divide-y divide-zinc-200 font-medium">
+                <tr>
+                  <td className="p-4 sm:p-5 font-bold text-black">ATS Resume Studio</td>
+                  <td className="p-4 sm:p-5 text-black font-bold bg-zinc-50/50">
+                    ✓ 6 Templates + Inline STAR Diff Rewriter + Vector Scan
+                  </td>
+                  <td className="p-4 sm:p-5 text-zinc-500">Basic static PDF builder without AI metric diffs</td>
+                </tr>
+                <tr>
+                  <td className="p-4 sm:p-5 font-bold text-black">Coding & System Design</td>
+                  <td className="p-4 sm:p-5 text-black font-bold bg-zinc-50/50">
+                    ✓ In-Browser Monaco IDE + Big-O Analyzer + SVG Whiteboard
+                  </td>
+                  <td className="p-4 sm:p-5 text-zinc-500">Separate subscription required (LeetCode / Excalidraw)</td>
+                </tr>
+                <tr>
+                  <td className="p-4 sm:p-5 font-bold text-black">Interview Preparation</td>
+                  <td className="p-4 sm:p-5 text-black font-bold bg-zinc-50/50">
+                    ✓ Spoken Voice Mocks (8 Personas) + Video Composure HUD
+                  </td>
+                  <td className="p-4 sm:p-5 text-zinc-500">Text-only static question lists</td>
+                </tr>
+                <tr>
+                  <td className="p-4 sm:p-5 font-bold text-black">Salary Negotiation</td>
+                  <td className="p-4 sm:p-5 text-black font-bold bg-zinc-50/50">
+                    ✓ 4-Year Equity Curves + AI Recruiter Roleplay Simulator
+                  </td>
+                  <td className="p-4 sm:p-5 text-zinc-500">Static self-reported averages without simulation</td>
+                </tr>
+                <tr>
+                  <td className="p-4 sm:p-5 font-bold text-black">Autonomous Search</td>
+                  <td className="p-4 sm:p-5 text-black font-bold bg-zinc-50/50">
+                    ✓ Hunter Agent Swarm + 1-Click Application Tracker Sync
+                  </td>
+                  <td className="p-4 sm:p-5 text-zinc-500">Manual copy-pasting into spreadsheets</td>
+                </tr>
               </tbody>
             </table>
           </div>
         </div>
       </section>
 
-      {/* Social Proof & Numbers */}
+      {/* Social Proof & Testimonials */}
       <StatsAndReviewsSection />
 
-      {/* Footer */}
-      <footer className="py-12 px-4 sm:px-6 lg:px-8 bg-white border-t border-zinc-200">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
-          <Logo size="md" />
-
-          <p className="text-xs text-zinc-500 text-center sm:text-right">
-            &copy; {new Date().getFullYear()} <strong>KYRO AI</strong>. The Universal Career & Talent Operating System.
-            <br />
-            Built with ❤️ for job seekers and hiring teams worldwide.
+      {/* Bottom Final CTA */}
+      <section className="py-20 md:py-28 px-4 text-center bg-zinc-50 border-t border-zinc-200">
+        <div className="max-w-3xl mx-auto space-y-6">
+          <Logo size="lg" />
+          <h2 className="text-3xl sm:text-5xl font-black text-black tracking-tight">
+            Ready to Take Control of Your Career?
+          </h2>
+          <p className="text-sm text-zinc-600 max-w-xl mx-auto leading-relaxed">
+            Join thousands of ambitious engineers and professionals using KYRO to master interviews and secure top-tier compensation.
           </p>
+          <div className="pt-2">
+            <Link
+              href="/login"
+              className="touch-target inline-flex items-center gap-2 px-10 py-4 bg-black hover:bg-zinc-800 text-white font-black text-xs rounded-2xl transition-all shadow-lg border border-black active:scale-95"
+            >
+              <span>Get Started Free — No Credit Card Needed</span>
+              <span>&rarr;</span>
+            </Link>
+          </div>
         </div>
-      </footer>
+      </section>
     </div>
   );
 }
