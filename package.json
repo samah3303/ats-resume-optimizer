@@ -9,11 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^4.0.29",
     "@neondatabase/serverless": "^1.1.0",
     "@prisma/adapter-neon": "^7.8.0",
     "@prisma/client": "^5.22.0",
-    "ai": "^7.0.51",
     "bcryptjs": "^3.0.3",
     "docx": "^9.7.1",
     "fast-xml-parser": "^5.9.3",
