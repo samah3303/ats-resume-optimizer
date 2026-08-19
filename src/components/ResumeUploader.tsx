@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback, type DragEvent, type ChangeEvent } from "react";
+import { useState, useCallback, type DragEvent, type ChangeEvent, useActionState, useEffect, useRef } from "react";
+import { uploadResumeAction, UploadState } from "@/app/actions/resume";
 
 interface ResumeUploaderProps {
   onUploaded: (resume: { id: string; name: string }) => void;
@@ -36,91 +37,60 @@ function detectFormat(file: File): "pdf" | "doc" | "docx" | null {
 
 export default function ResumeUploader({ onUploaded, onFormatDetected }: ResumeUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  
+  const [state, formAction, isPending] = useActionState<UploadState, FormData>(uploadResumeAction, {});
+  const [optimisticFileName, setOptimisticFileName] = useState<string | null>(null);
 
-  const validateFile = (file: File): string | null => {
-    const typeAllowed = ALLOWED_TYPES.includes(file.type);
-    const extAllowed = ALLOWED_EXTENSIONS.some((ext) =>
-      file.name.toLowerCase().endsWith(ext)
-    );
-    if (!typeAllowed && !extAllowed) {
-      return "Only PDF, DOC, and DOCX files are supported.";
+  // Effect to handle successful upload callback
+  useEffect(() => {
+    if (state.success && state.resume) {
+      onUploaded(state.resume);
     }
-    if (file.size > MAX_SIZE) {
-      return "File must be under 5MB.";
-    }
-    return null;
-  };
+  }, [state, onUploaded]);
 
-  const uploadFile = useCallback(
-    async (file: File) => {
-      const validationError = validateFile(file);
-      if (validationError) {
-        setError(validationError);
-        return;
-      }
-      setError(null);
-
-      // Detect format and notify parent
+  const processFile = (file: File) => {
+    setOptimisticFileName(file.name);
+    // Use DataTransfer to programmatically set the file input and submit the form
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    const fileInput = document.getElementById("resume-upload") as HTMLInputElement;
+    if (fileInput) {
+      fileInput.files = dataTransfer.files;
       const format = detectFormat(file);
       if (format && onFormatDetected) {
         onFormatDetected(format);
       }
-
-      setUploading(true);
-
-      try {
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const res = await fetch("/api/resumes", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!res.ok) {
-          let errorMsg = "Upload failed";
-          try {
-            const data = await res.json();
-            errorMsg = data.error || errorMsg;
-          } catch {
-            errorMsg = `Server error (${res.status}). Please try again.`;
-          }
-          throw new Error(errorMsg);
-        }
-
-        const data = await res.json();
-        onUploaded(data.resume);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Upload failed");
-      } finally {
-        setUploading(false);
-      }
-    },
-    [onUploaded, onFormatDetected]
-  );
+      formRef.current?.requestSubmit();
+    }
+  };
 
   const handleDrop = useCallback(
     (e: DragEvent<HTMLDivElement>) => {
       e.preventDefault();
       setIsDragging(false);
       const file = e.dataTransfer.files?.[0];
-      if (file) uploadFile(file);
+      if (file) {
+        processFile(file);
+      }
     },
-    [uploadFile]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
   );
 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
-      if (file) uploadFile(file);
+      if (file) {
+        processFile(file);
+      }
     },
-    [uploadFile]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
   );
-
+  
   return (
-    <div>
+    <form ref={formRef} action={formAction}>
       <div
         onDragOver={(e) => {
           e.preventDefault();
@@ -136,11 +106,12 @@ export default function ResumeUploader({ onUploaded, onFormatDetected }: ResumeU
       >
         <input
           type="file"
+          name="file"
           accept=".pdf,.docx,.doc"
           onChange={handleChange}
           className="hidden"
           id="resume-upload"
-          disabled={uploading}
+          disabled={isPending || state.success}
         />
         <label
           htmlFor="resume-upload"
@@ -154,11 +125,18 @@ export default function ResumeUploader({ onUploaded, onFormatDetected }: ResumeU
             }
           }}
         >
-          {uploading ? (
+          {isPending ? (
             <div className="flex flex-col items-center gap-2">
               <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin" />
-              <p className="text-sm font-medium text-zinc-600">Uploading...</p>
+              <p className="text-sm font-medium text-zinc-600">
+                {optimisticFileName ? `Uploading ${optimisticFileName}...` : 'Uploading and Parsing...'}
+              </p>
             </div>
+          ) : state.success ? (
+             <div className="flex flex-col items-center gap-2">
+               <div className="w-8 h-8 text-green-600 bg-green-100 rounded-full flex items-center justify-center">✓</div>
+               <p className="text-sm font-medium text-green-700">Success!</p>
+             </div>
           ) : (
             <div className="flex flex-col items-center gap-2">
               <div className="w-12 h-12 bg-black text-white rounded-2xl flex items-center justify-center shadow-sm">
@@ -187,11 +165,11 @@ export default function ResumeUploader({ onUploaded, onFormatDetected }: ResumeU
           )}
         </label>
       </div>
-      {error && (
+      {state.error && (
         <p className="mt-2 text-xs font-medium text-red-600 bg-red-50 border border-red-200 px-3 py-2 rounded-xl">
-          {error}
+          {state.error}
         </p>
       )}
-    </div>
+    </form>
   );
 }

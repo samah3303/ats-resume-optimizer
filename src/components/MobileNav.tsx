@@ -3,6 +3,7 @@
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useWorkspaceMode } from "./WorkspaceModeContext";
 
 interface MobileLink {
   href: string;
@@ -11,22 +12,32 @@ interface MobileLink {
   badgeCount?: number;
 }
 
-const mobileLinks: MobileLink[] = [
+const candidateMobileLinks: MobileLink[] = [
   { href: "/dashboard", label: "Home", emoji: "🏠" },
   { href: "/dashboard/jobs", label: "Jobs", emoji: "🔍" },
-  { href: "/dashboard/resumes", label: "Resume", emoji: "📝" },
-  { href: "/dashboard/tools", label: "Prep", emoji: "🎯" },
+  { href: "/dashboard/builder", label: "Studio", emoji: "📄" },
+  { href: "/dashboard/interview", label: "Prep", emoji: "🎯" },
   { href: "/dashboard/tracker", label: "Track", emoji: "📋" },
+];
+
+const recruiterMobileLinks: MobileLink[] = [
+  { href: "/dashboard/recruiter", label: "HQ", emoji: "👔" },
+  { href: "/dashboard/recruiter/pipeline/engineering-lead-01", label: "Pipelines", emoji: "📋" },
+  { href: "/dashboard/interview-rooms", label: "Rooms", emoji: "📹" },
+  { href: "/dashboard/agents", label: "Swarm", emoji: "🤖" },
+  { href: "/dashboard", label: "Candidate", emoji: "👤" },
 ];
 
 export default function MobileNav() {
   const { data: session } = useSession();
   const pathname = usePathname();
+  const { mode } = useWorkspaceMode();
 
-  // Only render bottom navigation for authenticated logged-in users
   if (!session?.user) {
     return null;
   }
+
+  const currentLinks = mode === "recruiter" ? recruiterMobileLinks : candidateMobileLinks;
 
   return (
     <nav
@@ -34,10 +45,8 @@ export default function MobileNav() {
       role="navigation"
       aria-label="Mobile main navigation"
     >
-      {/* Pure white backdrop */}
       <div className="absolute inset-0 bg-white/95 backdrop-blur-lg border-t border-zinc-200 shadow-md" />
 
-      {/* Fixed 5-Column Touch Target Grid */}
       <div
         className="relative grid grid-cols-5 items-center px-1 py-1"
         style={{
@@ -45,10 +54,10 @@ export default function MobileNav() {
           height: "calc(60px + env(safe-area-inset-bottom, 0px))",
         }}
       >
-        {mobileLinks.map((link, index) => {
+        {currentLinks.map((link, index) => {
           const isActive =
-            link.href === "/dashboard"
-              ? pathname === "/dashboard"
+            link.href === "/dashboard" || link.href === "/dashboard/recruiter"
+              ? pathname === link.href
               : pathname.startsWith(link.href);
 
           const isCenterTab = index === 2;

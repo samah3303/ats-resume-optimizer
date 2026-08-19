@@ -5,21 +5,30 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ProfileDropdown from "./ProfileDropdown";
 import Logo from "./Logo";
+import { useWorkspaceMode } from "./WorkspaceModeContext";
 
-const navLinks = [
-  { href: "/dashboard", label: "Home" },
+const candidateNavLinks = [
+  { href: "/dashboard", label: "Dashboard" },
   { href: "/dashboard/jobs", label: "Jobs" },
   { href: "/dashboard/builder", label: "Studio" },
   { href: "/dashboard/challenges", label: "Code" },
-  { href: "/dashboard/tools", label: "Prep" },
-  { href: "/dashboard/tracker", label: "Track" },
-  { href: "/dashboard/recruiter", label: "Recruiter" },
+  { href: "/dashboard/interview", label: "Prep" },
+  { href: "/dashboard/tracker", label: "Tracker" },
+];
+
+const recruiterNavLinks = [
+  { href: "/dashboard/recruiter", label: "Recruiter HQ" },
+  { href: "/dashboard/recruiter/pipeline/engineering-lead-01", label: "Pipelines" },
+  { href: "/dashboard/interview-rooms", label: "Video Rooms" },
 ];
 
 export default function Navbar() {
   const { data: session } = useSession();
   const pathname = usePathname();
+  const { mode, setMode } = useWorkspaceMode();
   const unreadCount = 0;
+
+  const currentNavLinks = mode === "recruiter" ? recruiterNavLinks : candidateNavLinks;
 
   return (
     <nav className="bg-white/95 backdrop-blur-md border-b border-zinc-200 sticky top-0 z-50 transition-colors" role="navigation" aria-label="Main navigation">
@@ -28,39 +37,43 @@ export default function Navbar() {
           {/* Logo */}
           <Logo size="md" />
 
-          {/* Nav links & Persona Mode Switcher — only when logged in */}
+          {/* Persona Mode Switcher & Filtered Nav Links — only when logged in */}
           {session && (
             <div className="hidden md:flex items-center gap-3">
               {/* Persona Switcher Pill */}
               <div className="flex items-center p-1 bg-zinc-100 border border-zinc-300 rounded-2xl text-[11px] font-bold">
-                <Link
-                  href="/dashboard"
-                  className={`px-3 py-1 rounded-xl transition-all ${
-                    !pathname.startsWith("/dashboard/recruiter")
+                <button
+                  type="button"
+                  onClick={() => setMode("candidate")}
+                  className={`px-3 py-1 rounded-xl transition-all flex items-center gap-1 cursor-pointer ${
+                    mode === "candidate"
                       ? "bg-black text-white shadow-xs"
                       : "text-zinc-600 hover:text-black"
                   }`}
                 >
-                  👤 Candidate
-                </Link>
-                <Link
-                  href="/dashboard/recruiter"
-                  className={`px-3 py-1 rounded-xl transition-all ${
-                    pathname.startsWith("/dashboard/recruiter")
+                  <span>👤</span>
+                  <span>Candidate Suite</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMode("recruiter")}
+                  className={`px-3 py-1 rounded-xl transition-all flex items-center gap-1 cursor-pointer ${
+                    mode === "recruiter"
                       ? "bg-black text-white shadow-xs"
                       : "text-zinc-600 hover:text-black"
                   }`}
                 >
-                  👔 Recruiter
-                </Link>
+                  <span>👔</span>
+                  <span>Recruiter OS</span>
+                </button>
               </div>
 
-              {/* Standard Nav Links */}
+              {/* Persona-Specific Nav Links */}
               <div className="flex items-center gap-1">
-                {navLinks.map((link) => {
+                {currentNavLinks.map((link) => {
                   const isActive =
-                    link.href === "/dashboard"
-                      ? pathname === "/dashboard"
+                    link.href === "/dashboard" || link.href === "/dashboard/recruiter"
+                      ? pathname === link.href
                       : pathname.startsWith(link.href);
                   return (
                     <Link
@@ -69,7 +82,7 @@ export default function Navbar() {
                       aria-current={isActive ? "page" : undefined}
                       className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all ${
                         isActive
-                          ? "bg-zinc-200 text-black font-black"
+                          ? "bg-black text-white font-black shadow-xs"
                           : "text-zinc-600 hover:text-black hover:bg-zinc-100"
                       }`}
                     >

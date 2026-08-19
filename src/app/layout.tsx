@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import MobileNav from "@/components/MobileNav";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import { UndoToastContainer } from "@/components/ui/UndoToast";
+import { WorkspaceModeProvider } from "@/components/WorkspaceModeContext";
 import "./globals.css";
 
 const sora = Sora({
@@ -96,9 +97,11 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-white text-zinc-950 font-sans selection:bg-black selection:text-white">
         <ThemeProvider>
           <SessionProvider>
-            <Navbar />
-            <main className="flex-1 pb-safe">{children}</main>
-            <MobileNav />
+            <WorkspaceModeProvider>
+              <Navbar />
+              <main className="flex-1 pb-safe">{children}</main>
+              <MobileNav />
+            </WorkspaceModeProvider>
           </SessionProvider>
         </ThemeProvider>
         <ServiceWorkerRegistration />
