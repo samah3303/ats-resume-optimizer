@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useWorkspaceMode } from "./WorkspaceModeContext";
+import ProfileDropdown from "./ProfileDropdown";
 
 export default function BottomActionDock() {
   const { data: session } = useSession();
@@ -27,11 +28,11 @@ export default function BottomActionDock() {
 
   const isHome = pathname === "/dashboard" || pathname === "/dashboard/recruiter";
   const isTracker = pathname === "/dashboard/tracker" || pathname.includes("/pipeline/");
-  const isStudio = pathname === "/dashboard/builder" || pathname === "/dashboard/recruiter";
+  const isStudio = pathname === "/dashboard/builder";
 
   return (
     <div className="fixed bottom-4 left-0 right-0 z-40 flex justify-center px-4 pointer-events-none">
-      <div className="pointer-events-auto bg-white/95 backdrop-blur-xl border border-zinc-300 shadow-2xl rounded-full px-4 py-2 flex items-center gap-1 sm:gap-2 transition-all">
+      <div className="pointer-events-auto bg-white/95 backdrop-blur-xl border border-zinc-300 shadow-2xl rounded-full px-3.5 py-1.5 flex items-center gap-1.5 sm:gap-2.5 transition-all">
         {/* 1. Hub Tile Navigation */}
         <Link
           href={mode === "candidate" ? "/dashboard" : "/dashboard/recruiter"}
@@ -87,19 +88,10 @@ export default function BottomActionDock() {
           <span className="hidden sm:inline">{mode === "candidate" ? "Tracker" : "Pipelines"}</span>
         </Link>
 
-        {/* 5. Quick Studio / HQ */}
-        <Link
-          href={mode === "candidate" ? "/dashboard/builder" : "/dashboard/recruiter"}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
-            isStudio && !isHome
-              ? "bg-black text-white shadow-xs font-black"
-              : "text-zinc-600 hover:text-black hover:bg-zinc-100"
-          }`}
-          aria-label="Core Studio"
-        >
-          <span className="text-sm">{mode === "candidate" ? "📄" : "👔"}</span>
-          <span className="hidden sm:inline">{mode === "candidate" ? "Studio" : "HQ"}</span>
-        </Link>
+        {/* 5. Account / Profile Avatar Icon Mounted Exclusively in Bottom Dock */}
+        <div className="pl-1 border-l border-zinc-200 flex items-center">
+          <ProfileDropdown />
+        </div>
       </div>
     </div>
   );

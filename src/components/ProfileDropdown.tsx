@@ -85,7 +85,7 @@ export default function ProfileDropdown() {
       {open && (
         <div
           role="menu"
-          className="absolute right-0 top-12 w-64 bg-white rounded-2xl border border-zinc-200 shadow-xl z-50 py-2 animate-in fade-in"
+          className="absolute right-0 bottom-12 w-64 bg-white rounded-2xl border border-zinc-200 shadow-2xl z-50 py-2 animate-in fade-in slide-in-from-bottom-2"
         >
           {/* User info */}
           <div className="px-4 py-3 border-b border-zinc-100">

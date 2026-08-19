@@ -1,7 +1,6 @@
 "use client";
 
 import { useSession, signIn } from "next-auth/react";
-import ProfileDropdown from "./ProfileDropdown";
 import Logo from "./Logo";
 
 export default function Navbar() {
@@ -19,9 +18,9 @@ export default function Navbar() {
           {/* Left: KYRO Monogram & Brand Logo */}
           <Logo size="md" />
 
-          {/* Right: Notifications & Profile Avatar ONLY (Zero Topbar Clutter) */}
+          {/* Right: Notifications ONLY (Zero Avatar/Profile in Top Bar) */}
           <div className="flex items-center gap-3">
-            {session && (
+            {session ? (
               <button
                 className="relative p-2 text-zinc-600 hover:text-black hover:bg-zinc-100 rounded-full transition-colors cursor-pointer"
                 aria-label="Notifications"
@@ -33,10 +32,6 @@ export default function Navbar() {
                   </span>
                 )}
               </button>
-            )}
-
-            {session ? (
-              <ProfileDropdown />
             ) : (
               <button
                 onClick={() => signIn(undefined, { callbackUrl: "/dashboard" })}
