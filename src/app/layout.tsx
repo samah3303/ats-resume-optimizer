@@ -3,10 +3,10 @@ import { Sora, JetBrains_Mono } from "next/font/google";
 import SessionProvider from "@/components/SessionProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import Navbar from "@/components/Navbar";
-import MobileNav from "@/components/MobileNav";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import { UndoToastContainer } from "@/components/ui/UndoToast";
 import { WorkspaceModeProvider } from "@/components/WorkspaceModeContext";
+import BottomActionDock from "@/components/BottomActionDock";
 import "./globals.css";
 
 const sora = Sora({
@@ -99,8 +99,8 @@ export default function RootLayout({
           <SessionProvider>
             <WorkspaceModeProvider>
               <Navbar />
-              <main className="flex-1 pb-safe">{children}</main>
-              <MobileNav />
+              <main className="flex-1 pb-24">{children}</main>
+              <BottomActionDock />
             </WorkspaceModeProvider>
           </SessionProvider>
         </ThemeProvider>

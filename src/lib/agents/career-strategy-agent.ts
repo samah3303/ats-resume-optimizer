@@ -124,7 +124,6 @@ Return ONLY JSON.`;
     model,
     prompt: gapPrompt,
     temperature: 0.3,
-    maxTokens: 3000,
   });
 
   const gapAnalysis = parseJsonSafely<{
@@ -163,7 +162,6 @@ Return ONLY JSON array.`;
     model,
     prompt: coursePrompt,
     temperature: 0.5,
-    maxTokens: 2000,
   });
 
   const courses = parseJsonSafely<CourseRecommendation[]>(courseResult.text, []);
@@ -202,7 +200,6 @@ Output JSON:
     model,
     prompt: roadmapPrompt,
     temperature: 0.3,
-    maxTokens: 3000,
   });
 
   const roadmap = parseJsonSafely<{
@@ -231,7 +228,6 @@ Output a concise timeline text (200-300 words) with Month 1 through Month 6 mile
     model,
     prompt: timelinePrompt,
     temperature: 0.4,
-    maxTokens: 800,
   });
 
   console.log(

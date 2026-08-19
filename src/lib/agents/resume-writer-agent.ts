@@ -79,7 +79,6 @@ Start directly with candidate name line, title line, and contact info line. Use 
     model,
     prompt: v1Prompt,
     temperature: 0.4,
-    maxTokens: 4096,
   });
 
   currentText = v1Result.text || params.resumeText;
@@ -118,7 +117,6 @@ Return ONLY JSON.`;
       model,
       prompt: critiquePrompt,
       temperature: 0.2,
-      maxTokens: 1000,
     });
 
     const critique = parseJsonSafely<{
@@ -147,7 +145,6 @@ Return ONLY the full revised resume.`;
       model,
       prompt: revisePrompt,
       temperature: 0.3,
-      maxTokens: 4096,
     });
 
     if (reviseResult.text) {
@@ -175,7 +172,6 @@ Return ONLY the polished resume.`;
     model,
     prompt: polishPrompt,
     temperature: 0.1,
-    maxTokens: 4096,
   });
 
   if (polishResult.text) {

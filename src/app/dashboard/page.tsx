@@ -14,7 +14,7 @@ import EditOnboardingModal from "@/components/dashboard/EditOnboardingModal";
 import NextBestActionBanner from "@/components/NextBestActionBanner";
 import NewAnalysisModal from "@/components/dashboard/NewAnalysisModal";
 import { CareerReadinessDock } from "@/components/dashboard/CareerReadinessDock";
-import { WorkspaceTileLauncher } from "@/components/dashboard/WorkspaceTileLauncher";
+import { StepByStepTileNavigator } from "@/components/tiles/StepByStepTileNavigator";
 import {
   Resume,
   Analysis,
@@ -201,8 +201,8 @@ function DashboardContent() {
         {/* 3-Step Career Readiness Onboarding Dock */}
         <CareerReadinessDock />
 
-        {/* Dynamic Tile Launcher (Screen 1: 2-Tile Workspace Selector / Screen 2: Persona Feature Tile Grid) */}
-        <WorkspaceTileLauncher />
+        {/* Progressive Step-by-Step Multi-Stage Tile Navigator */}
+        <StepByStepTileNavigator />
 
         {/* Error banner */}
         {dataError && (
