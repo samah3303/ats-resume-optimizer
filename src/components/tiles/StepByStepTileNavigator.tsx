@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useWorkspaceMode } from "@/components/WorkspaceModeContext";
+import { useWorkspaceMode, WorkspaceMode } from "@/components/WorkspaceModeContext";
 
 export interface SubFeatureItem {
   id: string;
@@ -361,12 +361,14 @@ const recruiterCategories: CategoryGroup[] = [
 
 export function StepByStepTileNavigator() {
   const { mode, setMode } = useWorkspaceMode();
+  const [selectedPersona, setSelectedPersona] = useState<WorkspaceMode | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<CategoryGroup | null>(null);
 
-  const categories = mode === "recruiter" ? recruiterCategories : candidateCategories;
+  const activeMode = selectedPersona || mode;
+  const categories = activeMode === "recruiter" ? recruiterCategories : candidateCategories;
 
   // STAGE 3: Sub-Feature Tiles inside a specific Category
-  if (selectedCategory) {
+  if (selectedPersona && selectedCategory) {
     return (
       <div className="space-y-6 animate-in fade-in zoom-in-95 duration-150">
         {/* Breadcrumb Header */}
@@ -378,10 +380,10 @@ export function StepByStepTileNavigator() {
               className="text-xs font-bold text-zinc-500 hover:text-black flex items-center gap-1.5 cursor-pointer mb-1.5 transition-colors"
             >
               <span>←</span>
-              <span>Back to {mode === "candidate" ? "Candidate Hub" : "Recruiter Hub"}</span>
+              <span>Back to {activeMode === "candidate" ? "Candidate Categories" : "Recruiter Categories"}</span>
             </button>
             <div className="flex items-center gap-2">
-              <span className="text-xl">{selectedCategory.icon}</span>
+              <span className="text-2xl">{selectedCategory.icon}</span>
               <h2 className="text-xl sm:text-2xl font-black text-black tracking-tight">
                 {selectedCategory.title}
               </h2>
@@ -390,17 +392,17 @@ export function StepByStepTileNavigator() {
           </div>
 
           <span className="px-3 py-1 bg-zinc-100 border border-zinc-300 text-xs font-black rounded-xl text-black self-start sm:self-auto">
-            {selectedCategory.features.length} Focused Tools
+            {selectedCategory.features.length} Dedicated Tools
           </span>
         </div>
 
         {/* Feature Tiles Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {selectedCategory.features.map((feature) => (
             <Link
               key={feature.id}
               href={feature.href}
-              className="p-6 bg-white border border-zinc-200 hover:border-black rounded-3xl shadow-xs hover:shadow-xl transition-all flex flex-col justify-between space-y-5 group hover:-translate-y-1 relative"
+              className="p-6 bg-white border border-zinc-200 hover:border-black rounded-3xl shadow-xs hover:shadow-xl transition-all flex flex-col justify-between space-y-5 group hover:-translate-y-1 relative active:scale-[0.98]"
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="w-12 h-12 rounded-2xl bg-zinc-100 border border-zinc-200 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform shadow-xs">
@@ -431,7 +433,7 @@ export function StepByStepTileNavigator() {
               </div>
 
               <div className="pt-3 border-t border-zinc-100 flex items-center justify-between text-xs font-bold text-black group-hover:underline">
-                <span>Launch Single Screen</span>
+                <span>Launch Tool</span>
                 <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
               </div>
             </Link>
@@ -441,70 +443,55 @@ export function StepByStepTileNavigator() {
     );
   }
 
-  // STAGE 2: Category Tile Hub
-  return (
-    <div className="space-y-8 animate-in fade-in duration-150">
-      {/* Active Persona Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 bg-zinc-50 border border-zinc-200 rounded-3xl shadow-xs">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-black text-white flex items-center justify-center text-lg shadow-sm">
-            {mode === "candidate" ? "👤" : "👔"}
-          </div>
+  // STAGE 2: Category Tile Hub (when a persona is selected)
+  if (selectedPersona) {
+    return (
+      <div className="space-y-6 animate-in fade-in duration-150">
+        {/* Header with Back to 2-Tile Persona Selector */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-200">
           <div>
+            <button
+              type="button"
+              onClick={() => setSelectedPersona(null)}
+              className="text-xs font-bold text-zinc-500 hover:text-black flex items-center gap-1.5 cursor-pointer mb-1.5 transition-colors"
+            >
+              <span>←</span>
+              <span>Back to Workspace Selector (2 Tiles)</span>
+            </button>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-black uppercase tracking-wider text-zinc-500">
-                KYRO WORKSPACE TILE OS
-              </span>
-              <span className="px-2 py-0.2 rounded-md bg-black text-white text-[9px] font-black uppercase">
-                {mode === "candidate" ? "Candidate Suite" : "Recruiter OS"}
-              </span>
+              <span className="text-2xl">{activeMode === "candidate" ? "👤" : "👔"}</span>
+              <h2 className="text-xl sm:text-2xl font-black text-black tracking-tight">
+                {activeMode === "candidate"
+                  ? "Candidate & Engineering Suite"
+                  : "Recruiter Talent Operating System"}
+              </h2>
             </div>
-            <h3 className="text-sm sm:text-base font-black text-black mt-0.5">
-              {mode === "candidate"
-                ? "Candidate Career & Engineering Command Center"
-                : "Recruiter Talent & Pipeline Operating System"}
-            </h3>
+            <p className="text-xs text-zinc-600 mt-1">
+              Select a category below to access dedicated single-purpose tools.
+            </p>
           </div>
-        </div>
 
-        {/* 2-Option Persona Switcher Pill */}
-        <div className="flex items-center p-1 bg-white border border-zinc-300 rounded-2xl text-[11px] font-bold shadow-xs">
           <button
             type="button"
-            onClick={() => setMode("candidate")}
-            className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer ${
-              mode === "candidate" ? "bg-black text-white font-black shadow-xs" : "text-zinc-600 hover:text-black"
-            }`}
+            onClick={() => {
+              const nextMode = activeMode === "candidate" ? "recruiter" : "candidate";
+              setSelectedPersona(nextMode);
+              setMode(nextMode);
+            }}
+            className="touch-target px-4 py-2 bg-white hover:bg-zinc-100 border border-zinc-300 text-black text-xs font-bold rounded-xl transition-all shadow-xs flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
           >
-            👤 Candidate
-          </button>
-          <button
-            type="button"
-            onClick={() => setMode("recruiter")}
-            className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer ${
-              mode === "recruiter" ? "bg-black text-white font-black shadow-xs" : "text-zinc-600 hover:text-black"
-            }`}
-          >
-            👔 Recruiter
+            <span>⇄</span>
+            <span>Switch to {activeMode === "candidate" ? "Recruiter OS" : "Candidate Suite"}</span>
           </button>
         </div>
-      </div>
 
-      {/* Category Tiles Grid */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-base sm:text-lg font-black text-black">
-            Select Feature Category ({categories.length} Categories)
-          </h2>
-          <span className="text-xs text-zinc-500 font-medium">Click tile to view dedicated tools</span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {/* Category Tiles Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {categories.map((category) => (
             <div
               key={category.id}
               onClick={() => setSelectedCategory(category)}
-              className="p-7 bg-white border border-zinc-200 hover:border-black rounded-3xl cursor-pointer shadow-xs hover:shadow-xl transition-all flex flex-col justify-between space-y-6 group hover:-translate-y-1 relative"
+              className="p-6 sm:p-7 bg-white border border-zinc-200 hover:border-black rounded-3xl cursor-pointer shadow-xs hover:shadow-xl transition-all flex flex-col justify-between space-y-5 group hover:-translate-y-1 relative active:scale-[0.98]"
             >
               <div className="flex items-start justify-between">
                 <div className="w-14 h-14 rounded-2xl bg-zinc-100 border border-zinc-200 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform shadow-xs">
@@ -530,6 +517,119 @@ export function StepByStepTileNavigator() {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  // STAGE 1 (DEFAULT HOME): Mobile-First 2 TILES ONLY
+  return (
+    <div className="space-y-6 sm:space-y-8 animate-in fade-in zoom-in-95 duration-200 max-w-4xl mx-auto">
+      {/* Title Header */}
+      <div className="text-center space-y-2">
+        <span className="px-3 py-1 rounded-full bg-zinc-100 border border-zinc-300 text-[10px] font-black uppercase tracking-wider text-black">
+          SELECT YOUR WORKSPACE
+        </span>
+        <h2 className="text-2xl sm:text-4xl font-black text-black tracking-tight">
+          Choose How You Want to Use KYRO
+        </h2>
+        <p className="text-xs sm:text-sm text-zinc-600 max-w-md mx-auto">
+          Tap one of the two options below to unlock your role-specific tools.
+        </p>
+      </div>
+
+      {/* MOBILE-FIRST 2 HERO TILES */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+        {/* TILE 1: CANDIDATE SUITE */}
+        <div
+          onClick={() => {
+            setSelectedPersona("candidate");
+            setMode("candidate");
+          }}
+          className="p-6 sm:p-8 bg-white border-2 border-zinc-200 hover:border-black rounded-3xl cursor-pointer transition-all space-y-6 shadow-sm hover:shadow-2xl hover:-translate-y-1 relative group active:scale-[0.98]"
+        >
+          <div className="flex items-center justify-between">
+            <div className="w-16 h-16 rounded-2xl bg-zinc-100 border border-zinc-300 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform shadow-xs">
+              👤
+            </div>
+            <span className="px-3 py-1 bg-zinc-100 border border-zinc-300 text-[10px] font-black uppercase rounded-lg text-black">
+              FOR JOB SEEKERS &amp; ENGINEERS
+            </span>
+          </div>
+
+          <div className="space-y-2">
+            <h3 className="text-xl sm:text-2xl font-black text-black">
+              Candidate &amp; Engineering Suite
+            </h3>
+            <p className="text-xs text-zinc-600 leading-relaxed font-medium">
+              Accelerate your career, build ATS-optimized resumes, solve in-browser coding challenges, practice spoken voice interviews, and simulate salary negotiations.
+            </p>
+          </div>
+
+          {/* Quick Pill Highlights */}
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {["📄 6 ATS Templates", "💻 Monaco Coding IDE", "🎙️ Spoken Voice Mocks", "💰 Salary War Room", "🤖 Auto Hunter"].map((pill, idx) => (
+              <span
+                key={idx}
+                className="px-2.5 py-1 rounded-lg bg-zinc-100 border border-zinc-200 text-[10px] font-bold text-black"
+              >
+                {pill}
+              </span>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            className="touch-target w-full py-4 bg-black hover:bg-zinc-800 text-white font-black text-xs uppercase tracking-wider rounded-2xl border border-black transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+          >
+            <span>Launch Candidate Suite &rarr;</span>
+          </button>
+        </div>
+
+        {/* TILE 2: RECRUITER TALENT OS */}
+        <div
+          onClick={() => {
+            setSelectedPersona("recruiter");
+            setMode("recruiter");
+          }}
+          className="p-6 sm:p-8 bg-white border-2 border-zinc-200 hover:border-black rounded-3xl cursor-pointer transition-all space-y-6 shadow-sm hover:shadow-2xl hover:-translate-y-1 relative group active:scale-[0.98]"
+        >
+          <div className="flex items-center justify-between">
+            <div className="w-16 h-16 rounded-2xl bg-zinc-100 border border-zinc-300 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform shadow-xs">
+              👔
+            </div>
+            <span className="px-3 py-1 bg-zinc-100 border border-zinc-300 text-[10px] font-black uppercase rounded-lg text-black">
+              FOR RECRUITERS &amp; HIRING TEAMS
+            </span>
+          </div>
+
+          <div className="space-y-2">
+            <h3 className="text-xl sm:text-2xl font-black text-black">
+              Recruiter Talent Operating System
+            </h3>
+            <p className="text-xs text-zinc-600 leading-relaxed font-medium">
+              Architect bias-free job descriptions in 15 seconds, screen candidate resumes in bulk, manage 8-stage Kanban pipelines, and host WebRTC interview rooms.
+            </p>
+          </div>
+
+          {/* Quick Pill Highlights */}
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {["📝 AI Job Architect", "📋 8-Stage Kanban", "⚡ Bulk ATS Screener", "📹 WebRTC Rooms", "🎯 Scorecards"].map((pill, idx) => (
+              <span
+                key={idx}
+                className="px-2.5 py-1 rounded-lg bg-zinc-100 border border-zinc-200 text-[10px] font-bold text-black"
+              >
+                {pill}
+              </span>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            className="touch-target w-full py-4 bg-black hover:bg-zinc-800 text-white font-black text-xs uppercase tracking-wider rounded-2xl border border-black transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+          >
+            <span>Launch Recruiter OS &rarr;</span>
+          </button>
         </div>
       </div>
     </div>
