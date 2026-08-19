@@ -103,7 +103,7 @@ Output a JSON array of strings: ["query1", "query2", "query3"]`;
     model,
     prompt: queryPrompt,
     temperature: 0.3,
-    maxOutputTokens: 300,
+    maxTokens: 300,
   });
 
   const queries = parseJsonSafely<string[]>(queryResult.text, params.targetPositions);
@@ -143,7 +143,7 @@ Make companies realistic and varied. Return ONLY the JSON array.`;
       model,
       prompt: genPrompt,
       temperature: 0.7,
-      maxOutputTokens: 3000,
+      maxTokens: 3000,
     });
 
     allJobs = parseJsonSafely<JobSearchResult[]>(genResult.text, []);
@@ -210,7 +210,7 @@ Found ${allJobs.length} jobs. Top match: ${topJobs[0]?.title} at ${topJobs[0]?.c
     model,
     prompt: analysisPrompt,
     temperature: 0.5,
-    maxOutputTokens: 200,
+    maxTokens: 200,
   });
 
   console.log(

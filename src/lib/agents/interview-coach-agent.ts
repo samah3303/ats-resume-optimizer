@@ -103,7 +103,7 @@ Return ONLY the JSON array.`;
     model,
     prompt,
     temperature: 0.5,
-    maxOutputTokens: 3000,
+    maxTokens: 3000,
   });
 
   const questions = parseJsonSafely<CoachQuestion[]>(result.text, []);
@@ -185,7 +185,7 @@ Return ONLY the JSON object.`;
     model,
     prompt,
     temperature: 0.3,
-    maxOutputTokens: 1500,
+    maxTokens: 1500,
   });
 
   const feedback = parseJsonSafely<AnswerFeedback>(result.text, {
@@ -274,7 +274,7 @@ Return ONLY JSON.`;
     model,
     prompt,
     temperature: 0.3,
-    maxOutputTokens: 1500,
+    maxTokens: 1500,
   });
 
   return parseJsonSafely(result.text, {

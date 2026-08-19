@@ -108,7 +108,7 @@ ${jdText.slice(0, 3500)}`;
     model,
     prompt,
     temperature: 0.1,
-    maxOutputTokens: 2000,
+    maxTokens: 2000,
   });
 
   return parseJsonSafely<JdRequirements>(result.text, {
@@ -149,7 +149,7 @@ ${resumeText.slice(0, 3500)}`;
     model,
     prompt,
     temperature: 0.1,
-    maxOutputTokens: 2000,
+    maxTokens: 2000,
   });
 
   return parseJsonSafely<ResumeClaims>(result.text, {
@@ -201,7 +201,7 @@ ${JSON.stringify(resumeClaims, null, 2)}
     model,
     prompt,
     temperature: 0.2,
-    maxOutputTokens: 1500,
+    maxTokens: 1500,
   });
 
   return parseJsonSafely<SkillGap[]>(result.text, []);
@@ -257,7 +257,7 @@ Output ONLY a JSON array of 7-10 suggestions:
     model,
     prompt,
     temperature: 0.3,
-    maxOutputTokens: 3000,
+    maxTokens: 3000,
   });
 
   return parseJsonSafely<AgentSuggestion[]>(result.text, []);
