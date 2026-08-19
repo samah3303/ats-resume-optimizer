@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useWorkspaceMode, WorkspaceMode } from "@/components/WorkspaceModeContext";
+import { useWorkspaceMode } from "@/components/WorkspaceModeContext";
 
 export interface SubFeatureItem {
   id: string;
@@ -210,6 +210,45 @@ const candidateCategories: CategoryGroup[] = [
       },
     ],
   },
+  {
+    id: "account-settings",
+    title: "Account, Portfolios & Settings",
+    description: "Manage onboarding career targets, verified portfolio links, and administrative governance.",
+    icon: "⚙️",
+    badge: "3 Tools",
+    features: [
+      {
+        id: "portfolio",
+        title: "Public Verified Portfolio",
+        tagline: "Certified Badges & Skills Link",
+        description: "Share a luxury monochrome profile showcasing your verified ATS scores, coding challenge badges, and system design grades.",
+        href: "/portfolio/alex-rivers",
+        icon: "🏆",
+        badge: "Shareable",
+        highlightMetric: "Certified Badges",
+      },
+      {
+        id: "edit-onboarding",
+        title: "Career Target & Onboarding Editor",
+        tagline: "Update Target Titles, Skills & Experience",
+        description: "Update your target job requisites and industry focus to refresh your tailored career roadmap.",
+        href: "/",
+        icon: "✏️",
+        badge: "Profile",
+        highlightMetric: "Onboarding State",
+      },
+      {
+        id: "admin-os",
+        title: "Master Admin & Governance OS",
+        tagline: "Telemetry, Token Ledgers & Moderation",
+        description: "Access executive multi-tenant telemetry, AI financial spend ledgers, and candidate management tools.",
+        href: "/admin",
+        icon: "🛡️",
+        badge: "Admin",
+        highlightMetric: "Telemetry OS",
+      },
+    ],
+  },
 ];
 
 const recruiterCategories: CategoryGroup[] = [
@@ -296,6 +335,25 @@ const recruiterCategories: CategoryGroup[] = [
         icon: "📹",
         badge: "P2P WebRTC",
         highlightMetric: "AI Copilot",
+      },
+    ],
+  },
+  {
+    id: "recruiter-governance",
+    title: "Governance & Master Admin",
+    description: "Platform telemetry, team seats, and server moderation.",
+    icon: "🛡️",
+    badge: "1 Tool",
+    features: [
+      {
+        id: "admin-os-recruiter",
+        title: "Master Admin & Governance OS",
+        tagline: "Telemetry, Token Ledgers & Moderation",
+        description: "Access executive multi-tenant telemetry, AI financial spend ledgers, and candidate management tools.",
+        href: "/admin",
+        icon: "🛡️",
+        badge: "Admin",
+        highlightMetric: "Telemetry OS",
       },
     ],
   },
