@@ -1,10 +1,44 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
+import GithubProvider from "next-auth/providers/github";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
   providers: [
+    ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+      ? [
+          GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            allowDangerousEmailAccountLinking: true,
+          }),
+        ]
+      : [
+          // Fallback placeholder if env variables have not yet been provided
+          GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID || "GOOGLE_CLIENT_ID_PLACEHOLDER",
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET || "GOOGLE_CLIENT_SECRET_PLACEHOLDER",
+            allowDangerousEmailAccountLinking: true,
+          }),
+        ]),
+    ...(process.env.GITHUB_ID || process.env.GITHUB_CLIENT_ID
+      ? [
+          GithubProvider({
+            clientId: (process.env.GITHUB_ID || process.env.GITHUB_CLIENT_ID)!,
+            clientSecret: (process.env.GITHUB_SECRET || process.env.GITHUB_CLIENT_SECRET)!,
+            allowDangerousEmailAccountLinking: true,
+          }),
+        ]
+      : [
+          // Fallback placeholder if env variables have not yet been provided
+          GithubProvider({
+            clientId: "GITHUB_CLIENT_ID_PLACEHOLDER",
+            clientSecret: "GITHUB_CLIENT_SECRET_PLACEHOLDER",
+            allowDangerousEmailAccountLinking: true,
+          }),
+        ]),
     CredentialsProvider({
       name: "credentials",
       credentials: {
@@ -16,8 +50,9 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
+        const email = credentials.email.toLowerCase().trim();
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
+          where: { email },
         });
 
         if (!user || !user.passwordHash) {
@@ -43,6 +78,38 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider === "google" || account?.provider === "github") {
+        if (!user.email) return false;
+        try {
+          const email = user.email.toLowerCase().trim();
+          let dbUser = await prisma.user.findUnique({
+            where: { email },
+          });
+
+          if (!dbUser) {
+            dbUser = await prisma.user.create({
+              data: {
+                email,
+                name: user.name || email.split("@")[0],
+                image: user.image,
+              },
+            });
+          } else if (!dbUser.image && user.image) {
+            await prisma.user.update({
+              where: { id: dbUser.id },
+              data: { image: user.image },
+            });
+          }
+          user.id = dbUser.id;
+          return true;
+        } catch (error) {
+          console.error("OAuth sign in error:", error);
+          return false;
+        }
+      }
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
@@ -58,6 +125,7 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/login",
+    error: "/login",
   },
   session: {
     strategy: "jwt",

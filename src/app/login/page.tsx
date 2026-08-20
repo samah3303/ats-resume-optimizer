@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, type FormEvent, useEffect } from "react";
+import { useState, type FormEvent, useEffect, Suspense } from "react";
 import { signIn, useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Logo from "@/components/Logo";
 
-export default function LoginPage() {
-  const { data: session, status } = useSession();
+function LoginForm() {
+  const { status } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,13 +24,26 @@ export default function LoginPage() {
     }
   }, [status, router]);
 
+  useEffect(() => {
+    const errorParam = searchParams.get("error");
+    if (errorParam) {
+      if (errorParam === "OAuthSignin" || errorParam === "OAuthCallback" || errorParam === "Configuration") {
+        setError("OAuth provider not yet configured. Please set GOOGLE_CLIENT_ID / GITHUB_ID in your environment variables.");
+      } else if (errorParam === "AccessDenied") {
+        setError("Access was denied by the authentication provider.");
+      } else {
+        setError(errorParam);
+      }
+    }
+  }, [searchParams]);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     const result = await signIn("credentials", {
-      email,
+      email: email.toLowerCase().trim(),
       password,
       redirect: false,
     });
@@ -47,9 +61,15 @@ export default function LoginPage() {
     }
   };
 
-  const handleSocialLogin = (provider: "google" | "github") => {
+  const handleSocialLogin = async (provider: "google" | "github") => {
+    setError("");
     setSocialLoading(provider);
-    signIn(provider, { callbackUrl: "/dashboard" });
+    try {
+      await signIn(provider, { callbackUrl: "/dashboard" });
+    } catch {
+      setError(`Failed to initiate ${provider} login. Check your OAuth configuration.`);
+      setSocialLoading(null);
+    }
   };
 
   if (status === "loading" || status === "authenticated") {
@@ -100,15 +120,15 @@ export default function LoginPage() {
           </div>
 
           {/* Social OAuth Buttons */}
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <button
                 type="button"
                 onClick={() => handleSocialLogin("google")}
                 disabled={socialLoading !== null || loading}
-                className="touch-target py-2.5 px-4 bg-[#09090B] hover:bg-[#27272A] border border-[#27272A] text-[#FAFAFA] text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 cursor-pointer"
+                className="touch-target min-h-[44px] py-2.5 px-4 bg-[#09090B] hover:bg-[#27272A] border border-[#27272A] text-[#FAFAFA] text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 cursor-pointer"
               >
-                <svg className="w-4 h-4" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                   <path
                     fill="#4285F4"
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -133,21 +153,22 @@ export default function LoginPage() {
                 type="button"
                 onClick={() => handleSocialLogin("github")}
                 disabled={socialLoading !== null || loading}
-                className="touch-target py-2.5 px-4 bg-[#09090B] hover:bg-[#27272A] text-white text-xs font-bold rounded-xl transition-all border border-[#27272A] flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 cursor-pointer"
+                className="touch-target min-h-[44px] py-2.5 px-4 bg-[#09090B] hover:bg-[#27272A] text-white text-xs font-bold rounded-xl transition-all border border-[#27272A] flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 cursor-pointer"
               >
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
                   <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
                 </svg>
                 <span>{socialLoading === "github" ? "Connecting..." : "GitHub"}</span>
               </button>
             </div>
 
-            <div className="relative flex items-center justify-center my-3">
-              <div className="border-t border-[#27272A] w-full" />
-              <span className="bg-[#18181B] px-3 text-[10px] uppercase font-bold tracking-wider text-zinc-500">
+            {/* Robust Horizontal Divider */}
+            <div className="flex items-center gap-3 my-2 w-full">
+              <div className="h-[1px] bg-[#27272A] flex-1" />
+              <span className="text-[10px] uppercase font-bold tracking-wider text-zinc-500 whitespace-nowrap shrink-0 select-none">
                 or with email
               </span>
-              <div className="border-t border-[#27272A] w-full" />
+              <div className="h-[1px] bg-[#27272A] flex-1" />
             </div>
           </div>
 
@@ -209,7 +230,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading || socialLoading !== null}
-              className="touch-target w-full py-3.5 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] font-bold text-xs uppercase tracking-wider rounded-xl transition-all active:scale-95 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2 border border-[#FAFAFA]"
+              className="touch-target min-h-[44px] w-full py-3.5 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] font-bold text-xs uppercase tracking-wider rounded-xl transition-all active:scale-95 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2 border border-[#FAFAFA]"
             >
               {loading ? (
                 <>
@@ -279,5 +300,19 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen bg-[#09090B]">
+          <div className="w-8 h-8 border-2 border-[#FAFAFA] border-t-transparent rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }

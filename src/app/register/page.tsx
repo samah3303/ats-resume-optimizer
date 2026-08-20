@@ -178,12 +178,13 @@ export default function RegisterPage() {
               </button>
             </div>
 
-            <div className="relative flex items-center justify-center my-3">
-              <div className="border-t border-[#27272A] w-full" />
-              <span className="bg-[#18181B] px-3 text-[10px] uppercase font-bold tracking-wider text-zinc-500">
+            {/* Robust Horizontal Divider */}
+            <div className="flex items-center gap-3 my-2 w-full">
+              <div className="h-[1px] bg-[#27272A] flex-1" />
+              <span className="text-[10px] uppercase font-bold tracking-wider text-zinc-500 whitespace-nowrap shrink-0 select-none">
                 or sign up with email
               </span>
-              <div className="border-t border-[#27272A] w-full" />
+              <div className="h-[1px] bg-[#27272A] flex-1" />
             </div>
           </div>
 
