@@ -179,7 +179,7 @@ function AdminDashboardInner() {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `kyro_telemetry_${new Date().toISOString().split("T")[0]}.csv`);
+    link.setAttribute("download", `paniund_telemetry_${new Date().toISOString().split("T")[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -187,46 +187,46 @@ function AdminDashboardInner() {
 
   if (!authed) {
     return (
-      <div className="min-h-screen bg-white text-zinc-950 flex flex-col items-center justify-center p-4 font-sans">
-        <div className="w-full max-w-md bg-white border border-zinc-300 rounded-3xl p-8 shadow-2xl space-y-6 text-center">
+      <div className="min-h-screen bg-[#09090B] text-[#FAFAFA] flex flex-col items-center justify-center p-4 font-sans">
+        <div className="w-full max-w-md bg-[#18181B] border border-[#27272A] rounded-3xl p-8 space-y-6 text-center">
           <div className="flex justify-center">
             <Logo size="lg" />
           </div>
           <div>
-            <span className="px-2.5 py-0.5 rounded-md bg-zinc-100 border border-zinc-300 text-[10px] font-black uppercase text-black">
+            <span className="px-2.5 py-0.5 rounded-md bg-[#09090B] border border-[#27272A] text-[10px] font-bold uppercase text-zinc-300">
               ADMIN CONTROL ROOM
             </span>
-            <h1 className="text-xl font-black text-black mt-2">
-              KYRO Telemetry &amp; Governance OS
+            <h1 className="text-xl font-bold text-[#FAFAFA] mt-2">
+              Paniund Telemetry &amp; Governance OS
             </h1>
-            <p className="text-xs text-zinc-600 mt-1">
+            <p className="text-xs text-zinc-400 mt-1">
               Enter your master administrative key to access real-time system metrics.
             </p>
           </div>
 
           {error && (
-            <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs font-bold text-rose-800">
+            <div className="p-3 bg-rose-950/40 border border-rose-800 rounded-xl text-xs font-bold text-rose-300">
               ⚠️ {error}
             </div>
           )}
 
           <form onSubmit={handleLogin} className="space-y-4 text-left">
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-600 block mb-1">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block mb-1">
                 Admin Secret Key
               </label>
               <input
                 type="password"
                 value={inputKey}
                 onChange={(e) => setInputKey(e.target.value)}
-                placeholder="kyro-admin-2026"
-                className="w-full bg-zinc-50 border border-zinc-300 focus:border-black focus:bg-white text-xs font-mono text-black rounded-xl px-4 py-3 outline-none transition-all shadow-xs"
+                placeholder="paniund-admin-2026"
+                className="w-full bg-[#09090B] border border-[#27272A] focus:border-[#FAFAFA] text-xs font-mono text-[#FAFAFA] rounded-xl px-4 py-3 outline-none transition-all"
               />
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="touch-target w-full py-3.5 bg-black hover:bg-zinc-800 text-white font-black text-xs uppercase tracking-wider rounded-xl border border-black transition-all shadow-md active:scale-95 disabled:opacity-50"
+              className="touch-target w-full py-3.5 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] font-bold text-xs uppercase tracking-wider rounded-xl border border-[#FAFAFA] transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               {loading ? "Authenticating..." : "Unlock Control Room &rarr;"}
             </button>
@@ -252,10 +252,10 @@ function AdminDashboardInner() {
   );
 
   return (
-    <div className="min-h-screen bg-white text-zinc-950 font-sans pb-24">
+    <div className="min-h-screen bg-[#09090B] text-[#FAFAFA] font-sans pb-24">
       {/* Top Global Broadcast Announcement if Active */}
       {broadcastActive && broadcastMessage && (
-        <div className="bg-black text-white px-4 py-2.5 text-center text-xs font-bold flex items-center justify-center gap-2 border-b border-zinc-800 animate-in slide-in-from-top-2">
+        <div className="bg-[#18181B] text-[#FAFAFA] px-4 py-2.5 text-center text-xs font-bold flex items-center justify-center gap-2 border-b border-[#27272A] animate-in slide-in-from-top-2">
           <span>📢</span>
           <span>{broadcastMessage}</span>
           <button
@@ -268,22 +268,22 @@ function AdminDashboardInner() {
       )}
 
       {/* Admin Top Header Bar */}
-      <header className="border-b border-zinc-200 bg-white/95 backdrop-blur-md sticky top-0 z-40">
+      <header className="border-b border-[#27272A] bg-[#09090B]/90 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Logo size="md" />
             <div>
               <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded-md bg-zinc-100 border border-zinc-300 text-[10px] font-black uppercase text-black">
+                <span className="px-2 py-0.5 rounded-md bg-[#18181B] border border-[#27272A] text-[10px] font-bold uppercase text-zinc-300">
                   MASTER ADMIN OS
                 </span>
-                <span className="inline-flex items-center gap-1 text-[10px] font-mono text-emerald-700 font-bold">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-ping" />
+                <span className="inline-flex items-center gap-1 text-[10px] font-mono text-emerald-400 font-bold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
                   Cluster Online
                 </span>
               </div>
-              <h1 className="text-lg font-black text-black tracking-tight mt-0.5">
-                KYRO Governance &amp; Telemetry Command Center
+              <h1 className="text-lg font-bold text-[#FAFAFA] tracking-tight mt-0.5">
+                Paniund Governance &amp; Telemetry Command Center
               </h1>
             </div>
           </div>

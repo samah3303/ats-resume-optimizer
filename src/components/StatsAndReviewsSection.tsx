@@ -45,8 +45,8 @@ const REVIEWS: Review[] = [
     badge: "Hired in 14 Days",
     headline: "From 4 months of silence to 3 offer letters!",
     content:
-      "I was unemployed for 4 months applying blindly on LinkedIn with zero callbacks. KYRO's ATS scanner showed my resume was missing 12 key hard skills and had table formatting bugs. Using the STAR bullet rewriter and Cold Email generator got me 3 interviews in my first week!",
-    timeframe: "2 weeks after using KYRO",
+      "I was unemployed for 4 months applying blindly on LinkedIn with zero callbacks. paniund's ATS scanner showed my resume was missing 12 key hard skills and had table formatting bugs. Using the STAR bullet rewriter and Cold Email generator got me 3 interviews in my first week!",
+    timeframe: "2 weeks after using paniund",
   },
   {
     name: "Priya Sharma",
@@ -58,7 +58,7 @@ const REVIEWS: Review[] = [
     headline: "The Cold Outreach scripts & Interview prep are gold!",
     content:
       "Getting past ATS is step 1, but the LinkedIn outreach note generator and predicted interview questions gave me immense confidence. I reached out directly to the hiring manager with the generated pitch and got hired within 3 weeks.",
-    timeframe: "3 weeks after using KYRO",
+    timeframe: "3 weeks after using paniund",
   },
   {
     name: "Marcus Vance",
@@ -69,8 +69,8 @@ const REVIEWS: Review[] = [
     badge: "Career Switcher",
     headline: "The free Skill Gap links helped me learn SQL fast!",
     content:
-      "Switching careers while unemployed was terrifying. When KYRO flagged SQL & Tableau as missing gaps, it immediately gave me free YouTube crash courses and weekend project blueprints. Added the project to my resume and passed ATS easily!",
-    timeframe: "1 month after using KYRO",
+      "Switching careers while unemployed was terrifying. When paniund flagged SQL & Tableau as missing gaps, it immediately gave me free YouTube crash courses and weekend project blueprints. Added the project to my resume and passed ATS easily!",
+    timeframe: "1 month after using paniund",
   },
   {
     name: "Samantha Taylor",
@@ -82,23 +82,23 @@ const REVIEWS: Review[] = [
     headline: "The Daily Sprint tracker kept me sane & disciplined.",
     content:
       "Job hunting after a layoff causes so much anxiety. The Daily Sprint tracker gave me a structured daily routine (3 applications, 2 outreaches). The 1-click ATS PDF exporter ensured my formatting was 100% clean every single time.",
-    timeframe: "10 days after using KYRO",
+    timeframe: "10 days after using paniund",
   },
 ];
 
 export default function StatsAndReviewsSection() {
   return (
-    <div className="space-y-20 py-12 bg-white">
+    <div className="space-y-20 py-16 bg-[#09090B] text-[#FAFAFA]">
       {/* ─── Numbers / Impact Stats Section ──────────────────────────────── */}
       <div className="space-y-8">
         <div className="text-center max-w-2xl mx-auto space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-zinc-100 border border-zinc-200 text-zinc-900 rounded-full text-xs font-bold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#18181B] border border-[#27272A] text-zinc-300 rounded-full text-xs font-bold uppercase tracking-wider">
             <span>📊 Proven Job-Landing Results</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-black text-black tracking-tight">
-            KYRO by the <span className="underline decoration-zinc-400 decoration-2 underline-offset-4">Numbers</span>
+          <h2 className="text-3xl sm:text-4xl font-bold text-[#FAFAFA] tracking-tight">
+            paniund by the <span className="underline decoration-[#FAFAFA] decoration-2 underline-offset-4">Numbers</span>
           </h2>
-          <p className="text-xs sm:text-sm text-zinc-600">
+          <p className="text-xs sm:text-sm text-zinc-400">
             Real impact measured across thousands of job applications and successful hires.
           </p>
         </div>
@@ -107,16 +107,16 @@ export default function StatsAndReviewsSection() {
           {STATS.map((stat, idx) => (
             <div
               key={idx}
-              className="relative overflow-hidden rounded-3xl bg-white border border-zinc-200 p-6 shadow-sm hover:border-black transition-all hover:-translate-y-0.5"
+              className="relative overflow-hidden rounded-3xl bg-[#18181B] border border-[#27272A] p-6 hover:border-[#FAFAFA] transition-all hover:-translate-y-0.5"
             >
               <div className="flex items-center justify-between mb-4">
                 <span className="text-3xl">{stat.icon}</span>
-                <div className="w-2 h-2 rounded-full bg-black shadow-sm" />
+                <div className="w-2 h-2 rounded-full bg-[#FAFAFA]" />
               </div>
-              <p className="text-3xl sm:text-4xl font-black text-black">
+              <p className="text-3xl sm:text-4xl font-bold text-[#FAFAFA]">
                 {stat.value}
               </p>
-              <p className="text-xs font-bold text-zinc-600 mt-2">
+              <p className="text-xs font-bold text-zinc-400 mt-2">
                 {stat.label}
               </p>
             </div>
@@ -127,14 +127,14 @@ export default function StatsAndReviewsSection() {
       {/* ─── User Reviews & Success Stories ───────────────────────────────── */}
       <div className="space-y-10">
         <div className="text-center max-w-2xl mx-auto space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-zinc-100 border border-zinc-200 text-zinc-900 rounded-full text-xs font-bold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#18181B] border border-[#27272A] text-zinc-300 rounded-full text-xs font-bold uppercase tracking-wider">
             <span>⭐ Real Success Stories</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-black text-black tracking-tight">
-            Loved by <span className="underline decoration-zinc-400">45,000+</span> Job Seekers
+          <h2 className="text-3xl sm:text-4xl font-bold text-[#FAFAFA] tracking-tight">
+            Loved by <span className="underline decoration-[#FAFAFA]">45,000+</span> Job Seekers
           </h2>
-          <p className="text-xs sm:text-sm text-zinc-600">
-            See how unemployed job seekers turned application silence into multiple job offers.
+          <p className="text-xs sm:text-sm text-zinc-400">
+            See how job seekers turned application silence into multiple offers.
           </p>
         </div>
 
@@ -142,43 +142,43 @@ export default function StatsAndReviewsSection() {
           {REVIEWS.map((rev, idx) => (
             <div
               key={idx}
-              className="bg-white rounded-3xl border border-zinc-200 p-6 sm:p-8 shadow-sm hover:border-black transition-all space-y-4 flex flex-col justify-between"
+              className="bg-[#18181B] rounded-3xl border border-[#27272A] p-6 sm:p-8 hover:border-[#FAFAFA] transition-all space-y-4 flex flex-col justify-between"
             >
               <div className="space-y-3">
                 {/* Rating & Badge */}
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1 text-black">
+                  <div className="flex items-center gap-1 text-[#FAFAFA]">
                     {Array.from({ length: rev.rating }).map((_, i) => (
                       <span key={i} className="text-base">★</span>
                     ))}
                   </div>
-                  <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-zinc-100 text-zinc-900 border border-zinc-200">
+                  <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-[#09090B] text-[#FAFAFA] border border-[#27272A]">
                     ✓ {rev.badge}
                   </span>
                 </div>
 
-                <h3 className="text-base font-black text-black">
+                <h3 className="text-base font-bold text-[#FAFAFA]">
                   &ldquo;{rev.headline}&rdquo;
                 </h3>
 
-                <p className="text-xs text-zinc-600 leading-relaxed font-sans">
+                <p className="text-xs text-zinc-400 leading-relaxed font-sans">
                   {rev.content}
                 </p>
               </div>
 
               {/* User Profile Footer */}
-              <div className="flex items-center gap-3 pt-4 border-t border-zinc-100">
+              <div className="flex items-center gap-3 pt-4 border-t border-[#27272A]">
                 <img
                   src={rev.avatar}
                   alt={rev.name}
-                  className="w-11 h-11 rounded-full object-cover border-2 border-black"
+                  className="w-11 h-11 rounded-full object-cover border border-[#27272A]"
                 />
                 <div>
-                  <h4 className="text-xs font-bold text-black">
+                  <h4 className="text-xs font-bold text-[#FAFAFA]">
                     {rev.name}
                   </h4>
-                  <p className="text-[11px] text-zinc-500">
-                    {rev.role} at <strong className="text-black font-semibold">{rev.company}</strong>
+                  <p className="text-[11px] text-zinc-400">
+                    {rev.role} at <strong className="text-[#FAFAFA] font-semibold">{rev.company}</strong>
                   </p>
                 </div>
               </div>

@@ -7,8 +7,8 @@ export async function generateMetadata({
 }) {
   const { username } = await params;
   return {
-    title: `@${username} | Verified Candidate Portfolio | KYRO AI`,
-    description: `View @${username}'s verified ATS resume score, coding challenge badges, and system design architecture certifications on KYRO AI.`,
+    title: `@${username} | Verified Candidate Portfolio | Paniund`,
+    description: `View @${username}'s verified ATS resume score, coding challenge badges, and system design architecture certifications on Paniund.`,
   };
 }
 

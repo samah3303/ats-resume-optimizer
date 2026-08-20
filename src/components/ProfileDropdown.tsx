@@ -45,7 +45,7 @@ export default function ProfileDropdown() {
         aria-expanded={open}
         aria-haspopup="true"
         aria-label="Account menu"
-        className="w-8 h-8 rounded-full bg-black text-white text-xs font-black flex items-center justify-center shadow-sm hover:bg-zinc-800 transition-colors border border-black cursor-pointer active:scale-95"
+        className="w-8 h-8 rounded-full bg-[#FAFAFA] text-[#09090B] text-xs font-black flex items-center justify-center transition-colors border border-[#FAFAFA] cursor-pointer active:scale-95 hover:bg-zinc-200"
       >
         {initials}
       </button>
@@ -53,24 +53,24 @@ export default function ProfileDropdown() {
       {open && (
         <div
           role="menu"
-          className="absolute right-0 bottom-12 w-60 bg-white rounded-2xl border border-zinc-300 shadow-2xl z-50 p-2 animate-in fade-in slide-in-from-bottom-2 space-y-2"
+          className="absolute right-0 bottom-12 w-60 bg-[#18181B] rounded-2xl border border-[#27272A] z-50 p-2 animate-in fade-in slide-in-from-bottom-2 space-y-2 text-[#FAFAFA]"
         >
           {/* User info */}
-          <div className="px-3 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl">
+          <div className="px-3 py-2.5 bg-[#09090B] border border-[#27272A] rounded-xl">
             <div className="flex items-center justify-between">
-              <p className="font-bold text-zinc-900 text-xs truncate max-w-[120px]">
+              <p className="font-bold text-[#FAFAFA] text-xs truncate max-w-[120px]">
                 {session?.user?.name || "User"}
               </p>
-              <span className="px-1.5 py-0.2 rounded-md bg-black text-white text-[9px] font-black uppercase">
+              <span className="px-1.5 py-0.2 rounded-md bg-[#27272A] border border-[#3F3F46] text-[#FAFAFA] text-[9px] font-black uppercase">
                 {mode === "candidate" ? "Candidate" : "Recruiter"}
               </span>
             </div>
-            <p className="text-[11px] text-zinc-500 font-mono truncate mt-0.5">
+            <p className="text-[11px] text-zinc-400 font-mono truncate mt-0.5">
               {session?.user?.email}
             </p>
           </div>
 
-          {/* Quick Actions (Theme & Logout Only - All features moved to Tile OS) */}
+          {/* Quick Actions */}
           <div className="space-y-1">
             <button
               role="menuitem"
@@ -78,34 +78,20 @@ export default function ProfileDropdown() {
                 toggleMode();
                 setOpen(false);
               }}
-              className="w-full text-left px-3 py-2 text-xs font-bold text-zinc-700 hover:text-black hover:bg-zinc-100 rounded-xl transition-colors flex items-center justify-between cursor-pointer"
+              className="w-full text-left px-3 py-2 text-xs font-bold text-zinc-300 hover:text-[#FAFAFA] hover:bg-[#27272A] rounded-xl transition-colors flex items-center justify-between cursor-pointer"
             >
               <span>⇄ Switch Workspace</span>
               <span className="text-[10px] text-zinc-400 font-mono uppercase">
                 {mode === "candidate" ? "To Recruiter" : "To Candidate"}
               </span>
             </button>
-
-            <button
-              role="menuitem"
-              onClick={() => {
-                toggle();
-                setOpen(false);
-              }}
-              className="w-full text-left px-3 py-2 text-xs font-bold text-zinc-700 hover:text-black hover:bg-zinc-100 rounded-xl transition-colors flex items-center justify-between cursor-pointer"
-            >
-              <span>{dark ? "☀️ Light Mode" : "🌙 Dark Mode"}</span>
-              <span className="text-[10px] text-zinc-400 font-mono">
-                {dark ? "Dark" : "Light"}
-              </span>
-            </button>
           </div>
 
-          <div className="border-t border-zinc-100 pt-1">
+          <div className="border-t border-[#27272A] pt-1">
             <button
               role="menuitem"
               onClick={() => signOut({ callbackUrl: "/" })}
-              className="w-full text-left px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 rounded-xl transition-colors flex items-center gap-2 cursor-pointer"
+              className="w-full text-left px-3 py-2 text-xs font-bold text-rose-400 hover:bg-rose-950/40 rounded-xl transition-colors flex items-center gap-2 cursor-pointer"
             >
               <span>🚪</span>
               <span>Sign Out</span>

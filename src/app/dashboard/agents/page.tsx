@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { AutonomousAgentCockpit } from "@/components/agents/AutonomousAgentCockpit";
 
 export const metadata = {
-  title: "Autonomous Agent Swarm & Market Intelligence | KYRO AI",
+  title: "Autonomous Agent Swarm & Market Intelligence | Paniund",
   description:
     "Deploy 24/7 background AI agents to autonomously scan multi-board job feeds, synthesize tailored application packets, and track live market salary surges.",
 };

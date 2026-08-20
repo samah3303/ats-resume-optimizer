@@ -17,8 +17,8 @@ function DashboardContent() {
 
   if (status === "loading") {
     return (
-      <div className="flex items-center justify-center min-h-[70vh] bg-white">
-        <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin" />
+      <div className="flex items-center justify-center min-h-[70vh] bg-[#09090B]">
+        <div className="w-8 h-8 border-2 border-[#FAFAFA] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -26,7 +26,7 @@ function DashboardContent() {
   if (status === "unauthenticated") return null;
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-white text-zinc-950 py-8 px-4 sm:px-6 lg:px-8 pb-28 flex flex-col justify-center">
+    <div className="min-h-[calc(100vh-4rem)] bg-[#09090B] text-[#FAFAFA] py-8 px-4 sm:px-6 lg:px-8 pb-28 flex flex-col justify-center">
       <div className="max-w-5xl mx-auto w-full space-y-6">
         {/* Strictly 2-Tile Workspace Navigator (Mobile-First) */}
         <StepByStepTileNavigator />
@@ -39,8 +39,8 @@ export default function DashboardPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex items-center justify-center min-h-[70vh] bg-white">
-          <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin" />
+        <div className="flex items-center justify-center min-h-[70vh] bg-[#09090B]">
+          <div className="w-8 h-8 border-2 border-[#FAFAFA] border-t-transparent rounded-full animate-spin" />
         </div>
       }
     >

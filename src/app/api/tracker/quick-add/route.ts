@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
         userId,
         jdId: jd.id,
         status: "applied",
-        notes: notes || `Auto-synced from KYRO Autonomous Hunter Agent Swarm. Comp: ${salaryEst || "N/A"}`,
+        notes: notes || `Auto-synced from Paniund Autonomous Hunter Agent Swarm. Comp: ${salaryEst || "N/A"}`,
         appliedAt: new Date(),
       },
       include: {

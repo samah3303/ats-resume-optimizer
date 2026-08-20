@@ -54,32 +54,32 @@ export default function LoginPage() {
 
   if (status === "loading" || status === "authenticated") {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-white">
-        <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin" />
+      <div className="flex items-center justify-center min-h-screen bg-[#09090B]">
+        <div className="w-8 h-8 border-2 border-[#FAFAFA] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-zinc-50">
-      <div className="w-full max-w-5xl bg-white border border-zinc-200 rounded-3xl shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12">
-        {/* LEFT PANEL: Interactive Authentication Form (7 cols on desktop) */}
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-[#09090B] text-[#FAFAFA]">
+      <div className="w-full max-w-5xl bg-[#18181B] border border-[#27272A] rounded-3xl overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+        {/* LEFT PANEL: Interactive Authentication Form */}
         <div className="lg:col-span-7 p-6 sm:p-10 lg:p-12 flex flex-col justify-between space-y-6">
           {/* Header & Logo */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <Logo size="md" />
               {/* Segmented Auth Mode Switcher */}
-              <div className="flex items-center p-1 bg-zinc-100 border border-zinc-300 rounded-2xl text-[11px] font-bold">
+              <div className="flex items-center p-1 bg-[#09090B] border border-[#27272A] rounded-2xl text-[11px] font-bold">
                 <button
                   type="button"
-                  className="px-3.5 py-1 bg-black text-white rounded-xl shadow-xs font-black"
+                  className="px-3.5 py-1 bg-[#FAFAFA] text-[#09090B] rounded-xl font-bold"
                 >
                   Sign In
                 </button>
                 <Link
                   href="/register"
-                  className="px-3.5 py-1 text-zinc-600 hover:text-black rounded-xl transition-all"
+                  className="px-3.5 py-1 text-zinc-400 hover:text-[#FAFAFA] rounded-xl transition-all"
                 >
                   Sign Up
                 </Link>
@@ -87,14 +87,14 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <span className="px-2.5 py-0.5 rounded-md bg-zinc-100 border border-zinc-300 text-[10px] font-black uppercase tracking-wider text-black">
+              <span className="px-2.5 py-0.5 rounded-md bg-[#09090B] border border-[#27272A] text-[10px] font-bold uppercase tracking-wider text-zinc-300">
                 AUTHENTICATED ACCESS
               </span>
-              <h1 className="text-2xl sm:text-3xl font-black text-black tracking-tight mt-1.5">
-                Welcome back to KYRO
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#FAFAFA] tracking-tight mt-1.5">
+                Welcome back to paniund
               </h1>
-              <p className="text-xs text-zinc-500 font-medium mt-0.5">
-                Sign in to manage your resumes, coding sandbox, spoken mocks, and application tracker.
+              <p className="text-xs text-zinc-400 font-medium mt-0.5">
+                Sign in to manage your resumes, coding sandbox, spoken mocks, and applicant pipeline.
               </p>
             </div>
           </div>
@@ -106,7 +106,7 @@ export default function LoginPage() {
                 type="button"
                 onClick={() => handleSocialLogin("google")}
                 disabled={socialLoading !== null || loading}
-                className="touch-target py-2.5 px-4 bg-white hover:bg-zinc-50 border border-zinc-300 text-black text-xs font-bold rounded-xl transition-all shadow-xs flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 cursor-pointer"
+                className="touch-target py-2.5 px-4 bg-[#09090B] hover:bg-[#27272A] border border-[#27272A] text-[#FAFAFA] text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 cursor-pointer"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24">
                   <path
@@ -133,7 +133,7 @@ export default function LoginPage() {
                 type="button"
                 onClick={() => handleSocialLogin("github")}
                 disabled={socialLoading !== null || loading}
-                className="touch-target py-2.5 px-4 bg-black hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all shadow-xs flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 cursor-pointer"
+                className="touch-target py-2.5 px-4 bg-[#09090B] hover:bg-[#27272A] text-white text-xs font-bold rounded-xl transition-all border border-[#27272A] flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 cursor-pointer"
               >
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                   <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
@@ -143,18 +143,18 @@ export default function LoginPage() {
             </div>
 
             <div className="relative flex items-center justify-center my-3">
-              <div className="border-t border-zinc-200 w-full" />
-              <span className="bg-white px-3 text-[10px] uppercase font-bold tracking-wider text-zinc-400">
+              <div className="border-t border-[#27272A] w-full" />
+              <span className="bg-[#18181B] px-3 text-[10px] uppercase font-bold tracking-wider text-zinc-500">
                 or with email
               </span>
-              <div className="border-t border-zinc-200 w-full" />
+              <div className="border-t border-[#27272A] w-full" />
             </div>
           </div>
 
           {/* Email/Password Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-800 font-bold animate-in fade-in">
+              <div className="p-3.5 rounded-2xl bg-rose-950/40 border border-rose-800 text-xs text-rose-300 font-bold animate-in fade-in">
                 ⚠️ {error}
               </div>
             )}
@@ -162,7 +162,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-xs font-black text-black mb-1.5"
+                className="block text-xs font-bold text-zinc-300 mb-1.5"
               >
                 Email Address
               </label>
@@ -172,7 +172,7 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl text-xs bg-zinc-50 border border-zinc-300 text-black placeholder-zinc-400 focus:border-black focus:bg-white outline-none transition-all shadow-xs font-medium"
+                className="w-full px-4 py-3 rounded-xl text-xs bg-[#09090B] border border-[#27272A] text-[#FAFAFA] placeholder-zinc-500 focus:border-[#FAFAFA] outline-none transition-all font-medium"
                 placeholder="alex.rivers@engineering.com"
               />
             </div>
@@ -181,14 +181,14 @@ export default function LoginPage() {
               <div className="flex items-center justify-between mb-1.5">
                 <label
                   htmlFor="password"
-                  className="block text-xs font-black text-black"
+                  className="block text-xs font-bold text-zinc-300"
                 >
                   Password
                 </label>
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="text-[11px] font-bold text-zinc-500 hover:text-black transition-colors cursor-pointer"
+                  className="text-[11px] font-bold text-zinc-400 hover:text-[#FAFAFA] transition-colors cursor-pointer"
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
@@ -200,7 +200,7 @@ export default function LoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl text-xs bg-zinc-50 border border-zinc-300 text-black placeholder-zinc-400 focus:border-black focus:bg-white outline-none transition-all shadow-xs font-medium"
+                  className="w-full px-4 py-3 rounded-xl text-xs bg-[#09090B] border border-[#27272A] text-[#FAFAFA] placeholder-zinc-500 focus:border-[#FAFAFA] outline-none transition-all font-medium"
                   placeholder="••••••••••••"
                 />
               </div>
@@ -209,70 +209,70 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading || socialLoading !== null}
-              className="touch-target w-full py-3.5 bg-black hover:bg-zinc-800 text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-md active:scale-95 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2 border border-black"
+              className="touch-target w-full py-3.5 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] font-bold text-xs uppercase tracking-wider rounded-xl transition-all active:scale-95 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2 border border-[#FAFAFA]"
             >
               {loading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-[#09090B] border-t-transparent rounded-full animate-spin" />
                   <span>Authenticating...</span>
                 </>
               ) : (
-                <span>Sign In to KYRO &rarr;</span>
+                <span>Sign In to paniund &rarr;</span>
               )}
             </button>
           </form>
 
           {/* Footer Note */}
-          <p className="text-center text-[11px] text-zinc-500 pt-2 border-t border-zinc-100">
+          <p className="text-center text-[11px] text-zinc-400 pt-2 border-t border-[#27272A]">
             Don&apos;t have an account yet?{" "}
             <Link
               href="/register"
-              className="text-black font-black hover:underline ml-1"
+              className="text-[#FAFAFA] font-bold hover:underline ml-1"
             >
               Create one free &rarr;
             </Link>
           </p>
         </div>
 
-        {/* RIGHT PANEL: Luxury Showcase & Social Proof (5 cols on desktop) */}
-        <div className="hidden lg:flex lg:col-span-5 bg-black text-white p-10 flex-col justify-between relative overflow-hidden">
+        {/* RIGHT PANEL: Luxury Showcase & Social Proof */}
+        <div className="hidden lg:flex lg:col-span-5 bg-[#09090B] text-[#FAFAFA] p-10 flex-col justify-between relative overflow-hidden border-l border-[#27272A]">
           {/* Top Badge */}
           <div className="space-y-4 relative z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-full text-[10px] font-black uppercase text-zinc-200">
-              <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-              Verified Career Intelligence
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#18181B] border border-[#27272A] rounded-full text-[10px] font-bold uppercase text-zinc-300">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#FAFAFA] animate-pulse" />
+              Verified Talent Operating System
             </div>
 
-            <h3 className="text-xl font-black tracking-tight leading-snug text-white">
-              The Complete 1-Stop AI Career &amp; Talent Operating System
+            <h3 className="text-xl font-bold tracking-tight leading-snug text-[#FAFAFA]">
+              The 1-Stop Talent Operating System for Engineers &amp; Recruiters
             </h3>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              Accelerate your engineering journey from ATS-optimized resumes to live WebRTC video mocks and 4-year salary negotiations.
+              Accelerate your hiring journey with ATS-optimized resumes, Monaco coding IDE, live video mocks, and 4-year salary negotiations.
             </p>
           </div>
 
           {/* Testimonial Quote Card */}
-          <div className="p-6 bg-zinc-900/90 border border-zinc-800 rounded-2xl space-y-3 relative z-10 shadow-lg">
-            <div className="flex items-center gap-1 text-amber-400 text-xs">
+          <div className="p-6 bg-[#18181B] border border-[#27272A] rounded-2xl space-y-3 relative z-10">
+            <div className="flex items-center gap-1 text-zinc-300 text-xs">
               {"★".repeat(5)}
             </div>
-            <p className="text-xs text-zinc-200 italic font-medium leading-relaxed">
-              &ldquo;KYRO helped me jump from a $140k senior role to a $285k Staff Infrastructure Engineer position at Stripe in under 3 weeks.&rdquo;
+            <p className="text-xs text-zinc-300 italic font-medium leading-relaxed">
+              &ldquo;paniund helped me jump from a $140k senior role to a $285k Staff Infrastructure Engineer position at Stripe in under 3 weeks.&rdquo;
             </p>
-            <div className="pt-2 border-t border-zinc-800 flex items-center justify-between text-[10px]">
-              <span className="font-bold text-white">Sarah Jenkins</span>
+            <div className="pt-2 border-t border-[#27272A] flex items-center justify-between text-[10px]">
+              <span className="font-bold text-[#FAFAFA]">Sarah Jenkins</span>
               <span className="text-zinc-500 font-mono">Staff SWE • Stripe</span>
             </div>
           </div>
 
           {/* Metric Telemetry Tickers */}
-          <div className="grid grid-cols-2 gap-3 relative z-10 pt-4 border-t border-zinc-800 text-xs">
+          <div className="grid grid-cols-2 gap-3 relative z-10 pt-4 border-t border-[#27272A] text-xs">
             <div>
-              <div className="text-xl font-black font-mono text-white">98.4%</div>
+              <div className="text-xl font-bold font-mono text-[#FAFAFA]">98.4%</div>
               <span className="text-[10px] text-zinc-400 uppercase font-bold">ATS Pass Rate</span>
             </div>
             <div>
-              <div className="text-xl font-black font-mono text-white">140k+</div>
+              <div className="text-xl font-bold font-mono text-[#FAFAFA]">140k+</div>
               <span className="text-[10px] text-zinc-400 uppercase font-bold">Semantic Jobs</span>
             </div>
           </div>

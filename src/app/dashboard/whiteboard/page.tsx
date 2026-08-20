@@ -4,9 +4,9 @@ import { redirect } from "next/navigation";
 import { WhiteboardArena } from "@/components/whiteboard/WhiteboardArena";
 
 export const metadata = {
-  title: "Collaborative System Design Whiteboard Arena | KYRO AI",
+  title: "Collaborative System Design Whiteboard Arena | Paniund",
   description:
-    "Interactive distributed architecture canvas for designing scalable microservices, caches, and databases with automated AI SPOF audits and capacity estimations.",
+    "Design distributed system architectures, calculate QPS and capacity math, and export Mermaid.js code directly in your browser.",
 };
 
 export default async function WhiteboardPage() {

@@ -30,7 +30,7 @@ const candidateCategories: CategoryGroup[] = [
     title: "Resume & ATS Studio",
     description: "Build ATS-compliant resumes, preview 6 pro templates, and optimize STAR bullets with metric diffs.",
     icon: "📄",
-    badge: "3 Tools",
+    badge: "4 Tools",
     features: [
       {
         id: "builder",
@@ -157,7 +157,7 @@ const candidateCategories: CategoryGroup[] = [
     title: "Salary & Career Strategy",
     description: "4-year equity vesting calculators, AI recruiter negotiation roleplay bots, and LinkedIn SEO optimizers.",
     icon: "💰",
-    badge: "2 Tools",
+    badge: "3 Tools",
     features: [
       {
         id: "salary-war-room",
@@ -390,28 +390,28 @@ export function StepByStepTileNavigator() {
   // STAGE 3: Sub-Feature Tiles inside a specific Category
   if (selectedPersona && selectedCategory) {
     return (
-      <div className="space-y-6 animate-in fade-in zoom-in-95 duration-150">
+      <div className="space-y-6 animate-in fade-in zoom-in-95 duration-150 text-[#FAFAFA]">
         {/* Breadcrumb Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-200">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#27272A]">
           <div>
             <button
               type="button"
               onClick={() => setSelectedCategory(null)}
-              className="text-xs font-bold text-zinc-500 hover:text-black flex items-center gap-1.5 cursor-pointer mb-1.5 transition-colors"
+              className="text-xs font-bold text-zinc-400 hover:text-[#FAFAFA] flex items-center gap-1.5 cursor-pointer mb-1.5 transition-colors"
             >
               <span>←</span>
               <span>Back to {activeMode === "candidate" ? "Candidate Categories" : "Recruiter Categories"}</span>
             </button>
             <div className="flex items-center gap-2">
               <span className="text-2xl">{selectedCategory.icon}</span>
-              <h2 className="text-xl sm:text-2xl font-black text-black tracking-tight">
+              <h2 className="text-xl sm:text-2xl font-bold text-[#FAFAFA] tracking-tight">
                 {selectedCategory.title}
               </h2>
             </div>
-            <p className="text-xs text-zinc-600 mt-1">{selectedCategory.description}</p>
+            <p className="text-xs text-zinc-400 mt-1">{selectedCategory.description}</p>
           </div>
 
-          <span className="px-3 py-1 bg-zinc-100 border border-zinc-300 text-xs font-black rounded-xl text-black self-start sm:self-auto">
+          <span className="px-3 py-1 bg-[#18181B] border border-[#27272A] text-xs font-bold rounded-xl text-[#FAFAFA] self-start sm:self-auto">
             {selectedCategory.features.length} Dedicated Tools
           </span>
         </div>
@@ -422,20 +422,20 @@ export function StepByStepTileNavigator() {
             <Link
               key={feature.id}
               href={feature.href}
-              className="p-6 bg-white border border-zinc-200 hover:border-black rounded-3xl shadow-xs hover:shadow-xl transition-all flex flex-col justify-between space-y-5 group hover:-translate-y-1 relative active:scale-[0.98]"
+              className="p-6 bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] rounded-3xl transition-all flex flex-col justify-between space-y-5 group hover:-translate-y-1 relative active:scale-[0.98]"
             >
               <div className="flex items-start justify-between gap-2">
-                <div className="w-12 h-12 rounded-2xl bg-zinc-100 border border-zinc-200 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform shadow-xs">
+                <div className="w-12 h-12 rounded-2xl bg-[#09090B] border border-[#27272A] flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
                   {feature.icon}
                 </div>
                 <div className="flex flex-col items-end gap-1">
                   {feature.badge && (
-                    <span className="px-2.5 py-0.5 rounded-md bg-black text-white text-[9px] font-black uppercase">
+                    <span className="px-2.5 py-0.5 rounded-md bg-[#27272A] text-[#FAFAFA] text-[9px] font-bold uppercase">
                       {feature.badge}
                     </span>
                   )}
                   {feature.highlightMetric && (
-                    <span className="text-[10px] font-mono font-bold text-zinc-500">
+                    <span className="text-[10px] font-mono font-bold text-zinc-400">
                       {feature.highlightMetric}
                     </span>
                   )}
@@ -443,16 +443,16 @@ export function StepByStepTileNavigator() {
               </div>
 
               <div className="space-y-1.5 flex-1">
-                <h3 className="text-base font-black text-black group-hover:text-zinc-900 transition-colors">
+                <h3 className="text-base font-bold text-[#FAFAFA] group-hover:text-white transition-colors">
                   {feature.title}
                 </h3>
-                <p className="text-xs font-bold text-zinc-700">{feature.tagline}</p>
-                <p className="text-xs text-zinc-500 leading-relaxed pt-1">
+                <p className="text-xs font-bold text-zinc-300">{feature.tagline}</p>
+                <p className="text-xs text-zinc-400 leading-relaxed pt-1">
                   {feature.description}
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-zinc-100 flex items-center justify-between text-xs font-bold text-black group-hover:underline">
+              <div className="pt-3 border-t border-[#27272A] flex items-center justify-between text-xs font-bold text-[#FAFAFA] group-hover:underline">
                 <span>Launch Tool</span>
                 <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
               </div>
@@ -466,27 +466,27 @@ export function StepByStepTileNavigator() {
   // STAGE 2: Category Tile Hub (when a persona is selected)
   if (selectedPersona) {
     return (
-      <div className="space-y-6 animate-in fade-in duration-150">
+      <div className="space-y-6 animate-in fade-in duration-150 text-[#FAFAFA]">
         {/* Header with Back to 2-Tile Persona Selector */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-200">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#27272A]">
           <div>
             <button
               type="button"
               onClick={() => setSelectedPersona(null)}
-              className="text-xs font-bold text-zinc-500 hover:text-black flex items-center gap-1.5 cursor-pointer mb-1.5 transition-colors"
+              className="text-xs font-bold text-zinc-400 hover:text-[#FAFAFA] flex items-center gap-1.5 cursor-pointer mb-1.5 transition-colors"
             >
               <span>←</span>
               <span>Back to Workspace Selector (2 Tiles)</span>
             </button>
             <div className="flex items-center gap-2">
               <span className="text-2xl">{activeMode === "candidate" ? "👤" : "👔"}</span>
-              <h2 className="text-xl sm:text-2xl font-black text-black tracking-tight">
+              <h2 className="text-xl sm:text-2xl font-bold text-[#FAFAFA] tracking-tight">
                 {activeMode === "candidate"
                   ? "Candidate & Engineering Suite"
                   : "Recruiter Talent Operating System"}
               </h2>
             </div>
-            <p className="text-xs text-zinc-600 mt-1">
+            <p className="text-xs text-zinc-400 mt-1">
               Select a category below to access dedicated single-purpose tools.
             </p>
           </div>
@@ -498,7 +498,7 @@ export function StepByStepTileNavigator() {
               setSelectedPersona(nextMode);
               setMode(nextMode);
             }}
-            className="touch-target px-4 py-2 bg-white hover:bg-zinc-100 border border-zinc-300 text-black text-xs font-bold rounded-xl transition-all shadow-xs flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
+            className="touch-target px-4 py-2 bg-[#18181B] hover:bg-[#27272A] border border-[#27272A] text-[#FAFAFA] text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
           >
             <span>⇄</span>
             <span>Switch to {activeMode === "candidate" ? "Recruiter OS" : "Candidate Suite"}</span>
@@ -511,27 +511,27 @@ export function StepByStepTileNavigator() {
             <div
               key={category.id}
               onClick={() => setSelectedCategory(category)}
-              className="p-6 sm:p-7 bg-white border border-zinc-200 hover:border-black rounded-3xl cursor-pointer shadow-xs hover:shadow-xl transition-all flex flex-col justify-between space-y-5 group hover:-translate-y-1 relative active:scale-[0.98]"
+              className="p-6 sm:p-7 bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] rounded-3xl cursor-pointer transition-all flex flex-col justify-between space-y-5 group hover:-translate-y-1 relative active:scale-[0.98]"
             >
               <div className="flex items-start justify-between">
-                <div className="w-14 h-14 rounded-2xl bg-zinc-100 border border-zinc-200 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform shadow-xs">
+                <div className="w-14 h-14 rounded-2xl bg-[#09090B] border border-[#27272A] flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
                   {category.icon}
                 </div>
-                <span className="px-2.5 py-1 rounded-md bg-zinc-100 border border-zinc-300 text-[10px] font-black uppercase text-black">
+                <span className="px-2.5 py-1 rounded-md bg-[#27272A] text-[10px] font-bold uppercase text-[#FAFAFA]">
                   {category.badge}
                 </span>
               </div>
 
               <div className="space-y-2 flex-1">
-                <h3 className="text-lg font-black text-black group-hover:text-zinc-900 transition-colors">
+                <h3 className="text-lg font-bold text-[#FAFAFA] group-hover:text-white transition-colors">
                   {category.title}
                 </h3>
-                <p className="text-xs text-zinc-600 leading-relaxed">
+                <p className="text-xs text-zinc-400 leading-relaxed">
                   {category.description}
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-zinc-100 flex items-center justify-between text-xs font-black text-black group-hover:underline">
+              <div className="pt-3 border-t border-[#27272A] flex items-center justify-between text-xs font-bold text-[#FAFAFA] group-hover:underline">
                 <span>View {category.features.length} Focused Tools</span>
                 <span className="group-hover:translate-x-1.5 transition-transform">&rarr;</span>
               </div>
@@ -544,17 +544,17 @@ export function StepByStepTileNavigator() {
 
   // STAGE 1 (DEFAULT HOME): Mobile-First 2 TILES ONLY
   return (
-    <div className="space-y-6 sm:space-y-8 animate-in fade-in zoom-in-95 duration-200 max-w-4xl mx-auto">
+    <div className="space-y-6 sm:space-y-8 animate-in fade-in zoom-in-95 duration-200 max-w-4xl mx-auto text-[#FAFAFA]">
       {/* Title Header */}
       <div className="text-center space-y-2">
-        <span className="px-3 py-1 rounded-full bg-zinc-100 border border-zinc-300 text-[10px] font-black uppercase tracking-wider text-black">
+        <span className="px-3 py-1 rounded-full bg-[#18181B] border border-[#27272A] text-[10px] font-bold uppercase tracking-wider text-zinc-300">
           SELECT YOUR WORKSPACE
         </span>
-        <h2 className="text-2xl sm:text-4xl font-black text-black tracking-tight">
-          Choose How You Want to Use KYRO
+        <h2 className="text-2xl sm:text-4xl font-bold text-[#FAFAFA] tracking-tight">
+          Choose How You Want to Use Paniund
         </h2>
-        <p className="text-xs sm:text-sm text-zinc-600 max-w-md mx-auto">
-          Tap one of the two options below to unlock your role-specific tools.
+        <p className="text-xs sm:text-sm text-zinc-400 max-w-md mx-auto">
+          Tap one of the two options below to unlock your role-specific talent operating system.
         </p>
       </div>
 
@@ -566,22 +566,22 @@ export function StepByStepTileNavigator() {
             setSelectedPersona("candidate");
             setMode("candidate");
           }}
-          className="p-6 sm:p-8 bg-white border-2 border-zinc-200 hover:border-black rounded-3xl cursor-pointer transition-all space-y-6 shadow-sm hover:shadow-2xl hover:-translate-y-1 relative group active:scale-[0.98]"
+          className="p-6 sm:p-8 bg-[#18181B] border-2 border-[#27272A] hover:border-[#FAFAFA] rounded-3xl cursor-pointer transition-all space-y-6 hover:-translate-y-1 relative group active:scale-[0.98]"
         >
           <div className="flex items-center justify-between">
-            <div className="w-16 h-16 rounded-2xl bg-zinc-100 border border-zinc-300 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform shadow-xs">
+            <div className="w-16 h-16 rounded-2xl bg-[#09090B] border border-[#27272A] flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
               👤
             </div>
-            <span className="px-3 py-1 bg-zinc-100 border border-zinc-300 text-[10px] font-black uppercase rounded-lg text-black">
+            <span className="px-3 py-1 bg-[#27272A] text-[10px] font-bold uppercase rounded-lg text-zinc-300">
               FOR JOB SEEKERS &amp; ENGINEERS
             </span>
           </div>
 
           <div className="space-y-2">
-            <h3 className="text-xl sm:text-2xl font-black text-black">
+            <h3 className="text-xl sm:text-2xl font-bold text-[#FAFAFA]">
               Candidate &amp; Engineering Suite
             </h3>
-            <p className="text-xs text-zinc-600 leading-relaxed font-medium">
+            <p className="text-xs text-zinc-400 leading-relaxed font-medium">
               Accelerate your career, build ATS-optimized resumes, solve in-browser coding challenges, practice spoken voice interviews, and simulate salary negotiations.
             </p>
           </div>
@@ -591,7 +591,7 @@ export function StepByStepTileNavigator() {
             {["📄 6 ATS Templates", "💻 Monaco Coding IDE", "🎙️ Spoken Voice Mocks", "💰 Salary War Room", "🤖 Auto Hunter"].map((pill, idx) => (
               <span
                 key={idx}
-                className="px-2.5 py-1 rounded-lg bg-zinc-100 border border-zinc-200 text-[10px] font-bold text-black"
+                className="px-2.5 py-1 rounded-lg bg-[#09090B] border border-[#27272A] text-[10px] font-bold text-zinc-300"
               >
                 {pill}
               </span>
@@ -600,7 +600,7 @@ export function StepByStepTileNavigator() {
 
           <button
             type="button"
-            className="touch-target w-full py-4 bg-black hover:bg-zinc-800 text-white font-black text-xs uppercase tracking-wider rounded-2xl border border-black transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+            className="touch-target w-full py-4 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] font-bold text-xs uppercase tracking-wider rounded-2xl border border-[#FAFAFA] transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
           >
             <span>Launch Candidate Suite &rarr;</span>
           </button>
@@ -612,22 +612,22 @@ export function StepByStepTileNavigator() {
             setSelectedPersona("recruiter");
             setMode("recruiter");
           }}
-          className="p-6 sm:p-8 bg-white border-2 border-zinc-200 hover:border-black rounded-3xl cursor-pointer transition-all space-y-6 shadow-sm hover:shadow-2xl hover:-translate-y-1 relative group active:scale-[0.98]"
+          className="p-6 sm:p-8 bg-[#18181B] border-2 border-[#27272A] hover:border-[#FAFAFA] rounded-3xl cursor-pointer transition-all space-y-6 hover:-translate-y-1 relative group active:scale-[0.98]"
         >
           <div className="flex items-center justify-between">
-            <div className="w-16 h-16 rounded-2xl bg-zinc-100 border border-zinc-300 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform shadow-xs">
+            <div className="w-16 h-16 rounded-2xl bg-[#09090B] border border-[#27272A] flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
               👔
             </div>
-            <span className="px-3 py-1 bg-zinc-100 border border-zinc-300 text-[10px] font-black uppercase rounded-lg text-black">
+            <span className="px-3 py-1 bg-[#27272A] text-[10px] font-bold uppercase rounded-lg text-zinc-300">
               FOR RECRUITERS &amp; HIRING TEAMS
             </span>
           </div>
 
           <div className="space-y-2">
-            <h3 className="text-xl sm:text-2xl font-black text-black">
+            <h3 className="text-xl sm:text-2xl font-bold text-[#FAFAFA]">
               Recruiter Talent Operating System
             </h3>
-            <p className="text-xs text-zinc-600 leading-relaxed font-medium">
+            <p className="text-xs text-zinc-400 leading-relaxed font-medium">
               Architect bias-free job descriptions in 15 seconds, screen candidate resumes in bulk, manage 8-stage Kanban pipelines, and host WebRTC interview rooms.
             </p>
           </div>
@@ -637,7 +637,7 @@ export function StepByStepTileNavigator() {
             {["📝 AI Job Architect", "📋 8-Stage Kanban", "⚡ Bulk ATS Screener", "📹 WebRTC Rooms", "🎯 Scorecards"].map((pill, idx) => (
               <span
                 key={idx}
-                className="px-2.5 py-1 rounded-lg bg-zinc-100 border border-zinc-200 text-[10px] font-bold text-black"
+                className="px-2.5 py-1 rounded-lg bg-[#09090B] border border-[#27272A] text-[10px] font-bold text-zinc-300"
               >
                 {pill}
               </span>
@@ -646,7 +646,7 @@ export function StepByStepTileNavigator() {
 
           <button
             type="button"
-            className="touch-target w-full py-4 bg-black hover:bg-zinc-800 text-white font-black text-xs uppercase tracking-wider rounded-2xl border border-black transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+            className="touch-target w-full py-4 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] font-bold text-xs uppercase tracking-wider rounded-2xl border border-[#FAFAFA] transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
           >
             <span>Launch Recruiter OS &rarr;</span>
           </button>

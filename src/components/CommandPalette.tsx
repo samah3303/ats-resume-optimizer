@@ -242,10 +242,10 @@ export default function CommandPalette() {
       />
 
       {/* Palette Modal */}
-      <div className="relative w-full max-w-xl bg-white border border-zinc-200 rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-        {/* Search Header */}
-        <div className="flex items-center px-4 py-3.5 border-b border-zinc-200 gap-3">
-          <span className="text-lg text-zinc-400">🔍</span>
+      <div className="bg-[#18181B] border border-[#27272A] rounded-3xl w-full max-w-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-[#FAFAFA]">
+        {/* Search Input Bar */}
+        <div className="p-4 border-b border-[#27272A] flex items-center gap-3">
+          <span className="text-zinc-400 text-lg">🔍</span>
           <input
             ref={inputRef}
             type="text"
@@ -260,17 +260,17 @@ export default function CommandPalette() {
                 ? "Search candidate tools, resumes, mocks, coding... (or type > to switch)"
                 : "Search recruiter tools, jobs, pipelines, candidates..."
             }
-            className="w-full bg-transparent text-sm font-semibold text-black placeholder-zinc-400 outline-none"
+            className="w-full bg-transparent text-sm font-semibold text-[#FAFAFA] placeholder-zinc-500 outline-none"
           />
-          <kbd className="px-2 py-0.5 bg-zinc-100 border border-zinc-300 text-[10px] font-mono text-zinc-600 rounded">
+          <kbd className="px-2 py-0.5 bg-[#09090B] border border-[#27272A] text-[10px] font-mono text-zinc-400 rounded">
             ESC
           </kbd>
         </div>
 
         {/* Mode Switcher Shortcut Bar */}
-        <div className="px-4 py-2 bg-zinc-50 border-b border-zinc-200 flex items-center justify-between text-xs">
-          <span className="text-[11px] font-bold text-zinc-500">
-            Active Workspace: <strong className="text-black uppercase">{mode}</strong>
+        <div className="px-4 py-2 bg-[#09090B] border-b border-[#27272A] flex items-center justify-between text-xs">
+          <span className="text-[11px] font-bold text-zinc-400">
+            Active Workspace: <strong className="text-[#FAFAFA] uppercase">{mode}</strong>
           </span>
           <button
             type="button"
@@ -278,14 +278,14 @@ export default function CommandPalette() {
               setMode(mode === "candidate" ? "recruiter" : "candidate");
               setOpen(false);
             }}
-            className="text-[11px] font-bold text-black hover:underline flex items-center gap-1"
+            className="text-[11px] font-bold text-[#FAFAFA] hover:underline flex items-center gap-1 cursor-pointer"
           >
             <span>⇄ Switch to {mode === "candidate" ? "Recruiter OS" : "Candidate Suite"}</span>
           </button>
         </div>
 
         {/* Results List */}
-        <div className="max-h-80 overflow-y-auto p-2 divide-y divide-zinc-100">
+        <div className="max-h-80 overflow-y-auto p-2 divide-y divide-[#27272A]">
           {filteredCommands.length > 0 ? (
             filteredCommands.map((item, index) => {
               const isSelected = index === selectedIndex;
@@ -299,22 +299,22 @@ export default function CommandPalette() {
                   onMouseEnter={() => setSelectedIndex(index)}
                   className={`flex items-center justify-between p-3 rounded-2xl cursor-pointer transition-all ${
                     isSelected
-                      ? "bg-black text-white shadow-xs"
-                      : "hover:bg-zinc-100 text-zinc-900"
+                      ? "bg-[#FAFAFA] text-[#09090B]"
+                      : "hover:bg-[#222226] text-[#FAFAFA]"
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-xl shrink-0">{item.icon}</span>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className={`text-xs font-black ${isSelected ? "text-white" : "text-black"}`}>
+                        <span className={`text-xs font-black ${isSelected ? "text-[#09090B]" : "text-[#FAFAFA]"}`}>
                           {item.title}
                         </span>
                         <span
                           className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
                             isSelected
-                              ? "bg-zinc-800 text-zinc-200"
-                              : "bg-zinc-100 text-zinc-600 border border-zinc-200"
+                              ? "bg-zinc-200 text-zinc-800"
+                              : "bg-[#27272A] text-zinc-300 border border-[#3F3F46]"
                           }`}
                         >
                           {item.category}
@@ -322,7 +322,7 @@ export default function CommandPalette() {
                       </div>
                       <p
                         className={`text-[11px] line-clamp-1 mt-0.5 ${
-                          isSelected ? "text-zinc-300" : "text-zinc-500"
+                          isSelected ? "text-zinc-700" : "text-zinc-400"
                         }`}
                       >
                         {item.description}
@@ -347,12 +347,12 @@ export default function CommandPalette() {
         </div>
 
         {/* Footer Navigation Hints */}
-        <div className="px-4 py-2.5 bg-zinc-50 border-t border-zinc-200 flex items-center justify-between text-[10px] text-zinc-500 font-mono">
+        <div className="px-4 py-2.5 bg-[#09090B] border-t border-[#27272A] flex items-center justify-between text-[10px] text-zinc-400 font-mono">
           <div className="flex items-center gap-3">
-            <span><kbd className="font-bold">↑↓</kbd> to navigate</span>
-            <span><kbd className="font-bold">↵</kbd> to select</span>
+            <span><kbd className="font-bold text-zinc-300">↑↓</kbd> to navigate</span>
+            <span><kbd className="font-bold text-zinc-300">↵</kbd> to select</span>
           </div>
-          <span>KYRO Omni-Search</span>
+          <span className="font-bold lowercase">paniund omni-search</span>
         </div>
       </div>
     </div>

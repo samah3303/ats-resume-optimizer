@@ -4,8 +4,9 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 
 export const metadata = {
-  title: "Live WebRTC Interview Rooms & Copilot | KYRO AI",
-  description: "Create and manage peer-to-peer HD video interview rooms with synchronized coding pads and live AI fact-checking copilot.",
+  title: "Live WebRTC Interview Rooms & Copilot | Paniund",
+  description:
+    "Conduct live 1-on-1 technical and behavioral interviews with synchronized coding sandboxes, collaborative scorecards, and a real-time AI fact-checking copilot.",
 };
 
 export default async function InterviewRoomsPage() {

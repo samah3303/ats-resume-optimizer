@@ -4,9 +4,9 @@ import { redirect } from "next/navigation";
 import { VideoAnalyticsDashboard } from "@/components/video/VideoAnalyticsDashboard";
 
 export const metadata = {
-  title: "Multi-Modal Video Emotion & Confidence Analytics | KYRO AI",
+  title: "Multi-Modal Video Emotion & Confidence Analytics | Paniund",
   description:
-    "Real-time webcam computer vision telemetry measuring eye contact directness, posture stability, micro-expression confidence, and executive presence.",
+    "Real-time computer vision analysis for mock interviews: Eye contact %, posture stability, facial emotion trends, and lighting quality index.",
 };
 
 export default async function VideoAnalyticsPage() {

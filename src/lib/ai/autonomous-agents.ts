@@ -52,7 +52,7 @@ export async function runHunterAgentScan(params: {
 }> {
   const { candidateName, candidateResumeText, targetRole = "Software Engineer" } = params;
 
-  const prompt = `You are the KYRO Autonomous Job Hunter Agent running background semantic scans.
+  const prompt = `You are the Paniund Autonomous Job Hunter Agent running background semantic scans.
 Analyze the candidate's background and generate 2 high-match, realistic, tailored job application packets for ${targetRole}.
 
 Candidate Resume Context:

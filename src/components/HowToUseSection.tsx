@@ -22,7 +22,7 @@ const STEPS: Step[] = [
     title: "Upload Primary Resume & Target Goals",
     subtitle: "Establish baseline ATS score & target country",
     description:
-      "Upload your primary resume in PDF or DOCX format. KYRO automatically extracts your core skills, work history, target roles, and country preferences, establishing your General ATS baseline score.",
+      "Upload your primary resume in PDF or DOCX format. Paniund automatically extracts your core skills, work history, target roles, and country preferences, establishing your General ATS baseline score.",
     actionText: "Upload Primary Resume",
     actionHref: "/dashboard/resumes",
     icon: "📄",
@@ -30,7 +30,7 @@ const STEPS: Step[] = [
     tips: [
       "Set your primary resume to drive your onboarding analysis baseline.",
       "Specify your target country (UAE, India, US, etc.) for region-specific ATS algorithms.",
-      "KYRO auto-populates target positions and skills directly from your uploaded document.",
+      "Paniund auto-populates target positions and skills directly from your uploaded document.",
     ],
   },
   {
@@ -198,30 +198,30 @@ export default function HowToUseSection() {
   return (
     <div className="space-y-16 py-4 bg-white text-black">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-3xl bg-zinc-50 text-black p-8 sm:p-12 border border-zinc-200 shadow-sm">
+      <div className="relative overflow-hidden rounded-3xl bg-[#18181B] text-[#FAFAFA] p-8 sm:p-12 border border-[#27272A]">
         <div className="relative z-10 max-w-3xl space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-200 border border-zinc-300 text-xs font-bold text-black">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#09090B] border border-[#27272A] text-xs font-bold text-zinc-300">
             <span>🚀 Complete Job Search Acceleration Playbook</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight text-black">
-            How to Master KYRO to Land Your Dream Job
+          <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-tight text-[#FAFAFA]">
+            How to Master Paniund to Land Your Dream Job
           </h1>
 
-          <p className="text-sm sm:text-base text-zinc-600 leading-relaxed font-medium">
+          <p className="text-sm sm:text-base text-zinc-400 leading-relaxed font-medium">
             Follow our 6-step system engineered to optimize your resume for ATS bots, boost recruiter outreach response rates, master interview prep, and maintain daily search discipline.
           </p>
 
           <div className="flex flex-wrap gap-4 pt-2">
             <Link
               href="/dashboard/builder"
-              className="px-6 py-3 rounded-xl bg-black hover:bg-zinc-800 font-bold text-xs text-white shadow-sm transition-all hover:scale-[1.02] border border-black"
+              className="px-6 py-3 rounded-xl bg-[#FAFAFA] hover:bg-zinc-200 font-bold text-xs text-[#09090B] transition-all border border-[#FAFAFA]"
             >
               Open Resume Studio →
             </Link>
             <Link
               href="/dashboard/compare"
-              className="px-6 py-3 rounded-xl bg-white hover:bg-zinc-100 border border-zinc-300 font-bold text-xs text-black transition-all shadow-sm"
+              className="px-6 py-3 rounded-xl bg-[#09090B] hover:bg-[#27272A] border border-[#27272A] font-bold text-xs text-[#FAFAFA] transition-all"
             >
               Batch Compare Resumes ⚖️
             </Link>
@@ -230,15 +230,15 @@ export default function HowToUseSection() {
       </div>
 
       {/* Founder's Story Banner */}
-      <div className="p-6 bg-zinc-50 text-black rounded-3xl border border-zinc-200 shadow-sm space-y-3">
-        <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-black">
-          <span>❤️ Why KYRO Was Built</span>
+      <div className="p-6 bg-[#18181B] text-[#FAFAFA] rounded-3xl border border-[#27272A] space-y-3">
+        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-zinc-300">
+          <span>❤️ Why Paniund Was Built</span>
         </div>
-        <h3 className="text-base sm:text-lg font-black text-black">
+        <h3 className="text-base sm:text-lg font-bold text-[#FAFAFA]">
           Built From 8 Months of Job Hunt Struggle to Make Sure Everyone Lands Interviews
         </h3>
-        <p className="text-xs text-zinc-600 leading-relaxed font-medium">
-          &quot;After suffering through 8 months of ghosting and automated ATS rejection emails, I created KYRO to break open the black box of corporate hiring algorithms. We keep this platform 100% free for job seekers right now so no candidate suffers alone.&quot;
+        <p className="text-xs text-zinc-400 leading-relaxed font-medium">
+          &quot;After suffering through 8 months of ghosting and automated ATS rejection emails, I created Paniund to break open the black box of corporate hiring algorithms. We keep this platform 100% free for job seekers right now so no candidate suffers alone.&quot;
         </p>
       </div>
 

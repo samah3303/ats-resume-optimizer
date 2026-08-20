@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import ScoreGauge from "@/components/ScoreGauge";
+import Logo from "@/components/Logo";
 
 interface SharedAnalysis {
   id: string;
@@ -77,21 +78,12 @@ export default function SharedAnalysisPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-black">
+    <div className="min-h-screen bg-[#09090B] text-[#FAFAFA]">
       {/* Header */}
-      <header className="bg-white border-b border-zinc-200">
+      <header className="bg-[#09090B] border-b border-[#27272A]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center font-black text-xs">
-                K
-              </div>
-              <span className="text-lg font-black text-black">
-                KYRO
-              </span>
-            </Link>
-          </div>
-          <span className="px-3 py-1 bg-zinc-100 text-black border border-zinc-300 text-xs font-bold rounded-full">
+          <Logo size="md" />
+          <span className="px-3 py-1 bg-[#18181B] text-[#FAFAFA] border border-[#27272A] text-xs font-bold rounded-full">
             Shared Analysis
           </span>
         </div>
@@ -192,9 +184,9 @@ export default function SharedAnalysisPage() {
             Optimized with{" "}
             <Link
               href="/"
-              className="text-black hover:underline font-bold"
+              className="text-[#FAFAFA] hover:underline font-bold"
             >
-              KYRO AI
+              paniund
             </Link>
           </p>
         </div>

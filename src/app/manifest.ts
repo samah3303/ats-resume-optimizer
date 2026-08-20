@@ -2,13 +2,13 @@ import { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'KYRO — AI Career & Talent Operating System',
-    short_name: 'KYRO',
-    description: 'The Complete 1-Stop AI Career Platform: Resume Studio, Coding Sandbox, Spoken Mock Interviews, Recruiter OS, and Salary War Room.',
+    name: 'Paniund — The Talent Operating System',
+    short_name: 'paniund',
+    description: 'The Complete 1-Stop Talent Operating System: Resume Studio, Coding Sandbox, Spoken Mock Interviews, Recruiter OS, and Salary War Room.',
     start_url: '/dashboard',
     display: 'standalone',
-    background_color: '#FFFFFF',
-    theme_color: '#000000',
+    background_color: '#09090B',
+    theme_color: '#09090B',
     orientation: 'portrait-primary',
     categories: ['productivity', 'business'],
     icons: [

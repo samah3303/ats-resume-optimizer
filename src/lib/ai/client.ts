@@ -49,7 +49,7 @@ export function getAiModelName(): string {
 /**
  * Static frozen system prompt prefix to maximize LLM Prompt Cache hits (75-90% discount).
  */
-export const STATIC_SYSTEM_PREFIX = `You are KYRO AI, the Universal Career & Talent Operating System. Output strict, valid JSON matching requested schemas without markdown wrapper formatting unless requested.`;
+export const STATIC_SYSTEM_PREFIX = `You are Paniund, the Universal Talent Operating System. Output strict, valid JSON matching requested schemas without markdown wrapper formatting unless requested.`;
 
 /**
  * Builds a prompt array structured to maximize LLM Prompt Caching.

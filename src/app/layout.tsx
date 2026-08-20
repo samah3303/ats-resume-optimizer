@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Sora, JetBrains_Mono } from "next/font/google";
+import { JetBrains_Mono } from "next/font/google";
 import SessionProvider from "@/components/SessionProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import Navbar from "@/components/Navbar";
@@ -9,12 +9,6 @@ import { WorkspaceModeProvider } from "@/components/WorkspaceModeContext";
 import BottomActionDock from "@/components/BottomActionDock";
 import "./globals.css";
 
-const sora = Sora({
-  variable: "--font-sora",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
-});
-
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin"],
@@ -22,12 +16,13 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "KYRO — The Complete 1-Stop AI Career & Talent Operating System",
+  title: "Paniund — The Talent Operating System",
   description:
-    "Universal AI platform for job seekers and recruiters: Semantic Job Matching, ATS Resume Studio, In-Browser Coding Sandbox, AI Voice Mock Interviews, LinkedIn Outreach, and Salary Negotiation War Room.",
+    "Universal talent operating system for job seekers and recruiters: Semantic Job Matching, ATS Resume Studio, Monaco Coding Challenges, AI Voice Mock Interviews, and Recruiter Pipelines.",
   keywords: [
-    "KYRO AI",
-    "career operating system",
+    "Paniund",
+    "paniund.com",
+    "talent operating system",
     "ATS resume studio",
     "AI mock interview voice",
     "in-browser coding challenge",
@@ -35,20 +30,20 @@ export const metadata: Metadata = {
     "salary negotiation simulator",
     "job search AI",
   ],
-  authors: [{ name: "KYRO Team" }],
+  authors: [{ name: "Paniund Team" }],
   openGraph: {
-    title: "KYRO — The Complete 1-Stop AI Career & Talent Operating System",
+    title: "Paniund — The Talent Operating System",
     description:
-      "All-in-one AI platform for job search, ATS resume building, coding challenges, conversational voice mock interviews, and recruiter talent pipelines.",
-    url: "https://kyro-ai.vercel.app",
-    siteName: "KYRO",
+      "All-in-one talent operating system for job search, ATS resume building, coding challenges, conversational voice mock interviews, and recruiter talent pipelines.",
+    url: "https://paniund.com",
+    siteName: "Paniund",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "KYRO — The Complete 1-Stop AI Career & Talent Operating System",
+    title: "Paniund — The Talent Operating System",
     description:
-      "All-in-one AI platform for job search, ATS resume building, coding challenges, conversational voice mock interviews, and recruiter talent pipelines.",
+      "All-in-one talent operating system for job search, ATS resume building, coding challenges, conversational voice mock interviews, and recruiter talent pipelines.",
   },
   icons: {
     icon: "/icon.svg",
@@ -56,8 +51,8 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
-    title: "KYRO",
+    statusBarStyle: "black-translucent",
+    title: "Paniund",
   },
   other: {
     "mobile-web-app-capable": "yes",
@@ -72,9 +67,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${sora.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${jetbrainsMono.variable} h-full antialiased dark`}
     >
       <head>
+        <link
+          rel="stylesheet"
+          href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,800,900&display=swap"
+        />
         <script
           async
           src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID || ""}`}
@@ -89,12 +88,12 @@ export default function RootLayout({
             `,
           }}
         />
-        <meta name="theme-color" content="#FFFFFF" />
+        <meta name="theme-color" content="#09090B" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
       </head>
-      <body className="min-h-full flex flex-col bg-white text-zinc-950 font-sans selection:bg-black selection:text-white">
+      <body className="min-h-full flex flex-col bg-[#09090B] text-[#FAFAFA] font-sans selection:bg-[#FAFAFA] selection:text-[#09090B]">
         <ThemeProvider>
           <SessionProvider>
             <WorkspaceModeProvider>

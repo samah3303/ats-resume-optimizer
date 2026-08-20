@@ -10,7 +10,7 @@ export async function generateMetadata({
 }) {
   const { roomId } = await params;
   return {
-    title: `Live Interview Room #${roomId} | KYRO AI`,
+    title: `Live Interview Room #${roomId} | Paniund`,
     description: "Peer-to-peer WebRTC video interview room with synchronized code pad and real-time AI fact-checking copilot.",
   };
 }
