@@ -1,188 +1,370 @@
+"use client";
+
 import Link from "next/link";
-import StatsAndReviewsSection from "@/components/StatsAndReviewsSection";
 import Logo from "@/components/Logo";
+import StatsAndReviewsSection from "@/components/StatsAndReviewsSection";
 import { LiveHeroDemoWidget } from "./LiveHeroDemoWidget";
 
 export default function UnauthenticatedHero() {
-  const PLATFORM_MODULES = [
+  // Core Feature Deep-Dive Tiles (The OS Feel)
+  const OS_TILES = [
     {
-      id: "resume-studio",
-      tag: "RESUME STUDIO",
-      title: "ATS Resume Builder & 6 Pro Templates",
+      id: "semantic-discovery",
+      icon: "🔍",
+      tag: "PGVECTOR MATCH",
+      title: "Semantic Job Discovery",
       description:
-        "Build pixel-perfect, ATS-verified resumes with 6 design templates, inline STAR metric rewriters, and instant PDF/DOCX downloads.",
-      icon: "📄",
+        "Rank 140k+ multi-board live job postings using 384-dimensional pgvector cosine embeddings matched directly against your verified resume graph.",
+      badge: "384-Dim Vector",
+      href: "/dashboard/jobs",
+    },
+    {
+      id: "star-diff-engine",
+      icon: "✨",
+      tag: "DIFF ENGINE",
+      title: "STAR Metric Diff Rewriter",
+      description:
+        "Transform weak passive verbs into quantified achievements with live red/green inline character diffs and ATS keyword density verification.",
+      badge: "Inline Diffs",
       href: "/dashboard/builder",
-      highlights: ["6 Tested ATS Templates", "STAR Metric Diff Enhancer", "Target Keyword Checklist", "Instant PDF & DOCX Export"],
     },
     {
-      id: "coding-sandbox",
-      tag: "CODING IDE",
-      title: "In-Browser Coding Practice & Big-O Analyzer",
-      description:
-        "Full Monaco IDE in JS, TS, and Python with live unit test assertions, pointer visualizers, and instant Big-O complexity feedback.",
-      icon: "💻",
-      href: "/dashboard/challenges",
-      highlights: ["Multi-Language Monaco IDE", "Step Pointer Visualizer", "Big-O Time/Space Reviewer", "Runtime & Memory Profiling"],
-    },
-    {
-      id: "voice-interviewer",
-      tag: "VOICE COACH",
-      title: "Live Spoken Mock Interviews & Audio Waveforms",
-      description:
-        "Practice realistic spoken interviews across 8 personas with live audio waveforms, filler-word tracking, and instant STAR scorecards.",
-      icon: "🎙️",
-      href: "/dashboard/mock-interview",
-      highlights: ["8 Interviewer Personas", "Real-Time Audio Waveforms", "Filler-Word Counter HUD", "Turn-by-Turn STAR Coaching"],
-    },
-    {
-      id: "video-analytics",
-      tag: "VIDEO PRESENCE",
-      title: "Webcam Gaze & Executive Composure Coach",
-      description:
-        "Camera HUD tracking real-time eye contact directness, posture stability, and executive presence to ensure you look confident.",
-      icon: "👁️",
-      href: "/dashboard/video-analytics",
-      highlights: ["Direct Eye Contact %", "Posture Stability Meter", "Lighting Pre-Flight Check", "Executive Presence Report"],
-    },
-    {
-      id: "job-hub",
-      tag: "JOB RADAR",
-      title: "Smart Job Discovery & Autonomous Hunter Swarm",
-      description:
-        "Automatically scan 140k+ live job openings, match your exact skills, and generate tailored application packets 24/7.",
+      id: "autonomous-swarm",
       icon: "🤖",
+      tag: "BACKGROUND SWARM",
+      title: "Autonomous Hunter Swarm",
+      description:
+        "Deploy 24/7 background AI agents that scout job markets, synthesize tailored application packets, and auto-sync with your Kanban pipeline.",
+      badge: "4 Active Agents",
       href: "/dashboard/agents",
-      highlights: ["Autonomous Hunter Agent", "Skill Match Accuracy", "Salary Surge Insights", "1-Click Tracker Sync"],
     },
     {
-      id: "negotiation-war-room",
-      tag: "SALARY WAR ROOM",
-      title: "Salary Negotiation Simulator & 4-Year Equity",
+      id: "voice-telemetry",
+      icon: "🎙️",
+      tag: "WEB SPEECH AI",
+      title: "Spoken Voice Mock Coach",
       description:
-        "Calculate 4-year total compensation with equity vesting curves, simulate live negotiations against an AI recruiter bot, and compare competing offers.",
+        "Practice out loud across 8 industry personas with live 48-bar audio waveform rendering, real-time filler word counting, and instant STAR debriefs.",
+      badge: "8 Personas",
+      href: "/dashboard/mock-interview",
+    },
+    {
+      id: "video-hud",
+      icon: "👁️",
+      tag: "COMPUTER VISION",
+      title: "Video Composure & Gaze HUD",
+      description:
+        "Webcam-powered telemetry assessing direct eye contact percentage, posture stability index, and lighting pre-flight checks before live rounds.",
+      badge: "Vision HUD",
+      href: "/dashboard/video-analytics",
+    },
+    {
+      id: "equity-vesting",
       icon: "💰",
+      tag: "COMPENSATION LAB",
+      title: "4-Year Equity Vesting Simulator",
+      description:
+        "Model 4-year total compensation across RSUs, options, and performance bonuses, paired with an AI recruiter negotiation roleplay bot.",
+      badge: "4-Year Vesting",
       href: "/dashboard/offers",
-      highlights: ["4-Year Equity Vesting Schedules", "Live AI Recruiter Roleplay", "Secret Coach Win-Rate Predictor", "Multi-Offer Decision Matrix"],
     },
   ];
 
   return (
-    <div className="flex flex-col bg-[#09090B] text-[#FAFAFA] font-sans">
-      {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center text-center px-4 py-16 md:py-24 bg-[#09090B] border-b border-[#27272A]">
+    <div className="flex flex-col bg-[#09090B] text-[#FAFAFA] font-sans selection:bg-[#FAFAFA] selection:text-[#09090B] overflow-x-hidden">
+      {/* ──────────────────────────────────────────────────────────────────────── */}
+      {/* A. HERO SECTION (High Impact)                                            */}
+      {/* ──────────────────────────────────────────────────────────────────────── */}
+      <section className="relative px-4 sm:px-6 lg:px-8 py-16 sm:py-20 md:py-28 border-b border-[#27272A] flex flex-col items-center justify-center text-center">
+        {/* Subtle Ambient Glow */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 sm:w-[600px] h-64 sm:h-96 bg-zinc-800/10 rounded-full blur-3xl pointer-events-none -z-10" />
+
         <div className="max-w-5xl mx-auto space-y-8">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#18181B] border border-[#27272A] text-zinc-300 rounded-full text-xs font-bold uppercase tracking-wider">
-            <span>⚡</span> THE 1-STOP TALENT OPERATING SYSTEM
+          {/* Eyebrow Badge */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#18181B] border border-[#27272A] rounded-full text-[11px] font-bold uppercase tracking-wider text-zinc-300">
+            <span className="w-2 h-2 rounded-full bg-[#FAFAFA] animate-pulse" />
+            <span>PALETTE A • THE TALENT OPERATING SYSTEM</span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-[#FAFAFA] leading-[1.08]">
-            Land Your Dream Role Faster — Powered by{" "}
-            <span className="underline decoration-[#FAFAFA] decoration-2 underline-offset-8">
-              paniund.
-            </span>
+          {/* Main Headline */}
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-[#FAFAFA] leading-[1.06] max-w-4xl mx-auto">
+            The Complete 1-Stop AI Career &amp; Talent Operating System.
           </h1>
 
-          <p className="text-sm sm:text-base md:text-lg text-zinc-400 max-w-3xl mx-auto leading-relaxed font-medium">
-            Beat ATS screening algorithms with 6 verified resume templates, practice live spoken mock interviews, solve Monaco coding challenges, and auto-discover roles 24/7.
+          {/* Subheadline */}
+          <p className="text-sm sm:text-base md:text-lg text-[#A1A1AA] max-w-3xl mx-auto leading-relaxed font-normal">
+            Paniund unites the entire hiring lifecycle in a distraction-free, high-performance monochrome environment — empowering job seekers to master technical interviews and enabling recruiters to build world-class engineering teams without friction.
           </p>
 
-          {/* Primary Action CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
+          {/* Dual High-Contrast CTAs */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2 w-full max-w-md sm:max-w-none mx-auto">
+            {/* Button 1: Candidate (Primary Style) */}
             <Link
               href="/login"
-              className="touch-target w-full sm:w-auto px-8 py-4 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] font-bold text-xs rounded-2xl transition-all border border-[#FAFAFA] flex items-center justify-center gap-2 active:scale-95"
+              className="touch-target w-full sm:w-auto min-h-[48px] px-8 py-3.5 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] font-bold text-xs uppercase tracking-wider rounded-2xl transition-all border border-[#FAFAFA] flex items-center justify-center gap-2 active:scale-95 cursor-pointer shadow-sm"
             >
-              <span>Explore Candidate Suite Free</span>
+              <span>👤 Enter as Candidate</span>
               <span>&rarr;</span>
             </Link>
+
+            {/* Button 2: Recruiter (Secondary / Outlined Style) */}
             <Link
               href="/dashboard/recruiter"
-              className="touch-target w-full sm:w-auto px-8 py-4 border border-[#27272A] bg-[#18181B] text-[#FAFAFA] hover:bg-[#222226] font-bold text-xs rounded-2xl transition-all flex items-center justify-center gap-2 active:scale-95"
+              className="touch-target w-full sm:w-auto min-h-[48px] px-8 py-3.5 bg-[#18181B] hover:bg-[#222226] text-[#FAFAFA] font-bold text-xs uppercase tracking-wider rounded-2xl transition-all border border-[#27272A] hover:border-[#FAFAFA] flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
             >
-              <span>👔</span>
-              <span>For Hiring &amp; Recruiter Teams</span>
+              <span>👔 Enter as Recruiter</span>
             </Link>
           </div>
 
-          {/* Interactive Live Hero Demo */}
-          <div className="pt-6">
+          {/* Interactive Live 3-Second Demo Widget */}
+          <div className="pt-8 w-full">
             <LiveHeroDemoWidget />
           </div>
         </div>
       </section>
 
-      {/* Platform Ecosystem Architecture Grid */}
-      <section className="py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-[#09090B] border-b border-[#27272A]">
+      {/* ──────────────────────────────────────────────────────────────────────── */}
+      {/* B. THE DUAL ECOSYSTEM (Bifurcated Layout)                                */}
+      {/* ──────────────────────────────────────────────────────────────────────── */}
+      <section className="py-20 md:py-28 px-4 sm:px-6 lg:px-8 border-b border-[#27272A] bg-[#09090B]">
         <div className="max-w-7xl mx-auto space-y-12">
+          {/* Section Header */}
           <div className="text-center max-w-3xl mx-auto space-y-3">
-            <span className="px-3.5 py-1.5 bg-[#18181B] text-zinc-300 border border-[#27272A] text-xs font-bold uppercase rounded-full tracking-wider">
-              🛠️ EVERYTHING YOU NEED TO GET HIRED
+            <span className="px-3.5 py-1 bg-[#18181B] border border-[#27272A] text-[10px] font-bold uppercase tracking-wider text-zinc-300 rounded-full">
+              DUAL-SIDED TALENT OS
             </span>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#FAFAFA] tracking-tight">
-              Six Specialized AI Engines in One Clean Command Center
+              Engineered for Both Sides of the Hiring Table
             </h2>
-            <p className="text-xs sm:text-sm text-zinc-400">
-              No more juggling 6 different subscriptions for resumes, LeetCode, mock interviews, and job trackers.
+            <p className="text-xs sm:text-sm text-[#A1A1AA] max-w-xl mx-auto leading-relaxed">
+              Whether you are an ambitious engineer landing Staff-level offers or a hiring team evaluating thousands of applicants, Paniund provides isolated, dedicated workflows.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {PLATFORM_MODULES.map((mod) => (
-              <div
-                key={mod.id}
-                className="p-6 sm:p-8 bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] rounded-3xl space-y-5 transition-all flex flex-col justify-between group"
-              >
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
+          {/* 2-Column Bifurcated Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-stretch">
+            {/* COLUMN 1: Candidate & Engineering Suite */}
+            <div className="bg-[#18181B] border-2 border-[#27272A] hover:border-[#FAFAFA] rounded-3xl p-6 sm:p-8 flex flex-col justify-between space-y-6 transition-all group">
+              <div className="space-y-6">
+                {/* Header */}
+                <div className="flex items-center justify-between border-b border-[#27272A] pb-5">
+                  <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-2xl bg-[#09090B] border border-[#27272A] flex items-center justify-center text-2xl group-hover:scale-105 transition-transform">
-                      {mod.icon}
+                      👤
                     </div>
-                    <span className="text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-[#09090B] text-zinc-300 border border-[#27272A]">
-                      {mod.tag}
-                    </span>
+                    <div>
+                      <span className="text-[10px] font-bold uppercase text-zinc-400">FOR JOB SEEKERS &amp; ENGINEERS</span>
+                      <h3 className="text-xl sm:text-2xl font-bold text-[#FAFAFA]">Candidate Suite</h3>
+                    </div>
                   </div>
-
-                  <div className="space-y-1.5">
-                    <h3 className="text-lg font-bold text-[#FAFAFA]">
-                      {mod.title}
-                    </h3>
-                    <p className="text-xs text-zinc-400 leading-relaxed">
-                      {mod.description}
-                    </p>
-                  </div>
-
-                  <div className="space-y-1.5 pt-2 border-t border-[#27272A]">
-                    <span className="text-[10px] uppercase font-bold text-zinc-500 block mb-1">
-                      Key Highlights:
-                    </span>
-                    <ul className="space-y-1 text-xs text-zinc-300 font-medium">
-                      {mod.highlights.map((h, idx) => (
-                        <li key={idx} className="flex items-center gap-1.5">
-                          <span className="text-[#FAFAFA] font-bold text-[10px]">✓</span>
-                          <span>{h}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  <span className="px-2.5 py-1 bg-[#09090B] border border-[#27272A] text-[10px] font-bold uppercase rounded-lg text-emerald-400">
+                    100% Free
+                  </span>
                 </div>
 
-                <div className="pt-4 border-t border-[#27272A]">
-                  <Link
-                    href={mod.href}
-                    className="touch-target w-full py-2.5 bg-[#09090B] hover:bg-[#FAFAFA] hover:text-[#09090B] border border-[#27272A] rounded-xl text-xs font-bold text-[#FAFAFA] transition-all flex items-center justify-center gap-1.5"
-                  >
-                    <span>Launch Module</span>
-                    <span>&rarr;</span>
-                  </Link>
+                <p className="text-xs sm:text-sm text-[#A1A1AA] leading-relaxed">
+                  A high-velocity operating system to build ATS-proof resumes, sharpen system design depth, practice conversational voice mocks, and maximize offer compensation.
+                </p>
+
+                {/* Key Features Scannable List */}
+                <div className="space-y-3">
+                  {[
+                    {
+                      icon: "📄",
+                      title: "ATS Resume Studio (6 Templates)",
+                      desc: "Pixel-perfect A4 print engine with drag-and-drop section ordering and STAR metric diff rewrites.",
+                    },
+                    {
+                      icon: "💻",
+                      title: "Monaco Coding IDE & Pointer Visualizer",
+                      desc: "In-browser algorithmic challenge arena supporting JS, TS, and Python with automated test assertions.",
+                    },
+                    {
+                      icon: "📐",
+                      title: "System Design Whiteboard Arena",
+                      desc: "Vector SVG architecture canvas with real-time SPOF grading, QPS math, and Mermaid.js export.",
+                    },
+                    {
+                      icon: "🎙️",
+                      title: "Spoken Voice Mock Interviewer",
+                      desc: "8 conversational AI interviewer personas with 48-bar audio waveforms and filler-word HUD.",
+                    },
+                    {
+                      icon: "💰",
+                      title: "Salary Negotiation War Room",
+                      desc: "4-year equity vesting calculators and live AI recruiter negotiation simulation bots.",
+                    },
+                  ].map((feat, idx) => (
+                    <div
+                      key={idx}
+                      className="p-3.5 bg-[#09090B] border border-[#27272A] rounded-2xl flex items-start gap-3 hover:border-zinc-500 transition-colors"
+                    >
+                      <span className="text-lg shrink-0 pt-0.5">{feat.icon}</span>
+                      <div className="space-y-0.5">
+                        <h4 className="text-xs font-bold text-[#FAFAFA]">{feat.title}</h4>
+                        <p className="text-[11px] text-[#A1A1AA] leading-relaxed">{feat.desc}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
+
+              {/* Bottom Launch Button */}
+              <div className="pt-4 border-t border-[#27272A]">
+                <Link
+                  href="/login"
+                  className="touch-target w-full min-h-[48px] py-3 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] font-bold text-xs uppercase tracking-wider rounded-2xl transition-all border border-[#FAFAFA] flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
+                >
+                  <span>Launch Candidate Suite Free &rarr;</span>
+                </Link>
+              </div>
+            </div>
+
+            {/* COLUMN 2: Recruiter Talent Operating System */}
+            <div className="bg-[#18181B] border-2 border-[#27272A] hover:border-[#FAFAFA] rounded-3xl p-6 sm:p-8 flex flex-col justify-between space-y-6 transition-all group">
+              <div className="space-y-6">
+                {/* Header */}
+                <div className="flex items-center justify-between border-b border-[#27272A] pb-5">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-2xl bg-[#09090B] border border-[#27272A] flex items-center justify-center text-2xl group-hover:scale-105 transition-transform">
+                      👔
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold uppercase text-zinc-400">FOR RECRUITERS &amp; HIRING TEAMS</span>
+                      <h3 className="text-xl sm:text-2xl font-bold text-[#FAFAFA]">Recruiter OS</h3>
+                    </div>
+                  </div>
+                  <span className="px-2.5 py-1 bg-[#09090B] border border-[#27272A] text-[10px] font-bold uppercase rounded-lg text-zinc-300 font-mono">
+                    Pro Talent OS
+                  </span>
+                </div>
+
+                <p className="text-xs sm:text-sm text-[#A1A1AA] leading-relaxed">
+                  End-to-end recruitment infrastructure to generate bias-free requisitions in 15 seconds, batch screen thousands of applicant resumes, and host collaborative WebRTC rounds.
+                </p>
+
+                {/* Key Features Scannable List */}
+                <div className="space-y-3">
+                  {[
+                    {
+                      icon: "📝",
+                      title: "AI Job Description Architect",
+                      desc: "Draft structured, bias-free job postings with role requirements, screening criteria, and interview rubrics in 15s.",
+                    },
+                    {
+                      icon: "📋",
+                      title: "8-Stage Visual Pipeline Kanban",
+                      desc: "Track candidate applications across Screening, Technical, System Design, Bar Raiser, Offer, and Hired.",
+                    },
+                    {
+                      icon: "⚡",
+                      title: "Bulk ATS Resume Screener",
+                      desc: "Upload dozens of candidate resumes simultaneously with instant compatibility scores and red-flag audits.",
+                    },
+                    {
+                      icon: "📹",
+                      title: "WebRTC Video Interview Rooms",
+                      desc: "Host peer-to-peer technical video rounds with synchronized live coding, shared scorecards, and AI copilots.",
+                    },
+                    {
+                      icon: "🎯",
+                      title: "Objective Scorecards & Committee Debriefs",
+                      desc: "Standardize grading across technical depth and system architecture with 1-click debrief synthesis.",
+                    },
+                  ].map((feat, idx) => (
+                    <div
+                      key={idx}
+                      className="p-3.5 bg-[#09090B] border border-[#27272A] rounded-2xl flex items-start gap-3 hover:border-zinc-500 transition-colors"
+                    >
+                      <span className="text-lg shrink-0 pt-0.5">{feat.icon}</span>
+                      <div className="space-y-0.5">
+                        <h4 className="text-xs font-bold text-[#FAFAFA]">{feat.title}</h4>
+                        <p className="text-[11px] text-[#A1A1AA] leading-relaxed">{feat.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Bottom Launch Button */}
+              <div className="pt-4 border-t border-[#27272A]">
+                <Link
+                  href="/dashboard/recruiter"
+                  className="touch-target w-full min-h-[48px] py-3 bg-[#18181B] hover:bg-[#222226] text-[#FAFAFA] font-bold text-xs uppercase tracking-wider rounded-2xl transition-all border border-[#27272A] hover:border-[#FAFAFA] flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
+                >
+                  <span>Launch Recruiter OS &rarr;</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ──────────────────────────────────────────────────────────────────────── */}
+      {/* C. FEATURE DEEP-DIVE TILES (The OS Feel)                                 */}
+      {/* ──────────────────────────────────────────────────────────────────────── */}
+      <section className="py-20 md:py-28 px-4 sm:px-6 lg:px-8 border-b border-[#27272A] bg-[#09090B]">
+        <div className="max-w-7xl mx-auto space-y-12">
+          {/* Section Header */}
+          <div className="text-center max-w-3xl mx-auto space-y-3">
+            <span className="px-3.5 py-1 bg-[#18181B] border border-[#27272A] text-[10px] font-bold uppercase tracking-wider text-zinc-300 rounded-full">
+              OS-GRADE ARCHITECTURE
+            </span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#FAFAFA] tracking-tight">
+              An Integrated Operating System, Not a Patchwork of Tools
+            </h2>
+            <p className="text-xs sm:text-sm text-[#A1A1AA] max-w-xl mx-auto leading-relaxed">
+              Every engine inside Paniund shares a unified state and vector model, giving you seamless transitions across your entire career journey.
+            </p>
+          </div>
+
+          {/* Deep-Dive Tile Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+            {OS_TILES.map((tile) => (
+              <Link
+                key={tile.id}
+                href={tile.href}
+                className="bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] rounded-3xl p-6 sm:p-7 flex flex-col justify-between space-y-5 transition-all group hover:-translate-y-1 active:scale-[0.98] cursor-pointer"
+              >
+                <div className="space-y-4">
+                  {/* Tile Top Header */}
+                  <div className="flex items-center justify-between">
+                    <div className="w-12 h-12 rounded-2xl bg-[#09090B] border border-[#27272A] flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                      {tile.icon}
+                    </div>
+                    <span className="px-2.5 py-1 rounded-md bg-[#09090B] border border-[#27272A] text-[10px] font-bold uppercase font-mono text-zinc-300">
+                      {tile.badge}
+                    </span>
+                  </div>
+
+                  {/* Title & Description */}
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block">
+                      {tile.tag}
+                    </span>
+                    <h3 className="text-lg font-bold text-[#FAFAFA] group-hover:text-white transition-colors">
+                      {tile.title}
+                    </h3>
+                    <p className="text-xs text-[#A1A1AA] leading-relaxed">
+                      {tile.description}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Bottom Tile Action */}
+                <div className="pt-3 border-t border-[#27272A] flex items-center justify-between text-xs font-bold text-[#FAFAFA] group-hover:underline">
+                  <span>Explore Engine</span>
+                  <span className="group-hover:translate-x-1.5 transition-transform">&rarr;</span>
+                </div>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Architectural Superiority Matrix */}
+      {/* ──────────────────────────────────────────────────────────────────────── */}
+      {/* D. ARCHITECTURAL SUPERIORITY MATRIX                                      */}
+      {/* ──────────────────────────────────────────────────────────────────────── */}
       <section className="py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-[#09090B] border-b border-[#27272A]">
         <div className="max-w-5xl mx-auto space-y-10">
           <div className="text-center space-y-3">
@@ -190,8 +372,11 @@ export default function UnauthenticatedHero() {
               ⚡ ARCHITECTURAL SUPERIORITY
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-[#FAFAFA] tracking-tight">
-              Why paniund Outperforms Fragmented Single-Purpose Tools
+              Why Paniund Outperforms Fragmented Single-Purpose Tools
             </h2>
+            <p className="text-xs sm:text-sm text-[#A1A1AA] max-w-lg mx-auto">
+              Replace 6 disconnected subscriptions with one cohesive, distraction-free talent operating system.
+            </p>
           </div>
 
           <div className="border border-[#27272A] rounded-3xl overflow-hidden bg-[#18181B]">
@@ -200,7 +385,7 @@ export default function UnauthenticatedHero() {
                 <tr className="bg-[#09090B] border-b border-[#27272A] text-[#FAFAFA]">
                   <th className="p-4 sm:p-5 font-bold uppercase tracking-wider">Capability</th>
                   <th className="p-4 sm:p-5 font-bold uppercase tracking-wider text-[#FAFAFA] bg-[#18181B]">
-                    paniund System
+                    Paniund System
                   </th>
                   <th className="p-4 sm:p-5 font-bold uppercase tracking-wider text-zinc-500">
                     Legacy Job Sites / Tools
@@ -216,7 +401,7 @@ export default function UnauthenticatedHero() {
                   <td className="p-4 sm:p-5 text-zinc-500">Basic static PDF builder without AI metric diffs</td>
                 </tr>
                 <tr>
-                  <td className="p-4 sm:p-5 font-bold text-[#FAFAFA]">Coding & System Design</td>
+                  <td className="p-4 sm:p-5 font-bold text-[#FAFAFA]">Coding &amp; System Design</td>
                   <td className="p-4 sm:p-5 text-[#FAFAFA] font-bold bg-[#18181B]">
                     ✓ In-Browser Monaco IDE + Big-O Analyzer + SVG Whiteboard
                   </td>
@@ -249,10 +434,14 @@ export default function UnauthenticatedHero() {
         </div>
       </section>
 
-      {/* Social Proof & Testimonials */}
+      {/* ──────────────────────────────────────────────────────────────────────── */}
+      {/* E. SOCIAL PROOF & METRIC TELEMETRY                                       */}
+      {/* ──────────────────────────────────────────────────────────────────────── */}
       <StatsAndReviewsSection />
 
-      {/* Bottom Final CTA */}
+      {/* ──────────────────────────────────────────────────────────────────────── */}
+      {/* F. FINAL CALL TO ACTION                                                  */}
+      {/* ──────────────────────────────────────────────────────────────────────── */}
       <section className="py-20 md:py-28 px-4 text-center bg-[#18181B] border-t border-[#27272A] text-[#FAFAFA]">
         <div className="max-w-3xl mx-auto space-y-6">
           <div className="flex justify-center">
@@ -261,13 +450,13 @@ export default function UnauthenticatedHero() {
           <h2 className="text-3xl sm:text-5xl font-bold text-[#FAFAFA] tracking-tight">
             Ready to Take Control of Your Career?
           </h2>
-          <p className="text-sm text-zinc-400 max-w-xl mx-auto leading-relaxed">
-            Join thousands of ambitious engineers and professionals using paniund to master interviews and secure top-tier compensation.
+          <p className="text-sm text-[#A1A1AA] max-w-xl mx-auto leading-relaxed">
+            Join thousands of ambitious engineers and top hiring teams using Paniund to master technical evaluations and secure market-leading compensation.
           </p>
-          <div className="pt-2">
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
               href="/login"
-              className="touch-target inline-flex items-center gap-2 px-10 py-4 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] font-bold text-xs rounded-2xl transition-all border border-[#FAFAFA] active:scale-95 cursor-pointer"
+              className="touch-target w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center gap-2 px-10 py-4 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] font-bold text-xs uppercase tracking-wider rounded-2xl transition-all border border-[#FAFAFA] active:scale-95 cursor-pointer shadow-sm"
             >
               <span>Get Started Free — No Credit Card Needed</span>
               <span>&rarr;</span>
