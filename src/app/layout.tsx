@@ -19,9 +19,10 @@ export const metadata: Metadata = {
   title: "Paniund — The Talent Operating System",
   description:
     "Universal talent operating system for job seekers and recruiters: Semantic Job Matching, ATS Resume Studio, Monaco Coding Challenges, AI Voice Mock Interviews, and Recruiter Pipelines.",
+  metadataBase: new URL("https://paniund.vercel.app"),
   keywords: [
     "Paniund",
-    "paniund.com",
+    "paniund.vercel.app",
     "talent operating system",
     "ATS resume studio",
     "AI mock interview voice",
@@ -35,7 +36,7 @@ export const metadata: Metadata = {
     title: "Paniund — The Talent Operating System",
     description:
       "All-in-one talent operating system for job search, ATS resume building, coding challenges, conversational voice mock interviews, and recruiter talent pipelines.",
-    url: "https://paniund.com",
+    url: "https://paniund.vercel.app",
     siteName: "Paniund",
     type: "website",
   },
