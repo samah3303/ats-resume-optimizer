@@ -193,7 +193,7 @@ function LoginForm() {
               <span>
                 {socialLoading === "google"
                   ? "Connecting to Google..."
-                  : `Continue as ${role === "recruiter" ? "Recruiter" : "Candidate"} with Google`}
+                  : "Continue with Google"}
               </span>
             </button>
 
@@ -271,9 +271,7 @@ function LoginForm() {
                   <span>Authenticating...</span>
                 </>
               ) : (
-                <span>
-                  Enter {role === "recruiter" ? "Recruiter OS" : "Candidate Suite"} &rarr;
-                </span>
+                <span>Sign In to paniund &rarr;</span>
               )}
             </button>
           </form>

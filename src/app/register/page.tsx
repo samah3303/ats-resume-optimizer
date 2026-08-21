@@ -216,7 +216,7 @@ function RegisterForm() {
               <span>
                 {socialLoading === "google"
                   ? "Connecting to Google..."
-                  : `Sign up as ${role === "recruiter" ? "Recruiter" : "Candidate"} with Google`}
+                  : "Sign up with Google"}
               </span>
             </button>
 
@@ -359,9 +359,7 @@ function RegisterForm() {
                   <span>Creating Account...</span>
                 </>
               ) : (
-                <span>
-                  Create {role === "recruiter" ? "Recruiter OS" : "Candidate Suite"} Account &rarr;
-                </span>
+                <span>Create Free Account &rarr;</span>
               )}
             </button>
           </form>
