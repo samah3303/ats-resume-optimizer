@@ -2,11 +2,10 @@ import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import SessionProvider from "@/components/SessionProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import Navbar from "@/components/Navbar";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import { UndoToastContainer } from "@/components/ui/UndoToast";
 import { WorkspaceModeProvider } from "@/components/WorkspaceModeContext";
-import BottomActionDock from "@/components/BottomActionDock";
+import BottomDock from "@/components/BottomDock";
 import "./globals.css";
 
 const jetbrainsMono = JetBrains_Mono({
@@ -232,13 +231,16 @@ export default function RootLayout({
           </>
         )}
       </head>
-      <body className="min-h-full flex flex-col bg-[#09090B] text-[#FAFAFA] font-sans selection:bg-[#FAFAFA] selection:text-[#09090B]">
+      <body className="h-[100dvh] w-full flex flex-col bg-[#09090B] text-[#FAFAFA] font-sans overflow-hidden selection:bg-[#FAFAFA] selection:text-[#09090B]">
         <ThemeProvider>
           <SessionProvider>
             <WorkspaceModeProvider>
-              <Navbar />
-              <main className="flex-1 pb-24">{children}</main>
-              <BottomActionDock />
+              {/* Pure Tile OS Grid Container — No Top Navigation Bar */}
+              <main className="flex-1 w-full overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8 pb-28">
+                {children}
+              </main>
+              {/* Floating Bottom OS Navigation Dock */}
+              <BottomDock />
             </WorkspaceModeProvider>
           </SessionProvider>
         </ThemeProvider>
