@@ -1,15 +1,18 @@
 "use client";
 
-import { useState, type FormEvent, useEffect } from "react";
+import { useState, type FormEvent, useEffect, Suspense } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Logo from "@/components/Logo";
+import { useWorkspaceMode, WorkspaceMode } from "@/components/WorkspaceModeContext";
 
-export default function RegisterPage() {
-  const { data: session, status } = useSession();
+function RegisterForm() {
+  const { status } = useSession();
   const router = useRouter();
+  const { setMode } = useWorkspaceMode();
 
+  const [role, setRole] = useState<WorkspaceMode>("candidate");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,9 +24,10 @@ export default function RegisterPage() {
 
   useEffect(() => {
     if (status === "authenticated") {
-      router.replace("/dashboard");
+      const target = role === "recruiter" ? "/dashboard/recruiter" : "/dashboard";
+      router.replace(target);
     }
-  }, [status, router]);
+  }, [status, router, role]);
 
   const calculatePasswordStrength = (pass: string) => {
     let score = 0;
@@ -56,7 +60,7 @@ export default function RegisterPage() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email: email.toLowerCase().trim(), password }),
+        body: JSON.stringify({ name, email: email.toLowerCase().trim(), password, role }),
       });
 
       const data = await res.json();
@@ -64,6 +68,10 @@ export default function RegisterPage() {
       if (!res.ok) {
         throw new Error(data.error || "Registration failed");
       }
+
+      localStorage.setItem("paniund_workspace_mode", role);
+      localStorage.setItem("kyro_workspace_mode", role);
+      setMode(role);
 
       // Auto sign-in after registration
       const result = await signIn("credentials", {
@@ -73,7 +81,8 @@ export default function RegisterPage() {
       });
 
       if (result?.ok) {
-        router.push("/dashboard");
+        const target = role === "recruiter" ? "/dashboard/recruiter" : "/dashboard";
+        router.push(target);
       } else {
         router.push("/login");
       }
@@ -86,8 +95,11 @@ export default function RegisterPage() {
   const handleSocialLogin = async (provider: "google") => {
     setError("");
     setSocialLoading(provider);
+    localStorage.setItem("paniund_workspace_mode", role);
+    localStorage.setItem("kyro_workspace_mode", role);
+    const callbackUrl = role === "recruiter" ? "/dashboard/recruiter" : "/dashboard";
     try {
-      await signIn(provider, { callbackUrl: "/dashboard" });
+      await signIn(provider, { callbackUrl });
     } catch {
       setError("Failed to initiate Google registration. Check your OAuth configuration.");
       setSocialLoading(null);
@@ -103,25 +115,25 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-[#09090B] text-[#FAFAFA]">
-      <div className="w-full max-w-5xl bg-[#18181B] border border-[#27272A] rounded-3xl overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-3 sm:p-6 lg:p-8 bg-[#09090B] text-[#FAFAFA]">
+      <div className="w-full max-w-5xl bg-[#18181B] border border-[#27272A] rounded-2xl sm:rounded-3xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 my-auto">
         {/* LEFT PANEL: Interactive Registration Form */}
-        <div className="lg:col-span-7 p-6 sm:p-10 lg:p-12 flex flex-col justify-between space-y-6">
+        <div className="lg:col-span-7 p-5 sm:p-8 lg:p-10 flex flex-col justify-between space-y-3.5 sm:space-y-4">
           {/* Header & Logo */}
-          <div className="space-y-4">
+          <div className="space-y-2.5 sm:space-y-3">
             <div className="flex items-center justify-between">
               <Logo size="md" />
               {/* Segmented Auth Mode Switcher */}
               <div className="flex items-center p-1 bg-[#09090B] border border-[#27272A] rounded-2xl text-[11px] font-bold">
                 <Link
                   href="/login"
-                  className="px-3.5 py-1 text-zinc-400 hover:text-[#FAFAFA] rounded-xl transition-all"
+                  className="px-3 py-1 text-zinc-400 hover:text-[#FAFAFA] rounded-xl transition-all"
                 >
                   Sign In
                 </Link>
                 <button
                   type="button"
-                  className="px-3.5 py-1 bg-[#FAFAFA] text-[#09090B] rounded-xl font-bold"
+                  className="px-3 py-1 bg-[#FAFAFA] text-[#09090B] rounded-xl font-bold"
                 >
                   Sign Up
                 </button>
@@ -132,22 +144,56 @@ export default function RegisterPage() {
               <span className="px-2.5 py-0.5 rounded-md bg-[#09090B] border border-[#27272A] text-[10px] font-bold uppercase tracking-wider text-zinc-300">
                 FREE ACCOUNT ACCESS
               </span>
-              <h1 className="text-2xl sm:text-3xl font-bold text-[#FAFAFA] tracking-tight mt-1.5">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-[#FAFAFA] tracking-tight mt-0.5">
                 Create your paniund account
               </h1>
-              <p className="text-xs text-zinc-400 font-medium mt-0.5">
-                Join engineers landing top roles with AI resume optimization and talent operating intelligence.
+              <p className="text-xs text-zinc-400 font-medium">
+                Select your role to configure your operating system.
               </p>
+            </div>
+
+            {/* Segmented Role Selector Toggle */}
+            <div className="space-y-1 pt-0.5">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-zinc-400 block">
+                Select Your Role / Workspace
+              </span>
+              <div className="grid grid-cols-2 p-1 bg-[#09090B] border border-[#27272A] rounded-xl text-xs font-bold gap-1">
+                <button
+                  type="button"
+                  onClick={() => setRole("candidate")}
+                  className={`min-h-[36px] py-1.5 px-3 rounded-lg flex items-center justify-center gap-1.5 transition-all cursor-pointer select-none active:scale-95 ${
+                    role === "candidate"
+                      ? "bg-[#FAFAFA] text-[#09090B] shadow-xs"
+                      : "text-zinc-400 hover:text-[#FAFAFA] hover:bg-[#18181B]"
+                  }`}
+                >
+                  <span>👤</span>
+                  <span>Candidate</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setRole("recruiter")}
+                  className={`min-h-[36px] py-1.5 px-3 rounded-lg flex items-center justify-center gap-1.5 transition-all cursor-pointer select-none active:scale-95 ${
+                    role === "recruiter"
+                      ? "bg-[#FAFAFA] text-[#09090B] shadow-xs"
+                      : "text-zinc-400 hover:text-[#FAFAFA] hover:bg-[#18181B]"
+                  }`}
+                >
+                  <span>👔</span>
+                  <span>Recruiter</span>
+                </button>
+              </div>
             </div>
           </div>
 
           {/* Social OAuth Button */}
-          <div className="space-y-4">
+          <div className="space-y-2">
             <button
               type="button"
               onClick={() => handleSocialLogin("google")}
               disabled={socialLoading !== null || loading}
-              className="touch-target min-h-[44px] w-full py-2.5 px-4 bg-[#09090B] hover:bg-[#27272A] border border-[#27272A] hover:border-[#FAFAFA] text-[#FAFAFA] text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2.5 active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="touch-target min-h-[42px] sm:min-h-[44px] w-full py-2 sm:py-2.5 px-4 bg-[#09090B] hover:bg-[#27272A] border border-[#27272A] hover:border-[#FAFAFA] text-[#FAFAFA] text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                 <path
@@ -167,11 +213,15 @@ export default function RegisterPage() {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
                 />
               </svg>
-              <span>{socialLoading === "google" ? "Connecting to Google..." : "Sign up with Google"}</span>
+              <span>
+                {socialLoading === "google"
+                  ? "Connecting to Google..."
+                  : `Sign up as ${role === "recruiter" ? "Recruiter" : "Candidate"} with Google`}
+              </span>
             </button>
 
-            {/* Robust Horizontal Divider */}
-            <div className="flex items-center gap-3 my-2 w-full">
+            {/* Horizontal Divider */}
+            <div className="flex items-center gap-3 my-1 w-full">
               <div className="h-[1px] bg-[#27272A] flex-1" />
               <span className="text-[10px] uppercase font-bold tracking-wider text-zinc-500 whitespace-nowrap shrink-0 select-none">
                 or sign up with email
@@ -181,55 +231,57 @@ export default function RegisterPage() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-3.5">
+          <form onSubmit={handleSubmit} className="space-y-2.5">
             {error && (
-              <div className="p-3.5 rounded-2xl bg-rose-950/40 border border-rose-800 text-xs text-rose-300 font-bold animate-in fade-in">
+              <div className="p-2.5 rounded-xl bg-rose-950/40 border border-rose-800 text-xs text-rose-300 font-bold animate-in fade-in">
                 ⚠️ {error}
               </div>
             )}
 
-            <div>
-              <label
-                htmlFor="name"
-                className="block text-xs font-bold text-zinc-300 mb-1"
-              >
-                Full Name
-              </label>
-              <input
-                id="name"
-                type="text"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl text-xs bg-[#09090B] border border-[#27272A] text-[#FAFAFA] placeholder-zinc-500 focus:border-[#FAFAFA] outline-none transition-all font-medium"
-                placeholder="Alex Rivers"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-xs font-bold text-zinc-300 mb-1"
-              >
-                Email Address
-              </label>
-              <input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl text-xs bg-[#09090B] border border-[#27272A] text-[#FAFAFA] placeholder-zinc-500 focus:border-[#FAFAFA] outline-none transition-all font-medium"
-                placeholder="alex.rivers@engineering.com"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div>
-                <div className="flex items-center justify-between mb-1">
+                <label
+                  htmlFor="name"
+                  className="block text-[11px] sm:text-xs font-bold text-zinc-300 mb-0.5"
+                >
+                  Full Name
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl text-xs bg-[#09090B] border border-[#27272A] text-[#FAFAFA] placeholder-zinc-500 focus:border-[#FAFAFA] outline-none transition-all font-medium"
+                  placeholder="Alex Rivers"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-[11px] sm:text-xs font-bold text-zinc-300 mb-0.5"
+                >
+                  Email Address
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl text-xs bg-[#09090B] border border-[#27272A] text-[#FAFAFA] placeholder-zinc-500 focus:border-[#FAFAFA] outline-none transition-all font-medium"
+                  placeholder="alex.rivers@example.com"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div>
+                <div className="flex items-center justify-between mb-0.5">
                   <label
                     htmlFor="password"
-                    className="block text-xs font-bold text-zinc-300"
+                    className="block text-[11px] sm:text-xs font-bold text-zinc-300"
                   >
                     Password
                   </label>
@@ -247,7 +299,7 @@ export default function RegisterPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl text-xs bg-[#09090B] border border-[#27272A] text-[#FAFAFA] placeholder-zinc-500 focus:border-[#FAFAFA] outline-none transition-all font-medium"
+                  className="w-full px-3 py-2 rounded-xl text-xs bg-[#09090B] border border-[#27272A] text-[#FAFAFA] placeholder-zinc-500 focus:border-[#FAFAFA] outline-none transition-all font-medium"
                   placeholder="Min. 6 chars"
                 />
               </div>
@@ -255,7 +307,7 @@ export default function RegisterPage() {
               <div>
                 <label
                   htmlFor="confirmPassword"
-                  className="block text-xs font-bold text-zinc-300 mb-1"
+                  className="block text-[11px] sm:text-xs font-bold text-zinc-300 mb-0.5"
                 >
                   Confirm Password
                 </label>
@@ -265,7 +317,7 @@ export default function RegisterPage() {
                   required
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl text-xs bg-[#09090B] border border-[#27272A] text-[#FAFAFA] placeholder-zinc-500 focus:border-[#FAFAFA] outline-none transition-all font-medium"
+                  className="w-full px-3 py-2 rounded-xl text-xs bg-[#09090B] border border-[#27272A] text-[#FAFAFA] placeholder-zinc-500 focus:border-[#FAFAFA] outline-none transition-all font-medium"
                   placeholder="Repeat password"
                 />
               </div>
@@ -273,9 +325,9 @@ export default function RegisterPage() {
 
             {/* Password Strength Indicator */}
             {password.length > 0 && (
-              <div className="space-y-1 pt-1">
+              <div className="space-y-0.5 pt-0.5">
                 <div className="flex items-center justify-between text-[10px] font-mono">
-                  <span className="text-zinc-400">Security Strength:</span>
+                  <span className="text-zinc-400">Security:</span>
                   <span className="font-bold text-[#FAFAFA]">
                     {passStrength <= 1 && "Weak"}
                     {passStrength === 2 && "Fair"}
@@ -283,11 +335,11 @@ export default function RegisterPage() {
                     {passStrength === 4 && "Bulletproof 🛡️"}
                   </span>
                 </div>
-                <div className="grid grid-cols-4 gap-1 h-1.5">
+                <div className="grid grid-cols-4 gap-1 h-1">
                   {[1, 2, 3, 4].map((step) => (
                     <div
                       key={step}
-                      className={`h-1.5 rounded-full transition-all ${
+                      className={`h-1 rounded-full transition-all ${
                         passStrength >= step ? "bg-[#FAFAFA]" : "bg-[#27272A]"
                       }`}
                     />
@@ -299,7 +351,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading || socialLoading !== null}
-              className="touch-target w-full py-3.5 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] font-bold text-xs uppercase tracking-wider rounded-xl transition-all active:scale-95 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2 border border-[#FAFAFA] mt-2"
+              className="touch-target min-h-[42px] sm:min-h-[44px] w-full py-2.5 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] font-bold text-xs uppercase tracking-wider rounded-xl transition-all active:scale-95 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2 border border-[#FAFAFA] mt-1"
             >
               {loading ? (
                 <>
@@ -307,64 +359,94 @@ export default function RegisterPage() {
                   <span>Creating Account...</span>
                 </>
               ) : (
-                <span>Create Free paniund Account &rarr;</span>
+                <span>
+                  Create {role === "recruiter" ? "Recruiter OS" : "Candidate Suite"} Account &rarr;
+                </span>
               )}
             </button>
           </form>
 
           {/* Footer Note */}
-          <p className="text-center text-[11px] text-zinc-400 pt-2 border-t border-[#27272A]">
+          <p className="text-center text-[11px] text-zinc-400 pt-1 border-t border-[#27272A]">
             Already have an account?{" "}
             <Link
               href="/login"
               className="text-[#FAFAFA] font-bold hover:underline ml-1"
             >
-              Sign in &rarr;
+              Sign In &rarr;
             </Link>
           </p>
         </div>
 
         {/* RIGHT PANEL: Luxury Showcase & Social Proof */}
-        <div className="hidden lg:flex lg:col-span-5 bg-[#09090B] text-[#FAFAFA] p-10 flex-col justify-between relative overflow-hidden border-l border-[#27272A]">
-          {/* Top Badge */}
-          <div className="space-y-4 relative z-10">
+        <div className="hidden lg:flex lg:col-span-5 bg-[#09090B] text-[#FAFAFA] p-8 lg:p-10 flex-col justify-between relative overflow-hidden border-l border-[#27272A]">
+          <div className="space-y-3 relative z-10">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#18181B] border border-[#27272A] rounded-full text-[10px] font-bold uppercase text-zinc-300">
               <span className="w-1.5 h-1.5 rounded-full bg-[#FAFAFA] animate-pulse" />
-              100% Free Candidate Suite
+              Direct Workspace Registration
             </div>
 
             <h3 className="text-xl font-bold tracking-tight leading-snug text-[#FAFAFA]">
-              Built for High-Velocity Engineering &amp; Career Growth
+              {role === "recruiter"
+                ? "Recruiter OS: AI Requisitions & Candidate Pipelines"
+                : "Candidate Suite: ATS Resumes, Voice Mocks & Offers"}
             </h3>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              Unlock 6 ATS-compliant resume templates, Monaco coding sandboxes, and conversational voice mocks with zero paywalls.
+              {role === "recruiter"
+                ? "Unlock automated candidate sourcing, ATS screening filters, and objective evaluation debriefs."
+                : "Build ATS-proof resumes, sharpen system design depth, and simulate 4-year equity packages."}
             </p>
           </div>
 
-          {/* Feature Highlight Bento */}
-          <div className="space-y-2.5 relative z-10">
-            {[
-              { icon: "📄", title: "6 Pro ATS Templates", desc: "Pixel-perfect A4 print styles with inline STAR diffs" },
-              { icon: "💻", title: "Monaco Coding IDE", desc: "Automated test assertions with Two-Pointer visualizer" },
-              { icon: "🎙️", title: "Spoken Voice Mock Coach", desc: "8 interview personas with 48-bar audio waveforms" },
-            ].map((f, idx) => (
-              <div key={idx} className="p-3.5 bg-[#18181B] border border-[#27272A] rounded-xl flex items-center gap-3">
-                <span className="text-xl">{f.icon}</span>
-                <div>
-                  <h4 className="text-xs font-bold text-[#FAFAFA]">{f.title}</h4>
-                  <p className="text-[10px] text-zinc-400">{f.desc}</p>
-                </div>
-              </div>
-            ))}
+          <div className="p-5 bg-[#18181B] border border-[#27272A] rounded-2xl space-y-2.5 relative z-10">
+            <div className="flex items-center gap-1 text-zinc-300 text-xs">
+              {"★".repeat(5)}
+            </div>
+            <p className="text-xs text-zinc-300 italic font-medium leading-relaxed">
+              {role === "recruiter"
+                ? "“The fastest pipeline setup we have used. The live scoring scorecards streamline committee reviews.”"
+                : "“The STAR diff rewriter transformed my resume bullets and helped me land 3 offers in my first month.”"}
+            </p>
+            <div className="pt-2 border-t border-[#27272A] flex items-center justify-between text-[10px]">
+              <span className="font-bold text-[#FAFAFA]">
+                {role === "recruiter" ? "Marcus Vance" : "Alex Rivera"}
+              </span>
+              <span className="text-zinc-500 font-mono">
+                {role === "recruiter" ? "Head of Recruiting" : "Product Lead"}
+              </span>
+            </div>
           </div>
 
-          {/* Bottom Security Note */}
-          <div className="pt-4 border-t border-[#27272A] text-[10px] text-zinc-500 font-mono flex items-center justify-between relative z-10">
-            <span>🔒 Enterprise Grade Encryption</span>
-            <span>GDPR / CCPA Compliant</span>
+          <div className="grid grid-cols-2 gap-3 relative z-10 pt-3 border-t border-[#27272A] text-xs">
+            <div>
+              <div className="text-lg font-bold font-mono text-[#FAFAFA]">
+                {role === "recruiter" ? "10x" : "3.8x"}
+              </div>
+              <span className="text-[10px] text-zinc-400 uppercase font-bold">
+                {role === "recruiter" ? "Faster Screening" : "More Callbacks"}
+              </span>
+            </div>
+            <div>
+              <div className="text-lg font-bold font-mono text-[#FAFAFA]">100%</div>
+              <span className="text-[10px] text-zinc-400 uppercase font-bold">Data Privacy</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen bg-[#09090B]">
+          <div className="w-8 h-8 border-2 border-[#FAFAFA] border-t-transparent rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <RegisterForm />
+    </Suspense>
   );
 }

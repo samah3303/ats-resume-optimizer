@@ -20,7 +20,8 @@ export function WorkspaceModeProvider({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     // Check localStorage
-    const saved = localStorage.getItem("kyro_workspace_mode") as WorkspaceMode | null;
+    const saved = (localStorage.getItem("paniund_workspace_mode") ||
+      localStorage.getItem("kyro_workspace_mode")) as WorkspaceMode | null;
     if (saved === "candidate" || saved === "recruiter") {
       setModeState(saved);
     } else if (pathname.startsWith("/dashboard/recruiter")) {
@@ -30,6 +31,7 @@ export function WorkspaceModeProvider({ children }: { children: React.ReactNode 
 
   const setMode = (newMode: WorkspaceMode) => {
     setModeState(newMode);
+    localStorage.setItem("paniund_workspace_mode", newMode);
     localStorage.setItem("kyro_workspace_mode", newMode);
     if (newMode === "recruiter") {
       router.push("/dashboard/recruiter");
