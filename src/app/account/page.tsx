@@ -32,7 +32,7 @@ export default function AccountPage() {
     .slice(0, 2);
 
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-6 animate-in fade-in duration-200">
+    <div className="w-full max-w-6xl mx-auto space-y-6 animate-in fade-in duration-200 p-4 sm:p-6 lg:p-8 pb-28">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-[#27272A]">
         <div className="flex items-center gap-3">

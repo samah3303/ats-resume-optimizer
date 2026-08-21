@@ -10,6 +10,11 @@ export default function BottomDock() {
   const pathname = usePathname();
   const { mode } = useWorkspaceMode();
 
+  // Hide Bottom Dock on unauthenticated home landing page, login, and register pages
+  if (pathname === "/" || pathname === "/login" || pathname === "/register") {
+    return null;
+  }
+
   // Dynamic Home Route determination based on authenticated persona
   const getHomeHref = () => {
     if (!session?.user) return "/";
@@ -18,7 +23,6 @@ export default function BottomDock() {
 
   const homeHref = getHomeHref();
   const isHomeActive =
-    pathname === "/" ||
     pathname === "/dashboard" ||
     pathname === "/dashboard/recruiter";
 

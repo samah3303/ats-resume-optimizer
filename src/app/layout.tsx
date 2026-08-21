@@ -235,8 +235,8 @@ export default function RootLayout({
         <ThemeProvider>
           <SessionProvider>
             <WorkspaceModeProvider>
-              {/* Pure Tile OS Grid Container — No Top Navigation Bar */}
-              <main className="flex-1 w-full overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8 pb-28">
+              {/* Pure Tile OS Container — Clean Full-Bleed Viewport */}
+              <main className="flex-1 w-full overflow-y-auto overflow-x-hidden">
                 {children}
               </main>
               {/* Floating Bottom OS Navigation Dock */}

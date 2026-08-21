@@ -73,21 +73,46 @@ export default function UnauthenticatedHero() {
   return (
     <div className="flex flex-col bg-[#09090B] text-[#FAFAFA] font-sans selection:bg-[#FAFAFA] selection:text-[#09090B] overflow-x-hidden">
       {/* ──────────────────────────────────────────────────────────────────────── */}
+      {/* TOP BRAND HEADER (Clean Navigation on Landing Page)                      */}
+      {/* ──────────────────────────────────────────────────────────────────────── */}
+      <header className="w-full border-b border-[#27272A] bg-[#09090B]/90 backdrop-blur-md sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <Logo size="md" />
+
+          <div className="flex items-center gap-3">
+            <Link
+              href="/login"
+              className="text-xs font-bold text-zinc-400 hover:text-[#FAFAFA] px-3.5 py-2 rounded-xl transition-colors"
+            >
+              Sign In
+            </Link>
+            <Link
+              href="/register"
+              className="touch-target min-h-[38px] px-4 py-2 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] text-xs font-bold rounded-xl transition-all active:scale-95 cursor-pointer shadow-xs flex items-center gap-1.5"
+            >
+              <span>Get Started</span>
+              <span>&rarr;</span>
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      {/* ──────────────────────────────────────────────────────────────────────── */}
       {/* A. HERO SECTION (High Impact)                                            */}
       {/* ──────────────────────────────────────────────────────────────────────── */}
-      <section className="relative px-4 sm:px-6 lg:px-8 py-16 sm:py-20 md:py-28 border-b border-[#27272A] flex flex-col items-center justify-center text-center">
+      <section className="relative px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 border-b border-[#27272A] flex flex-col items-center justify-center text-center">
         {/* Subtle Ambient Glow */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 sm:w-[600px] h-64 sm:h-96 bg-zinc-800/10 rounded-full blur-3xl pointer-events-none -z-10" />
 
-        <div className="max-w-5xl mx-auto space-y-8">
+        <div className="max-w-5xl mx-auto space-y-6 sm:space-y-8">
           {/* Eyebrow Badge */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#18181B] border border-[#27272A] rounded-full text-[11px] font-bold uppercase tracking-wider text-zinc-300">
             <span className="w-2 h-2 rounded-full bg-[#FAFAFA] animate-pulse" />
-            <span>PALETTE A • THE TALENT OPERATING SYSTEM</span>
+            <span>THE COMPLETE TALENT OPERATING SYSTEM</span>
           </div>
 
           {/* Main Headline */}
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-[#FAFAFA] leading-[1.06] max-w-4xl mx-auto">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-[#FAFAFA] leading-[1.08] max-w-4xl mx-auto">
             The Complete 1-Stop AI Career &amp; Talent Operating System.
           </h1>
 
@@ -117,7 +142,7 @@ export default function UnauthenticatedHero() {
           </div>
 
           {/* Interactive Live 3-Second Demo Widget */}
-          <div className="pt-8 w-full">
+          <div className="pt-6 w-full">
             <LiveHeroDemoWidget />
           </div>
         </div>
@@ -126,14 +151,14 @@ export default function UnauthenticatedHero() {
       {/* ──────────────────────────────────────────────────────────────────────── */}
       {/* B. THE DUAL ECOSYSTEM (Bifurcated Layout)                                */}
       {/* ──────────────────────────────────────────────────────────────────────── */}
-      <section className="py-20 md:py-28 px-4 sm:px-6 lg:px-8 border-b border-[#27272A] bg-[#09090B]">
-        <div className="max-w-7xl mx-auto space-y-12">
+      <section className="py-14 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 border-b border-[#27272A] bg-[#09090B]">
+        <div className="max-w-7xl mx-auto space-y-10">
           {/* Section Header */}
           <div className="text-center max-w-3xl mx-auto space-y-3">
             <span className="px-3.5 py-1 bg-[#18181B] border border-[#27272A] text-[10px] font-bold uppercase tracking-wider text-zinc-300 rounded-full">
               DUAL-SIDED TALENT OS
             </span>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#FAFAFA] tracking-tight">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold text-[#FAFAFA] tracking-tight">
               Engineered for Both Sides of the Hiring Table
             </h2>
             <p className="text-xs sm:text-sm text-[#A1A1AA] max-w-xl mx-auto leading-relaxed">
@@ -303,14 +328,14 @@ export default function UnauthenticatedHero() {
       {/* ──────────────────────────────────────────────────────────────────────── */}
       {/* C. FEATURE DEEP-DIVE TILES (The OS Feel)                                 */}
       {/* ──────────────────────────────────────────────────────────────────────── */}
-      <section className="py-20 md:py-28 px-4 sm:px-6 lg:px-8 border-b border-[#27272A] bg-[#09090B]">
-        <div className="max-w-7xl mx-auto space-y-12">
+      <section className="py-14 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 border-b border-[#27272A] bg-[#09090B]">
+        <div className="max-w-7xl mx-auto space-y-10">
           {/* Section Header */}
           <div className="text-center max-w-3xl mx-auto space-y-3">
             <span className="px-3.5 py-1 bg-[#18181B] border border-[#27272A] text-[10px] font-bold uppercase tracking-wider text-zinc-300 rounded-full">
               OS-GRADE ARCHITECTURE
             </span>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#FAFAFA] tracking-tight">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold text-[#FAFAFA] tracking-tight">
               An Integrated Operating System, Not a Patchwork of Tools
             </h2>
             <p className="text-xs sm:text-sm text-[#A1A1AA] max-w-xl mx-auto leading-relaxed">
@@ -365,13 +390,13 @@ export default function UnauthenticatedHero() {
       {/* ──────────────────────────────────────────────────────────────────────── */}
       {/* D. ARCHITECTURAL SUPERIORITY MATRIX                                      */}
       {/* ──────────────────────────────────────────────────────────────────────── */}
-      <section className="py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-[#09090B] border-b border-[#27272A]">
-        <div className="max-w-5xl mx-auto space-y-10">
+      <section className="py-14 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-[#09090B] border-b border-[#27272A]">
+        <div className="max-w-5xl mx-auto space-y-8">
           <div className="text-center space-y-3">
             <span className="px-3.5 py-1.5 bg-[#18181B] text-[#FAFAFA] border border-[#27272A] text-xs font-bold uppercase rounded-full tracking-wider">
               ⚡ ARCHITECTURAL SUPERIORITY
             </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#FAFAFA] tracking-tight">
+            <h2 className="text-2xl sm:text-4xl font-bold text-[#FAFAFA] tracking-tight">
               Why Paniund Outperforms Fragmented Single-Purpose Tools
             </h2>
             <p className="text-xs sm:text-sm text-[#A1A1AA] max-w-lg mx-auto">
@@ -442,15 +467,15 @@ export default function UnauthenticatedHero() {
       {/* ──────────────────────────────────────────────────────────────────────── */}
       {/* F. FINAL CALL TO ACTION                                                  */}
       {/* ──────────────────────────────────────────────────────────────────────── */}
-      <section className="py-20 md:py-28 px-4 text-center bg-[#18181B] border-t border-[#27272A] text-[#FAFAFA]">
+      <section className="py-14 sm:py-16 md:py-20 px-4 text-center bg-[#18181B] border-t border-[#27272A] text-[#FAFAFA]">
         <div className="max-w-3xl mx-auto space-y-6">
           <div className="flex justify-center">
             <Logo size="lg" />
           </div>
-          <h2 className="text-3xl sm:text-5xl font-bold text-[#FAFAFA] tracking-tight">
+          <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold text-[#FAFAFA] tracking-tight">
             Ready to Take Control of Your Career?
           </h2>
-          <p className="text-sm text-[#A1A1AA] max-w-xl mx-auto leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#A1A1AA] max-w-xl mx-auto leading-relaxed">
             Join thousands of ambitious engineers and top hiring teams using Paniund to master technical evaluations and secure market-leading compensation.
           </p>
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
