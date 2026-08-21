@@ -12,10 +12,10 @@ export default function UnauthenticatedHero() {
       id: "semantic-discovery",
       icon: "🔍",
       tag: "PGVECTOR MATCH",
-      title: "Semantic Job Discovery",
+      title: "Semantic Job & Skill Discovery",
       description:
-        "Rank 140k+ multi-board live job postings using 384-dimensional pgvector cosine embeddings matched directly against your verified resume graph.",
-      badge: "384-Dim Vector",
+        "Rank 140k+ live job openings across every discipline using 384-dimensional pgvector cosine embeddings matched directly against your verified career profile.",
+      badge: "Universal Search",
       href: "/dashboard/jobs",
     },
     {
@@ -24,7 +24,7 @@ export default function UnauthenticatedHero() {
       tag: "DIFF ENGINE",
       title: "STAR Metric Diff Rewriter",
       description:
-        "Transform weak passive verbs into quantified achievements with live red/green inline character diffs and ATS keyword density verification.",
+        "Transform weak passive verbs into high-impact quantified achievements with live red/green inline character diffs for any role or seniority level.",
       badge: "Inline Diffs",
       href: "/dashboard/builder",
     },
@@ -34,7 +34,7 @@ export default function UnauthenticatedHero() {
       tag: "BACKGROUND SWARM",
       title: "Autonomous Hunter Swarm",
       description:
-        "Deploy 24/7 background AI agents that scout job markets, synthesize tailored application packets, and auto-sync with your Kanban pipeline.",
+        "Deploy 24/7 background AI agents that discover opportunities across all job boards, tailor custom application packets, and sync with your pipeline.",
       badge: "4 Active Agents",
       href: "/dashboard/agents",
     },
@@ -44,7 +44,7 @@ export default function UnauthenticatedHero() {
       tag: "WEB SPEECH AI",
       title: "Spoken Voice Mock Coach",
       description:
-        "Practice out loud across 8 industry personas with live 48-bar audio waveform rendering, real-time filler word counting, and instant STAR debriefs.",
+        "Practice out loud for behavioral, leadership, and domain interviews across 8 AI interviewer personas with live 48-bar audio waveform rendering.",
       badge: "8 Personas",
       href: "/dashboard/mock-interview",
     },
@@ -52,9 +52,9 @@ export default function UnauthenticatedHero() {
       id: "video-hud",
       icon: "👁️",
       tag: "COMPUTER VISION",
-      title: "Video Composure & Gaze HUD",
+      title: "Video Composure & Presence HUD",
       description:
-        "Webcam-powered telemetry assessing direct eye contact percentage, posture stability index, and lighting pre-flight checks before live rounds.",
+        "Webcam telemetry measuring eye contact, vocal cadence, and posture composure to ensure executive presence in high-stakes interviews.",
       badge: "Vision HUD",
       href: "/dashboard/video-analytics",
     },
@@ -62,10 +62,10 @@ export default function UnauthenticatedHero() {
       id: "equity-vesting",
       icon: "💰",
       tag: "COMPENSATION LAB",
-      title: "4-Year Equity Vesting Simulator",
+      title: "Salary & Equity Offer Simulator",
       description:
-        "Model 4-year total compensation across RSUs, options, and performance bonuses, paired with an AI recruiter negotiation roleplay bot.",
-      badge: "4-Year Vesting",
+        "Model 4-year total compensation packages across base, bonus, and stock options, backed by an interactive AI recruiter salary negotiation simulator.",
+      badge: "Compensation Lab",
       href: "/dashboard/offers",
     },
   ];
@@ -73,52 +73,48 @@ export default function UnauthenticatedHero() {
   return (
     <div className="flex flex-col bg-[#09090B] text-[#FAFAFA] font-sans selection:bg-[#FAFAFA] selection:text-[#09090B] overflow-x-hidden">
       {/* ──────────────────────────────────────────────────────────────────────── */}
-      {/* TOP BRAND HEADER (Clean Navigation on Landing Page)                      */}
+      {/* A. HERO SECTION (With Top-Left Logo & No Topbar)                         */}
       {/* ──────────────────────────────────────────────────────────────────────── */}
-      <header className="w-full border-b border-[#27272A] bg-[#09090B]/90 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Logo size="md" />
-
-          <div className="flex items-center gap-3">
+      <section className="relative px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 md:pt-16 pb-14 sm:pb-18 md:pb-24 border-b border-[#27272A] flex flex-col items-center justify-center text-center">
+        {/* Top-Left Logo Wordmark (Pure Minimal Placement — No Topbar) */}
+        <div className="w-full max-w-7xl mx-auto flex items-center justify-between pb-8 sm:pb-12">
+          <Link href="/" className="select-none active:scale-95 transition-transform">
+            <Logo size="md" />
+          </Link>
+          <div className="flex items-center gap-2">
             <Link
               href="/login"
-              className="text-xs font-bold text-zinc-400 hover:text-[#FAFAFA] px-3.5 py-2 rounded-xl transition-colors"
+              className="text-xs font-bold text-zinc-400 hover:text-[#FAFAFA] px-3.5 py-1.5 rounded-xl transition-colors"
             >
               Sign In
             </Link>
             <Link
               href="/register"
-              className="touch-target min-h-[38px] px-4 py-2 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] text-xs font-bold rounded-xl transition-all active:scale-95 cursor-pointer shadow-xs flex items-center gap-1.5"
+              className="px-4 py-1.5 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] text-xs font-bold rounded-xl transition-all active:scale-95 cursor-pointer shadow-xs"
             >
-              <span>Get Started</span>
-              <span>&rarr;</span>
+              Get Started &rarr;
             </Link>
           </div>
         </div>
-      </header>
 
-      {/* ──────────────────────────────────────────────────────────────────────── */}
-      {/* A. HERO SECTION (High Impact)                                            */}
-      {/* ──────────────────────────────────────────────────────────────────────── */}
-      <section className="relative px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 border-b border-[#27272A] flex flex-col items-center justify-center text-center">
         {/* Subtle Ambient Glow */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 sm:w-[600px] h-64 sm:h-96 bg-zinc-800/10 rounded-full blur-3xl pointer-events-none -z-10" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 sm:w-[600px] h-64 sm:h-96 bg-zinc-800/10 rounded-full blur-3xl pointer-events-none -z-10" />
 
         <div className="max-w-5xl mx-auto space-y-6 sm:space-y-8">
           {/* Eyebrow Badge */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#18181B] border border-[#27272A] rounded-full text-[11px] font-bold uppercase tracking-wider text-zinc-300">
             <span className="w-2 h-2 rounded-full bg-[#FAFAFA] animate-pulse" />
-            <span>THE COMPLETE TALENT OPERATING SYSTEM</span>
+            <span>PANIUND • THE UNIVERSAL TALENT OPERATING SYSTEM</span>
           </div>
 
-          {/* Main Headline */}
+          {/* Main Headline with Brand Name */}
           <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-[#FAFAFA] leading-[1.08] max-w-4xl mx-auto">
-            The Complete 1-Stop AI Career &amp; Talent Operating System.
+            The Complete AI Career &amp; Talent Operating System for Every Role.
           </h1>
 
           {/* Subheadline */}
           <p className="text-sm sm:text-base md:text-lg text-[#A1A1AA] max-w-3xl mx-auto leading-relaxed font-normal">
-            Paniund unites the entire hiring lifecycle in a distraction-free, high-performance monochrome environment — empowering job seekers to master technical interviews and enabling recruiters to build world-class engineering teams without friction.
+            <strong>paniund</strong> elevates your entire career journey — whether you are in Engineering, Marketing, Operations, Product, Finance, or Executive Management. Build ATS-verified resumes, practice live interviews, simulate compensation offers, and empower recruiters to hire world-class talent without friction.
           </p>
 
           {/* Dual High-Contrast CTAs */}
@@ -141,7 +137,7 @@ export default function UnauthenticatedHero() {
             </Link>
           </div>
 
-          {/* Interactive Live 3-Second Demo Widget */}
+          {/* Interactive Live Multi-Role Demo Widget */}
           <div className="pt-6 w-full">
             <LiveHeroDemoWidget />
           </div>
@@ -162,13 +158,13 @@ export default function UnauthenticatedHero() {
               Engineered for Both Sides of the Hiring Table
             </h2>
             <p className="text-xs sm:text-sm text-[#A1A1AA] max-w-xl mx-auto leading-relaxed">
-              Whether you are an ambitious engineer landing Staff-level offers or a hiring team evaluating thousands of applicants, Paniund provides isolated, dedicated workflows.
+              Whether you are an ambitious professional targeting your next high-impact career move or a hiring team evaluating applicants, paniund provides dedicated, high-performance environments.
             </p>
           </div>
 
           {/* 2-Column Bifurcated Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-stretch">
-            {/* COLUMN 1: Candidate & Engineering Suite */}
+            {/* COLUMN 1: Candidate Suite */}
             <div className="bg-[#18181B] border-2 border-[#27272A] hover:border-[#FAFAFA] rounded-3xl p-6 sm:p-8 flex flex-col justify-between space-y-6 transition-all group">
               <div className="space-y-6">
                 {/* Header */}
@@ -178,7 +174,7 @@ export default function UnauthenticatedHero() {
                       👤
                     </div>
                     <div>
-                      <span className="text-[10px] font-bold uppercase text-zinc-400">FOR JOB SEEKERS &amp; ENGINEERS</span>
+                      <span className="text-[10px] font-bold uppercase text-zinc-400">FOR JOB SEEKERS &amp; PROFESSIONALS</span>
                       <h3 className="text-xl sm:text-2xl font-bold text-[#FAFAFA]">Candidate Suite</h3>
                     </div>
                   </div>
@@ -188,7 +184,7 @@ export default function UnauthenticatedHero() {
                 </div>
 
                 <p className="text-xs sm:text-sm text-[#A1A1AA] leading-relaxed">
-                  A high-velocity operating system to build ATS-proof resumes, sharpen system design depth, practice conversational voice mocks, and maximize offer compensation.
+                  A comprehensive operating system to build ATS-proof resumes for any role, practice live voice mocks, master technical and domain challenges, and negotiate top-tier compensation.
                 </p>
 
                 {/* Key Features Scannable List */}
@@ -196,28 +192,28 @@ export default function UnauthenticatedHero() {
                   {[
                     {
                       icon: "📄",
-                      title: "ATS Resume Studio (6 Templates)",
-                      desc: "Pixel-perfect A4 print engine with drag-and-drop section ordering and STAR metric diff rewrites.",
+                      title: "ATS Resume Studio (6 Universal Templates)",
+                      desc: "Pixel-perfect A4 print engine with drag-and-drop section ordering and STAR metric diff rewrites for all industries.",
                     },
                     {
-                      icon: "💻",
-                      title: "Monaco Coding IDE & Pointer Visualizer",
-                      desc: "In-browser algorithmic challenge arena supporting JS, TS, and Python with automated test assertions.",
-                    },
-                    {
-                      icon: "📐",
-                      title: "System Design Whiteboard Arena",
-                      desc: "Vector SVG architecture canvas with real-time SPOF grading, QPS math, and Mermaid.js export.",
+                      icon: "📊",
+                      title: "Target Job Description Keyword Scanner",
+                      desc: "Real-time semantic keyword coverage and gap analysis against any target job posting.",
                     },
                     {
                       icon: "🎙️",
                       title: "Spoken Voice Mock Interviewer",
-                      desc: "8 conversational AI interviewer personas with 48-bar audio waveforms and filler-word HUD.",
+                      desc: "8 conversational AI interviewer personas with live audio waveforms, filler-word analysis, and instant debriefs.",
+                    },
+                    {
+                      icon: "💻",
+                      title: "Technical & Problem Solving Sandbox",
+                      desc: "Interactive algorithmic challenge IDE with real-time test assertions and complexity reviews.",
                     },
                     {
                       icon: "💰",
-                      title: "Salary Negotiation War Room",
-                      desc: "4-year equity vesting calculators and live AI recruiter negotiation simulation bots.",
+                      title: "Salary & Equity Negotiation War Room",
+                      desc: "4-year compensation models and live AI recruiter negotiation roleplay simulation bots.",
                     },
                   ].map((feat, idx) => (
                     <div
@@ -265,7 +261,7 @@ export default function UnauthenticatedHero() {
                 </div>
 
                 <p className="text-xs sm:text-sm text-[#A1A1AA] leading-relaxed">
-                  End-to-end recruitment infrastructure to generate bias-free requisitions in 15 seconds, batch screen thousands of applicant resumes, and host collaborative WebRTC rounds.
+                  End-to-end recruitment infrastructure to generate bias-free requisitions in 15 seconds, batch screen hundreds of applicant resumes, and manage collaborative pipelines.
                 </p>
 
                 {/* Key Features Scannable List */}
@@ -279,7 +275,7 @@ export default function UnauthenticatedHero() {
                     {
                       icon: "📋",
                       title: "8-Stage Visual Pipeline Kanban",
-                      desc: "Track candidate applications across Screening, Technical, System Design, Bar Raiser, Offer, and Hired.",
+                      desc: "Track candidate applications across Screening, Interviews, Domain Evaluations, Bar Raiser, Offer, and Hired.",
                     },
                     {
                       icon: "⚡",
@@ -289,12 +285,12 @@ export default function UnauthenticatedHero() {
                     {
                       icon: "📹",
                       title: "WebRTC Video Interview Rooms",
-                      desc: "Host peer-to-peer technical video rounds with synchronized live coding, shared scorecards, and AI copilots.",
+                      desc: "Host peer-to-peer interview rounds with synchronized evaluations, shared scorecards, and AI copilots.",
                     },
                     {
                       icon: "🎯",
                       title: "Objective Scorecards & Committee Debriefs",
-                      desc: "Standardize grading across technical depth and system architecture with 1-click debrief synthesis.",
+                      desc: "Standardize grading across role competencies and domain depth with 1-click debrief synthesis.",
                     },
                   ].map((feat, idx) => (
                     <div
@@ -339,7 +335,7 @@ export default function UnauthenticatedHero() {
               An Integrated Operating System, Not a Patchwork of Tools
             </h2>
             <p className="text-xs sm:text-sm text-[#A1A1AA] max-w-xl mx-auto leading-relaxed">
-              Every engine inside Paniund shares a unified state and vector model, giving you seamless transitions across your entire career journey.
+              Every engine inside paniund shares a unified state and vector model, giving you seamless transitions across your entire career journey.
             </p>
           </div>
 
@@ -397,7 +393,7 @@ export default function UnauthenticatedHero() {
               ⚡ ARCHITECTURAL SUPERIORITY
             </span>
             <h2 className="text-2xl sm:text-4xl font-bold text-[#FAFAFA] tracking-tight">
-              Why Paniund Outperforms Fragmented Single-Purpose Tools
+              Why paniund Outperforms Fragmented Single-Purpose Tools
             </h2>
             <p className="text-xs sm:text-sm text-[#A1A1AA] max-w-lg mx-auto">
               Replace 6 disconnected subscriptions with one cohesive, distraction-free talent operating system.
@@ -410,44 +406,44 @@ export default function UnauthenticatedHero() {
                 <tr className="bg-[#09090B] border-b border-[#27272A] text-[#FAFAFA]">
                   <th className="p-4 sm:p-5 font-bold uppercase tracking-wider">Capability</th>
                   <th className="p-4 sm:p-5 font-bold uppercase tracking-wider text-[#FAFAFA] bg-[#18181B]">
-                    Paniund System
+                    paniund System
                   </th>
                   <th className="p-4 sm:p-5 font-bold uppercase tracking-wider text-zinc-500">
-                    Legacy Job Sites / Tools
+                    Legacy Job Sites / Single Tools
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#27272A] font-medium text-zinc-300">
                 <tr>
-                  <td className="p-4 sm:p-5 font-bold text-[#FAFAFA]">ATS Resume Studio</td>
+                  <td className="p-4 sm:p-5 font-bold text-[#FAFAFA]">Universal ATS Resume Studio</td>
                   <td className="p-4 sm:p-5 text-[#FAFAFA] font-bold bg-[#18181B]">
-                    ✓ 6 Templates + Inline STAR Diff Rewriter + Vector Scan
+                    ✓ 6 Templates + Inline STAR Diff Rewriter + Multi-JD Keyword Scanner
                   </td>
                   <td className="p-4 sm:p-5 text-zinc-500">Basic static PDF builder without AI metric diffs</td>
                 </tr>
                 <tr>
-                  <td className="p-4 sm:p-5 font-bold text-[#FAFAFA]">Coding &amp; System Design</td>
+                  <td className="p-4 sm:p-5 font-bold text-[#FAFAFA]">Interview Practice &amp; Spoken Mocks</td>
                   <td className="p-4 sm:p-5 text-[#FAFAFA] font-bold bg-[#18181B]">
-                    ✓ In-Browser Monaco IDE + Big-O Analyzer + SVG Whiteboard
-                  </td>
-                  <td className="p-4 sm:p-5 text-zinc-500">Separate subscription required (LeetCode / Excalidraw)</td>
-                </tr>
-                <tr>
-                  <td className="p-4 sm:p-5 font-bold text-[#FAFAFA]">Interview Preparation</td>
-                  <td className="p-4 sm:p-5 text-[#FAFAFA] font-bold bg-[#18181B]">
-                    ✓ Spoken Voice Mocks (8 Personas) + Video Composure HUD
+                    ✓ Conversational Voice Mocks (8 Personas) + Video Composure HUD
                   </td>
                   <td className="p-4 sm:p-5 text-zinc-500">Text-only static question lists</td>
                 </tr>
                 <tr>
-                  <td className="p-4 sm:p-5 font-bold text-[#FAFAFA]">Salary Negotiation</td>
+                  <td className="p-4 sm:p-5 font-bold text-[#FAFAFA]">Domain &amp; Technical Preparation</td>
                   <td className="p-4 sm:p-5 text-[#FAFAFA] font-bold bg-[#18181B]">
-                    ✓ 4-Year Equity Curves + AI Recruiter Roleplay Simulator
+                    ✓ In-Browser Sandbox + Big-O Analysis + System Design Whiteboard
+                  </td>
+                  <td className="p-4 sm:p-5 text-zinc-500">Separate expensive subscriptions required</td>
+                </tr>
+                <tr>
+                  <td className="p-4 sm:p-5 font-bold text-[#FAFAFA]">Offer &amp; Salary Negotiation</td>
+                  <td className="p-4 sm:p-5 text-[#FAFAFA] font-bold bg-[#18181B]">
+                    ✓ 4-Year Total Compensation Lab + AI Recruiter Roleplay Simulator
                   </td>
                   <td className="p-4 sm:p-5 text-zinc-500">Static self-reported averages without simulation</td>
                 </tr>
                 <tr>
-                  <td className="p-4 sm:p-5 font-bold text-[#FAFAFA]">Autonomous Search</td>
+                  <td className="p-4 sm:p-5 font-bold text-[#FAFAFA]">Autonomous Search &amp; Tracking</td>
                   <td className="p-4 sm:p-5 text-[#FAFAFA] font-bold bg-[#18181B]">
                     ✓ Hunter Agent Swarm + 1-Click Application Tracker Sync
                   </td>
@@ -476,7 +472,7 @@ export default function UnauthenticatedHero() {
             Ready to Take Control of Your Career?
           </h2>
           <p className="text-xs sm:text-sm text-[#A1A1AA] max-w-xl mx-auto leading-relaxed">
-            Join thousands of ambitious engineers and top hiring teams using Paniund to master technical evaluations and secure market-leading compensation.
+            Join thousands of ambitious professionals and top hiring teams using paniund to master interviews and secure market-leading compensation.
           </p>
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link

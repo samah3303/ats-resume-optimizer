@@ -8,24 +8,43 @@ export function LiveHeroDemoWidget() {
 
   const DEMOS = [
     {
-      role: "Backend Engineer",
+      category: "Software & Tech",
+      role: "Software Engineer",
       original: "Worked on database queries and made them faster for users.",
       enhanced:
         "Refactored PostgreSQL indexing and query execution plans, slashing p99 latency by 42% across 2.4M daily requests.",
       metrics: ["42% Latency Drop", "2.4M Daily Requests", "PostgreSQL"],
     },
     {
-      role: "Frontend Developer",
-      original: "Helped redesign checkout page to improve user experience.",
+      category: "Marketing & Growth",
+      role: "Growth Marketer",
+      original: "Managed social ad campaigns and helped increase monthly leads.",
       enhanced:
-        "Architected responsive Next.js checkout funnel with optimistic UI updates, boosting conversion rate by 18.5% ($340k ARR).",
-      metrics: ["+18.5% Conversion", "$340k ARR", "Next.js"],
+        "Orchestrated multi-channel paid acquisition strategy across Meta & LinkedIn, driving 14,200 MQLs while cutting CPA by 31.4%.",
+      metrics: ["14,200 Qualified Leads", "-31.4% Acquisition Cost", "Meta & LinkedIn"],
     },
     {
+      category: "Sales & Operations",
+      role: "Operations Lead",
+      original: "Handled vendor contracts and daily office supply logistics.",
+      enhanced:
+        "Negotiated 18 regional supplier master contracts, reducing annual operational procurement spend by $420k without service disruption.",
+      metrics: ["$420k Cost Savings", "18 Contracts Negotiated", "Zero Downtime"],
+    },
+    {
+      category: "Finance & Analytics",
+      role: "Financial Analyst",
+      original: "Built monthly revenue models and created forecast spreadsheets.",
+      enhanced:
+        "Engineered dynamic 3-statement forecast models in Excel/SQL, identifying $1.8M in revenue leakage and improving quarterly accuracy by 28%.",
+      metrics: ["$1.8M Leakage Identified", "+28% Forecast Accuracy", "SQL / Modeling"],
+    },
+    {
+      category: "Product & Management",
       role: "Product Manager",
       original: "Led sprint meetings and launched new mobile app features.",
       enhanced:
-        "Directed cross-functional agile team of 8 engineers to ship iOS MVP in 6 weeks, driving 45k downloads with 4.8★ App Store rating.",
+        "Directed cross-functional agile team of 8 to ship mobile MVP in 6 weeks, driving 45k downloads with 4.8★ App Store rating.",
       metrics: ["6-Week MVP Ship", "45k Active Downloads", "4.8★ Rating"],
     },
   ];
@@ -37,15 +56,15 @@ export function LiveHeroDemoWidget() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#27272A]">
         <div>
           <span className="px-2.5 py-0.5 rounded-md bg-[#09090B] border border-[#27272A] text-[10px] font-bold uppercase text-zinc-300">
-            ⚡ LIVE 3-SECOND INTERACTIVE DEMO
+            ⚡ LIVE INTERACTIVE TRANSFORMATION DEMO
           </span>
           <h3 className="text-base sm:text-lg font-bold text-[#FAFAFA] mt-1">
-            See How paniund Transforms Weak Bullets Into Executive Offers
+            Transform Weak Bullets Into Executive STAR Achievements Across Any Role
           </h3>
         </div>
 
-        {/* Demo Selector Tabs */}
-        <div className="flex items-center gap-1.5 p-1 bg-[#09090B] border border-[#27272A] rounded-2xl">
+        {/* Role Filter Tabs (Multi-Industry) */}
+        <div className="flex flex-wrap items-center gap-1.5 p-1 bg-[#09090B] border border-[#27272A] rounded-2xl">
           {DEMOS.map((d, idx) => (
             <button
               key={idx}
@@ -56,10 +75,18 @@ export function LiveHeroDemoWidget() {
                   : "text-zinc-400 hover:text-[#FAFAFA]"
               }`}
             >
-              {d.role}
+              {d.category}
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Role Badge Indicator */}
+      <div className="flex items-center gap-2">
+        <span className="text-[11px] font-mono text-zinc-500 uppercase font-bold">Target Position:</span>
+        <span className="px-2.5 py-0.5 rounded-md bg-[#09090B] border border-[#27272A] text-xs font-bold text-[#FAFAFA]">
+          {current.role}
+        </span>
       </div>
 
       {/* Comparison Split */}
@@ -101,11 +128,11 @@ export function LiveHeroDemoWidget() {
       {/* Instant Hook CTA */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 border-t border-[#27272A]">
         <p className="text-xs text-zinc-400 font-medium">
-          Ready to optimize your entire resume with 6 ATS templates in 60 seconds?
+          Ready to optimize your resume for any role with 6 ATS templates in 60 seconds?
         </p>
         <Link
           href="/login"
-          className="touch-target px-6 py-2.5 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] font-bold text-xs rounded-xl border border-[#FAFAFA] transition-all shrink-0 active:scale-95"
+          className="touch-target px-6 py-2.5 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] font-bold text-xs rounded-xl border border-[#FAFAFA] transition-all shrink-0 active:scale-95 cursor-pointer"
         >
           <span>Try with Your Resume Free &rarr;</span>
         </Link>
