@@ -6,6 +6,7 @@ import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import { UndoToastContainer } from "@/components/ui/UndoToast";
 import { WorkspaceModeProvider } from "@/components/WorkspaceModeContext";
 import BottomDock from "@/components/BottomDock";
+import SplashScreen from "@/components/SplashScreen";
 import "./globals.css";
 
 const jetbrainsMono = JetBrains_Mono({
@@ -232,6 +233,7 @@ export default function RootLayout({
         )}
       </head>
       <body className="h-[100dvh] w-full flex flex-col bg-[#09090B] text-[#FAFAFA] font-sans overflow-hidden selection:bg-[#FAFAFA] selection:text-[#09090B]">
+        <SplashScreen />
         <ThemeProvider>
           <SessionProvider>
             <WorkspaceModeProvider>
