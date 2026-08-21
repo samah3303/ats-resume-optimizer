@@ -14,6 +14,7 @@ import {
 import JobPostingModal from "@/components/recruiter/JobPostingModal";
 import AtsScreeningModal from "@/components/recruiter/AtsScreeningModal";
 import CandidateDetailModal from "@/components/recruiter/CandidateDetailModal";
+import RecruiterOnboardingWizard from "@/components/recruiter/RecruiterOnboardingWizard";
 
 export default function RecruiterCommandCenterPage() {
   const { data: session, status } = useSession();
@@ -41,6 +42,7 @@ export default function RecruiterCommandCenterPage() {
   // Modal States
   const [showJobModal, setShowJobModal] = useState(false);
   const [editingJob, setEditingJob] = useState<JobPostingData | null>(null);
+  const [showOnboardingWizard, setShowOnboardingWizard] = useState(false);
 
   const [screeningModalJob, setScreeningModalJob] =
     useState<JobPostingData | null>(null);
@@ -66,6 +68,15 @@ export default function RecruiterCommandCenterPage() {
         setRecentApplicants(data.recentApplicants || []);
         if (data.profile?.companyName) {
           setCompanyName(data.profile.companyName);
+        }
+      }
+
+      // Check if recruiter onboarding is pending
+      const onboardingRes = await fetch("/api/recruiter/onboarding");
+      if (onboardingRes.ok) {
+        const onboardingData = await onboardingRes.json();
+        if (!onboardingData.completed && localStorage.getItem("recruiter_onboarding_dismissed") !== "true") {
+          setShowOnboardingWizard(true);
         }
       }
     } catch {
@@ -210,11 +221,17 @@ export default function RecruiterCommandCenterPage() {
             {/* Quick Action Buttons */}
             <div className="flex items-center gap-3 flex-wrap">
               <button
+                onClick={() => setShowOnboardingWizard(true)}
+                className="px-4 py-3 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 font-bold text-xs sm:text-sm rounded-2xl transition-all border border-zinc-300 flex items-center gap-1.5 cursor-pointer active:scale-95"
+              >
+                <span>⚡ Setup Wizard</span>
+              </button>
+              <button
                 onClick={() => {
                   setEditingJob(null);
                   setShowJobModal(true);
                 }}
-                className="px-5 py-3 bg-black hover:bg-zinc-800 text-white font-black text-xs sm:text-sm rounded-2xl transition-all shadow-sm border border-black flex items-center gap-2 hover:scale-[1.02] active:scale-95"
+                className="px-5 py-3 bg-black hover:bg-zinc-800 text-white font-black text-xs sm:text-sm rounded-2xl transition-all shadow-sm border border-black flex items-center gap-2 hover:scale-[1.02] active:scale-95 cursor-pointer"
               >
                 <span>+ Post New Job</span>
               </button>
@@ -713,16 +730,19 @@ export default function RecruiterCommandCenterPage() {
           />
         )}
 
-        {/* Candidate Detail Modal */}
-        {selectedCandidate && (
-          <CandidateDetailModal
-            open={!!selectedCandidate}
-            candidate={selectedCandidate}
-            jobId={selectedCandidate.jobPostingId}
-            onClose={() => setSelectedCandidate(null)}
-            onStageChange={handleStageChange}
-            onCandidateUpdated={async () => {
+        {/* Recruiter Onboarding 3-Step Wizard */}
+        {showOnboardingWizard && (
+          <RecruiterOnboardingWizard
+            initialCompanyName={companyName !== "Talent Studio" ? companyName : ""}
+            onComplete={async () => {
+              setShowOnboardingWizard(false);
+              localStorage.setItem("recruiter_onboarding_dismissed", "true");
+              toast("Workspace & Requisition configured successfully!", "success");
               await fetchData();
+            }}
+            onSkip={() => {
+              setShowOnboardingWizard(false);
+              localStorage.setItem("recruiter_onboarding_dismissed", "true");
             }}
           />
         )}
