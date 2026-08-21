@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, type FormEvent, useEffect, Suspense } from "react";
+import { useState, type FormEvent, useEffect } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Logo from "@/components/Logo";
 
-function RegisterForm() {
-  const { status } = useSession();
+export default function RegisterPage() {
+  const { data: session, status } = useSession();
   const router = useRouter();
 
   const [name, setName] = useState("");
@@ -96,32 +96,32 @@ function RegisterForm() {
 
   if (status === "loading" || status === "authenticated") {
     return (
-      <div className="flex items-center justify-center min-h-[100dvh] bg-[#09090B]">
+      <div className="flex items-center justify-center min-h-screen bg-[#09090B]">
         <div className="w-8 h-8 border-2 border-[#FAFAFA] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-[100dvh] h-full flex items-center justify-center p-3 sm:p-6 lg:p-8 bg-[#09090B] text-[#FAFAFA] overflow-y-auto sm:overflow-hidden">
-      <div className="w-full max-w-5xl bg-[#18181B] border border-[#27272A] rounded-2xl sm:rounded-3xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 my-auto">
-        {/* LEFT PANEL: Interactive Registration Form (Reduced mobile box padding) */}
-        <div className="lg:col-span-7 p-4 sm:p-8 lg:p-12 flex flex-col justify-between space-y-3 sm:space-y-4">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-[#09090B] text-[#FAFAFA]">
+      <div className="w-full max-w-5xl bg-[#18181B] border border-[#27272A] rounded-3xl overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+        {/* LEFT PANEL: Interactive Registration Form */}
+        <div className="lg:col-span-7 p-6 sm:p-10 lg:p-12 flex flex-col justify-between space-y-6">
           {/* Header & Logo */}
-          <div className="space-y-2 sm:space-y-3">
+          <div className="space-y-4">
             <div className="flex items-center justify-between">
               <Logo size="md" />
               {/* Segmented Auth Mode Switcher */}
-              <div className="flex items-center p-0.5 sm:p-1 bg-[#09090B] border border-[#27272A] rounded-xl sm:rounded-2xl text-[10px] sm:text-[11px] font-bold">
+              <div className="flex items-center p-1 bg-[#09090B] border border-[#27272A] rounded-2xl text-[11px] font-bold">
                 <Link
                   href="/login"
-                  className="px-2.5 sm:px-3.5 py-0.5 sm:py-1 text-zinc-400 hover:text-[#FAFAFA] rounded-lg sm:rounded-xl transition-all"
+                  className="px-3.5 py-1 text-zinc-400 hover:text-[#FAFAFA] rounded-xl transition-all"
                 >
                   Sign In
                 </Link>
                 <button
                   type="button"
-                  className="px-2.5 sm:px-3.5 py-0.5 sm:py-1 bg-[#FAFAFA] text-[#09090B] rounded-lg sm:rounded-xl font-bold"
+                  className="px-3.5 py-1 bg-[#FAFAFA] text-[#09090B] rounded-xl font-bold"
                 >
                   Sign Up
                 </button>
@@ -129,25 +129,25 @@ function RegisterForm() {
             </div>
 
             <div>
-              <span className="px-2 py-0.5 rounded bg-[#09090B] border border-[#27272A] text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-zinc-300">
+              <span className="px-2.5 py-0.5 rounded-md bg-[#09090B] border border-[#27272A] text-[10px] font-bold uppercase tracking-wider text-zinc-300">
                 FREE ACCOUNT ACCESS
               </span>
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-[#FAFAFA] tracking-tight mt-0.5">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#FAFAFA] tracking-tight mt-1.5">
                 Create your paniund account
               </h1>
-              <p className="text-[11px] sm:text-xs text-zinc-400 font-medium">
-                Join ambitious professionals landing top roles with AI career intelligence.
+              <p className="text-xs text-zinc-400 font-medium mt-0.5">
+                Join engineers landing top roles with AI resume optimization and talent operating intelligence.
               </p>
             </div>
           </div>
 
           {/* Social OAuth Button */}
-          <div className="space-y-2 sm:space-y-2.5">
+          <div className="space-y-4">
             <button
               type="button"
               onClick={() => handleSocialLogin("google")}
               disabled={socialLoading !== null || loading}
-              className="touch-target min-h-[40px] sm:min-h-[44px] w-full py-2 sm:py-2.5 px-3 sm:px-4 bg-[#09090B] hover:bg-[#27272A] border border-[#27272A] hover:border-[#FAFAFA] text-[#FAFAFA] text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="touch-target min-h-[44px] w-full py-2.5 px-4 bg-[#09090B] hover:bg-[#27272A] border border-[#27272A] hover:border-[#FAFAFA] text-[#FAFAFA] text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2.5 active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                 <path
@@ -170,10 +170,10 @@ function RegisterForm() {
               <span>{socialLoading === "google" ? "Connecting to Google..." : "Sign up with Google"}</span>
             </button>
 
-            {/* Horizontal Divider */}
-            <div className="flex items-center gap-2.5 my-1 w-full">
+            {/* Robust Horizontal Divider */}
+            <div className="flex items-center gap-3 my-2 w-full">
               <div className="h-[1px] bg-[#27272A] flex-1" />
-              <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider text-zinc-500 whitespace-nowrap shrink-0 select-none">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-zinc-500 whitespace-nowrap shrink-0 select-none">
                 or sign up with email
               </span>
               <div className="h-[1px] bg-[#27272A] flex-1" />
@@ -181,64 +181,62 @@ function RegisterForm() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-2 sm:space-y-2.5">
+          <form onSubmit={handleSubmit} className="space-y-3.5">
             {error && (
-              <div className="p-2 sm:p-2.5 rounded-xl bg-rose-950/40 border border-rose-800 text-[11px] sm:text-xs text-rose-300 font-bold animate-in fade-in">
+              <div className="p-3.5 rounded-2xl bg-rose-950/40 border border-rose-800 text-xs text-rose-300 font-bold animate-in fade-in">
                 ⚠️ {error}
               </div>
             )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5">
-              <div>
-                <label
-                  htmlFor="name"
-                  className="block text-[10px] sm:text-xs font-bold text-zinc-300 mb-0.5"
-                >
-                  Full Name
-                </label>
-                <input
-                  id="name"
-                  type="text"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3 py-1.5 sm:py-2 rounded-xl text-xs bg-[#09090B] border border-[#27272A] text-[#FAFAFA] placeholder-zinc-500 focus:border-[#FAFAFA] outline-none transition-all font-medium"
-                  placeholder="Alex Rivers"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-[10px] sm:text-xs font-bold text-zinc-300 mb-0.5"
-                >
-                  Email Address
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-1.5 sm:py-2 rounded-xl text-xs bg-[#09090B] border border-[#27272A] text-[#FAFAFA] placeholder-zinc-500 focus:border-[#FAFAFA] outline-none transition-all font-medium"
-                  placeholder="alex.rivers@example.com"
-                />
-              </div>
+            <div>
+              <label
+                htmlFor="name"
+                className="block text-xs font-bold text-zinc-300 mb-1"
+              >
+                Full Name
+              </label>
+              <input
+                id="name"
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl text-xs bg-[#09090B] border border-[#27272A] text-[#FAFAFA] placeholder-zinc-500 focus:border-[#FAFAFA] outline-none transition-all font-medium"
+                placeholder="Alex Rivers"
+              />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5">
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-xs font-bold text-zinc-300 mb-1"
+              >
+                Email Address
+              </label>
+              <input
+                id="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl text-xs bg-[#09090B] border border-[#27272A] text-[#FAFAFA] placeholder-zinc-500 focus:border-[#FAFAFA] outline-none transition-all font-medium"
+                placeholder="alex.rivers@engineering.com"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <div className="flex items-center justify-between mb-0.5">
+                <div className="flex items-center justify-between mb-1">
                   <label
                     htmlFor="password"
-                    className="block text-[10px] sm:text-xs font-bold text-zinc-300"
+                    className="block text-xs font-bold text-zinc-300"
                   >
                     Password
                   </label>
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="text-[9px] sm:text-[10px] font-bold text-zinc-400 hover:text-[#FAFAFA] cursor-pointer"
+                    className="text-[10px] font-bold text-zinc-400 hover:text-[#FAFAFA] cursor-pointer"
                   >
                     {showPassword ? "Hide" : "Show"}
                   </button>
@@ -249,7 +247,7 @@ function RegisterForm() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3 py-1.5 sm:py-2 rounded-xl text-xs bg-[#09090B] border border-[#27272A] text-[#FAFAFA] placeholder-zinc-500 focus:border-[#FAFAFA] outline-none transition-all font-medium"
+                  className="w-full px-4 py-2.5 rounded-xl text-xs bg-[#09090B] border border-[#27272A] text-[#FAFAFA] placeholder-zinc-500 focus:border-[#FAFAFA] outline-none transition-all font-medium"
                   placeholder="Min. 6 chars"
                 />
               </div>
@@ -257,7 +255,7 @@ function RegisterForm() {
               <div>
                 <label
                   htmlFor="confirmPassword"
-                  className="block text-[10px] sm:text-xs font-bold text-zinc-300 mb-0.5"
+                  className="block text-xs font-bold text-zinc-300 mb-1"
                 >
                   Confirm Password
                 </label>
@@ -267,7 +265,7 @@ function RegisterForm() {
                   required
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-3 py-1.5 sm:py-2 rounded-xl text-xs bg-[#09090B] border border-[#27272A] text-[#FAFAFA] placeholder-zinc-500 focus:border-[#FAFAFA] outline-none transition-all font-medium"
+                  className="w-full px-4 py-2.5 rounded-xl text-xs bg-[#09090B] border border-[#27272A] text-[#FAFAFA] placeholder-zinc-500 focus:border-[#FAFAFA] outline-none transition-all font-medium"
                   placeholder="Repeat password"
                 />
               </div>
@@ -275,8 +273,8 @@ function RegisterForm() {
 
             {/* Password Strength Indicator */}
             {password.length > 0 && (
-              <div className="space-y-0.5 pt-0.5">
-                <div className="flex items-center justify-between text-[9px] sm:text-[10px] font-mono">
+              <div className="space-y-1 pt-1">
+                <div className="flex items-center justify-between text-[10px] font-mono">
                   <span className="text-zinc-400">Security Strength:</span>
                   <span className="font-bold text-[#FAFAFA]">
                     {passStrength <= 1 && "Weak"}
@@ -285,11 +283,11 @@ function RegisterForm() {
                     {passStrength === 4 && "Bulletproof 🛡️"}
                   </span>
                 </div>
-                <div className="grid grid-cols-4 gap-1 h-1">
+                <div className="grid grid-cols-4 gap-1 h-1.5">
                   {[1, 2, 3, 4].map((step) => (
                     <div
                       key={step}
-                      className={`h-1 rounded-full transition-all ${
+                      className={`h-1.5 rounded-full transition-all ${
                         passStrength >= step ? "bg-[#FAFAFA]" : "bg-[#27272A]"
                       }`}
                     />
@@ -301,11 +299,11 @@ function RegisterForm() {
             <button
               type="submit"
               disabled={loading || socialLoading !== null}
-              className="touch-target min-h-[40px] sm:min-h-[44px] w-full py-2 sm:py-2.5 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] font-bold text-xs uppercase tracking-wider rounded-xl transition-all active:scale-95 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2 border border-[#FAFAFA] mt-1"
+              className="touch-target w-full py-3.5 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] font-bold text-xs uppercase tracking-wider rounded-xl transition-all active:scale-95 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2 border border-[#FAFAFA] mt-2"
             >
               {loading ? (
                 <>
-                  <div className="w-3.5 h-3.5 border-2 border-[#09090B] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-[#09090B] border-t-transparent rounded-full animate-spin" />
                   <span>Creating Account...</span>
                 </>
               ) : (
@@ -315,72 +313,58 @@ function RegisterForm() {
           </form>
 
           {/* Footer Note */}
-          <p className="text-center text-[10px] sm:text-[11px] text-zinc-400 pt-1 border-t border-[#27272A]">
+          <p className="text-center text-[11px] text-zinc-400 pt-2 border-t border-[#27272A]">
             Already have an account?{" "}
             <Link
               href="/login"
               className="text-[#FAFAFA] font-bold hover:underline ml-1"
             >
-              Sign In &rarr;
+              Sign in &rarr;
             </Link>
           </p>
         </div>
 
         {/* RIGHT PANEL: Luxury Showcase & Social Proof */}
-        <div className="hidden lg:flex lg:col-span-5 bg-[#09090B] text-[#FAFAFA] p-8 lg:p-10 flex-col justify-between relative overflow-hidden border-l border-[#27272A]">
-          <div className="space-y-3 relative z-10">
+        <div className="hidden lg:flex lg:col-span-5 bg-[#09090B] text-[#FAFAFA] p-10 flex-col justify-between relative overflow-hidden border-l border-[#27272A]">
+          {/* Top Badge */}
+          <div className="space-y-4 relative z-10">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#18181B] border border-[#27272A] rounded-full text-[10px] font-bold uppercase text-zinc-300">
               <span className="w-1.5 h-1.5 rounded-full bg-[#FAFAFA] animate-pulse" />
-              Free Lifetime Starter Access
+              100% Free Candidate Suite
             </div>
 
             <h3 className="text-xl font-bold tracking-tight leading-snug text-[#FAFAFA]">
-              Build Your Competitive Edge in Modern Career Markets
+              Built for High-Velocity Engineering &amp; Career Growth
             </h3>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              Unlock ATS-verified resume builders, live coding challenges, conversational audio mock interviews, and salary negotiation simulators.
+              Unlock 6 ATS-compliant resume templates, Monaco coding sandboxes, and conversational voice mocks with zero paywalls.
             </p>
           </div>
 
-          <div className="p-5 bg-[#18181B] border border-[#27272A] rounded-2xl space-y-2.5 relative z-10">
-            <div className="flex items-center gap-1 text-zinc-300 text-xs">
-              {"★".repeat(5)}
-            </div>
-            <p className="text-xs text-zinc-300 italic font-medium leading-relaxed">
-              &ldquo;The STAR diff rewriter turned my basic bullet points into metric-rich achievements. Landed multiple interviews in my first week.&rdquo;
-            </p>
-            <div className="pt-2 border-t border-[#27272A] flex items-center justify-between text-[10px]">
-              <span className="font-bold text-[#FAFAFA]">Alex Rivera</span>
-              <span className="text-zinc-500 font-mono">Product Lead</span>
-            </div>
+          {/* Feature Highlight Bento */}
+          <div className="space-y-2.5 relative z-10">
+            {[
+              { icon: "📄", title: "6 Pro ATS Templates", desc: "Pixel-perfect A4 print styles with inline STAR diffs" },
+              { icon: "💻", title: "Monaco Coding IDE", desc: "Automated test assertions with Two-Pointer visualizer" },
+              { icon: "🎙️", title: "Spoken Voice Mock Coach", desc: "8 interview personas with 48-bar audio waveforms" },
+            ].map((f, idx) => (
+              <div key={idx} className="p-3.5 bg-[#18181B] border border-[#27272A] rounded-xl flex items-center gap-3">
+                <span className="text-xl">{f.icon}</span>
+                <div>
+                  <h4 className="text-xs font-bold text-[#FAFAFA]">{f.title}</h4>
+                  <p className="text-[10px] text-zinc-400">{f.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
 
-          <div className="grid grid-cols-2 gap-3 relative z-10 pt-3 border-t border-[#27272A] text-xs">
-            <div>
-              <div className="text-lg font-bold font-mono text-[#FAFAFA]">3.8x</div>
-              <span className="text-[9px] text-zinc-400 uppercase font-bold">More Callbacks</span>
-            </div>
-            <div>
-              <div className="text-lg font-bold font-mono text-[#FAFAFA]">100%</div>
-              <span className="text-[9px] text-zinc-400 uppercase font-bold">Privacy Guaranteed</span>
-            </div>
+          {/* Bottom Security Note */}
+          <div className="pt-4 border-t border-[#27272A] text-[10px] text-zinc-500 font-mono flex items-center justify-between relative z-10">
+            <span>🔒 Enterprise Grade Encryption</span>
+            <span>GDPR / CCPA Compliant</span>
           </div>
         </div>
       </div>
     </div>
-  );
-}
-
-export default function RegisterPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="flex items-center justify-center min-h-[100dvh] bg-[#09090B]">
-          <div className="w-8 h-8 border-2 border-[#FAFAFA] border-t-transparent rounded-full animate-spin" />
-        </div>
-      }
-    >
-      <RegisterForm />
-    </Suspense>
   );
 }
