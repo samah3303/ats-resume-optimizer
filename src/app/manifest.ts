@@ -4,13 +4,14 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Paniund — The Talent Operating System',
     short_name: 'paniund',
-    description: 'The Complete 1-Stop Talent Operating System: Resume Studio, Coding Sandbox, Spoken Mock Interviews, Recruiter OS, and Salary War Room.',
+    description: 'The Complete 1-Stop AI Career & Talent Operating System: ATS Resume Studio, In-Browser Monaco Coding Challenges, Spoken Voice Mock Interviews, Recruiter Talent OS, and Salary War Room.',
     start_url: '/dashboard',
+    scope: '/',
     display: 'standalone',
     background_color: '#09090B',
     theme_color: '#09090B',
     orientation: 'portrait-primary',
-    categories: ['productivity', 'business'],
+    categories: ['productivity', 'business', 'education', 'utilities'],
     icons: [
       {
         src: '/icon.svg',
@@ -36,19 +37,29 @@ export default function manifest(): MetadataRoute.Manifest {
     ],
     shortcuts: [
       {
-        name: 'Analyze Resume',
+        name: 'ATS Resume Studio',
+        url: '/dashboard/builder',
+        description: 'Build ATS-optimized resumes with 6 templates and STAR metric diffs',
+      },
+      {
+        name: 'ATS Match & Gap Scan',
         url: '/dashboard/analyze',
-        description: 'Analyze your resume with AI',
+        description: 'Scan resume against target job description for instant keyword fit',
       },
       {
-        name: 'Search Jobs',
-        url: '/dashboard/jobs',
-        description: 'Find matching jobs',
+        name: 'Monaco Coding Challenges',
+        url: '/dashboard/challenges',
+        description: 'In-browser algorithmic challenge sandbox with unit test assertions',
       },
       {
-        name: 'Track Applications',
-        url: '/dashboard/tracker',
-        description: 'Manage your job applications',
+        name: 'Spoken Voice Mock Coach',
+        url: '/dashboard/mock-interview',
+        description: 'Practice conversational interviews out loud with 8 AI personas',
+      },
+      {
+        name: 'Recruiter Talent OS',
+        url: '/dashboard/recruiter',
+        description: 'AI Job Architect, Bulk ATS Screener, and 8-Stage Kanban Pipelines',
       },
     ],
   }
