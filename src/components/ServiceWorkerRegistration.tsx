@@ -12,11 +12,33 @@ export default function ServiceWorkerRegistration() {
       navigator.serviceWorker
         .register('/sw.js')
         .then((registration) => {
-          console.log('Service Worker registered with scope:', registration.scope);
+          // Check for service worker updates on initial load and route navigation
+          registration.update();
+
+          registration.onupdatefound = () => {
+            const installingWorker = registration.installing;
+            if (installingWorker) {
+              installingWorker.onstatechange = () => {
+                if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  // New update installed - immediately take control
+                  console.log('[Paniund] New update detected. Cache refreshed.');
+                }
+              };
+            }
+          };
         })
         .catch((error) => {
           console.error('Service Worker registration failed:', error);
         });
+
+      // Reload tabs smoothly when a new worker claims clients
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!refreshing) {
+          refreshing = true;
+          window.location.reload();
+        }
+      });
     }
   }, []);
 
