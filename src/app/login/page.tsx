@@ -23,7 +23,7 @@ function LoginForm() {
 
   useEffect(() => {
     if (status === "authenticated") {
-      const target = role === "recruiter" ? "/dashboard/recruiter" : "/dashboard";
+      const target = role === "recruiter" ? "/dashboard/recruiter" : "/";
       router.replace(target);
     }
   }, [status, router, role]);
@@ -64,7 +64,7 @@ function LoginForm() {
       localStorage.setItem("paniund_workspace_mode", role);
       localStorage.setItem("kyro_workspace_mode", role);
       setMode(role);
-      const target = role === "recruiter" ? "/dashboard/recruiter" : "/dashboard";
+      const target = role === "recruiter" ? "/dashboard/recruiter" : "/";
       router.push(target);
     }
   };
@@ -74,7 +74,7 @@ function LoginForm() {
     setSocialLoading(provider);
     localStorage.setItem("paniund_workspace_mode", role);
     localStorage.setItem("kyro_workspace_mode", role);
-    const callbackUrl = role === "recruiter" ? "/dashboard/recruiter" : "/dashboard";
+    const callbackUrl = role === "recruiter" ? "/dashboard/recruiter" : "/";
     try {
       await signIn(provider, { callbackUrl });
     } catch {
