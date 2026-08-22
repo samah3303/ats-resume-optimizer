@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, type KeyboardEvent } from "react";
 import { COUNTRIES, INDUSTRIES, JOB_TYPES } from "./constants";
 
 interface StepTargetPreferencesProps {
@@ -28,7 +28,6 @@ export default function StepTargetPreferences({
   positions,
   setPositions,
   suggestedPositions,
-  togglePosition,
   industry,
   setIndustry,
   country,
@@ -41,12 +40,19 @@ export default function StepTargetPreferences({
   onChangeResume,
 }: StepTargetPreferencesProps) {
   const [showDropdown, setShowDropdown] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [customInput, setCustomInput] = useState("");
+  const containerRef = useRef<HTMLDivElement>(null);
+  const textInputRef = useRef<HTMLInputElement>(null);
+
+  const selectedList = positions
+    .split(",")
+    .map((p) => p.trim())
+    .filter(Boolean);
 
   // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setShowDropdown(false);
       }
     }
@@ -54,18 +60,37 @@ export default function StepTargetPreferences({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleSelectPosition = (pos: string) => {
-    const current = positions
-      .split(",")
-      .map((p) => p.trim())
-      .filter(Boolean);
-
-    if (current.includes(pos)) {
-      setPositions(current.filter((p) => p !== pos).join(", "));
+  const handleTogglePosition = (pos: string) => {
+    const trimmed = pos.trim();
+    if (!trimmed) return;
+    if (selectedList.includes(trimmed)) {
+      setPositions(selectedList.filter((p) => p !== trimmed).join(", "));
     } else {
-      setPositions([...current, pos].join(", "));
+      setPositions([...selectedList, trimmed].join(", "));
+    }
+    setCustomInput("");
+  };
+
+  const handleRemovePosition = (posToRemove: string) => {
+    setPositions(selectedList.filter((p) => p !== posToRemove).join(", "));
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      if (customInput.trim()) {
+        handleTogglePosition(customInput.trim());
+      }
+    } else if (e.key === "Backspace" && !customInput && selectedList.length > 0) {
+      e.preventDefault();
+      handleRemovePosition(selectedList[selectedList.length - 1]);
     }
   };
+
+  // Filter suggested positions if user is typing
+  const filteredSuggestions = suggestedPositions.filter((pos) =>
+    pos.toLowerCase().includes(customInput.toLowerCase())
+  );
 
   return (
     <div className="space-y-6 text-[#FAFAFA]">
@@ -104,100 +129,134 @@ export default function StepTargetPreferences({
       )}
 
       <div className="space-y-4">
-        {/* Target Positions with Interactive Dropdown on Focus */}
-        <div className="space-y-1.5 relative" ref={dropdownRef}>
+        {/* Target Positions with Removable Badges inside Input Box + Dropdown Multiselect */}
+        <div className="space-y-1.5 relative" ref={containerRef}>
           <div className="flex items-center justify-between">
             <label
-              htmlFor="positions"
+              htmlFor="positions-input"
               className="block text-xs font-bold text-zinc-300 uppercase tracking-wide"
             >
               Target Job Positions <span className="text-rose-400">*</span>
             </label>
             <span className="text-[10px] text-zinc-500 font-mono">
-              Click input to see AI suggestions
+              Click box to select / type custom roles
             </span>
           </div>
 
-          <div className="relative">
+          {/* Badge Input Container Box */}
+          <div
+            onClick={() => {
+              textInputRef.current?.focus();
+              setShowDropdown(true);
+            }}
+            className="w-full min-h-[48px] px-3 py-2 bg-[#09090B] border border-[#27272A] focus-within:border-[#FAFAFA] rounded-2xl flex flex-wrap items-center gap-2 cursor-text transition-all shadow-inner"
+          >
+            {/* Removable Badges Inside Input Box */}
+            {selectedList.map((pos) => (
+              <span
+                key={pos}
+                className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#18181B] border border-[#27272A] hover:border-zinc-400 text-xs font-bold text-[#FAFAFA] rounded-xl animate-in fade-in transition-all select-none"
+              >
+                <span>{pos}</span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemovePosition(pos);
+                  }}
+                  className="text-zinc-400 hover:text-rose-400 font-bold text-xs cursor-pointer ml-0.5 leading-none"
+                  title={`Remove ${pos}`}
+                >
+                  &times;
+                </button>
+              </span>
+            ))}
+
+            {/* Inline Input for typing custom positions */}
             <input
-              id="positions"
+              ref={textInputRef}
+              id="positions-input"
               type="text"
-              value={positions}
-              onChange={(e) => setPositions(e.target.value)}
+              value={customInput}
+              onChange={(e) => {
+                setCustomInput(e.target.value);
+                setShowDropdown(true);
+              }}
               onFocus={() => setShowDropdown(true)}
-              onClick={() => setShowDropdown(true)}
-              placeholder="e.g. Senior Software Engineer, Product Manager, Financial Analyst"
-              className="w-full px-4 py-2.5 bg-[#09090B] text-[#FAFAFA] border border-[#27272A] rounded-xl text-xs sm:text-sm focus:border-[#FAFAFA] focus:outline-none transition-colors placeholder-zinc-500 font-medium"
+              onKeyDown={handleKeyDown}
+              placeholder={selectedList.length === 0 ? "Select from dropdown or type custom role..." : "Type more..."}
+              className="flex-1 min-w-[140px] bg-transparent text-[#FAFAFA] text-xs sm:text-sm focus:outline-none placeholder-zinc-500 font-medium py-1"
             />
+
+            {/* Toggle Arrow */}
             {suggestedPositions.length > 0 && (
               <button
                 type="button"
-                onClick={() => setShowDropdown(!showDropdown)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zinc-400 hover:text-[#FAFAFA] px-1 py-0.5"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowDropdown(!showDropdown);
+                }}
+                className="text-xs text-zinc-400 hover:text-[#FAFAFA] px-1 py-1"
               >
                 {showDropdown ? "▲" : "▼"}
               </button>
             )}
           </div>
 
-          {/* Interactive Position Dropdown */}
-          {showDropdown && suggestedPositions.length > 0 && (
+          {/* Interactive Multi-Select Dropdown */}
+          {showDropdown && (suggestedPositions.length > 0 || customInput.trim()) && (
             <div className="absolute left-0 right-0 top-full mt-1.5 z-30 bg-[#18181B] border border-[#27272A] rounded-2xl shadow-2xl p-3 space-y-2 animate-in fade-in slide-in-from-top-2 duration-150">
               <div className="flex items-center justify-between pb-1.5 border-b border-[#27272A] text-[10px] font-mono text-zinc-400">
                 <span>🤖 AI SUGGESTED ROLES FROM RESUME</span>
-                <span>Click to Add / Toggle</span>
+                <span>Click to Select / Toggle</span>
               </div>
-              <div className="space-y-1 max-h-48 overflow-y-auto">
-                {suggestedPositions.map((pos) => {
-                  const isSelected = positions
-                    .split(",")
-                    .map((p) => p.trim())
-                    .includes(pos);
-                  return (
-                    <div
-                      key={pos}
-                      onClick={() => handleSelectPosition(pos)}
-                      className={`px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-between ${
-                        isSelected
-                          ? "bg-[#FAFAFA] text-[#09090B]"
-                          : "text-zinc-300 hover:bg-[#09090B] hover:text-[#FAFAFA]"
-                      }`}
-                    >
-                      <span>{pos}</span>
-                      <span className="text-[10px] font-mono opacity-80">
-                        {isSelected ? "Selected ✓" : "+ Add"}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
 
-          {/* Suggested position chips for quick glance */}
-          {suggestedPositions.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 pt-1">
-              {suggestedPositions.map((pos) => {
-                const isSelected = positions
-                  .split(",")
-                  .map((p) => p.trim())
-                  .includes(pos);
-                return (
-                  <button
-                    key={pos}
-                    type="button"
-                    onClick={() => togglePosition(pos)}
-                    className={`px-2.5 py-1 text-xs rounded-xl border transition-all font-bold cursor-pointer ${
-                      isSelected
-                        ? "bg-[#FAFAFA] text-[#09090B] border-[#FAFAFA]"
-                        : "bg-[#09090B] text-zinc-300 border-[#27272A] hover:border-zinc-500"
-                    }`}
-                  >
-                    {isSelected ? "✓ " : "+ "}
-                    {pos}
-                  </button>
-                );
-              })}
+              {/* If user typed a custom role not in list */}
+              {customInput.trim() && !suggestedPositions.some((p) => p.toLowerCase() === customInput.trim().toLowerCase()) && (
+                <div
+                  onClick={() => handleTogglePosition(customInput.trim())}
+                  className="px-3 py-2 rounded-xl text-xs font-bold bg-[#09090B] border border-[#27272A] text-emerald-400 hover:border-emerald-500 transition-all cursor-pointer flex items-center justify-between"
+                >
+                  <span>+ Add &ldquo;{customInput.trim()}&rdquo;</span>
+                  <span className="text-[10px] font-mono opacity-80">Press Enter ↵</span>
+                </div>
+              )}
+
+              {/* Suggestions List */}
+              <div className="space-y-1 max-h-52 overflow-y-auto">
+                {filteredSuggestions.length > 0 ? (
+                  filteredSuggestions.map((pos) => {
+                    const isSelected = selectedList.includes(pos);
+                    return (
+                      <div
+                        key={pos}
+                        onClick={() => handleTogglePosition(pos)}
+                        className={`px-3 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-between select-none ${
+                          isSelected
+                            ? "bg-[#FAFAFA] text-[#09090B] shadow-xs"
+                            : "text-zinc-300 hover:bg-[#09090B] hover:text-[#FAFAFA]"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className={`w-4 h-4 rounded-md border flex items-center justify-center text-[10px] font-bold ${
+                            isSelected ? "border-[#09090B] bg-[#09090B] text-[#FAFAFA]" : "border-zinc-500 text-transparent"
+                          }`}>
+                            ✓
+                          </span>
+                          <span>{pos}</span>
+                        </div>
+                        <span className="text-[10px] font-mono opacity-80">
+                          {isSelected ? "Selected ✓" : "+ Add"}
+                        </span>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <p className="text-[11px] text-zinc-500 p-2 italic">
+                    No matching AI suggested roles. Press Enter to add custom role.
+                  </p>
+                )}
+              </div>
             </div>
           )}
         </div>
