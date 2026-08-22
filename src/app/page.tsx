@@ -41,15 +41,20 @@ export default function HomePage() {
     setCheckingOnboarding(true);
     try {
       if (mode === "recruiter") {
+        const localDone = typeof window !== "undefined" && localStorage.getItem("recruiter_onboarding_done") === "true";
         const res = await fetch("/api/recruiter/onboarding");
         if (res.ok) {
           const data = await res.json();
-          setRecruiterOnboardingDone(data.completed);
-          if (data.completed) {
+          const isDone = data.completed || localDone;
+          setRecruiterOnboardingDone(isDone);
+          if (isDone) {
             router.replace("/dashboard/recruiter");
           }
         } else {
-          setRecruiterOnboardingDone(false);
+          setRecruiterOnboardingDone(localDone);
+          if (localDone) {
+            router.replace("/dashboard/recruiter");
+          }
         }
       } else {
         const res = await fetch("/api/onboarding");

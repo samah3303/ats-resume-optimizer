@@ -103,10 +103,11 @@ export default function RecruiterCommandCenterPage() {
     if (status === "unauthenticated") {
       router.replace("/login");
     } else if (status === "authenticated") {
+      const localDone = typeof window !== "undefined" && localStorage.getItem("recruiter_onboarding_done") === "true";
       fetch("/api/recruiter/onboarding")
         .then((res) => res.json())
         .then((data) => {
-          if (!data.completed) {
+          if (!data.completed && !localDone) {
             setNeedsOnboarding(true);
             if (data.profile?.companyName) {
               setInitialCompanyName(data.profile.companyName);
@@ -127,9 +128,15 @@ export default function RecruiterCommandCenterPage() {
   };
 
   const handleOnboardingComplete = () => {
+    localStorage.setItem("recruiter_onboarding_done", "true");
     setNeedsOnboarding(false);
     toast("🎉 Talent workspace configured successfully!", "success");
     router.push("/account");
+  };
+
+  const handleOnboardingSkip = () => {
+    localStorage.setItem("recruiter_onboarding_done", "true");
+    setNeedsOnboarding(false);
   };
 
   if (status === "loading" || needsOnboarding === null) {
@@ -149,7 +156,7 @@ export default function RecruiterCommandCenterPage() {
         <RecruiterOnboardingWizard
           initialCompanyName={initialCompanyName}
           onComplete={handleOnboardingComplete}
-          onSkip={() => setNeedsOnboarding(false)}
+          onSkip={handleOnboardingSkip}
         />
       )}
 

@@ -21,9 +21,8 @@ export async function GET() {
       where: { userId },
     });
 
-    // Considered completed if recruiter profile exists and has customized company name or posted jobs
-    const isCustomized = profile && profile.companyName !== "My Company" && profile.companyName !== "Talent Studio";
-    const completed = !!(profile && (isCustomized || hasJobs > 1));
+    // Completed if recruiter profile exists or has posted jobs
+    const completed = !!profile || hasJobs > 0;
 
     return NextResponse.json({
       completed,
