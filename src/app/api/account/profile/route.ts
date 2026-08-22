@@ -17,9 +17,9 @@ export async function GET() {
     const [onboardingProfile, primaryResume, latestDraft] = await Promise.all([
       prisma.onboardingProfile.findUnique({ where: { userId } }),
       prisma.resume.findFirst({
-        where: { userId, isPrimary: true },
-        orderBy: { updatedAt: "desc" },
-      }) || prisma.resume.findFirst({ where: { userId }, orderBy: { updatedAt: "desc" } }),
+        where: { userId },
+        orderBy: [{ isPrimary: "desc" }, { updatedAt: "desc" }],
+      }),
       prisma.resumeDraft.findFirst({
         where: { userId },
         orderBy: { updatedAt: "desc" },
@@ -38,7 +38,7 @@ export async function GET() {
     if (onboardingProfile?.coreSkills) {
       try {
         const parsed = JSON.parse(onboardingProfile.coreSkills);
-        skillsList = Array.isArray(parsed) ? parsed : [];
+        if (Array.isArray(parsed)) skillsList = parsed;
       } catch {}
     }
     if (skillsList.length === 0 && parsedDraftData?.skills && parsedDraftData.skills.length > 0) {
@@ -63,17 +63,27 @@ export async function GET() {
     // AUTO-POPULATION FALLBACK: If resume text exists but structured sections are empty, extract them now
     if (
       primaryResume?.parsedText &&
-      primaryResume.parsedText.length > 50 &&
+      primaryResume.parsedText.length > 30 &&
       (experience.length === 0 || skillsList.length === 0 || !summary)
     ) {
       try {
         const extracted = await extractFullStructuredResumeData(primaryResume.parsedText);
 
-        if (extracted.summary && !summary) summary = extracted.summary;
-        if (extracted.skills.length > 0 && skillsList.length === 0) skillsList = extracted.skills;
-        if (extracted.experiences.length > 0 && experience.length === 0) experience = extracted.experiences;
-        if (extracted.education.length > 0 && education.length === 0) education = extracted.education;
-        if (extracted.projects.length > 0 && projects.length === 0) projects = extracted.projects;
+        if (extracted.summary && (!summary || summary.length < 10)) {
+          summary = extracted.summary;
+        }
+        if (extracted.skills.length > 0 && skillsList.length === 0) {
+          skillsList = extracted.skills;
+        }
+        if (extracted.experiences.length > 0 && experience.length === 0) {
+          experience = extracted.experiences;
+        }
+        if (extracted.education.length > 0 && education.length === 0) {
+          education = extracted.education;
+        }
+        if (extracted.projects.length > 0 && projects.length === 0) {
+          projects = extracted.projects;
+        }
 
         // Persist to ResumeDraft
         const newDraftData: ResumeData = {
