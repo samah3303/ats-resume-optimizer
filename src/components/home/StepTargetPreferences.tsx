@@ -123,7 +123,7 @@ export default function StepTargetPreferences({
             onClick={onChangeResume}
             className="ml-auto text-xs text-zinc-400 hover:text-[#FAFAFA] font-bold underline transition-colors cursor-pointer"
           >
-            Change Resume
+            Change
           </button>
         </div>
       )}
