@@ -349,32 +349,15 @@ export default function StepTargetPreferences({
       </div>
 
       {/* Navigation Footer */}
-      <div className="flex items-center justify-between pt-4 border-t border-[#27272A]">
+      <div className="flex items-center justify-end pt-4 border-t border-[#27272A]">
         <button
           type="button"
-          onClick={onBack}
-          className="px-4 py-2 text-xs font-bold text-zinc-400 hover:text-[#FAFAFA] transition-colors cursor-pointer"
+          onClick={onNext}
+          disabled={!positions || !country}
+          className="touch-target px-8 py-3 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] font-bold text-xs rounded-xl transition-all cursor-pointer disabled:opacity-50 active:scale-95 border border-[#FAFAFA] shadow-sm"
         >
-          &larr; Back
+          Continue to Analysis &rarr;
         </button>
-
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={onSkip}
-            className="px-4 py-2 text-xs font-bold text-zinc-400 hover:text-[#FAFAFA] transition-colors cursor-pointer"
-          >
-            Skip for now
-          </button>
-          <button
-            type="button"
-            onClick={onNext}
-            disabled={!positions || !country}
-            className="touch-target px-7 py-2.5 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] font-bold text-xs rounded-xl transition-all cursor-pointer disabled:opacity-50 active:scale-95 border border-[#FAFAFA]"
-          >
-            Continue to Analysis &rarr;
-          </button>
-        </div>
       </div>
     </div>
   );
