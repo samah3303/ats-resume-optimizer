@@ -218,11 +218,11 @@ export default function HomePage() {
   if (candidateOnboardingDone) return null;
 
   return (
-    <div className="min-h-[85vh] bg-[#09090B] text-[#FAFAFA] py-8 md:py-12 px-4">
+    <div className="min-h-[100dvh] bg-[#09090B] text-[#FAFAFA] pt-6 pb-44 md:pt-10 md:pb-44 px-4 sm:px-6">
       <div className="max-w-2xl mx-auto space-y-6">
         <OnboardingStepper step={step} />
 
-        <div className="bg-[#18181B] rounded-3xl border border-[#27272A] p-6 md:p-8">
+        <div className="bg-[#18181B] rounded-3xl border border-[#27272A] p-6 sm:p-8 md:p-10 mb-10 shadow-2xl">
           {step === 1 && (
             <StepResumeUpload
               resumeFormat={resumeFormat}

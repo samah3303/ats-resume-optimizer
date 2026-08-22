@@ -349,14 +349,15 @@ export default function StepTargetPreferences({
       </div>
 
       {/* Navigation Footer */}
-      <div className="flex items-center justify-end pt-4 border-t border-[#27272A]">
+      <div className="flex items-center justify-end pt-5 mt-3 border-t border-[#27272A]">
         <button
           type="button"
           onClick={onNext}
           disabled={!positions || !country}
-          className="touch-target px-8 py-3 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] font-bold text-xs rounded-xl transition-all cursor-pointer disabled:opacity-50 active:scale-95 border border-[#FAFAFA] shadow-sm"
+          className="w-full sm:w-auto touch-target px-8 py-3.5 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] font-bold text-xs sm:text-sm rounded-xl transition-all cursor-pointer disabled:opacity-50 active:scale-95 border border-[#FAFAFA] shadow-md flex items-center justify-center gap-2"
         >
-          Continue to Analysis &rarr;
+          <span>Continue to Analysis</span>
+          <span>&rarr;</span>
         </button>
       </div>
     </div>
