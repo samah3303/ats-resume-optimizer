@@ -461,10 +461,10 @@ export default function AccountPage() {
                     ⚠️ Your resume is currently scoring below the Tier-1 80+ ATS benchmark.
                   </p>
                   <Link
-                    href="/dashboard#roadmap"
+                    href="/dashboard/analyze"
                     className="touch-target w-full py-2 px-3 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] font-bold text-xs rounded-xl transition-all border border-[#FAFAFA] flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer shadow-xs"
                   >
-                    <span>View Detailed ATS Breakdown &amp; 80+ Roadmap &rarr;</span>
+                    <span>View Detailed ATS Breakdown &amp; 80+ Suggestions &rarr;</span>
                   </Link>
                 </div>
               ) : (
@@ -473,10 +473,10 @@ export default function AccountPage() {
                     ✓ Tier-1 ATS Benchmark Met (80+)
                   </span>
                   <Link
-                    href="/dashboard#roadmap"
+                    href="/dashboard/analyze"
                     className="text-xs font-bold text-[#FAFAFA] hover:underline"
                   >
-                    View Roadmap &rarr;
+                    View ATS Analysis &rarr;
                   </Link>
                 </div>
               )}

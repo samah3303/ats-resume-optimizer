@@ -37,7 +37,7 @@ export default function StepAnalyzingProgress({
           </h2>
           <p className="text-xs sm:text-sm text-zinc-400 max-w-sm mx-auto leading-relaxed">
             Our AI is reviewing your experience against your target positions in{" "}
-            <span className="text-[#FAFAFA] font-bold">{country}</span>. Calculating your standalone ATS compatibility score and keyword gap analysis...
+            <span className="text-[#FAFAFA] font-bold">{country}</span>. Calculating your standalone ATS score, keyword coverage, and section improvements...
           </p>
         </div>
       ) : (
