@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useWorkspaceMode, WorkspaceMode } from "@/components/WorkspaceModeContext";
+import { useWorkspaceMode } from "@/components/WorkspaceModeContext";
 
 export interface SubFeatureItem {
   id: string;
@@ -143,35 +143,6 @@ const candidateCategories: CategoryGroup[] = [
     ],
   },
   {
-    id: "technical-coding",
-    title: "Coding Sandbox & Systems",
-    description: "In-browser algorithmic challenge IDE, pointer visualizers, and distributed system design whiteboards.",
-    icon: "💻",
-    badge: "2 Tools",
-    features: [
-      {
-        id: "coding-sandbox",
-        title: "Monaco Coding Challenge IDE",
-        tagline: "JS / TS / Python 3.11 with Pointer Visualizer",
-        description: "Solve algorithmic problems with real-time test assertions, Two-Pointer visual step debuggers, and AI Big-O complexity reviews.",
-        href: "/dashboard/challenges",
-        icon: "💻",
-        badge: "IDE",
-        highlightMetric: "Automated Tests",
-      },
-      {
-        id: "system-design",
-        title: "System Design Whiteboard Arena",
-        tagline: "SVG Vector Canvas & SPOF Capacity Grader",
-        description: "Drag-and-drop distributed systems diagrams, calculate QPS/Bandwidth capacity math, and export clean Mermaid.js flowchart code.",
-        href: "/dashboard/whiteboard",
-        icon: "📐",
-        badge: "Arena",
-        highlightMetric: "Mermaid Export",
-      },
-    ],
-  },
-  {
     id: "interview-prep",
     title: "Interview & Presentation Mastery",
     description: "Conversational spoken voice mocks, company loop question predictors, video composure HUD, and follow-ups.",
@@ -221,11 +192,40 @@ const candidateCategories: CategoryGroup[] = [
     ],
   },
   {
+    id: "technical-coding",
+    title: "Coding Sandbox & Systems",
+    description: "In-browser algorithmic challenge IDE, pointer visualizers, and distributed system design whiteboards.",
+    icon: "💻",
+    badge: "2 Tools",
+    features: [
+      {
+        id: "coding-sandbox",
+        title: "Monaco Coding Challenge IDE",
+        tagline: "JS / TS / Python 3.11 with Pointer Visualizer",
+        description: "Solve algorithmic problems with real-time test assertions, Two-Pointer visual step debuggers, and AI Big-O complexity reviews.",
+        href: "/dashboard/challenges",
+        icon: "💻",
+        badge: "IDE",
+        highlightMetric: "Automated Tests",
+      },
+      {
+        id: "system-design",
+        title: "System Design Whiteboard Arena",
+        tagline: "SVG Vector Canvas & SPOF Capacity Grader",
+        description: "Drag-and-drop distributed systems diagrams, calculate QPS/Bandwidth capacity math, and export clean Mermaid.js flowchart code.",
+        href: "/dashboard/whiteboard",
+        icon: "📐",
+        badge: "Arena",
+        highlightMetric: "Mermaid Export",
+      },
+    ],
+  },
+  {
     id: "compensation-strategy",
-    title: "Salary & Career Strategy",
-    description: "4-year equity vesting calculators, AI recruiter negotiation roleplay bots, and LinkedIn SEO optimizers.",
+    title: "Salary Negotiation War Room",
+    description: "4-year equity vesting calculators, AI recruiter negotiation roleplay bots, and formal counter-offer letters.",
     icon: "💰",
-    badge: "3 Tools",
+    badge: "1 Tool",
     features: [
       {
         id: "salary-war-room",
@@ -237,34 +237,14 @@ const candidateCategories: CategoryGroup[] = [
         badge: "Negotiation",
         highlightMetric: "+$18.4k Avg Gain",
       },
-      {
-        id: "linkedin-optimizer",
-        title: "LinkedIn Brand Optimizer",
-        tagline: "4 Headlines, About Stories & Cold Drip",
-        description: "Generate 4 high-ranking headlines, narrative about sections, top 50 search keywords, and 3-step cold outreach drip sequences.",
-        href: "/dashboard/linkedin",
-        icon: "⚡",
-        badge: "SEO Suite",
-        highlightMetric: "Top 50 Skills",
-      },
-      {
-        id: "career-roadmap",
-        title: "Onboarding Baseline & Career Roadmap",
-        tagline: "General ATS Baseline & Weekly Milestones",
-        description: "View your general onboarding baseline score, LinkedIn optimization tips, and customized week-by-week skill roadmap.",
-        href: "/dashboard/roadmap",
-        icon: "🗺️",
-        badge: "Roadmap",
-        highlightMetric: "Baseline Score",
-      },
     ],
   },
   {
     id: "discovery-automation",
     title: "Discovery & Background Swarm",
-    description: "140k+ semantic job aggregator stream, 24/7 background Hunter Agent, and visual Kanban application tracker.",
+    description: "140k+ semantic job aggregator stream and 24/7 background Hunter Agent packets.",
     icon: "🤖",
-    badge: "3 Tools",
+    badge: "2 Tools",
     features: [
       {
         id: "job-discovery",
@@ -286,177 +266,16 @@ const candidateCategories: CategoryGroup[] = [
         badge: "Autonomous",
         highlightMetric: "4 Agents",
       },
-      {
-        id: "app-tracker",
-        title: "Kanban Application Tracker",
-        tagline: "Visual Pipeline & 1-Click Swarm Sync",
-        description: "Drag-and-drop applications across Wishlist, Applied, Interviewing, and Offer stages with 1-click Swarm imports.",
-        href: "/dashboard/tracker",
-        icon: "📊",
-        badge: "Kanban",
-        highlightMetric: "1-Click Sync",
-      },
-    ],
-  },
-  {
-    id: "account-settings",
-    title: "Account, Portfolios & Settings",
-    description: "Manage onboarding career targets, verified portfolio links, and administrative governance.",
-    icon: "⚙️",
-    badge: "3 Tools",
-    features: [
-      {
-        id: "portfolio",
-        title: "Public Verified Portfolio",
-        tagline: "Certified Badges & Skills Link",
-        description: "Share a luxury monochrome profile showcasing your verified ATS scores, coding challenge badges, and system design grades.",
-        href: "/portfolio/alex-rivers",
-        icon: "🏆",
-        badge: "Shareable",
-        highlightMetric: "Certified Badges",
-      },
-      {
-        id: "edit-onboarding",
-        title: "Career Target & Onboarding Editor",
-        tagline: "Update Target Titles, Skills & Experience",
-        description: "Update your target job requisites and industry focus to refresh your tailored career roadmap.",
-        href: "/",
-        icon: "✏️",
-        badge: "Profile",
-        highlightMetric: "Onboarding State",
-      },
-      {
-        id: "admin-os",
-        title: "Master Admin & Governance OS",
-        tagline: "Telemetry, Token Ledgers & Moderation",
-        description: "Access executive multi-tenant telemetry, AI financial spend ledgers, and candidate management tools.",
-        href: "/admin",
-        icon: "🛡️",
-        badge: "Admin",
-        highlightMetric: "Telemetry OS",
-      },
-    ],
-  },
-];
-
-const recruiterCategories: CategoryGroup[] = [
-  {
-    id: "requisitions",
-    title: "Job Requisitions & Architect",
-    description: "Create and manage structured job requisitions with AI-generated screening rubrics.",
-    icon: "📝",
-    badge: "1 Tool",
-    features: [
-      {
-        id: "job-architect",
-        title: "AI Job Description Architect",
-        tagline: "Generate Bias-Free JDs in 15s",
-        description: "Draft comprehensive, structured job postings with role requirements, screening criteria, and interview rubrics.",
-        href: "/dashboard/recruiter",
-        icon: "📝",
-        badge: "Requisition Engine",
-        highlightMetric: "15s Generation",
-      },
-    ],
-  },
-  {
-    id: "pipelines",
-    title: "Applicant Pipelines & Kanban",
-    description: "Visual 8-stage applicant tracking from Applied to Hired.",
-    icon: "📋",
-    badge: "1 Tool",
-    features: [
-      {
-        id: "pipeline-kanban",
-        title: "8-Stage Pipeline Kanban",
-        tagline: "Visual Drag-and-Drop Applicant Funnel",
-        description: "Track candidate applications across Screening, Technical, System Design, Bar Raiser, Offer, and Hired.",
-        href: "/dashboard/recruiter/pipeline/engineering-lead-01",
-        icon: "📋",
-        badge: "8 Stages",
-        highlightMetric: "Drag & Drop",
-      },
-    ],
-  },
-  {
-    id: "screening-evaluation",
-    title: "Screening & Scorecards",
-    description: "Bulk automated resume evaluation and structured hiring committee scorecards.",
-    icon: "⚡",
-    badge: "2 Tools",
-    features: [
-      {
-        id: "bulk-screener",
-        title: "Bulk ATS Resume Screener",
-        tagline: "Automated Batch Fit Scoring",
-        description: "Upload and evaluate dozens of candidate resumes simultaneously with instant compatibility scores and red-flag audits.",
-        href: "/dashboard/recruiter",
-        icon: "⚡",
-        badge: "Batch AI",
-        highlightMetric: "0-100% Fit",
-      },
-      {
-        id: "scorecard-builder",
-        title: "Standardized Scorecards",
-        tagline: "Objective Hiring Committee Rubrics",
-        description: "Grade candidates across technical depth, system architecture, and culture add with 1-click debrief generation.",
-        href: "/dashboard/recruiter",
-        icon: "🎯",
-        badge: "Objective",
-        highlightMetric: "1-Click Debrief",
-      },
-    ],
-  },
-  {
-    id: "live-assessments",
-    title: "Live Video Assessments",
-    description: "WebRTC interview rooms with synchronized code editor and secret AI copilot.",
-    icon: "📹",
-    badge: "1 Tool",
-    features: [
-      {
-        id: "interview-rooms",
-        title: "WebRTC Video Interview Rooms",
-        tagline: "Live P2P Calling + AI Fact Copilot",
-        description: "Host technical video rounds with synchronized live coding, shared scorecards, and real-time AI probing assistance.",
-        href: "/dashboard/interview-rooms",
-        icon: "📹",
-        badge: "P2P WebRTC",
-        highlightMetric: "AI Copilot",
-      },
-    ],
-  },
-  {
-    id: "recruiter-governance",
-    title: "Governance & Master Admin",
-    description: "Platform telemetry, team seats, and server moderation.",
-    icon: "🛡️",
-    badge: "1 Tool",
-    features: [
-      {
-        id: "admin-os-recruiter",
-        title: "Master Admin & Governance OS",
-        tagline: "Telemetry, Token Ledgers & Moderation",
-        description: "Access executive multi-tenant telemetry, AI financial spend ledgers, and candidate management tools.",
-        href: "/admin",
-        icon: "🛡️",
-        badge: "Admin",
-        highlightMetric: "Telemetry OS",
-      },
     ],
   },
 ];
 
 export function StepByStepTileNavigator() {
-  const { mode, setMode } = useWorkspaceMode();
-  const [selectedPersona, setSelectedPersona] = useState<WorkspaceMode | null>(null);
+  const { mode, toggleMode } = useWorkspaceMode();
   const [selectedCategory, setSelectedCategory] = useState<CategoryGroup | null>(null);
 
-  const activeMode = selectedPersona || mode;
-  const categories = activeMode === "recruiter" ? recruiterCategories : candidateCategories;
-
-  // STAGE 3: Sub-Feature Tiles inside a specific Category
-  if (selectedPersona && selectedCategory) {
+  // If a Category is opened, drill down into its tools
+  if (selectedCategory) {
     return (
       <div className="space-y-6 animate-in fade-in zoom-in-95 duration-150 text-[#FAFAFA]">
         {/* Breadcrumb Header */}
@@ -467,8 +286,8 @@ export function StepByStepTileNavigator() {
               onClick={() => setSelectedCategory(null)}
               className="text-xs font-bold text-zinc-400 hover:text-[#FAFAFA] flex items-center gap-1.5 cursor-pointer mb-1.5 transition-colors"
             >
-              <span>←</span>
-              <span>Back to {activeMode === "candidate" ? "Candidate Categories" : "Recruiter Categories"}</span>
+              <span>&larr;</span>
+              <span>Back to Candidate Tools Hub</span>
             </button>
             <div className="flex items-center gap-2">
               <span className="text-2xl">{selectedCategory.icon}</span>
@@ -479,26 +298,26 @@ export function StepByStepTileNavigator() {
             <p className="text-xs text-zinc-400 mt-1">{selectedCategory.description}</p>
           </div>
 
-          <span className="px-3 py-1 bg-[#18181B] border border-[#27272A] text-xs font-bold rounded-xl text-[#FAFAFA] self-start sm:self-auto">
-            {selectedCategory.features.length} Dedicated Tools
-          </span>
+          <div className="px-3 py-1.5 rounded-full bg-[#18181B] border border-[#27272A] text-xs font-mono text-zinc-300 self-start sm:self-auto">
+            {selectedCategory.features.length} Specialized Tools
+          </div>
         </div>
 
-        {/* Feature Tiles Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+        {/* Feature Sub-Tiles */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
           {selectedCategory.features.map((feature) => (
             <Link
               key={feature.id}
               href={feature.href}
-              className="p-6 bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] rounded-3xl transition-all flex flex-col justify-between space-y-5 group hover:-translate-y-1 relative active:scale-[0.98]"
+              className="p-6 bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] rounded-3xl transition-all flex flex-col justify-between space-y-4 group hover:-translate-y-1 active:scale-[0.99] shadow-lg"
             >
-              <div className="flex items-start justify-between gap-2">
+              <div className="flex items-start justify-between">
                 <div className="w-12 h-12 rounded-2xl bg-[#09090B] border border-[#27272A] flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
                   {feature.icon}
                 </div>
-                <div className="flex flex-col items-end gap-1">
+                <div className="flex items-center gap-2">
                   {feature.badge && (
-                    <span className="px-2.5 py-0.5 rounded-md bg-[#27272A] text-[#FAFAFA] text-[9px] font-bold uppercase">
+                    <span className="px-2.5 py-0.5 rounded-md bg-[#27272A] text-[#FAFAFA] text-[9px] font-bold uppercase font-mono">
                       {feature.badge}
                     </span>
                   )}
@@ -531,194 +350,65 @@ export function StepByStepTileNavigator() {
     );
   }
 
-  // STAGE 2: Category Tile Hub (when a persona is selected)
-  if (selectedPersona) {
-    return (
-      <div className="space-y-6 animate-in fade-in duration-150 text-[#FAFAFA]">
-        {/* Header with Back to 2-Tile Persona Selector */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#27272A]">
-          <div>
-            <button
-              type="button"
-              onClick={() => setSelectedPersona(null)}
-              className="text-xs font-bold text-zinc-400 hover:text-[#FAFAFA] flex items-center gap-1.5 cursor-pointer mb-1.5 transition-colors"
-            >
-              <span>←</span>
-              <span>Back to Workspace Selector (2 Tiles)</span>
-            </button>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">{activeMode === "candidate" ? "👤" : "👔"}</span>
-              <h2 className="text-xl sm:text-2xl font-bold text-[#FAFAFA] tracking-tight">
-                {activeMode === "candidate"
-                  ? "Candidate & Engineering Suite"
-                  : "Recruiter Talent Operating System"}
-              </h2>
-            </div>
-            <p className="text-xs text-zinc-400 mt-1">
-              Select a category below to access dedicated single-purpose tools.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => {
-              const nextMode = activeMode === "candidate" ? "recruiter" : "candidate";
-              setSelectedPersona(nextMode);
-              setMode(nextMode);
-            }}
-            className="touch-target px-4 py-2 bg-[#18181B] hover:bg-[#27272A] border border-[#27272A] text-[#FAFAFA] text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
-          >
-            <span>⇄</span>
-            <span>Switch to {activeMode === "candidate" ? "Recruiter OS" : "Candidate Suite"}</span>
-          </button>
-        </div>
-
-        {/* Category Tiles Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-          {categories.map((category) => (
-            <div
-              key={category.id}
-              onClick={() => setSelectedCategory(category)}
-              className="p-6 sm:p-7 bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] rounded-3xl cursor-pointer transition-all flex flex-col justify-between space-y-5 group hover:-translate-y-1 relative active:scale-[0.98]"
-            >
-              <div className="flex items-start justify-between">
-                <div className="w-14 h-14 rounded-2xl bg-[#09090B] border border-[#27272A] flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
-                  {category.icon}
-                </div>
-                <span className="px-2.5 py-1 rounded-md bg-[#27272A] text-[10px] font-bold uppercase text-[#FAFAFA]">
-                  {category.badge}
-                </span>
-              </div>
-
-              <div className="space-y-2 flex-1">
-                <h3 className="text-lg font-bold text-[#FAFAFA] group-hover:text-white transition-colors">
-                  {category.title}
-                </h3>
-                <p className="text-xs text-zinc-400 leading-relaxed">
-                  {category.description}
-                </p>
-              </div>
-
-              <div className="pt-3 border-t border-[#27272A] flex items-center justify-between text-xs font-bold text-[#FAFAFA] group-hover:underline">
-                <span>View {category.features.length} Focused Tools</span>
-                <span className="group-hover:translate-x-1.5 transition-transform">&rarr;</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  // STAGE 1 (DEFAULT HOME): Mobile-First 2 TILES ONLY
+  // DEFAULT CANDIDATE HOME: Direct Category Grid (No intermediate 2-card picker!)
   return (
-    <div className="space-y-6 sm:space-y-8 animate-in fade-in zoom-in-95 duration-200 max-w-4xl mx-auto text-[#FAFAFA]">
-      {/* Title Header */}
-      <div className="text-center space-y-2">
-        <span className="px-3 py-1 rounded-full bg-[#18181B] border border-[#27272A] text-[10px] font-bold uppercase tracking-wider text-zinc-300">
-          SELECT YOUR WORKSPACE
-        </span>
-        <h2 className="text-2xl sm:text-4xl font-bold text-[#FAFAFA] tracking-tight">
-          Choose How You Want to Use Paniund
-        </h2>
-        <p className="text-xs sm:text-sm text-zinc-400 max-w-md mx-auto">
-          Tap one of the two options below to unlock your role-specific talent operating system.
-        </p>
+    <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-200 text-[#FAFAFA]">
+      {/* Top Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#27272A]">
+        <div>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-[#18181B] border border-[#27272A] text-zinc-300 mb-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>Candidate &amp; Engineering Suite</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#FAFAFA]">
+            Career OS Dashboard
+          </h1>
+          <p className="text-xs text-zinc-400 mt-1">
+            Access your ATS resume optimizer, LinkedIn branding suite, and 2-month career roadmap.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={toggleMode}
+          className="touch-target px-4 py-2.5 bg-[#18181B] hover:bg-[#27272A] border border-[#27272A] text-zinc-300 hover:text-[#FAFAFA] text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
+        >
+          <span>⇄ Switch to Recruiter OS</span>
+        </button>
       </div>
 
-      {/* MOBILE-FIRST 2 HERO TILES */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
-        {/* TILE 1: CANDIDATE SUITE */}
-        <div
-          onClick={() => {
-            setSelectedPersona("candidate");
-            setMode("candidate");
-          }}
-          className="p-6 sm:p-8 bg-[#18181B] border-2 border-[#27272A] hover:border-[#FAFAFA] rounded-3xl cursor-pointer transition-all space-y-6 hover:-translate-y-1 relative group active:scale-[0.98]"
-        >
-          <div className="flex items-center justify-between">
-            <div className="w-16 h-16 rounded-2xl bg-[#09090B] border border-[#27272A] flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
-              👤
-            </div>
-            <span className="px-3 py-1 bg-[#27272A] text-[10px] font-bold uppercase rounded-lg text-zinc-300">
-              FOR JOB SEEKERS &amp; ENGINEERS
-            </span>
-          </div>
-
-          <div className="space-y-2">
-            <h3 className="text-xl sm:text-2xl font-bold text-[#FAFAFA]">
-              Candidate &amp; Engineering Suite
-            </h3>
-            <p className="text-xs text-zinc-400 leading-relaxed font-medium">
-              Accelerate your career, build ATS-optimized resumes, solve in-browser coding challenges, practice spoken voice interviews, and simulate salary negotiations.
-            </p>
-          </div>
-
-          {/* Quick Pill Highlights */}
-          <div className="flex flex-wrap gap-1.5 pt-1">
-            {["📄 6 ATS Templates", "💻 Monaco Coding IDE", "🎙️ Spoken Voice Mocks", "💰 Salary War Room", "🤖 Auto Hunter"].map((pill, idx) => (
-              <span
-                key={idx}
-                className="px-2.5 py-1 rounded-lg bg-[#09090B] border border-[#27272A] text-[10px] font-bold text-zinc-300"
-              >
-                {pill}
-              </span>
-            ))}
-          </div>
-
-          <button
-            type="button"
-            className="touch-target w-full py-4 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] font-bold text-xs uppercase tracking-wider rounded-2xl border border-[#FAFAFA] transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+      {/* Primary Category Tiles Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {candidateCategories.map((category) => (
+          <div
+            key={category.id}
+            onClick={() => setSelectedCategory(category)}
+            className="p-6 sm:p-7 bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] rounded-3xl cursor-pointer transition-all flex flex-col justify-between space-y-5 group hover:-translate-y-1 relative active:scale-[0.98] shadow-lg"
           >
-            <span>Launch Candidate Suite &rarr;</span>
-          </button>
-        </div>
-
-        {/* TILE 2: RECRUITER TALENT OS */}
-        <div
-          onClick={() => {
-            setSelectedPersona("recruiter");
-            setMode("recruiter");
-          }}
-          className="p-6 sm:p-8 bg-[#18181B] border-2 border-[#27272A] hover:border-[#FAFAFA] rounded-3xl cursor-pointer transition-all space-y-6 hover:-translate-y-1 relative group active:scale-[0.98]"
-        >
-          <div className="flex items-center justify-between">
-            <div className="w-16 h-16 rounded-2xl bg-[#09090B] border border-[#27272A] flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
-              👔
-            </div>
-            <span className="px-3 py-1 bg-[#27272A] text-[10px] font-bold uppercase rounded-lg text-zinc-300">
-              FOR RECRUITERS &amp; HIRING TEAMS
-            </span>
-          </div>
-
-          <div className="space-y-2">
-            <h3 className="text-xl sm:text-2xl font-bold text-[#FAFAFA]">
-              Recruiter Talent Operating System
-            </h3>
-            <p className="text-xs text-zinc-400 leading-relaxed font-medium">
-              Architect bias-free job descriptions in 15 seconds, screen candidate resumes in bulk, manage 8-stage Kanban pipelines, and host WebRTC interview rooms.
-            </p>
-          </div>
-
-          {/* Quick Pill Highlights */}
-          <div className="flex flex-wrap gap-1.5 pt-1">
-            {["📝 AI Job Architect", "📋 8-Stage Kanban", "⚡ Bulk ATS Screener", "📹 WebRTC Rooms", "🎯 Scorecards"].map((pill, idx) => (
-              <span
-                key={idx}
-                className="px-2.5 py-1 rounded-lg bg-[#09090B] border border-[#27272A] text-[10px] font-bold text-zinc-300"
-              >
-                {pill}
+            <div className="flex items-start justify-between">
+              <div className="w-14 h-14 rounded-2xl bg-[#09090B] border border-[#27272A] flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
+                {category.icon}
+              </div>
+              <span className="px-2.5 py-1 rounded-md bg-[#27272A] text-[10px] font-bold uppercase text-[#FAFAFA] font-mono">
+                {category.badge}
               </span>
-            ))}
-          </div>
+            </div>
 
-          <button
-            type="button"
-            className="touch-target w-full py-4 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] font-bold text-xs uppercase tracking-wider rounded-2xl border border-[#FAFAFA] transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
-          >
-            <span>Launch Recruiter OS &rarr;</span>
-          </button>
-        </div>
+            <div className="space-y-2 flex-1">
+              <h3 className="text-lg font-bold text-[#FAFAFA] group-hover:text-white transition-colors">
+                {category.title}
+              </h3>
+              <p className="text-xs text-zinc-400 leading-relaxed">
+                {category.description}
+              </p>
+            </div>
+
+            <div className="pt-3 border-t border-[#27272A] flex items-center justify-between text-xs font-bold text-[#FAFAFA] group-hover:underline">
+              <span>View {category.features.length} Focused Tools</span>
+              <span className="group-hover:translate-x-1.5 transition-transform">&rarr;</span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

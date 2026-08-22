@@ -4,16 +4,20 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, Suspense } from "react";
 import { StepByStepTileNavigator } from "@/components/tiles/StepByStepTileNavigator";
+import { useWorkspaceMode } from "@/components/WorkspaceModeContext";
 
 function DashboardContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const { mode } = useWorkspaceMode();
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.replace("/login");
+    } else if (status === "authenticated" && mode === "recruiter") {
+      router.replace("/dashboard/recruiter");
     }
-  }, [status, router]);
+  }, [status, mode, router]);
 
   if (status === "loading") {
     return (
@@ -26,9 +30,8 @@ function DashboardContent() {
   if (status === "unauthenticated") return null;
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-[#09090B] text-[#FAFAFA] py-8 px-4 sm:px-6 lg:px-8 pb-28 flex flex-col justify-center">
-      <div className="max-w-5xl mx-auto w-full space-y-6">
-        {/* Strictly 2-Tile Workspace Navigator (Mobile-First) */}
+    <div className="min-h-[calc(100vh-4rem)] bg-[#09090B] text-[#FAFAFA] py-8 px-4 sm:px-6 lg:px-8 pb-32">
+      <div className="max-w-6xl mx-auto w-full space-y-6">
         <StepByStepTileNavigator />
       </div>
     </div>
