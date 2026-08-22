@@ -21,10 +21,7 @@ export default function HomePage() {
   const [positions, setPositions] = useState("");
   const [country, setCountry] = useState("");
   const [industry, setIndustry] = useState("");
-  const [linkedin, setLinkedin] = useState("");
-  const [portfolioUrl, setPortfolioUrl] = useState("");
-  const [githubUrl, setGithubUrl] = useState("");
-  const [jobType, setJobType] = useState("");
+  const [jobType, setJobType] = useState("Full-time");
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [onboardingDone, setOnboardingDone] = useState<boolean | null>(null);
@@ -107,15 +104,6 @@ export default function HomePage() {
               );
             if (match) setCountry(match);
           }
-          if (data.linkedinUrl) {
-            setLinkedin(data.linkedinUrl);
-          }
-          if (data.githubUrl) {
-            setGithubUrl(data.githubUrl);
-          }
-          if (data.portfolioUrl) {
-            setPortfolioUrl(data.portfolioUrl);
-          }
           if (data.suggestedJobTypes?.length > 0) {
             setJobType(data.suggestedJobTypes.join(", "));
           }
@@ -135,7 +123,7 @@ export default function HomePage() {
 
   const handleSubmit = async () => {
     if (!resumeId || !positions.trim() || !country) {
-      setError("Please complete all required fields.");
+      setError("Please complete all required fields (Target Positions and Country).");
       return;
     }
     setError(null);
@@ -152,11 +140,8 @@ export default function HomePage() {
             .map((p) => p.trim())
             .filter(Boolean),
           targetCountry: country,
-          linkedinUrl: linkedin.trim() || undefined,
-          portfolioUrl: portfolioUrl.trim() || undefined,
-          githubUrl: githubUrl.trim() || undefined,
           industry: industry || undefined,
-          jobType: jobType || undefined,
+          jobType: jobType || "Full-time",
         }),
       });
 
@@ -217,12 +202,6 @@ export default function HomePage() {
               setCountry={setCountry}
               jobType={jobType}
               setJobType={setJobType}
-              linkedin={linkedin}
-              setLinkedin={setLinkedin}
-              portfolioUrl={portfolioUrl}
-              setPortfolioUrl={setPortfolioUrl}
-              githubUrl={githubUrl}
-              setGithubUrl={setGithubUrl}
               onBack={() => setStep(1)}
               onSkip={() => router.push("/dashboard")}
               onNext={() => setStep(3)}
@@ -241,7 +220,7 @@ export default function HomePage() {
               resumeName={resumeName}
               positions={positions}
               country={country}
-              linkedin={linkedin}
+              linkedin=""
               error={error}
               onBack={() => setStep(2)}
               onSubmit={handleSubmit}

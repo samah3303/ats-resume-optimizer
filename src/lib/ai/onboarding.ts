@@ -20,60 +20,59 @@ export async function mode1OnboardingAnalysis(
     atsBoost?: string | number;
   }>;
 }> {
-  const prompt = `You are an expert career coach and ATS analyst.
+  const prompt = `You are a world-class ATS Resume Auditor and Career Intelligence Engine.
 
-Your task is to analyze a candidate's primary resume against their target positions and country, then produce a comprehensive onboarding analysis.
+Your task is to conduct an authoritative, standalone General ATS Compatibility Analysis on the candidate's resume for their target positions (${targetPositions.join(", ")}) in ${targetCountry}.
+Analyze formatting parseability, keyword density, section taxonomy, and quantifiable impact to provide prioritized, actionable recommendations that will elevate the candidate's ATS score from its current state to 80+ (Tier-1 ATS Benchmark).
 
 ## Target Positions:
 ${targetPositions.map((p, i) => `${i + 1}. ${p}`).join("\n")}
 
-## Target Country: ${targetCountry}
-${linkedinUrl ? `## LinkedIn Profile URL: ${linkedinUrl}` : ""}
+## Target Geography: ${targetCountry}
+${linkedinUrl ? `## Candidate Link: ${linkedinUrl}` : ""}
 
-## Primary Resume Text:
+## Candidate Resume Text:
 ${resumeText}
 
-## Instructions:
-Parse the resume and produce a JSON response with EXACTLY this structure. Do NOT include markdown formatting or extra text:
+## Output Format:
+Output ONLY a valid JSON object matching this exact schema (no markdown fences, no explanatory preambles):
 
 {
-  "profileSummary": "<2-3 paragraph professional summary distilling the candidate's experience, strengths, and career narrative>",
-  "detectedCoreSkills": ["skill1", "skill2", "skill3"],
+  "profileSummary": "<2-3 paragraph executive summary evaluating the candidate's professional trajectory, core strengths, and immediate ATS readiness>",
+  "detectedCoreSkills": ["skill1", "skill2", "skill3", "skill4", "skill5", "skill6"],
   "marketGaps": [
     {
       "type": "skill|experience|certification|education|language|other",
-      "description": "<specific gap description relevant to target positions and country>"
+      "description": "<specific gap description explaining what prevents the resume from ranking in the top 10% for ${targetPositions[0] || "Target Position"}>"
     }
   ],
   "aiSuggestions": [
-    "<actionable suggestion for improving ATS competitiveness>",
-    "<actionable suggestion for skill development>"
+    "<High-priority action item to achieve 80+ ATS score: e.g. Add quantified metrics (%, $, latency) to bullet points>",
+    "<Action item: Integrate high-frequency industry keywords relevant to ${targetPositions[0] || "Target Role"}>",
+    "<Action item: Standardize section headers and bullet formatting for flawless parser parsing>",
+    "<Action item: Strengthen executive summary with target role alignment>"
   ],
   "linkedinOptimizations": [
-    "<Specific LinkedIn profile change needed to align candidate's resume to target position '${targetPositions[0] || "Target Role"}' — e.g. Headline, About Section, Skills List, or Experience Title>",
-    "<Specific headline or summary phrasing adjustment to rank in recruiter searches in ${targetCountry}>"
+    "<Strategic positioning advice to rank in recruiter search results for ${targetPositions[0] || "Target Position"}>",
+    "<Keyword-rich headline and summary formula for ${targetCountry} talent markets>"
   ],
-  "generalAtsScore": <integer 60-95 rating the resume's standalone ATS compatibility — format, keywords, structure, readability>,
+  "generalAtsScore": <integer 50-95 realistically scoring the current resume's parseability, keyword density, action verb strength, and quantified achievements>,
   "resumeImprovements": [
     {
-      "section": "<resume section name e.g. Summary, Experience, Skills, Education>",
-      "current": "<brief excerpt or description of what's currently lacking>",
-      "suggested": "<specific improvement suggestion>",
-      "reason": "<why this change improves ATS performance>",
-      "atsBoost": "<estimated ATS score gain e.g. '+5% ATS Boost' or '+8% ATS Boost'>"
+      "section": "<Section Name: Summary | Experience | Skills | Education | Projects>",
+      "current": "<Exact weak or passive phrasing from resume needing improvement>",
+      "suggested": "<High-impact rewrite using Google/Executive STAR method (Situation, Task, Action, Metric Result) to hit 80+ score>",
+      "reason": "<Why this change satisfies ATS filters and hiring managers>",
+      "atsBoost": "<Estimated score gain e.g. '+6% ATS Boost' or '+8% ATS Boost'>"
     }
   ]
 }
 
-Guidelines:
-- Identify 4-8 core skills from the resume
-- Identify 3-6 market gaps specific to the target positions and country
-- Provide 4-8 actionable AI suggestions
-- Provide 4-6 LinkedIn profile optimization tips specifically tailored to bridge the candidate's resume to target positions
-- Provide 3-6 resume improvements with specific current vs suggested comparisons AND estimated ATS score percentage gains (atsBoost)
-- Rate generalAtsScore holistically between 60 and 95 based on formatting, keyword density, action verbs, and structure
-- Be honest and constructive; focus on what will actually help the candidate
-- Consider country-specific requirements (visa, language, certifications, local market norms)`;
+## Guidelines:
+1. Provide a realistic generalAtsScore (typically 55-80 for unoptimized resumes, 80+ for top-tier resumes).
+2. Detail 4-6 high-impact resumeImprovements with concrete before-and-after bullet rewrites using numbers, metrics, and industry taxonomy.
+3. Identify 4-8 core verified skills and 3-5 critical market gaps.
+4. Ensure all suggestions are universally applicable for the candidate's target role and domain.`;
 
   const response = await getDeepSeek().chat.completions.create({
     model: getAiModelName(),
