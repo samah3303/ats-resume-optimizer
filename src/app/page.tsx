@@ -8,12 +8,16 @@ import OnboardingStepper from "@/components/home/OnboardingStepper";
 import StepResumeUpload from "@/components/home/StepResumeUpload";
 import StepTargetPreferences from "@/components/home/StepTargetPreferences";
 import StepAnalyzingProgress from "@/components/home/StepAnalyzingProgress";
+import RecruiterOnboardingWizard from "@/components/recruiter/RecruiterOnboardingWizard";
+import { useWorkspaceMode } from "@/components/WorkspaceModeContext";
 import { COUNTRIES, INDUSTRIES } from "@/components/home/constants";
 
 export default function HomePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const { mode } = useWorkspaceMode();
 
+  // Candidate Stepper State
   const [step, setStep] = useState(1);
   const [resumeId, setResumeId] = useState<string | null>(null);
   const [resumeName, setResumeName] = useState<string | null>(null);
@@ -24,29 +28,48 @@ export default function HomePage() {
   const [jobType, setJobType] = useState("Full-time");
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [onboardingDone, setOnboardingDone] = useState<boolean | null>(null);
-  const [checkingOnboarding, setCheckingOnboarding] = useState(false);
   const [autoFilling, setAutoFilling] = useState(false);
   const [suggestedPositions, setSuggestedPositions] = useState<string[]>([]);
 
-  // Check onboarding status when authenticated
+  // Onboarding Status Checks
+  const [checkingOnboarding, setCheckingOnboarding] = useState(false);
+  const [candidateOnboardingDone, setCandidateOnboardingDone] = useState<boolean | null>(null);
+  const [recruiterOnboardingDone, setRecruiterOnboardingDone] = useState<boolean | null>(null);
+
+  // Check onboarding status based on mode
   const checkOnboarding = useCallback(async () => {
     setCheckingOnboarding(true);
     try {
-      const res = await fetch("/api/onboarding");
-      if (res.ok) {
-        const data = await res.json();
-        setOnboardingDone(data.completed);
-        if (data.completed) {
-          router.replace("/dashboard");
+      if (mode === "recruiter") {
+        const res = await fetch("/api/recruiter/onboarding");
+        if (res.ok) {
+          const data = await res.json();
+          setRecruiterOnboardingDone(data.completed);
+          if (data.completed) {
+            router.replace("/dashboard/recruiter");
+          }
+        } else {
+          setRecruiterOnboardingDone(false);
+        }
+      } else {
+        const res = await fetch("/api/onboarding");
+        if (res.ok) {
+          const data = await res.json();
+          setCandidateOnboardingDone(data.completed);
+          if (data.completed) {
+            router.replace("/dashboard");
+          }
+        } else {
+          setCandidateOnboardingDone(false);
         }
       }
     } catch {
-      setOnboardingDone(false);
+      setCandidateOnboardingDone(false);
+      setRecruiterOnboardingDone(false);
     } finally {
       setCheckingOnboarding(false);
     }
-  }, [router]);
+  }, [mode, router]);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -172,7 +195,22 @@ export default function HomePage() {
     return <UnauthenticatedHero />;
   }
 
-  if (onboardingDone) return null;
+  // 1. RECRUITER ONBOARDING FLOW
+  if (mode === "recruiter") {
+    if (recruiterOnboardingDone) return null;
+
+    return (
+      <div className="min-h-[85vh] bg-[#09090B] text-[#FAFAFA] py-8 md:py-12 px-4 flex items-center justify-center">
+        <RecruiterOnboardingWizard
+          onComplete={() => router.push("/account")}
+          onSkip={() => router.push("/dashboard/recruiter")}
+        />
+      </div>
+    );
+  }
+
+  // 2. CANDIDATE ONBOARDING FLOW
+  if (candidateOnboardingDone) return null;
 
   return (
     <div className="min-h-[85vh] bg-[#09090B] text-[#FAFAFA] py-8 md:py-12 px-4">

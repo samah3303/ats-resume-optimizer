@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useToast } from "@/components/Toast";
 import Logo from "@/components/Logo";
+import RecruiterOnboardingWizard from "@/components/recruiter/RecruiterOnboardingWizard";
 
 interface RecruiterFeatureShowcase {
   id: string;
@@ -95,10 +96,28 @@ export default function RecruiterCommandCenterPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [requestedFeatures, setRequestedFeatures] = useState<Record<string, boolean>>({});
+  const [needsOnboarding, setNeedsOnboarding] = useState<boolean | null>(null);
+  const [initialCompanyName, setInitialCompanyName] = useState("");
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.replace("/login");
+    } else if (status === "authenticated") {
+      fetch("/api/recruiter/onboarding")
+        .then((res) => res.json())
+        .then((data) => {
+          if (!data.completed) {
+            setNeedsOnboarding(true);
+            if (data.profile?.companyName) {
+              setInitialCompanyName(data.profile.companyName);
+            }
+          } else {
+            setNeedsOnboarding(false);
+          }
+        })
+        .catch(() => {
+          setNeedsOnboarding(false);
+        });
     }
   }, [status, router]);
 
@@ -107,7 +126,13 @@ export default function RecruiterCommandCenterPage() {
     toast(`🎉 You're on the early beta list for "${featureTitle}"! We'll notify you as soon as it's enabled.`, "success");
   };
 
-  if (status === "loading") {
+  const handleOnboardingComplete = () => {
+    setNeedsOnboarding(false);
+    toast("🎉 Talent workspace configured successfully!", "success");
+    router.push("/account");
+  };
+
+  if (status === "loading" || needsOnboarding === null) {
     return (
       <div className="flex items-center justify-center min-h-[70vh] bg-[#09090B]">
         <div className="w-8 h-8 border-2 border-[#FAFAFA] border-t-transparent rounded-full animate-spin" />
@@ -119,6 +144,15 @@ export default function RecruiterCommandCenterPage() {
 
   return (
     <div className="min-h-screen bg-[#09090B] text-[#FAFAFA] py-8 px-4 sm:px-6 lg:px-8 space-y-8 pb-32">
+      {/* Recruiter Onboarding Wizard Modal if not completed */}
+      {needsOnboarding && (
+        <RecruiterOnboardingWizard
+          initialCompanyName={initialCompanyName}
+          onComplete={handleOnboardingComplete}
+          onSkip={() => setNeedsOnboarding(false)}
+        />
+      )}
+
       <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-200">
         {/* Recruiter Hero Header */}
         <div className="relative overflow-hidden bg-[#18181B] rounded-3xl border border-[#27272A] p-6 sm:p-8 space-y-4 shadow-xl">
