@@ -137,6 +137,51 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Step 2.5: Extract full structured sections from resume (Summary, Skills, Experience, Education, Projects)
+    try {
+      const { extractFullStructuredResumeData } = await import("@/lib/resume-autofill");
+      const structured = await extractFullStructuredResumeData(resume.parsedText);
+
+      const draftPayload = {
+        personalInfo: {
+          fullName: session.user.name || "Candidate",
+          headline: positions[0] || "Professional",
+          email: session.user.email || "",
+          phone: "",
+          location: targetCountry,
+          summary: structured.summary || mode1Result.profileSummary,
+        },
+        skills: [{ category: "Core Competencies", skills: structured.skills.length > 0 ? structured.skills : mode1Result.detectedCoreSkills }],
+        experiences: structured.experiences,
+        education: structured.education,
+        projects: structured.projects,
+        certifications: [],
+      };
+
+      const existingDraft = await prisma.resumeDraft.findFirst({
+        where: { userId },
+        orderBy: { updatedAt: "desc" },
+      });
+
+      if (existingDraft) {
+        await prisma.resumeDraft.update({
+          where: { id: existingDraft.id },
+          data: { dataJson: JSON.stringify(draftPayload) },
+        });
+      } else {
+        await prisma.resumeDraft.create({
+          data: {
+            userId,
+            title: resume.name || "Primary Profile Draft",
+            templateId: "classic-corporate",
+            dataJson: JSON.stringify(draftPayload),
+          },
+        });
+      }
+    } catch (draftErr) {
+      console.warn("Failed to create structured resume draft:", draftErr);
+    }
+
     // Step 3: Generate roadmap
     let roadmap: any = null;
     try {
