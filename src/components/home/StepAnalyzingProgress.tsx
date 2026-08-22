@@ -37,17 +37,17 @@ export default function StepAnalyzingProgress({
           </h2>
           <p className="text-xs sm:text-sm text-zinc-400 max-w-sm mx-auto leading-relaxed">
             Our AI is reviewing your experience against your target positions in{" "}
-            <span className="text-[#FAFAFA] font-bold">{country}</span>. Generating ATS compatibility scores and personalized roadmap...
+            <span className="text-[#FAFAFA] font-bold">{country}</span>. Calculating your standalone ATS compatibility score and keyword gap analysis...
           </p>
         </div>
       ) : (
         <div className="py-6 space-y-6">
           <div className="space-y-1">
             <h2 className="text-xl sm:text-2xl font-bold text-[#FAFAFA] tracking-tight">
-              Ready to Launch Analysis
+              Ready to Launch ATS Analysis
             </h2>
             <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
-              We&apos;ll analyze your resume keywords, format compliance, and generate a personalized 8-week career roadmap.
+              We&apos;ll analyze your resume keywords, format compliance, and calculate your standalone ATS compatibility score.
             </p>
           </div>
 
@@ -96,7 +96,7 @@ export default function StepAnalyzingProgress({
               onClick={onSubmit}
               className="touch-target px-8 py-3 bg-[#FAFAFA] text-[#09090B] text-xs font-bold rounded-xl hover:bg-zinc-200 transition-all shadow-sm border border-[#FAFAFA] cursor-pointer active:scale-95"
             >
-              Generate Analysis &amp; Roadmap &rarr;
+              Launch ATS Analysis &rarr;
             </button>
           </div>
         </div>
