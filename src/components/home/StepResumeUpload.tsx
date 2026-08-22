@@ -12,14 +12,15 @@ export default function StepResumeUpload({
   onFormatDetected,
 }: StepResumeUploadProps) {
   return (
-    <div>
-      <h2 className="text-xl font-black text-black mb-2">
-        Upload Your Resume
-      </h2>
-      <p className="text-sm text-zinc-600 mb-6">
-        We&apos;ll analyze your resume to identify strengths, gaps, and
-        opportunities for your target roles.
-      </p>
+    <div className="space-y-6">
+      <div className="space-y-1">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#FAFAFA] tracking-tight">
+          Upload Your Resume
+        </h2>
+        <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+          We&apos;ll analyze your resume to identify strengths, ATS keyword coverage, and opportunities for your target roles.
+        </p>
+      </div>
 
       <ResumeUploader
         onUploaded={onUploaded}
@@ -28,14 +29,14 @@ export default function StepResumeUpload({
 
       {/* PDF Disclaimer */}
       {resumeFormat === "pdf" && (
-        <div className="mt-4 p-3.5 bg-zinc-50 border border-zinc-200 rounded-xl flex items-start gap-3">
-          <span className="text-zinc-900 text-lg shrink-0">ℹ️</span>
-          <p className="text-xs text-zinc-700 leading-relaxed">
-            <strong className="text-black">PDF uploaded:</strong> Generated optimizations will use a
+        <div className="p-4 bg-[#09090B] border border-[#27272A] rounded-2xl flex items-start gap-3 text-xs text-zinc-300">
+          <span className="text-lg shrink-0 pt-0.5">ℹ️</span>
+          <p className="leading-relaxed">
+            <strong className="text-[#FAFAFA]">PDF uploaded:</strong> Generated optimizations will use a
             standard structural layout. For custom designer-layout generation,
-            please upload a{" "}
-            <code className="bg-zinc-200 px-1 py-0.5 rounded text-black font-mono text-[11px]">.doc</code> or{" "}
-            <code className="bg-zinc-200 px-1 py-0.5 rounded text-black font-mono text-[11px]">.docx</code> file.
+            you may also upload a{" "}
+            <code className="bg-[#18181B] border border-[#27272A] px-1.5 py-0.5 rounded text-[#FAFAFA] font-mono text-[11px]">.doc</code> or{" "}
+            <code className="bg-[#18181B] border border-[#27272A] px-1.5 py-0.5 rounded text-[#FAFAFA] font-mono text-[11px]">.docx</code> file.
           </p>
         </div>
       )}

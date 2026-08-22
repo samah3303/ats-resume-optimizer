@@ -50,33 +50,35 @@ export default function StepTargetPreferences({
   onChangeResume,
 }: StepTargetPreferencesProps) {
   return (
-    <div>
-      <h2 className="text-xl font-black text-black mb-2">
-        Tell Us About Your Goals
-      </h2>
-      <p className="text-sm text-zinc-600 mb-4">
-        This helps us tailor the analysis and roadmap to your specific career
-        ambitions.
-      </p>
+    <div className="space-y-6 text-[#FAFAFA]">
+      <div className="space-y-1">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#FAFAFA] tracking-tight">
+          Tell Us About Your Goals
+        </h2>
+        <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+          This helps us tailor the analysis, keyword coverage, and roadmap to your specific career ambitions.
+        </p>
+      </div>
 
       {/* Auto-fill indicator */}
       {autoFilling && (
-        <div className="flex items-center gap-2 p-3 bg-zinc-50 border border-zinc-200 rounded-xl mb-4 text-xs font-semibold text-black">
-          <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
-          AI is extracting details from your resume...
+        <div className="flex items-center gap-2.5 p-3.5 bg-[#09090B] border border-[#27272A] rounded-2xl text-xs font-semibold text-zinc-200 animate-in fade-in">
+          <div className="w-4 h-4 border-2 border-[#FAFAFA] border-t-transparent rounded-full animate-spin shrink-0" />
+          <span>AI is extracting details from your resume...</span>
         </div>
       )}
 
       {/* Uploaded resume info */}
       {resumeName && (
-        <div className="flex items-center gap-2 p-3 bg-zinc-50 border border-zinc-200 rounded-xl mb-4">
-          <span className="text-black text-base">📄</span>
-          <span className="text-xs font-bold text-black truncate">
+        <div className="flex items-center gap-3 p-3.5 bg-[#09090B] border border-[#27272A] rounded-2xl">
+          <span className="text-base">📄</span>
+          <span className="text-xs font-bold text-[#FAFAFA] truncate">
             {resumeName}
           </span>
           <button
+            type="button"
             onClick={onChangeResume}
-            className="ml-auto text-xs text-zinc-600 hover:text-black font-semibold underline"
+            className="ml-auto text-xs text-zinc-400 hover:text-[#FAFAFA] font-bold underline transition-colors cursor-pointer"
           >
             Change
           </button>
@@ -85,31 +87,32 @@ export default function StepTargetPreferences({
 
       <div className="space-y-4">
         {/* Target Positions */}
-        <div>
+        <div className="space-y-1.5">
           <label
             htmlFor="positions"
-            className="block text-xs font-bold text-black mb-1.5 uppercase tracking-wide"
+            className="block text-xs font-bold text-zinc-300 uppercase tracking-wide"
           >
-            Target Job Positions <span className="text-red-500">*</span>
+            Target Job Positions <span className="text-rose-400">*</span>
           </label>
           <input
             id="positions"
             type="text"
             value={positions}
             onChange={(e) => setPositions(e.target.value)}
-            placeholder="e.g. Senior Software Engineer, Engineering Manager"
-            className="w-full px-4 py-2.5 bg-white text-black border border-zinc-300 rounded-xl text-sm focus:border-black focus:outline-none transition-colors"
+            placeholder="e.g. Staff Engineer, Engineering Manager, Product Lead"
+            className="w-full px-4 py-2.5 bg-[#09090B] text-[#FAFAFA] border border-[#27272A] rounded-xl text-xs sm:text-sm focus:border-[#FAFAFA] focus:outline-none transition-colors placeholder-zinc-500 font-medium"
           />
-          <p className="text-xs text-zinc-500 mt-1">
-            💡 Tell us where you want to go — this helps find gaps between your current profile and your dream roles.
+          <p className="text-[11px] text-zinc-500">
+            💡 Tell us where you want to go — this finds gap metrics between your current profile and target roles.
           </p>
+
           {/* Suggested position chips */}
           {suggestedPositions.length > 0 && (
-            <div className="mt-2">
-              <p className="text-xs text-zinc-600 font-medium mb-1.5">
+            <div className="space-y-1.5 pt-1">
+              <p className="text-[11px] text-zinc-400 font-medium">
                 🤖 AI-suggested from your resume — click to add/remove:
               </p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 {suggestedPositions.map((pos) => {
                   const isSelected = positions
                     .split(",")
@@ -120,10 +123,10 @@ export default function StepTargetPreferences({
                       key={pos}
                       type="button"
                       onClick={() => togglePosition(pos)}
-                      className={`px-3 py-1 text-xs rounded-full border transition-colors font-medium ${
+                      className={`px-3 py-1 text-xs rounded-xl border transition-all font-bold cursor-pointer ${
                         isSelected
-                          ? "bg-black text-white border-black"
-                          : "bg-white text-zinc-800 border-zinc-300 hover:border-black"
+                          ? "bg-[#FAFAFA] text-[#09090B] border-[#FAFAFA]"
+                          : "bg-[#09090B] text-zinc-300 border-[#27272A] hover:border-zinc-500"
                       }`}
                     >
                       {isSelected ? "✓ " : "+ "}
@@ -138,43 +141,43 @@ export default function StepTargetPreferences({
 
         {/* Industry + Country row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
+          <div className="space-y-1.5">
             <label
               htmlFor="industry"
-              className="block text-xs font-bold text-black mb-1.5 uppercase tracking-wide"
+              className="block text-xs font-bold text-zinc-300 uppercase tracking-wide"
             >
-              Target Industry <span className="text-zinc-400 font-normal lowercase">(optional)</span>
+              Target Industry <span className="text-zinc-500 font-normal lowercase">(optional)</span>
             </label>
             <select
               id="industry"
               value={industry}
               onChange={(e) => setIndustry(e.target.value)}
-              className="w-full px-4 py-2.5 bg-white text-black border border-zinc-300 rounded-xl text-sm focus:border-black focus:outline-none transition-colors"
+              className="w-full px-3.5 py-2.5 bg-[#09090B] text-[#FAFAFA] border border-[#27272A] rounded-xl text-xs sm:text-sm focus:border-[#FAFAFA] focus:outline-none transition-colors cursor-pointer"
             >
-              <option value="">Select industry...</option>
+              <option value="" className="bg-[#18181B] text-[#FAFAFA]">Select industry...</option>
               {INDUSTRIES.map((i) => (
-                <option key={i} value={i}>
+                <option key={i} value={i} className="bg-[#18181B] text-[#FAFAFA]">
                   {i}
                 </option>
               ))}
             </select>
           </div>
-          <div>
+          <div className="space-y-1.5">
             <label
               htmlFor="country"
-              className="block text-xs font-bold text-black mb-1.5 uppercase tracking-wide"
+              className="block text-xs font-bold text-zinc-300 uppercase tracking-wide"
             >
-              Target Country <span className="text-red-500">*</span>
+              Target Country <span className="text-rose-400">*</span>
             </label>
             <select
               id="country"
               value={country}
               onChange={(e) => setCountry(e.target.value)}
-              className="w-full px-4 py-2.5 bg-white text-black border border-zinc-300 rounded-xl text-sm focus:border-black focus:outline-none transition-colors"
+              className="w-full px-3.5 py-2.5 bg-[#09090B] text-[#FAFAFA] border border-[#27272A] rounded-xl text-xs sm:text-sm focus:border-[#FAFAFA] focus:outline-none transition-colors cursor-pointer"
             >
-              <option value="">Select a country...</option>
+              <option value="" className="bg-[#18181B] text-[#FAFAFA]">Select a country...</option>
               {COUNTRIES.map((c) => (
-                <option key={c} value={c}>
+                <option key={c} value={c} className="bg-[#18181B] text-[#FAFAFA]">
                   {c}
                 </option>
               ))}
@@ -183,10 +186,10 @@ export default function StepTargetPreferences({
         </div>
 
         {/* Job Type (multi-select checkboxes) */}
-        <div>
-          <label className="block text-xs font-bold text-black mb-1.5 uppercase tracking-wide">
+        <div className="space-y-1.5">
+          <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wide">
             Job Type Preferences{" "}
-            <span className="text-zinc-400 font-normal lowercase">(optional)</span>
+            <span className="text-zinc-500 font-normal lowercase">(optional)</span>
           </label>
           <div className="flex flex-wrap gap-2">
             {JOB_TYPES.map((jt) => {
@@ -209,10 +212,10 @@ export default function StepTargetPreferences({
                       setJobType([...current, jt].join(", "));
                     }
                   }}
-                  className={`px-3 py-1.5 text-xs rounded-full border transition-colors font-medium ${
+                  className={`px-3 py-1.5 text-xs rounded-xl border transition-all font-bold cursor-pointer ${
                     selected
-                      ? "bg-black text-white border-black"
-                      : "bg-white text-zinc-800 border-zinc-300 hover:border-black"
+                      ? "bg-[#FAFAFA] text-[#09090B] border-[#FAFAFA]"
+                      : "bg-[#09090B] text-zinc-300 border-[#27272A] hover:border-zinc-500"
                   }`}
                 >
                   {selected ? "✓ " : "+ "}
@@ -223,81 +226,74 @@ export default function StepTargetPreferences({
           </div>
         </div>
 
-        {/* LinkedIn, Portfolio, GitHub */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div>
-            <label
-              htmlFor="linkedin"
-              className="block text-xs font-bold text-black mb-1.5 uppercase tracking-wide"
-            >
-              LinkedIn URL <span className="text-zinc-400 font-normal lowercase">(optional)</span>
+        {/* Social / Portfolio Links */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+          <div className="space-y-1">
+            <label className="block text-[11px] font-bold text-zinc-400 uppercase">
+              LinkedIn URL
             </label>
             <input
-              id="linkedin"
               type="url"
               value={linkedin}
               onChange={(e) => setLinkedin(e.target.value)}
-              placeholder="linkedin.com/in/..."
-              className="w-full px-4 py-2.5 bg-white text-black border border-zinc-300 rounded-xl text-sm focus:border-black focus:outline-none transition-colors"
+              placeholder="https://linkedin.com/in/..."
+              className="w-full px-3 py-2 bg-[#09090B] text-[#FAFAFA] border border-[#27272A] rounded-xl text-xs focus:border-[#FAFAFA] outline-none placeholder-zinc-600"
             />
           </div>
-          <div>
-            <label
-              htmlFor="portfolio"
-              className="block text-xs font-bold text-black mb-1.5 uppercase tracking-wide"
-            >
-              Portfolio URL <span className="text-zinc-400 font-normal lowercase">(optional)</span>
+          <div className="space-y-1">
+            <label className="block text-[11px] font-bold text-zinc-400 uppercase">
+              Portfolio URL
             </label>
             <input
-              id="portfolio"
               type="url"
               value={portfolioUrl}
               onChange={(e) => setPortfolioUrl(e.target.value)}
-              placeholder="yourportfolio.com"
-              className="w-full px-4 py-2.5 bg-white text-black border border-zinc-300 rounded-xl text-sm focus:border-black focus:outline-none transition-colors"
+              placeholder="https://myportfolio.dev"
+              className="w-full px-3 py-2 bg-[#09090B] text-[#FAFAFA] border border-[#27272A] rounded-xl text-xs focus:border-[#FAFAFA] outline-none placeholder-zinc-600"
             />
           </div>
-          <div>
-            <label
-              htmlFor="github"
-              className="block text-xs font-bold text-black mb-1.5 uppercase tracking-wide"
-            >
-              GitHub URL <span className="text-zinc-400 font-normal lowercase">(optional)</span>
+          <div className="space-y-1">
+            <label className="block text-[11px] font-bold text-zinc-400 uppercase">
+              GitHub URL
             </label>
             <input
-              id="github"
               type="url"
               value={githubUrl}
               onChange={(e) => setGithubUrl(e.target.value)}
-              placeholder="github.com/username"
-              className="w-full px-4 py-2.5 bg-white text-black border border-zinc-300 rounded-xl text-sm focus:border-black focus:outline-none transition-colors"
+              placeholder="https://github.com/..."
+              className="w-full px-3 py-2 bg-[#09090B] text-[#FAFAFA] border border-[#27272A] rounded-xl text-xs focus:border-[#FAFAFA] outline-none placeholder-zinc-600"
             />
           </div>
         </div>
       </div>
 
-      <div className="flex items-center justify-between mt-8">
-        <div className="flex gap-3">
+      {/* Navigation Footer */}
+      <div className="flex items-center justify-between pt-4 border-t border-[#27272A]">
+        <button
+          type="button"
+          onClick={onBack}
+          className="px-4 py-2 text-xs font-bold text-zinc-400 hover:text-[#FAFAFA] transition-colors cursor-pointer"
+        >
+          &larr; Back
+        </button>
+
+        <div className="flex items-center gap-3">
           <button
-            onClick={onBack}
-            className="px-4 py-2 text-xs font-bold text-zinc-600 hover:text-black transition-colors"
-          >
-            ← Back
-          </button>
-          <button
+            type="button"
             onClick={onSkip}
-            className="px-4 py-2 text-xs font-bold text-zinc-400 hover:text-black transition-colors"
+            className="px-4 py-2 text-xs font-bold text-zinc-400 hover:text-[#FAFAFA] transition-colors cursor-pointer"
           >
             Skip for now
           </button>
+          <button
+            type="button"
+            onClick={onNext}
+            disabled={!positions || !country}
+            className="touch-target px-6 py-2.5 bg-[#FAFAFA] hover:bg-zinc-200 text-[#09090B] font-bold text-xs rounded-xl transition-all cursor-pointer disabled:opacity-50 active:scale-95 border border-[#FAFAFA]"
+          >
+            Continue to Analysis &rarr;
+          </button>
         </div>
-        <button
-          onClick={onNext}
-          disabled={!positions.trim() || !country}
-          className="px-6 py-2.5 bg-black text-white text-xs font-bold rounded-xl hover:bg-zinc-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm border border-black"
-        >
-          Start Analysis
-        </button>
       </div>
     </div>
   );
