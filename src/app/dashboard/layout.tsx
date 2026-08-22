@@ -1,6 +1,5 @@
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { ToastProvider } from "@/components/Toast";
-import FloatingActionButton from "@/components/FloatingActionButton";
 
 export default function DashboardLayout({
   children,
@@ -10,9 +9,8 @@ export default function DashboardLayout({
   return (
     <ErrorBoundary>
       <ToastProvider>
-        <div className="bg-white min-h-screen text-zinc-900">
+        <div className="bg-[#09090B] min-h-screen text-[#FAFAFA]">
           {children}
-          <FloatingActionButton />
         </div>
       </ToastProvider>
     </ErrorBoundary>
