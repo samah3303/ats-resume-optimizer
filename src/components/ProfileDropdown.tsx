@@ -70,23 +70,6 @@ export default function ProfileDropdown() {
             </p>
           </div>
 
-          {/* Quick Actions */}
-          <div className="space-y-1">
-            <button
-              role="menuitem"
-              onClick={() => {
-                toggleMode();
-                setOpen(false);
-              }}
-              className="w-full text-left px-3 py-2 text-xs font-bold text-zinc-300 hover:text-[#FAFAFA] hover:bg-[#27272A] rounded-xl transition-colors flex items-center justify-between cursor-pointer"
-            >
-              <span>⇄ Switch Workspace</span>
-              <span className="text-[10px] text-zinc-400 font-mono uppercase">
-                {mode === "candidate" ? "To Recruiter" : "To Candidate"}
-              </span>
-            </button>
-          </div>
-
           <div className="border-t border-[#27272A] pt-1">
             <button
               role="menuitem"

@@ -386,14 +386,6 @@ export default function AccountPage() {
           </button>
 
           <button
-            onClick={toggleMode}
-            className="px-3.5 py-2.5 bg-[#18181B] hover:bg-[#27272A] text-zinc-300 hover:text-[#FAFAFA] font-bold text-xs rounded-xl transition-all border border-[#27272A] flex items-center gap-1.5 cursor-pointer"
-            title="Switch Workspace Mode"
-          >
-            <span>⇄ Switch to {mode === "candidate" ? "Recruiter OS" : "Candidate Suite"}</span>
-          </button>
-
-          <button
             onClick={() => signOut({ callbackUrl: "/login" })}
             className="px-3.5 py-2.5 bg-[#18181B] hover:bg-rose-950/40 text-zinc-400 hover:text-rose-300 font-bold text-xs rounded-xl transition-all border border-[#27272A] hover:border-rose-800 cursor-pointer"
           >

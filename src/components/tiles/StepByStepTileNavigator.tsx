@@ -367,14 +367,6 @@ export function StepByStepTileNavigator() {
             Access your ATS resume optimizer, LinkedIn branding suite, and 2-month career roadmap.
           </p>
         </div>
-
-        <button
-          type="button"
-          onClick={toggleMode}
-          className="touch-target px-4 py-2.5 bg-[#18181B] hover:bg-[#27272A] border border-[#27272A] text-zinc-300 hover:text-[#FAFAFA] text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
-        >
-          <span>⇄ Switch to Recruiter OS</span>
-        </button>
       </div>
 
       {/* Primary Category Tiles Grid */}

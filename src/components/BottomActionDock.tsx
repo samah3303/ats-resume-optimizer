@@ -46,18 +46,7 @@ export default function BottomActionDock() {
           <span className="hidden sm:inline">Tile Hub</span>
         </Link>
 
-        {/* 2. Workspace Persona Switcher */}
-        <button
-          type="button"
-          onClick={toggleMode}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-zinc-300 hover:text-[#FAFAFA] hover:bg-[#27272A] transition-all border border-[#27272A] cursor-pointer"
-          aria-label="Switch workspace persona"
-        >
-          <span className="text-sm">⇄</span>
-          <span className="text-[11px] font-black uppercase text-[#FAFAFA]">
-            {mode === "candidate" ? "👤 Candidate" : "👔 Recruiter"}
-          </span>
-        </button>
+
 
         {/* 3. Global ⌘K Omni-Search */}
         <button
