@@ -223,20 +223,8 @@ export function StepByStepTileNavigator() {
         
         // --- STAGE 1: Foundation ---
         // ATS Engine & Builder are unlocked.
-        const stage1 = updatedStages[0];
-        
-        // Inject latest ATS score into the ATS tool card
-        const atsTool = stage1.features.find(f => f.id === "ats-analysis-engine");
-        if (atsTool) {
-          if (data.latestAnalysisId) {
-            atsTool.href = `/dashboard/analyze/${data.latestAnalysisId}`;
-            if (data.latestAnalysisScore) {
-              atsTool.badge = `${data.latestAnalysisScore}% Score`;
-            }
-          }
-        }
-
         // LinkedIn is locked until Primary Resume exists.
+        const stage1 = updatedStages[0];
         const linkedInTool = stage1.features.find(f => f.id === "linkedin");
         if (linkedInTool) {
           if (data.hasPrimaryResume) {
@@ -361,14 +349,7 @@ export function StepByStepTileNavigator() {
                   </div>
                   <div className="flex items-center gap-2">
                     {feature.badge && (
-                      <span className={`px-2.5 py-0.5 rounded-md text-[9px] font-bold uppercase font-mono ${
-                        isToolLocked ? 'bg-[#27272A] text-zinc-500' : 
-                        feature.badge.includes('%') ? (
-                          parseInt(feature.badge) >= 80 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 
-                          parseInt(feature.badge) >= 60 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 
-                          'bg-rose-500/20 text-rose-400 border border-rose-500/30'
-                        ) : 'bg-[#27272A] text-[#FAFAFA]'
-                      }`}>
+                      <span className={`px-2.5 py-0.5 rounded-md bg-[#27272A] ${isToolLocked ? 'text-zinc-500' : 'text-[#FAFAFA]'} text-[9px] font-bold uppercase font-mono`}>
                         {feature.badge}
                       </span>
                     )}
@@ -392,7 +373,7 @@ export function StepByStepTileNavigator() {
 
                 <div className="pt-3 border-t border-[#27272A] flex items-center justify-between text-xs font-bold text-[#FAFAFA] mt-4">
                   <span className={isToolLocked ? 'text-zinc-500' : 'group-hover:underline'}>
-                    {isToolLocked ? 'Locked' : feature.badge?.includes('%') ? 'View Suggestions' : 'Launch Tool'}
+                    {isToolLocked ? 'Locked' : 'Launch Tool'}
                   </span>
                   {!isToolLocked && <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>}
                 </div>
