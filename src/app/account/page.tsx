@@ -898,7 +898,7 @@ export default function AccountPage() {
             </div>
           </div>
         </div>
-      ) : null /* (
+      ) : false && (
         /* ──────────────────────────────────────────────────────────────────────── */
         /* RECRUITER VIEW                                                           */
         /* ──────────────────────────────────────────────────────────────────────── */
@@ -1146,7 +1146,7 @@ export default function AccountPage() {
             </div>
           </div>
         </div>
-      )} */
+      )}
     </div>
   );
 }
