@@ -211,12 +211,12 @@ export default function JobsPage() {
   };
 
   return (
-    <div className="flex-1 flex flex-col p-4 md:p-6 page-enter max-w-7xl mx-auto w-full pb-safe bg-white text-zinc-950">
+    <div className="flex-1 flex flex-col p-4 md:p-6 page-enter max-w-7xl mx-auto w-full pb-safe bg-[#09090B] text-[#FAFAFA]">
       {/* Header & Search */}
       <div className="flex flex-col items-center mb-8 text-center space-y-4">
         <div className="text-4xl md:text-5xl animate-fadeIn">🔍</div>
-        <h1 className="text-2xl md:text-3xl font-black text-black">Job Command Center</h1>
-        <p className="text-xs md:text-sm text-zinc-600 max-w-xl">
+        <h1 className="text-2xl md:text-3xl font-black text-[#FAFAFA]">Job Command Center</h1>
+        <p className="text-xs md:text-sm text-zinc-400 max-w-xl">
           Search across multiple platforms, filter by your preferences, and instantly match roles against your resume.
         </p>
         
@@ -243,13 +243,13 @@ export default function JobsPage() {
         {/* Results Section */}
         <div className="flex-1 flex flex-col min-w-0">
           {/* Results Header */}
-          <div className="flex items-center justify-between mb-4 bg-zinc-50 p-3.5 rounded-2xl border border-zinc-200">
-            <div className="text-xs font-semibold text-zinc-600">
-              Showing <span className="text-black font-bold">{totalResults}</span> results
+          <div className="flex items-center justify-between mb-4 bg-[#09090B] p-3.5 rounded-2xl border border-[#27272A]">
+            <div className="text-xs font-semibold text-zinc-400">
+              Showing <span className="text-[#FAFAFA] font-bold">{totalResults}</span> results
             </div>
             <button
               onClick={() => setShowFilters(true)}
-              className="md:hidden flex items-center gap-2 px-3 py-1.5 bg-white border border-zinc-300 text-black rounded-xl text-xs font-bold touch-target shadow-sm"
+              className="md:hidden flex items-center gap-2 px-3 py-1.5 bg-[#18181B] border border-[#27272A] text-[#FAFAFA] rounded-xl text-xs font-bold touch-target shadow-sm"
             >
               <span>⚙️</span> Filters
             </button>
@@ -260,19 +260,19 @@ export default function JobsPage() {
             {loading ? (
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <div key={i} className="bg-white border border-zinc-200 rounded-2xl p-5 h-48 flex flex-col gap-4 shadow-sm animate-pulse">
+                  <div key={i} className="bg-[#18181B] border border-[#27272A] rounded-2xl p-5 h-48 flex flex-col gap-4 shadow-sm animate-pulse">
                     <div className="flex gap-4">
                       <div className="flex-1 space-y-3">
-                        <div className="bg-zinc-100 h-3 w-1/3 rounded"></div>
-                        <div className="bg-zinc-200 h-5 w-3/4 rounded"></div>
+                        <div className="bg-[#27272A] h-3 w-1/3 rounded"></div>
+                        <div className="bg-[#27272A] h-5 w-3/4 rounded"></div>
                       </div>
-                      <div className="bg-zinc-100 rounded-full w-10 h-10 shrink-0"></div>
+                      <div className="bg-[#27272A] rounded-full w-10 h-10 shrink-0"></div>
                     </div>
-                    <div className="bg-zinc-100 h-3 w-full mt-2 rounded"></div>
-                    <div className="bg-zinc-100 h-3 w-2/3 rounded"></div>
+                    <div className="bg-[#27272A] h-3 w-full mt-2 rounded"></div>
+                    <div className="bg-[#27272A] h-3 w-2/3 rounded"></div>
                     <div className="mt-auto flex gap-2">
-                      <div className="bg-zinc-200 w-16 h-8 rounded-lg"></div>
-                      <div className="bg-zinc-200 w-20 h-8 rounded-lg"></div>
+                      <div className="bg-[#27272A] w-16 h-8 rounded-lg"></div>
+                      <div className="bg-[#27272A] w-20 h-8 rounded-lg"></div>
                     </div>
                   </div>
                 ))}
@@ -292,8 +292,8 @@ export default function JobsPage() {
             ) : (
               <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
                 <div className="text-6xl mb-4">📭</div>
-                <h3 className="text-xl font-black text-black mb-2">No jobs found</h3>
-                <p className="text-zinc-500 text-xs max-w-md">
+                <h3 className="text-xl font-black text-[#FAFAFA] mb-2">No jobs found</h3>
+                <p className="text-zinc-400 text-xs max-w-md">
                   We couldn't find any jobs matching your search and filters. Try adjusting your criteria or checking back later.
                 </p>
                 <button 
@@ -312,17 +312,17 @@ export default function JobsPage() {
               <button
                 disabled={page === 1}
                 onClick={() => searchJobs(searchQuery, filters, page - 1)}
-                className="px-4 py-2 rounded-xl bg-white border border-zinc-300 text-black text-xs font-bold disabled:opacity-40 hover:bg-zinc-100 transition-colors touch-target shadow-sm"
+                className="px-4 py-2 rounded-xl bg-[#18181B] border border-[#27272A] text-[#FAFAFA] text-xs font-bold disabled:opacity-40 hover:bg-[#27272A] transition-colors touch-target shadow-sm"
               >
                 Previous
               </button>
-              <span className="text-xs font-semibold text-zinc-500">
+              <span className="text-xs font-semibold text-zinc-400">
                 Page {page} of {totalPages}
               </span>
               <button
                 disabled={page === totalPages}
                 onClick={() => searchJobs(searchQuery, filters, page + 1)}
-                className="px-4 py-2 rounded-xl bg-white border border-zinc-300 text-black text-xs font-bold disabled:opacity-40 hover:bg-zinc-100 transition-colors touch-target shadow-sm"
+                className="px-4 py-2 rounded-xl bg-[#18181B] border border-[#27272A] text-[#FAFAFA] text-xs font-bold disabled:opacity-40 hover:bg-[#27272A] transition-colors touch-target shadow-sm"
               >
                 Next
               </button>

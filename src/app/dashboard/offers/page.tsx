@@ -18,27 +18,27 @@ export default async function OffersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-zinc-950 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-8 pb-28">
+    <div className="min-h-screen bg-[#09090B] text-[#FAFAFA] p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-8 pb-28">
       {/* Breadcrumb & Hero Header */}
       <div className="space-y-3">
-        <div className="flex items-center gap-2 text-xs font-bold text-zinc-500 uppercase tracking-wider">
+        <div className="flex items-center gap-2 text-xs font-bold text-zinc-400 uppercase tracking-wider">
           <span>Dashboard</span>
           <span>/</span>
-          <span className="text-black">Compensation & Negotiation War Room</span>
+          <span className="text-[#FAFAFA]">Compensation & Negotiation War Room</span>
         </div>
 
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-black tracking-tight flex items-center gap-3">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#FAFAFA] tracking-tight flex items-center gap-3">
               <span>Salary Negotiation & Offer War Room</span>
             </h1>
-            <p className="text-xs sm:text-sm text-zinc-600 max-w-3xl mt-1.5 leading-relaxed">
+            <p className="text-xs sm:text-sm text-zinc-400 max-w-3xl mt-1.5 leading-relaxed">
               Model 4-year total compensation packages with vesting schedules, simulate live counter-negotiations against an AI recruiter bot, and compare competing offers side-by-side.
             </p>
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            <span className="px-3 py-1 bg-zinc-100 border border-zinc-300 text-zinc-900 text-xs font-black rounded-xl uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
+            <span className="px-3 py-1 bg-[#27272A] border border-[#27272A] text-[#FAFAFA] text-xs font-black rounded-xl uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
               <span className="w-2 h-2 rounded-full bg-emerald-500" />
               Real-Time AI Coach Active
             </span>

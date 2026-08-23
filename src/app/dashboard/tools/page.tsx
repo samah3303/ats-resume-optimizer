@@ -108,19 +108,19 @@ const TOOLS: ToolExplanation[] = [
 
 export default function ToolsHubPage() {
   return (
-    <div className="min-h-screen bg-white text-black py-8 px-4 sm:px-6 lg:px-8 space-y-8 pb-24">
+    <div className="min-h-screen bg-[#09090B] text-[#FAFAFA] py-8 px-4 sm:px-6 lg:px-8 space-y-8 pb-24">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header Banner */}
-        <div className="bg-zinc-50 rounded-3xl border border-zinc-200 p-6 sm:p-8 text-black shadow-sm space-y-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-zinc-200 text-black border border-zinc-300">
+        <div className="bg-[#18181B] rounded-3xl border border-[#27272A] p-6 sm:p-8 text-[#FAFAFA] shadow-sm space-y-3">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#27272A] text-[#FAFAFA] border border-[#27272A]">
             <span>🧩 Features Directory</span>
             <span>•</span>
-            <span>Simple Guides & Tools</span>
+            <span>Simple Guides &amp; Tools</span>
           </div>
-          <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-black">
-            All KYRO Tools & Features
+          <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-[#FAFAFA]">
+            All KYRO Tools &amp; Features
           </h1>
-          <p className="text-xs sm:text-sm text-zinc-600 max-w-2xl leading-relaxed font-medium">
+          <p className="text-xs sm:text-sm text-zinc-400 max-w-2xl leading-relaxed font-medium">
             Every tool is designed to solve a specific barrier in your job search. Below is what each tool does, why you need it, and how to use it in simple terms.
           </p>
         </div>
@@ -130,24 +130,24 @@ export default function ToolsHubPage() {
           {TOOLS.map((tool) => (
             <div
               key={tool.title}
-              className="bg-white border border-zinc-200 hover:border-black rounded-3xl p-6 text-black shadow-sm transition-all flex flex-col justify-between space-y-5"
+              className="bg-[#18181B] border border-[#27272A] hover:border-zinc-400 rounded-3xl p-6 text-[#FAFAFA] shadow-sm transition-all flex flex-col justify-between space-y-5"
             >
               <div className="space-y-4">
                 {/* Header */}
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <span className="w-12 h-12 rounded-2xl bg-zinc-100 text-2xl flex items-center justify-center shrink-0 border border-zinc-200">
+                    <span className="w-12 h-12 rounded-2xl bg-[#27272A] text-2xl flex items-center justify-center shrink-0 border border-[#27272A]">
                       {tool.emoji}
                     </span>
                     <div>
-                      <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block">
+                      <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
                         {tool.category}
                       </span>
-                      <h2 className="text-lg font-black text-black">{tool.title}</h2>
+                      <h2 className="text-lg font-black text-[#FAFAFA]">{tool.title}</h2>
                     </div>
                   </div>
                   {tool.badge && (
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-zinc-100 text-black border border-zinc-300 shrink-0">
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-[#27272A] text-[#FAFAFA] border border-[#27272A] shrink-0">
                       {tool.badge}
                     </span>
                   )}
@@ -156,27 +156,27 @@ export default function ToolsHubPage() {
                 {/* Why? What? How? Section */}
                 <div className="space-y-3 text-xs">
                   {/* Why */}
-                  <div className="p-3 bg-zinc-50 rounded-2xl border border-zinc-200 space-y-1">
+                  <div className="p-3 bg-[#09090B] rounded-2xl border border-[#27272A] space-y-1">
                     <span className="font-bold text-rose-800 uppercase tracking-wider text-[10px] block">
                       ❓ Why Use This?
                     </span>
-                    <p className="text-zinc-700 font-medium leading-relaxed">{tool.why}</p>
+                    <p className="text-zinc-300 font-medium leading-relaxed">{tool.why}</p>
                   </div>
 
                   {/* What */}
-                  <div className="p-3 bg-zinc-50 rounded-2xl border border-zinc-200 space-y-1">
-                    <span className="font-bold text-zinc-900 uppercase tracking-wider text-[10px] block">
+                  <div className="p-3 bg-[#09090B] rounded-2xl border border-[#27272A] space-y-1">
+                    <span className="font-bold text-[#FAFAFA] uppercase tracking-wider text-[10px] block">
                       💡 What Is It?
                     </span>
-                    <p className="text-zinc-700 font-medium leading-relaxed">{tool.what}</p>
+                    <p className="text-zinc-300 font-medium leading-relaxed">{tool.what}</p>
                   </div>
 
                   {/* How */}
-                  <div className="p-3 bg-zinc-50 rounded-2xl border border-zinc-200 space-y-1">
+                  <div className="p-3 bg-[#09090B] rounded-2xl border border-[#27272A] space-y-1">
                     <span className="font-bold text-emerald-800 uppercase tracking-wider text-[10px] block">
                       🚀 How To Use It?
                     </span>
-                    <p className="text-zinc-700 font-medium leading-relaxed">{tool.how}</p>
+                    <p className="text-zinc-300 font-medium leading-relaxed">{tool.how}</p>
                   </div>
                 </div>
               </div>

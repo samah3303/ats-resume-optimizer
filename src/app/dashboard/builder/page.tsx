@@ -309,10 +309,10 @@ export default function ResumeStudioPage() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-white">
+      <div className="flex items-center justify-center min-h-screen bg-[#09090B]">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin" />
-          <p className="text-xs font-bold text-zinc-600 uppercase tracking-widest">
+          <div className="w-8 h-8 border-2 border-[#FAFAFA] border-t-transparent rounded-full animate-spin" />
+          <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">
             Loading ATS Resume Studio...
           </p>
         </div>
@@ -321,28 +321,28 @@ export default function ResumeStudioPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-zinc-950 flex flex-col pb-20 md:pb-6">
+    <div className="min-h-screen bg-[#09090B] text-[#FAFAFA] flex flex-col pb-20 md:pb-6">
       {/* 1. TOP STUDIO CONTROL BAR */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl border-b border-zinc-200 px-4 sm:px-6 py-3">
+      <header className="sticky top-0 z-40 bg-[#09090B]/95 backdrop-blur-xl border-b border-[#27272A] px-4 sm:px-6 py-3">
         <div className="max-w-[1700px] mx-auto flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
           {/* Left: Document Title & Autosave */}
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-black" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#FAFAFA]" />
               <input
                 type="text"
                 value={documentTitle}
                 onChange={(e) => setDocumentTitle(e.target.value)}
                 placeholder="Resume Title..."
-                className="bg-transparent text-sm sm:text-base font-black text-black focus:outline-none focus:bg-zinc-50 px-2 py-1 rounded-lg border border-transparent focus:border-zinc-300 max-w-[260px] sm:max-w-xs transition-colors"
+                className="bg-transparent text-sm sm:text-base font-black text-[#FAFAFA] focus:outline-none focus:bg-[#09090B] px-2 py-1 rounded-lg border border-transparent focus:border-[#27272A] max-w-[260px] sm:max-w-xs transition-colors"
               />
             </div>
 
             {/* Autosave Pill */}
-            <div className="flex items-center gap-1 text-[11px] text-zinc-500 font-mono pl-2 border-l border-zinc-200">
+            <div className="flex items-center gap-1 text-[11px] text-zinc-400 font-mono pl-2 border-l border-[#27272A]">
               {autosaveStatus === "saving" ? (
-                <span className="text-zinc-800 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-black animate-ping" />
+                <span className="text-[#FAFAFA] flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#FAFAFA] animate-ping" />
                   Saving...
                 </span>
               ) : autosaveStatus === "saved" ? (
@@ -361,11 +361,11 @@ export default function ResumeStudioPage() {
             <button
               type="button"
               onClick={() => setIsGalleryOpen(true)}
-              className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-zinc-50 border border-zinc-300 hover:border-black text-xs font-bold text-black flex items-center gap-2 transition-all touch-target shadow-sm"
+              className="px-3.5 py-1.5 rounded-xl bg-[#18181B] hover:bg-[#27272A] border border-[#27272A] hover:border-zinc-400 text-xs font-bold text-[#FAFAFA] flex items-center gap-2 transition-all touch-target shadow-sm"
             >
               <span className="text-xs">🎨</span>
-              <span>Layout: <strong className="text-black">{currentTemplate.name}</strong></span>
-              <span className="text-[10px] text-zinc-600 font-mono">({currentTemplate.atsScore}% ATS)</span>
+              <span>Layout: <strong className="text-[#FAFAFA]">{currentTemplate.name}</strong></span>
+              <span className="text-[10px] text-zinc-400 font-mono">({currentTemplate.atsScore}% ATS)</span>
               <span className="text-zinc-400 text-[10px]">▾</span>
             </button>
 
@@ -374,7 +374,7 @@ export default function ResumeStudioPage() {
               <select
                 value={selectedExistingId}
                 onChange={(e) => handleLoadParsedResume(e.target.value)}
-                className="px-2.5 py-1.5 rounded-xl bg-white border border-zinc-300 text-[11px] font-semibold text-zinc-800 focus:outline-none focus:border-black max-w-[150px] truncate shadow-sm"
+                className="px-2.5 py-1.5 rounded-xl bg-[#09090B] border border-[#27272A] text-[11px] font-semibold text-[#FAFAFA] focus:outline-none focus:border-[#FAFAFA] max-w-[150px] truncate shadow-sm"
               >
                 <option value="">Load Existing...</option>
                 {existingResumes.map((r) => (
@@ -389,7 +389,7 @@ export default function ResumeStudioPage() {
             <button
               type="button"
               onClick={() => handleOpenAiAssist("generate_summary")}
-              className="px-3.5 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 border border-zinc-300 hover:border-black text-black text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-sm transition-all touch-target"
+              className="px-3.5 py-1.5 rounded-xl bg-[#27272A] hover:bg-[#3F3F46] border border-[#27272A] text-[#FAFAFA] text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-sm transition-all touch-target"
             >
               <span>⚡</span>
               <span>AI Copilot</span>
@@ -400,10 +400,10 @@ export default function ResumeStudioPage() {
               type="button"
               onClick={handleExportDocx}
               disabled={exportingDocx}
-              className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-zinc-50 border border-zinc-300 hover:border-black text-black text-xs font-bold transition-all disabled:opacity-50 flex items-center gap-1.5 touch-target shadow-sm"
+              className="px-3.5 py-1.5 rounded-xl bg-[#18181B] hover:bg-[#27272A] border border-[#27272A] hover:border-zinc-400 text-[#FAFAFA] text-xs font-bold transition-all disabled:opacity-50 flex items-center gap-1.5 touch-target shadow-sm"
             >
               {exportingDocx ? (
-                <div className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                <div className="w-3.5 h-3.5 border-2 border-[#FAFAFA] border-t-transparent rounded-full animate-spin" />
               ) : (
                 "DOCX"
               )}
@@ -432,13 +432,13 @@ export default function ResumeStudioPage() {
       </header>
 
       {/* 2. MOBILE SEGMENTED TABS (Visible only on < md screens) */}
-      <div className="md:hidden sticky top-[57px] z-30 bg-white border-b border-zinc-200 px-4 py-2 flex items-center justify-around gap-2">
+      <div className="md:hidden sticky top-[57px] z-30 bg-[#09090B] border-b border-[#27272A] px-4 py-2 flex items-center justify-around gap-2">
         <button
           onClick={() => setMobileTab("editor")}
           className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
             mobileTab === "editor"
               ? "bg-black text-white font-bold"
-              : "bg-zinc-100 text-zinc-700 border border-zinc-200"
+              : "bg-[#27272A] text-zinc-300 border border-[#27272A]"
           }`}
         >
           <span>✏️</span>
@@ -450,7 +450,7 @@ export default function ResumeStudioPage() {
           className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
             mobileTab === "preview"
               ? "bg-black text-white font-bold"
-              : "bg-zinc-100 text-zinc-700 border border-zinc-200"
+              : "bg-[#27272A] text-zinc-300 border border-[#27272A]"
           }`}
         >
           <span>👁️</span>
@@ -465,7 +465,7 @@ export default function ResumeStudioPage() {
           className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
             mobileTab === "ai"
               ? "bg-black text-white font-bold"
-              : "bg-zinc-100 text-zinc-700 border border-zinc-200"
+              : "bg-[#27272A] text-zinc-300 border border-[#27272A]"
           }`}
         >
           <span>⚡</span>
@@ -482,19 +482,19 @@ export default function ResumeStudioPage() {
           }`}
         >
           {/* Quick Header Bar */}
-          <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200 flex items-center justify-between">
+          <div className="p-4 rounded-2xl bg-[#09090B] border border-[#27272A] flex items-center justify-between">
             <div className="space-y-0.5">
-              <h2 className="text-xs font-bold text-black uppercase tracking-wider">
+              <h2 className="text-xs font-bold text-[#FAFAFA] uppercase tracking-wider">
                 Resume Content Architect
               </h2>
-              <p className="text-[11px] text-zinc-500">
+              <p className="text-[11px] text-zinc-400">
                 All sections auto-format into ATS-compliant bullet density and keywords
               </p>
             </div>
 
             <button
               onClick={handleLoadSamplePreset}
-              className="text-[11px] text-black hover:underline font-bold"
+              className="text-[11px] text-[#FAFAFA] hover:underline font-bold"
             >
               Reset to Sample
             </button>
@@ -521,7 +521,7 @@ export default function ResumeStudioPage() {
       {/* 4. TEMPLATE GALLERY MODAL */}
       {isGalleryOpen && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-          <div className="w-full max-w-5xl bg-white border border-zinc-200 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 my-auto max-h-[90vh] overflow-y-auto text-black">
+          <div className="w-full max-w-5xl bg-[#18181B] border border-[#27272A] rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 my-auto max-h-[90vh] overflow-y-auto text-[#FAFAFA]">
             <TemplateGallery
               selectedTemplateId={selectedTemplateId}
               onSelectTemplate={(templateId) => {

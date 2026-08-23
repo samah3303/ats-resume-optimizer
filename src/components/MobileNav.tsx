@@ -3,7 +3,6 @@
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useWorkspaceMode } from "./WorkspaceModeContext";
 
 interface MobileLink {
   href: string;
@@ -12,32 +11,26 @@ interface MobileLink {
   badgeCount?: number;
 }
 
-const candidateMobileLinks: MobileLink[] = [
-  { href: "/dashboard", label: "Home", emoji: "🏠" },
-  { href: "/dashboard/jobs", label: "Jobs", emoji: "🔍" },
-  { href: "/dashboard/builder", label: "Studio", emoji: "📄" },
-  { href: "/dashboard/interview", label: "Prep", emoji: "🎯" },
-  { href: "/dashboard/tracker", label: "Track", emoji: "📋" },
-];
-
-const recruiterMobileLinks: MobileLink[] = [
-  { href: "/dashboard/recruiter", label: "HQ", emoji: "👔" },
-  { href: "/dashboard/recruiter/pipeline/engineering-lead-01", label: "Pipelines", emoji: "📋" },
-  { href: "/dashboard/interview-rooms", label: "Rooms", emoji: "📹" },
-  { href: "/dashboard/agents", label: "Swarm", emoji: "🤖" },
-  { href: "/dashboard", label: "Candidate", emoji: "👤" },
+const campaignLinks: MobileLink[] = [
+  { href: "/dashboard", label: "Quest", emoji: "🗺️" },
+  { href: "/dashboard/builder", label: "Foundation", emoji: "🏗️" },
+  { href: "/dashboard/jobs", label: "Hunt", emoji: "🤖" },
+  { href: "/dashboard/interview", label: "Loop", emoji: "🎙️" },
+  { href: "/dashboard/offers", label: "Close", emoji: "💰" },
 ];
 
 export default function MobileNav() {
   const { data: session } = useSession();
   const pathname = usePathname();
-  const { mode } = useWorkspaceMode();
 
   if (!session?.user) {
     return null;
   }
 
-  const currentLinks = mode === "recruiter" ? recruiterMobileLinks : candidateMobileLinks;
+  // Hide nav on enterprise routes
+  if (pathname.startsWith("/enterprise")) {
+    return null;
+  }
 
   return (
     <nav
@@ -54,9 +47,9 @@ export default function MobileNav() {
           height: "calc(60px + env(safe-area-inset-bottom, 0px))",
         }}
       >
-        {currentLinks.map((link, index) => {
+        {campaignLinks.map((link, index) => {
           const isActive =
-            link.href === "/dashboard" || link.href === "/dashboard/recruiter"
+            link.href === "/dashboard"
               ? pathname === link.href
               : pathname.startsWith(link.href);
 

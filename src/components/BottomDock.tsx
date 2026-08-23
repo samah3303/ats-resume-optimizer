@@ -3,29 +3,23 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useWorkspaceMode } from "./WorkspaceModeContext";
 
 export default function BottomDock() {
   const { data: session } = useSession();
   const pathname = usePathname();
-  const { mode } = useWorkspaceMode();
 
-  // Hide Bottom Dock on unauthenticated home landing page, login, and register pages
-  if (pathname === "/" || pathname === "/login" || pathname === "/register") {
+  // Hide Bottom Dock on unauthenticated home landing page, login, register, and enterprise pages
+  if (
+    pathname === "/" ||
+    pathname === "/login" ||
+    pathname === "/register" ||
+    pathname.startsWith("/enterprise")
+  ) {
     return null;
   }
 
-  // Dynamic Home Route determination based on authenticated persona
-  const getHomeHref = () => {
-    if (!session?.user) return "/";
-    return mode === "recruiter" ? "/dashboard/recruiter" : "/dashboard";
-  };
-
-  const homeHref = getHomeHref();
-  const isHomeActive =
-    pathname === "/dashboard" ||
-    pathname === "/dashboard/recruiter";
-
+  const homeHref = session?.user ? "/dashboard" : "/";
+  const isHomeActive = pathname === "/dashboard";
   const isAccountActive = pathname === "/account" || pathname.startsWith("/portfolio");
 
   return (

@@ -8,14 +8,11 @@ import OnboardingStepper from "@/components/home/OnboardingStepper";
 import StepResumeUpload from "@/components/home/StepResumeUpload";
 import StepTargetPreferences from "@/components/home/StepTargetPreferences";
 import StepAnalyzingProgress from "@/components/home/StepAnalyzingProgress";
-import RecruiterOnboardingWizard from "@/components/recruiter/RecruiterOnboardingWizard";
-import { useWorkspaceMode } from "@/components/WorkspaceModeContext";
 import { COUNTRIES, INDUSTRIES } from "@/components/home/constants";
 
 export default function HomePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { mode } = useWorkspaceMode();
 
   // Candidate Stepper State
   const [step, setStep] = useState(1);
@@ -34,47 +31,27 @@ export default function HomePage() {
   // Onboarding Status Checks
   const [checkingOnboarding, setCheckingOnboarding] = useState(false);
   const [candidateOnboardingDone, setCandidateOnboardingDone] = useState<boolean | null>(null);
-  const [recruiterOnboardingDone, setRecruiterOnboardingDone] = useState<boolean | null>(null);
 
-  // Check onboarding status based on mode
+  // Check onboarding status
   const checkOnboarding = useCallback(async () => {
     setCheckingOnboarding(true);
     try {
-      if (mode === "recruiter") {
-        const localDone = typeof window !== "undefined" && localStorage.getItem("recruiter_onboarding_done") === "true";
-        const res = await fetch("/api/recruiter/onboarding");
-        if (res.ok) {
-          const data = await res.json();
-          const isDone = data.completed || localDone;
-          setRecruiterOnboardingDone(isDone);
-          if (isDone) {
-            router.replace("/dashboard/recruiter");
-          }
-        } else {
-          setRecruiterOnboardingDone(localDone);
-          if (localDone) {
-            router.replace("/dashboard/recruiter");
-          }
+      const res = await fetch("/api/onboarding");
+      if (res.ok) {
+        const data = await res.json();
+        setCandidateOnboardingDone(data.completed);
+        if (data.completed) {
+          router.replace("/dashboard");
         }
       } else {
-        const res = await fetch("/api/onboarding");
-        if (res.ok) {
-          const data = await res.json();
-          setCandidateOnboardingDone(data.completed);
-          if (data.completed) {
-            router.replace("/dashboard");
-          }
-        } else {
-          setCandidateOnboardingDone(false);
-        }
+        setCandidateOnboardingDone(false);
       }
     } catch {
       setCandidateOnboardingDone(false);
-      setRecruiterOnboardingDone(false);
     } finally {
       setCheckingOnboarding(false);
     }
-  }, [mode, router]);
+  }, [router]);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -198,20 +175,6 @@ export default function HomePage() {
 
   if (status === "unauthenticated") {
     return <UnauthenticatedHero />;
-  }
-
-  // 1. RECRUITER ONBOARDING FLOW
-  if (mode === "recruiter") {
-    if (recruiterOnboardingDone) return null;
-
-    return (
-      <div className="min-h-[85vh] bg-[#09090B] text-[#FAFAFA] py-8 md:py-12 px-4 flex items-center justify-center">
-        <RecruiterOnboardingWizard
-          onComplete={() => router.push("/account")}
-          onSkip={() => router.push("/dashboard/recruiter")}
-        />
-      </div>
-    );
   }
 
   // 2. CANDIDATE ONBOARDING FLOW
