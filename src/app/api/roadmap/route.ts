@@ -94,7 +94,9 @@ export async function POST(req: NextRequest) {
       coreSkills,
       marketGaps,
       positions,
-      nextGenCount
+      nextGenCount,
+      profile.targetCountry,
+      profile.targetCity
     );
 
     const getPhase = (weekNumber: number): string => {

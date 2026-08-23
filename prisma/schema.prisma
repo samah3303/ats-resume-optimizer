@@ -167,6 +167,7 @@ model OnboardingProfile {
   resumeId        String?  @map("resume_id")
   targetPositions String   @map("target_positions") @db.Text
   targetCountry   String   @map("target_country")
+  targetCity      String?  @map("target_city")
   linkedinUrl     String?  @map("linkedin_url")
   portfolioUrl    String?  @map("portfolio_url")
   githubUrl       String?  @map("github_url")

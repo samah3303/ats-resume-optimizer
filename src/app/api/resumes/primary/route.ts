@@ -52,6 +52,7 @@ export async function POST(req: NextRequest) {
         resume.parsedText,
         positions,
         existingProfile.targetCountry,
+        existingProfile.targetCity,
         existingProfile.linkedinUrl || undefined
       );
 
@@ -75,7 +76,10 @@ export async function POST(req: NextRequest) {
           resume.parsedText,
           mode1Result.detectedCoreSkills,
           mode1Result.marketGaps,
-          positions
+          positions,
+          1, // nextGenCount
+          existingProfile.targetCountry,
+          existingProfile.targetCity
         );
 
         await prisma.roadmap.deleteMany({ where: { userId } });

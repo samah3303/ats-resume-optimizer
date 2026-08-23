@@ -56,9 +56,10 @@ export async function generateLinkedInProfileOptimization(params: {
   resumeText: string;
   targetRole?: string;
   industry?: string;
+  location?: string;
   tone?: "bold" | "executive" | "technical" | "founder";
 }): Promise<LinkedInOptimizationResult> {
-  const { resumeText, targetRole = "Software Engineer", industry = "Technology", tone = "executive" } = params;
+  const { resumeText, targetRole = "Software Engineer", industry = "Technology", tone = "executive", location = "" } = params;
 
   const prompt = `You are the world's top LinkedIn Executive Brand Strategist and Talent Recruiter.
 Analyze this resume and generate an elite, high-conversion LinkedIn profile optimization packet.
@@ -67,6 +68,9 @@ Analyze this resume and generate an elite, high-conversion LinkedIn profile opti
 - Target Role: ${targetRole}
 - Target Industry: ${industry}
 - Preferred Tone: ${tone}
+${location ? `- Target Market/Location: ${location}` : ""}
+
+If the target location is Dubai, UAE, or the Middle East, ensure the optimization incorporates regional norms (e.g., emphasizing immediate availability, regional experience if applicable, or specific high-demand stacks in that area).
 
 ## Candidate Resume:
 ${resumeText.slice(0, 4000)}

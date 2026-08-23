@@ -4,6 +4,7 @@ export async function mode1OnboardingAnalysis(
   resumeText: string,
   targetPositions: string[],
   targetCountry: string,
+  targetCity?: string | null,
   linkedinUrl?: string
 ): Promise<{
   profileSummary: string;
@@ -22,13 +23,13 @@ export async function mode1OnboardingAnalysis(
 }> {
   const prompt = `You are a world-class ATS Resume Auditor and Career Intelligence Engine.
 
-Your task is to conduct an authoritative, standalone General ATS Compatibility Analysis on the candidate's resume for their target positions (${targetPositions.join(", ")}) in ${targetCountry}.
+Your task is to conduct an authoritative, standalone General ATS Compatibility Analysis on the candidate's resume for their target positions (${targetPositions.join(", ")}) in ${targetCity ? targetCity + ", " : ""}${targetCountry}.
 Analyze formatting parseability, keyword density, section taxonomy, and quantifiable impact to provide prioritized, actionable recommendations that will elevate the candidate's ATS score from its current state to 80+ (Tier-1 ATS Benchmark).
 
 ## Target Positions:
 ${targetPositions.map((p, i) => `${i + 1}. ${p}`).join("\n")}
 
-## Target Geography: ${targetCountry}
+## Target Geography: ${targetCity ? targetCity + ", " : ""}${targetCountry}
 ${linkedinUrl ? `## Candidate Link: ${linkedinUrl}` : ""}
 
 ## Candidate Resume Text:
@@ -120,7 +121,9 @@ export async function mode2GenerateRoadmap(
   coreSkills: string[],
   marketGaps: Array<{ type: string; description: string }>,
   targetPositions: string[],
-  generationCount: number = 1
+  generationCount: number = 1,
+  targetCountry: string = "United States",
+  targetCity?: string | null
 ): Promise<{
   strategyOverview: string;
   weeks: Array<{
@@ -140,14 +143,18 @@ The VERY FIRST TASK in Week 1 MUST explicitly be: "Check the 'LinkedIn Tips' and
     : `IMPORTANT: This is a REGENERATED (Iteration ${generationCount}) roadmap.
 The candidate has ALREADY applied their initial LinkedIn and Resume fixes. Do NOT include setup/fix tasks for reviewing LinkedIn or Resume tabs. Focus 100% on advanced skill development, project portfolio execution, high-volume job applications, and interview performance.`;
 
-  const prompt = `You are an expert career strategist and resume coach.
+  const prompt = `You are an expert career strategist and local market job hunt coach.
 
-Your task is to create an 8-week phased roadmap to close market gaps and position the candidate for their target roles.
+Your task is to create a highly actionable 8-week phased job hunt and upskilling roadmap to position the candidate for their target roles in ${targetCity ? targetCity + ", " : ""}${targetCountry}.
+
+If the target location is UAE/Dubai/Middle East, explicitly include weekly strategies for Naukri Gulf, Indeed UAE, and localized LinkedIn Middle East networking, alongside WhatsApp follow-up practices.
 
 ${initialSetupInstruction}
 
 ## Target Positions:
 ${targetPositions.map((p, i) => `${i + 1}. ${p}`).join("\n")}
+
+## Target Geography: ${targetCity ? targetCity + ", " : ""}${targetCountry}
 
 ## Candidate Core Skills:
 ${coreSkills.map((s) => `- ${s}`).join("\n")}

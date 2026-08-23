@@ -60,6 +60,7 @@ export default function AccountPage() {
   const [projects, setProjects] = useState<ProjectItem[]>([]);
   const [targetPositions, setTargetPositions] = useState("");
   const [targetCountry, setTargetCountry] = useState("United States");
+  const [targetCity, setTargetCity] = useState("");
   const [industry, setIndustry] = useState("Technology / SaaS");
   const [jobType, setJobType] = useState("Full-time");
 
@@ -114,6 +115,7 @@ export default function AccountPage() {
           setProjects(data.projects || []);
           setTargetPositions(data.targetPositions || "");
           setTargetCountry(data.targetCountry || "United States");
+          setTargetCity(data.targetCity || "");
           setIndustry(data.industry || "Technology / SaaS");
           setJobType(data.jobType || "Full-time");
         }
@@ -157,6 +159,7 @@ export default function AccountPage() {
           projects,
           targetPositions,
           targetCountry,
+          targetCity,
           industry,
           jobType,
         }),
@@ -868,7 +871,7 @@ export default function AccountPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
                       <label className="block text-xs font-bold text-zinc-300 mb-1">Target Industry</label>
                       <select
@@ -882,6 +885,16 @@ export default function AccountPage() {
                           </option>
                         ))}
                       </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-zinc-300 mb-1">Target City / Region</label>
+                      <input
+                        type="text"
+                        value={targetCity}
+                        onChange={(e) => setTargetCity(e.target.value)}
+                        placeholder="e.g. Dubai, London, SF"
+                        className="w-full px-3 py-2 bg-[#09090B] text-[#FAFAFA] border border-[#27272A] rounded-xl text-xs"
+                      />
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-zinc-300 mb-1">Job Type</label>

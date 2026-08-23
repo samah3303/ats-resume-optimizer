@@ -504,7 +504,25 @@ function AnalysisDetailContent() {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full lg:w-auto">
+          <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3 w-full lg:w-auto lg:justify-end max-w-lg">
+            {overallScoreVal >= 80 && (
+              <button
+                onClick={async () => {
+                  const res = await fetch("/api/resumes/primary", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ resumeId: analysis.resume?.id }),
+                  });
+                  if (res.ok) {
+                    toast("Saved as Primary Baseline Resume!", "success");
+                  }
+                }}
+                className="px-5 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase tracking-wider rounded-2xl shadow-sm transition-all flex items-center gap-2 border border-emerald-700"
+              >
+                ⭐ Set as Primary Baseline
+              </button>
+            )}
+
             {/* Template Selector Dropdown */}
             <select
               value={selectedTemplate}

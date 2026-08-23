@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
       resumeId,
       targetPositions,
       targetCountry,
+      targetCity,
       linkedinUrl,
       portfolioUrl,
       githubUrl,
@@ -87,6 +88,7 @@ export async function POST(req: NextRequest) {
         resume.parsedText,
         positions,
         targetCountry,
+        targetCity,
         linkedinUrl || undefined
       );
     } catch (err) {
@@ -105,6 +107,7 @@ export async function POST(req: NextRequest) {
         resumeId,
         targetPositions: positions.join(", "),
         targetCountry,
+        targetCity: targetCity || null,
         linkedinUrl: linkedinUrl || null,
         portfolioUrl: portfolioUrl || null,
         githubUrl: githubUrl || null,
@@ -122,6 +125,7 @@ export async function POST(req: NextRequest) {
         resumeId,
         targetPositions: positions.join(", "),
         targetCountry,
+        targetCity: targetCity || null,
         linkedinUrl: linkedinUrl || null,
         portfolioUrl: portfolioUrl || null,
         githubUrl: githubUrl || null,
@@ -224,12 +228,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Step 4: Fire-and-forget recommendations (matching 50-60% of primary resume)
+    const locationString = targetCity ? `${targetCity}, ${targetCountry}` : targetCountry;
+
     generateRecommendationsAsync(
       userId,
       resume.parsedText,
       mode1Result.detectedCoreSkills,
       positions,
-      targetCountry
+      locationString
     ).catch((err) => {
       console.error("Background recommendations failed:", err);
     });

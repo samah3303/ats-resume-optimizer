@@ -12,6 +12,10 @@ export async function POST(req: NextRequest) {
 
   const userId = (session.user as { id: string }).id;
 
+  const profile = await prisma.onboardingProfile.findUnique({
+    where: { userId },
+  });
+
   try {
     const body = await req.json();
     const { resumeId, resumeText, targetRole, industry, tone } = body;
@@ -45,11 +49,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const targetCountry = profile?.targetCountry || "United States";
+    const targetCity = profile?.targetCity;
+    const locationString = targetCity ? `${targetCity}, ${targetCountry}` : targetCountry;
+
     const optimization = await generateLinkedInProfileOptimization({
       resumeText: contentToAnalyze,
-      targetRole: targetRole || "Senior Software Engineer",
-      industry: industry || "Technology",
+      targetRole: targetRole || profile?.targetPositions?.split(",")[0] || "Professional",
+      industry: industry || profile?.industry || "Technology",
       tone: tone || "executive",
+      location: locationString
     });
 
     return NextResponse.json({ data: optimization });

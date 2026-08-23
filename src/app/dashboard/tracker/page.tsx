@@ -249,6 +249,13 @@ export default function TrackerPage() {
                               </p>
                             )}
                             
+                            <Link
+                              href={`/dashboard/analyze?jdId=${app.jobDescription.id}`}
+                              className="w-full mt-1 px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-700 text-[10px] font-bold rounded-xl transition-colors flex items-center justify-center gap-1 shadow-sm"
+                            >
+                              <span>⭐ Tailor vs Primary Resume</span>
+                            </Link>
+
                             <button
                               onClick={() => handleOpenOutreach(app)}
                               className="w-full mt-1 px-2.5 py-1.5 bg-black hover:bg-zinc-800 text-white border border-black text-[10px] font-bold rounded-xl transition-colors flex items-center justify-center gap-1 shadow-sm"
