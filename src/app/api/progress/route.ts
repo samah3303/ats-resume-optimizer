@@ -40,12 +40,21 @@ export async function GET() {
       ["offer", "hired"].includes(app.stage.toLowerCase())
     );
 
+    const latestAnalysis = await prisma.analysis.findFirst({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+    });
+
     return NextResponse.json({
       hasPrimaryResume,
       hasLinkedin,
       hasRoadmap,
       hasInterview,
       hasOffer,
+      generalAtsScore: profile?.generalAtsScore || null,
+      primaryResumeId: primaryResume?.id || null,
+      latestAnalysisId: latestAnalysis?.id || null,
+      latestAnalysisScore: latestAnalysis?.overallScore || null,
     });
   } catch (error) {
     console.error("Progress fetch error:", error);
