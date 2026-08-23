@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export interface SubFeatureItem {
@@ -12,6 +12,8 @@ export interface SubFeatureItem {
   icon: string;
   badge?: string;
   highlightMetric?: string;
+  isLocked?: boolean;
+  unlockCondition?: string;
 }
 
 export interface PipelineStage {
@@ -207,6 +209,99 @@ const campaignStages: PipelineStage[] = [
 
 export function StepByStepTileNavigator() {
   const [selectedStage, setSelectedStage] = useState<PipelineStage | null>(null);
+  const [stages, setStages] = useState<PipelineStage[]>(campaignStages);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/progress")
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data) return;
+
+        // Deep clone so we can modify nested features
+        const updatedStages = JSON.parse(JSON.stringify(campaignStages)) as PipelineStage[];
+        
+        // --- STAGE 1: Foundation ---
+        // ATS Engine & Builder are unlocked.
+        // LinkedIn is locked until Primary Resume exists.
+        const stage1 = updatedStages[0];
+        const linkedInTool = stage1.features.find(f => f.id === "linkedin");
+        if (linkedInTool) {
+          if (data.hasPrimaryResume) {
+            linkedInTool.isLocked = false;
+            linkedInTool.badge = "Unlocked";
+          } else {
+            linkedInTool.isLocked = true;
+            linkedInTool.badge = "Locked";
+            linkedInTool.unlockCondition = "Hit 80+ and set Primary Baseline to unlock";
+          }
+        }
+        
+        // --- STAGE 2: The Hunt ---
+        // Locked until LinkedIn is generated
+        const stage2 = updatedStages[1];
+        if (data.hasLinkedin) {
+          stage2.isLocked = false;
+          stage2.badge = "Unlocked";
+          stage2.unlockCondition = undefined;
+        } else {
+          stage2.isLocked = true;
+          stage2.badge = "Locked";
+          stage2.unlockCondition = "Unlocks after finishing LinkedIn Delta Report";
+        }
+
+        // Inside Stage 2, Roadmap is unlocked.
+        // Tracker, Tailor vs JD, Jobs, Resumes are locked until Roadmap exists.
+        if (stage2.features) {
+          stage2.features.forEach(f => {
+            if (f.id !== "roadmap") {
+              if (data.hasRoadmap) {
+                f.isLocked = false;
+              } else {
+                f.isLocked = true;
+                f.badge = "Locked";
+                f.unlockCondition = "Generate 2-Month Roadmap to unlock";
+              }
+            }
+          });
+        }
+
+        // --- STAGE 3: The Loop (Interviews) ---
+        const stage3 = updatedStages[2];
+        if (data.hasInterview) {
+          stage3.isLocked = false;
+          stage3.badge = "Unlocked";
+          stage3.unlockCondition = undefined;
+        } else {
+          stage3.isLocked = true;
+          stage3.badge = "Locked";
+          stage3.unlockCondition = "Unlocks when an interview is added to Tracker";
+        }
+
+        // --- STAGE 4: The Close (Offers) ---
+        const stage4 = updatedStages[3];
+        if (data.hasOffer) {
+          stage4.isLocked = false;
+          stage4.badge = "Unlocked";
+          stage4.unlockCondition = undefined;
+        } else {
+          stage4.isLocked = true;
+          stage4.badge = "Locked";
+          stage4.unlockCondition = "Unlocks when an offer is added to Tracker";
+        }
+
+        setStages(updatedStages);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="w-8 h-8 border-2 border-[#FAFAFA] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   if (selectedStage) {
     return (
@@ -238,41 +333,69 @@ export function StepByStepTileNavigator() {
 
         {/* Feature Sub-Tiles */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
-          {selectedStage.features.map((feature) => (
-            <Link
-              key={feature.id}
-              href={feature.href}
-              className="p-6 bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] rounded-3xl transition-all flex flex-col justify-between space-y-4 group hover:-translate-y-1 active:scale-[0.99] shadow-lg"
-            >
-              <div className="flex items-start justify-between">
-                <div className="w-12 h-12 rounded-2xl bg-[#09090B] border border-[#27272A] flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                  {feature.icon}
+          {selectedStage.features.map((feature) => {
+            const isToolLocked = feature.isLocked;
+
+            const content = (
+              <>
+                {isToolLocked && (
+                  <div className="absolute top-4 right-4 z-10 text-zinc-500">
+                    dY"'
+                  </div>
+                )}
+                <div className="flex items-start justify-between">
+                  <div className={`w-12 h-12 rounded-2xl bg-[#09090B] border border-[#27272A] flex items-center justify-center text-2xl ${isToolLocked ? '' : 'group-hover:scale-110'} transition-transform`}>
+                    {feature.icon}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {feature.badge && (
+                      <span className={`px-2.5 py-0.5 rounded-md bg-[#27272A] ${isToolLocked ? 'text-zinc-500' : 'text-[#FAFAFA]'} text-[9px] font-bold uppercase font-mono`}>
+                        {feature.badge}
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  {feature.badge && (
-                    <span className="px-2.5 py-0.5 rounded-md bg-[#27272A] text-[#FAFAFA] text-[9px] font-bold uppercase font-mono">
-                      {feature.badge}
-                    </span>
+
+                <div className="space-y-1.5 flex-1 mt-4">
+                  <h3 className={`text-base font-bold ${isToolLocked ? 'text-zinc-500' : 'text-[#FAFAFA] group-hover:text-white'} transition-colors`}>
+                    {feature.title}
+                  </h3>
+                  <p className="text-xs font-bold text-zinc-400">{feature.tagline}</p>
+                  <p className="text-xs text-zinc-500 leading-relaxed pt-1">
+                    {feature.description}
+                  </p>
+                  {isToolLocked && feature.unlockCondition && (
+                    <p className="text-[10px] text-amber-500 font-mono mt-2 bg-amber-500/10 p-2 rounded-md border border-amber-500/20">
+                      {feature.unlockCondition}
+                    </p>
                   )}
                 </div>
-              </div>
 
-              <div className="space-y-1.5 flex-1">
-                <h3 className="text-base font-bold text-[#FAFAFA] group-hover:text-white transition-colors">
-                  {feature.title}
-                </h3>
-                <p className="text-xs font-bold text-zinc-300">{feature.tagline}</p>
-                <p className="text-xs text-zinc-400 leading-relaxed pt-1">
-                  {feature.description}
-                </p>
-              </div>
+                <div className="pt-3 border-t border-[#27272A] flex items-center justify-between text-xs font-bold text-[#FAFAFA] mt-4">
+                  <span className={isToolLocked ? 'text-zinc-500' : 'group-hover:underline'}>
+                    {isToolLocked ? 'Locked' : 'Launch Tool'}
+                  </span>
+                  {!isToolLocked && <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>}
+                </div>
+              </>
+            );
 
-              <div className="pt-3 border-t border-[#27272A] flex items-center justify-between text-xs font-bold text-[#FAFAFA] group-hover:underline">
-                <span>Launch Tool</span>
-                <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
-              </div>
-            </Link>
-          ))}
+            const className = `p-6 bg-[#18181B] border ${isToolLocked ? 'border-[#27272A] opacity-75 grayscale cursor-not-allowed' : 'border-[#27272A] hover:border-[#FAFAFA] cursor-pointer hover:-translate-y-1 active:scale-[0.99]'} rounded-3xl transition-all flex flex-col justify-between group shadow-lg relative h-full`;
+
+            if (isToolLocked) {
+              return (
+                <div key={feature.id} className={className}>
+                  {content}
+                </div>
+              );
+            }
+
+            return (
+              <Link key={feature.id} href={feature.href} className={className}>
+                {content}
+              </Link>
+            );
+          })}
         </div>
       </div>
     );
@@ -298,7 +421,7 @@ export function StepByStepTileNavigator() {
 
       {/* Campaign Pipeline Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
-        {campaignStages.map((stage) => (
+        {stages.map((stage) => (
           <div
             key={stage.id}
             onClick={() => {
