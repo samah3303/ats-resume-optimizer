@@ -215,12 +215,14 @@ export function StepByStepTileNavigator() {
     id: null,
     score: null,
   });
+  const [progress, setProgress] = useState<any>(null);
 
   useEffect(() => {
     fetch("/api/progress")
       .then((res) => res.json())
       .then((data) => {
         if (!data) return;
+        setProgress(data);
 
         // Deep clone so we can modify nested features
         const updatedStages = JSON.parse(JSON.stringify(campaignStages)) as PipelineStage[];
@@ -427,52 +429,164 @@ export function StepByStepTileNavigator() {
         </div>
       </div>
 
-      {/* Primary Baseline ATS Score Banner */}
-      {latestAnalysis.id && latestAnalysis.score !== null && (
-        <Link 
-          href={`/dashboard/analyze/${latestAnalysis.id}`}
-          className={`block p-5 sm:p-6 rounded-3xl border transition-all shadow-lg hover:-translate-y-1 active:scale-[0.99] group ${
-            latestAnalysis.score >= 80 
-              ? 'bg-emerald-500/10 border-emerald-500/30 hover:border-emerald-500/60' 
-              : latestAnalysis.score >= 60 
-                ? 'bg-amber-500/10 border-amber-500/30 hover:border-amber-500/60' 
-                : 'bg-rose-500/10 border-rose-500/30 hover:border-rose-500/60'
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4 sm:gap-6">
-              <div className={`flex flex-col items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border bg-[#09090B] ${
-                latestAnalysis.score >= 80 
-                  ? 'border-emerald-500/50 text-emerald-400' 
-                  : latestAnalysis.score >= 60 
-                    ? 'border-amber-500/50 text-amber-400' 
-                    : 'border-rose-500/50 text-rose-400'
-              }`}>
-                <span className="text-xl sm:text-3xl font-black tracking-tighter">{latestAnalysis.score}</span>
-                <span className="text-[9px] sm:text-[10px] font-bold uppercase font-mono mt-0.5">Score</span>
-              </div>
-              <div className="space-y-1">
-                <div className="inline-flex items-center gap-2">
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+      {/* Core Workflow Hub */}
+      {progress && (
+        <div className="space-y-4 mb-8">
+          <h2 className="text-lg sm:text-xl font-bold tracking-tight text-[#FAFAFA]">
+            The "Perfect Job Hunt" Workflow
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            {/* Card 1: ATS Analysis */}
+            <Link
+              href={latestAnalysis.id ? `/dashboard/analyze/${latestAnalysis.id}` : `/dashboard/analyze`}
+              className={`p-5 rounded-2xl border transition-all flex flex-col group ${
+                latestAnalysis.score !== null 
+                  ? latestAnalysis.score >= 80 
+                    ? 'bg-emerald-500/10 border-emerald-500/30 hover:border-emerald-500/60' 
+                    : latestAnalysis.score >= 60 
+                      ? 'bg-amber-500/10 border-amber-500/30 hover:border-amber-500/60' 
+                      : 'bg-rose-500/10 border-rose-500/30 hover:border-rose-500/60'
+                  : 'bg-[#18181B] border-[#27272A] hover:border-[#FAFAFA]'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-400">Step 1</span>
+                {latestAnalysis.score !== null && (
+                  <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${
                     latestAnalysis.score >= 80 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'
                   }`}>
-                    {latestAnalysis.score >= 80 ? 'Primary Baseline Ready' : 'Optimization Required'}
+                    {latestAnalysis.score >= 80 ? 'Ready' : 'Improve'}
                   </span>
+                )}
+              </div>
+              <h3 className="font-bold text-[#FAFAFA] text-sm group-hover:text-white transition-colors">
+                ATS Baseline Analysis
+              </h3>
+              <p className="text-[11px] text-zinc-400 mt-1 flex-1">
+                {latestAnalysis.score !== null 
+                  ? 'Click to view line-by-line suggestions.'
+                  : 'Scan your resume against JDs to hit 80+.'}
+              </p>
+              <div className="mt-4 flex items-center justify-between text-xs font-bold text-[#FAFAFA]">
+                {latestAnalysis.score !== null ? (
+                  <span className={`text-lg font-black ${
+                    latestAnalysis.score >= 80 ? 'text-emerald-400' : latestAnalysis.score >= 60 ? 'text-amber-400' : 'text-rose-400'
+                  }`}>{latestAnalysis.score}%</span>
+                ) : (
+                  <span>Launch Tool</span>
+                )}
+                <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
+              </div>
+            </Link>
+
+            {/* Card 2: LinkedIn Updates */}
+            {progress.hasPrimaryResume ? (
+              <Link
+                href="/dashboard/linkedin"
+                className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] transition-all flex flex-col group"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-400">Step 2</span>
+                  {progress.hasLinkedin && (
+                    <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-emerald-500/20 text-emerald-400">Done</span>
+                  )}
                 </div>
-                <h2 className="text-lg sm:text-xl font-bold text-[#FAFAFA] group-hover:text-white transition-colors">
-                  Latest ATS Analysis Results
-                </h2>
-                <p className="text-xs text-zinc-400 max-w-lg">
-                  Click here to view detailed line-by-line AI suggestions, keyword gaps, and formatting red flags to improve your match score.
+                <h3 className="font-bold text-[#FAFAFA] text-sm group-hover:text-white transition-colors">
+                  LinkedIn Optimization
+                </h3>
+                <p className="text-[11px] text-zinc-400 mt-1 flex-1">
+                  Sync your baseline resume to generate localized LinkedIn updates.
+                </p>
+                <div className="mt-4 flex items-center justify-between text-xs font-bold text-[#FAFAFA]">
+                  <span>Launch Tool</span>
+                  <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
+                </div>
+              </Link>
+            ) : (
+              <div className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-75 grayscale flex flex-col cursor-not-allowed">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 2</span>
+                  <span className="text-[14px]">dY"'</span>
+                </div>
+                <h3 className="font-bold text-zinc-500 text-sm">LinkedIn Optimization</h3>
+                <p className="text-[11px] text-zinc-600 mt-1 flex-1">
+                  Hit 80+ ATS score & set Primary Baseline to unlock.
                 </p>
               </div>
-            </div>
-            <div className="hidden sm:flex items-center gap-2 text-sm font-bold text-[#FAFAFA] group-hover:underline">
-              <span>View Suggestions</span>
-              <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
-            </div>
+            )}
+
+            {/* Card 3: 2-Month Roadmap */}
+            {progress.hasLinkedin ? (
+              <Link
+                href="/dashboard/roadmap"
+                className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] transition-all flex flex-col group"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-400">Step 3</span>
+                  {progress.hasRoadmap && (
+                    <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-emerald-500/20 text-emerald-400">Active</span>
+                  )}
+                </div>
+                <h3 className="font-bold text-[#FAFAFA] text-sm group-hover:text-white transition-colors">
+                  2-Month Master Plan
+                </h3>
+                <p className="text-[11px] text-zinc-400 mt-1 flex-1">
+                  Generate your 8-week structured roadmap for local markets.
+                </p>
+                <div className="mt-4 flex items-center justify-between text-xs font-bold text-[#FAFAFA]">
+                  <span>Launch Tool</span>
+                  <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
+                </div>
+              </Link>
+            ) : (
+              <div className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-75 grayscale flex flex-col cursor-not-allowed">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 3</span>
+                  <span className="text-[14px]">dY"'</span>
+                </div>
+                <h3 className="font-bold text-zinc-500 text-sm">2-Month Master Plan</h3>
+                <p className="text-[11px] text-zinc-600 mt-1 flex-1">
+                  Complete LinkedIn optimization to unlock.
+                </p>
+              </div>
+            )}
+
+            {/* Card 4: Kanban Tracker */}
+            {progress.hasRoadmap ? (
+              <Link
+                href="/dashboard/tracker"
+                className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] transition-all flex flex-col group"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-400">Step 4</span>
+                </div>
+                <h3 className="font-bold text-[#FAFAFA] text-sm group-hover:text-white transition-colors">
+                  Kanban Job Tracker
+                </h3>
+                <p className="text-[11px] text-zinc-400 mt-1 flex-1">
+                  Tailor resumes per JD and track applications.
+                </p>
+                <div className="mt-4 flex items-center justify-between text-xs font-bold text-[#FAFAFA]">
+                  <span>Launch Tool</span>
+                  <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
+                </div>
+              </Link>
+            ) : (
+              <div className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-75 grayscale flex flex-col cursor-not-allowed">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 4</span>
+                  <span className="text-[14px]">dY"'</span>
+                </div>
+                <h3 className="font-bold text-zinc-500 text-sm">Kanban Job Tracker</h3>
+                <p className="text-[11px] text-zinc-600 mt-1 flex-1">
+                  Generate your 8-Week roadmap to unlock.
+                </p>
+              </div>
+            )}
+
           </div>
-        </Link>
+        </div>
       )}
 
       {/* Campaign Pipeline Grid */}
