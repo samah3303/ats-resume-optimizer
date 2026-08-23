@@ -32,7 +32,7 @@ const campaignStages: PipelineStage[] = [
     id: "stage-1-foundation",
     title: "Stage 1: Foundation",
     description: "Build a pixel-perfect ATS resume and a high-ranking LinkedIn profile.",
-    icon: "ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚ÂÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒÆ’Ã‚Â¯Ãƒâ€šÃ‚Â¸Ãƒâ€šÃ‚Â",
+    icon: "ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â°ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â",
     badge: "Unlocked",
     isLocked: false,
     features: [
@@ -42,7 +42,7 @@ const campaignStages: PipelineStage[] = [
         tagline: "Multi-JD Compatibility & 80+ Fit Scoring",
         description: "Scan your resume against target job postings to uncover missing technical skills.",
         href: "/dashboard/analyze",
-        icon: "ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒâ€¦Ã‚Â ",
+        icon: "ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â°ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â ",
         badge: "Top Priority",
       },
       {
@@ -51,7 +51,7 @@ const campaignStages: PipelineStage[] = [
         tagline: "6 Pro Templates & Drag-Drop Editor",
         description: "Pixel-perfect A4 canvas with live print styles and high-res PDF downloads.",
         href: "/dashboard/builder",
-        icon: "ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾",
+        icon: "ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â°ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¾",
         badge: "Core Studio",
       },
       {
@@ -60,7 +60,7 @@ const campaignStages: PipelineStage[] = [
         tagline: "1-Click Sharable Candidate Profile",
         description: "Generate a clean, verified candidate portfolio link to send directly to recruiters.",
         href: "/portfolio",
-        icon: "ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â",
+        icon: "ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â°ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â",
         badge: "Live Link",
       }
     ],
@@ -69,7 +69,7 @@ const campaignStages: PipelineStage[] = [
     id: "stage-2-hunt",
     title: "Stage 2: The Hunt",
     description: "Deploy background AI agents and semantic job discovery.",
-    icon: "ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â°ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¤ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ",
+    icon: "ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¤ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“",
     badge: "In Progress",
     isLocked: false,
     features: [
@@ -79,7 +79,7 @@ const campaignStages: PipelineStage[] = [
         tagline: "140k+ Multi-Board Live Job Stream",
         description: "Discover live job postings ranked by semantic compatibility with your resume.",
         href: "/dashboard/jobs",
-        icon: "ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â°ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â",
+        icon: "ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â",
         badge: "Live Feed",
       },
       {
@@ -88,7 +88,7 @@ const campaignStages: PipelineStage[] = [
         tagline: "3-Step Follow-Up Sequence Synthesizer",
         description: "Generate high-converting recruiter connection notes and hiring manager cold pitches.",
         href: "/dashboard/outreach",
-        icon: "ÃƒÂ¢Ã…â€œÃ‚ÂÃƒÂ¯Ã‚Â¸Ã‚Â",
+        icon: "ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¯Ãƒâ€šÃ‚Â¸Ãƒâ€šÃ‚Â",
         badge: "Outreach",
       },
       {
@@ -97,7 +97,7 @@ const campaignStages: PipelineStage[] = [
         tagline: "24/7 Background Application Packets",
         description: "Autonomous background agents generate tailored STAR bullets and cover letters.",
         href: "/dashboard/agents",
-        icon: "ÃƒÂ°Ã…Â¸Ã‚Â¤Ã¢â‚¬â€œ",
+        icon: "ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚Â¤ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“",
         badge: "Autonomous",
       }
     ],
@@ -106,7 +106,7 @@ const campaignStages: PipelineStage[] = [
     id: "stage-3-loop",
     title: "Stage 3: Active Loop",
     description: "Practice out loud with AI interviewer personas and video composure tracking.",
-    icon: "ÃƒÂ°Ã…Â¸Ã…Â½Ã¢â€žÂ¢ÃƒÂ¯Ã‚Â¸Ã‚Â",
+    icon: "ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â½ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã‚Â¯Ãƒâ€šÃ‚Â¸Ãƒâ€šÃ‚Â",
     badge: "Locked",
     isLocked: true,
     unlockCondition: "Unlocks when an interview is scheduled in Tracker",
@@ -117,7 +117,7 @@ const campaignStages: PipelineStage[] = [
         tagline: "Predict Loop Questions for Google, Stripe & Meta",
         description: "Uncover top predicted interview loop questions and Bar Raiser expectations.",
         href: "/dashboard/interview",
-        icon: "ÃƒÂ°Ã…Â¸Ã…Â½Ã‚Â¯",
+        icon: "ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â½Ãƒâ€šÃ‚Â¯",
         badge: "Radar",
       },
       {
@@ -126,7 +126,7 @@ const campaignStages: PipelineStage[] = [
         tagline: "In-Browser Algorithms IDE",
         description: "Solve algorithmic problems with real-time test assertions.",
         href: "/dashboard/challenges",
-        icon: "ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â°ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â»",
+        icon: "ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â»",
         badge: "IDE",
       },
       {
@@ -135,7 +135,7 @@ const campaignStages: PipelineStage[] = [
         tagline: "SVG Vector Canvas & SPOF Capacity Grader",
         description: "Drag-and-drop distributed systems diagrams and export clean Mermaid.js code.",
         href: "/dashboard/whiteboard",
-        icon: "📋",
+        icon: "ðŸ“‹",
         badge: "Arena",
       },
       {
@@ -144,7 +144,7 @@ const campaignStages: PipelineStage[] = [
         tagline: "Webcam Computer Vision Overlay",
         description: "Track real-time direct eye contact % and posture stability.",
         href: "/dashboard/video-analytics",
-        icon: "ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â°ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¹Ã…â€œÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€š ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€š ",
+        icon: "ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¹Ãƒâ€¦Ã¢â‚¬Å“ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡ ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡ ",
         badge: "Vision HUD",
       }
       ],
@@ -359,16 +359,12 @@ export function StepByStepTileNavigator() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#27272A]">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-[#18181B] border border-[#27272A] text-zinc-300 mb-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>Active Campaign Pipeline</span>
-          </div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#FAFAFA]">
-            Career OS Dashboard
-          </h1>
-          <p className="text-xs text-zinc-400 mt-1">
-            Follow the 4-stage pipeline to land your next high-tier offer.
-          </p>
+              Dashboard
+            </h1>
+            <p className="text-xs text-zinc-400 mt-1">
+              Follow these steps to land your next job.
+            </p>
         </div>
       </div>
 
@@ -648,6 +644,7 @@ export function StepByStepTileNavigator() {
     </div>
   );
 }
+
 
 
 
