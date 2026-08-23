@@ -586,6 +586,76 @@ export function StepByStepTileNavigator() {
             )}
 
           </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            {/* Card 5: Mock Interviews (Only shown/unlocked based on hasInterview) */}
+            {progress.hasInterview ? (
+              <Link
+                href="/dashboard/mock-interview"
+                className="p-5 rounded-2xl bg-[#18181B] border border-amber-500/30 hover:border-amber-500 transition-all flex flex-col group shadow-[0_0_15px_rgba(245,158,11,0.1)]"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-amber-500">Step 5</span>
+                  <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-amber-500/20 text-amber-500 animate-pulse">Unlocked!</span>
+                </div>
+                <h3 className="font-bold text-[#FAFAFA] text-sm group-hover:text-white transition-colors">
+                  AI Mock Interviews
+                </h3>
+                <p className="text-[11px] text-zinc-400 mt-1 flex-1">
+                  Practice for your upcoming interview with an AI recruiter.
+                </p>
+                <div className="mt-4 flex items-center justify-between text-xs font-bold text-[#FAFAFA]">
+                  <span>Launch Tool</span>
+                  <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
+                </div>
+              </Link>
+            ) : (
+              <div className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-50 grayscale flex flex-col cursor-not-allowed hidden md:flex">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 5</span>
+                  <span className="text-[14px]">dY"'</span>
+                </div>
+                <h3 className="font-bold text-zinc-500 text-sm">AI Mock Interviews</h3>
+                <p className="text-[11px] text-zinc-600 mt-1 flex-1">
+                  Move a job to 'Interview' in Tracker to unlock.
+                </p>
+              </div>
+            )}
+
+            {/* Card 6: Salary War Room (Only shown/unlocked based on hasOffer) */}
+            {progress.hasOffer ? (
+              <Link
+                href="/dashboard/offers"
+                className="p-5 rounded-2xl bg-[#18181B] border border-emerald-500/30 hover:border-emerald-500 transition-all flex flex-col group shadow-[0_0_15px_rgba(16,185,129,0.1)]"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-emerald-500">Step 6</span>
+                  <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-emerald-500/20 text-emerald-400 animate-pulse">Unlocked!</span>
+                </div>
+                <h3 className="font-bold text-[#FAFAFA] text-sm group-hover:text-white transition-colors">
+                  Salary War Room
+                </h3>
+                <p className="text-[11px] text-zinc-400 mt-1 flex-1">
+                  Simulate HR counter-offers and maximize your compensation.
+                </p>
+                <div className="mt-4 flex items-center justify-between text-xs font-bold text-[#FAFAFA]">
+                  <span>Launch Tool</span>
+                  <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
+                </div>
+              </Link>
+            ) : (
+              <div className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-50 grayscale flex flex-col cursor-not-allowed hidden md:flex">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 6</span>
+                  <span className="text-[14px]">dY"'</span>
+                </div>
+                <h3 className="font-bold text-zinc-500 text-sm">Salary War Room</h3>
+                <p className="text-[11px] text-zinc-600 mt-1 flex-1">
+                  Move a job to 'Offer' in Tracker to unlock.
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       )}
 

@@ -95,7 +95,14 @@ export default function TrackerPage() {
         setApplications((prev) =>
           prev.map((a) => (a.id === appId ? { ...a, status: newStatus } : a))
         );
-        toast(`Moved to ${STATUSES.find(s => s.key === newStatus)?.label}`, "info");
+        
+        if (newStatus === "interview") {
+          toast("Interview tools unlocked on Dashboard! 🎉", "success");
+        } else if (newStatus === "offer") {
+          toast("Salary War Room unlocked on Dashboard! 💰", "success");
+        } else {
+          toast(`Moved to ${STATUSES.find(s => s.key === newStatus)?.label}`, "info");
+        }
       }
     } catch {
       toast("Failed to update status", "error");
