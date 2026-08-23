@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -32,7 +32,7 @@ const campaignStages: PipelineStage[] = [
     id: "stage-1-foundation",
     title: "Stage 1: Foundation",
     description: "Build a pixel-perfect ATS resume and a high-ranking LinkedIn profile.",
-    icon: "🏗️",
+    icon: "ðŸ—ï¸",
     badge: "Unlocked",
     isLocked: false,
     features: [
@@ -42,7 +42,7 @@ const campaignStages: PipelineStage[] = [
         tagline: "Multi-JD Compatibility & 80+ Fit Scoring",
         description: "Scan your resume against target job postings to uncover missing technical skills.",
         href: "/dashboard/analyze",
-        icon: "📊",
+        icon: "ðŸ“Š",
         badge: "Top Priority",
       },
       {
@@ -51,7 +51,7 @@ const campaignStages: PipelineStage[] = [
         tagline: "6 Pro Templates & Drag-Drop Editor",
         description: "Pixel-perfect A4 canvas with live print styles and high-res PDF downloads.",
         href: "/dashboard/builder",
-        icon: "📄",
+        icon: "ðŸ“„",
         badge: "Core Studio",
       },
       {
@@ -60,7 +60,7 @@ const campaignStages: PipelineStage[] = [
         tagline: "4 Headlines, Narrative About & SEO Skills",
         description: "Generate 4 high-ranking headlines and compelling narrative About sections.",
         href: "/dashboard/linkedin",
-        icon: "⚡",
+        icon: "âš¡",
         badge: "SEO Suite",
       },
       {
@@ -69,7 +69,7 @@ const campaignStages: PipelineStage[] = [
         tagline: "1-Click Sharable Candidate Profile",
         description: "Generate a clean, verified candidate portfolio link to send directly to recruiters.",
         href: "/portfolio",
-        icon: "🌐",
+        icon: "ðŸŒ",
         badge: "Live Link",
       },
       {
@@ -78,7 +78,7 @@ const campaignStages: PipelineStage[] = [
         tagline: "Customized Weekly Milestones",
         description: "Follow actionable checklists to methodically land high-tier offers in 60 days.",
         href: "/dashboard/roadmap",
-        icon: "🗺️",
+        icon: "ðŸ—ºï¸",
         badge: "8-Week Plan",
       }
     ],
@@ -87,7 +87,7 @@ const campaignStages: PipelineStage[] = [
     id: "stage-2-hunt",
     title: "Stage 2: The Hunt",
     description: "Deploy background AI agents and semantic job discovery.",
-    icon: "🤖",
+    icon: "ðŸ¤–",
     badge: "In Progress",
     isLocked: false,
     features: [
@@ -97,7 +97,7 @@ const campaignStages: PipelineStage[] = [
         tagline: "140k+ Multi-Board Live Job Stream",
         description: "Discover live job postings ranked by semantic compatibility with your resume.",
         href: "/dashboard/jobs",
-        icon: "🔍",
+        icon: "ðŸ”",
         badge: "Live Feed",
       },
       {
@@ -106,7 +106,7 @@ const campaignStages: PipelineStage[] = [
         tagline: "3-Step Follow-Up Sequence Synthesizer",
         description: "Generate high-converting recruiter connection notes and hiring manager cold pitches.",
         href: "/dashboard/outreach",
-        icon: "✉️",
+        icon: "âœ‰ï¸",
         badge: "Outreach",
       },
       {
@@ -115,7 +115,7 @@ const campaignStages: PipelineStage[] = [
         tagline: "24/7 Background Application Packets",
         description: "Autonomous background agents generate tailored STAR bullets and cover letters.",
         href: "/dashboard/agents",
-        icon: "🤖",
+        icon: "ðŸ¤–",
         badge: "Autonomous",
       },
       {
@@ -124,7 +124,7 @@ const campaignStages: PipelineStage[] = [
         tagline: "Visual Drag-and-Drop Application Board",
         description: "Track applications across Applied, Screening, Technical, Onsite, and Offer stages.",
         href: "/dashboard/tracker",
-        icon: "📋",
+        icon: "ðŸ“‹",
         badge: "Kanban",
       }
     ],
@@ -133,7 +133,7 @@ const campaignStages: PipelineStage[] = [
     id: "stage-3-loop",
     title: "Stage 3: Active Loop",
     description: "Practice out loud with AI interviewer personas and video composure tracking.",
-    icon: "🎙️",
+    icon: "ðŸŽ™ï¸",
     badge: "Locked",
     isLocked: true,
     unlockCondition: "Unlocks when an interview is scheduled in Tracker",
@@ -144,7 +144,7 @@ const campaignStages: PipelineStage[] = [
         tagline: "8 Personas & 48-Bar Audio Waveforms",
         description: "Practice spoken interviews out loud with Web Speech recognition.",
         href: "/dashboard/mock-interview",
-        icon: "🎙️",
+        icon: "ðŸŽ™ï¸",
         badge: "Voice AI",
       },
       {
@@ -153,7 +153,7 @@ const campaignStages: PipelineStage[] = [
         tagline: "Predict Loop Questions for Google, Stripe & Meta",
         description: "Uncover top predicted interview loop questions and Bar Raiser expectations.",
         href: "/dashboard/interview",
-        icon: "🏢",
+        icon: "ðŸ¢",
         badge: "Radar",
       },
       {
@@ -162,7 +162,7 @@ const campaignStages: PipelineStage[] = [
         tagline: "In-Browser Algorithms IDE",
         description: "Solve algorithmic problems with real-time test assertions.",
         href: "/dashboard/challenges",
-        icon: "💻",
+        icon: "ðŸ’»",
         badge: "IDE",
       },
       {
@@ -171,7 +171,7 @@ const campaignStages: PipelineStage[] = [
         tagline: "SVG Vector Canvas & SPOF Capacity Grader",
         description: "Drag-and-drop distributed systems diagrams and export clean Mermaid.js code.",
         href: "/dashboard/whiteboard",
-        icon: "📐",
+        icon: "ðŸ“",
         badge: "Arena",
       },
       {
@@ -180,7 +180,7 @@ const campaignStages: PipelineStage[] = [
         tagline: "Webcam Computer Vision Overlay",
         description: "Track real-time direct eye contact % and posture stability.",
         href: "/dashboard/video-analytics",
-        icon: "👁️",
+        icon: "ðŸ‘ï¸",
         badge: "Vision HUD",
       }
     ],
@@ -189,7 +189,7 @@ const campaignStages: PipelineStage[] = [
     id: "stage-4-close",
     title: "Stage 4: The Close",
     description: "Model 4-year total comp and roleplay negotiation tactics.",
-    icon: "💰",
+    icon: "ðŸ’°",
     badge: "Locked",
     isLocked: true,
     unlockCondition: "Unlocks when an offer is added to Tracker",
@@ -200,7 +200,7 @@ const campaignStages: PipelineStage[] = [
         tagline: "4-Year Equity Vesting & Counter-Offer Bot",
         description: "Model 4-year total comp and simulate HR counter-offers.",
         href: "/dashboard/offers",
-        icon: "💰",
+        icon: "ðŸ’°",
         badge: "Negotiation",
       },
     ],
@@ -349,9 +349,7 @@ export function StepByStepTileNavigator() {
             const content = (
               <>
                 {isToolLocked && (
-                  <div className="absolute top-4 right-4 z-10 text-zinc-500">
-                    dY"'
-                  </div>
+                  <div className="absolute top-4 right-4 z-10 text-zinc-500"><svg className="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg></div>
                 )}
                 <div className="flex items-start justify-between">
                   <div className={`w-12 h-12 rounded-2xl bg-[#09090B] border border-[#27272A] flex items-center justify-center text-2xl ${isToolLocked ? '' : 'group-hover:scale-110'} transition-transform`}>
@@ -432,9 +430,7 @@ export function StepByStepTileNavigator() {
       {/* Core Workflow Hub */}
       {progress && (
         <div className="space-y-4 mb-8">
-          <h2 className="text-lg sm:text-xl font-bold tracking-tight text-[#FAFAFA]">
-            The "Perfect Job Hunt" Workflow
-          </h2>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             
             {/* Card 1: ATS Analysis */}
@@ -507,7 +503,7 @@ export function StepByStepTileNavigator() {
               <div className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-75 grayscale flex flex-col cursor-not-allowed">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 2</span>
-                  <span className="text-[14px]">dY"'</span>
+                  <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                 </div>
                 <h3 className="font-bold text-zinc-500 text-sm">LinkedIn Optimization</h3>
                 <p className="text-[11px] text-zinc-600 mt-1 flex-1">
@@ -543,7 +539,7 @@ export function StepByStepTileNavigator() {
               <div className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-75 grayscale flex flex-col cursor-not-allowed">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 3</span>
-                  <span className="text-[14px]">dY"'</span>
+                  <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                 </div>
                 <h3 className="font-bold text-zinc-500 text-sm">2-Month Master Plan</h3>
                 <p className="text-[11px] text-zinc-600 mt-1 flex-1">
@@ -576,7 +572,7 @@ export function StepByStepTileNavigator() {
               <div className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-75 grayscale flex flex-col cursor-not-allowed">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 4</span>
-                  <span className="text-[14px]">dY"'</span>
+                  <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                 </div>
                 <h3 className="font-bold text-zinc-500 text-sm">Kanban Job Tracker</h3>
                 <p className="text-[11px] text-zinc-600 mt-1 flex-1">
@@ -613,7 +609,7 @@ export function StepByStepTileNavigator() {
               <div className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-50 grayscale flex flex-col cursor-not-allowed hidden md:flex">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 5</span>
-                  <span className="text-[14px]">dY"'</span>
+                  <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                 </div>
                 <h3 className="font-bold text-zinc-500 text-sm">AI Mock Interviews</h3>
                 <p className="text-[11px] text-zinc-600 mt-1 flex-1">
@@ -647,7 +643,7 @@ export function StepByStepTileNavigator() {
               <div className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-50 grayscale flex flex-col cursor-not-allowed hidden md:flex">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 6</span>
-                  <span className="text-[14px]">dY"'</span>
+                  <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                 </div>
                 <h3 className="font-bold text-zinc-500 text-sm">Salary War Room</h3>
                 <p className="text-[11px] text-zinc-600 mt-1 flex-1">
@@ -671,9 +667,7 @@ export function StepByStepTileNavigator() {
             className={`p-6 sm:p-7 bg-[#18181B] border ${stage.isLocked ? 'border-[#27272A] opacity-75 grayscale' : 'border-[#27272A] hover:border-[#FAFAFA]'} rounded-3xl cursor-pointer transition-all flex flex-col justify-between space-y-5 group hover:-translate-y-1 relative active:scale-[0.98] shadow-lg`}
           >
             {stage.isLocked && (
-              <div className="absolute top-4 right-4 z-10 text-zinc-500">
-                🔒
-              </div>
+              <div className="absolute top-4 right-4 z-10 text-zinc-500"><svg className="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg></div>
             )}
             
             <div className="flex items-start justify-between">
@@ -709,3 +703,6 @@ export function StepByStepTileNavigator() {
     </div>
   );
 }
+
+
+
