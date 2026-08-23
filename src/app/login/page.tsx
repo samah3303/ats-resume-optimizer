@@ -130,6 +130,7 @@ function LoginForm() {
             </div>
 
             {/* Segmented Role Selector Toggle */}
+            {/*
             <div className="space-y-1 pt-0.5">
               <span className="text-[10px] uppercase font-bold tracking-wider text-zinc-400 block">
                 Select Your Role / Workspace
@@ -162,6 +163,7 @@ function LoginForm() {
                 </button>
               </div>
             </div>
+            */}
           </div>
 
           {/* Social OAuth Button */}

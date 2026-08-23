@@ -35,6 +35,15 @@ const campaignStages: PipelineStage[] = [
     isLocked: false,
     features: [
       {
+        id: "ats-analysis-engine",
+        title: "ATS Match & Gap Analysis Hub",
+        tagline: "Multi-JD Compatibility & 80+ Fit Scoring",
+        description: "Scan your resume against target job postings to uncover missing technical skills.",
+        href: "/dashboard/analyze",
+        icon: "📊",
+        badge: "Top Priority",
+      },
+      {
         id: "builder",
         title: "ATS Resume Studio",
         tagline: "6 Pro Templates & Drag-Drop Editor",
@@ -51,6 +60,24 @@ const campaignStages: PipelineStage[] = [
         href: "/dashboard/linkedin",
         icon: "⚡",
         badge: "SEO Suite",
+      },
+      {
+        id: "public-share",
+        title: "Public Verified Portfolio & Share Link",
+        tagline: "1-Click Sharable Candidate Profile",
+        description: "Generate a clean, verified candidate portfolio link to send directly to recruiters.",
+        href: "/portfolio",
+        icon: "🌐",
+        badge: "Live Link",
+      },
+      {
+        id: "tactical-roadmap",
+        title: "8-Week Career Execution Roadmap",
+        tagline: "Customized Weekly Milestones",
+        description: "Follow actionable checklists to methodically land high-tier offers in 60 days.",
+        href: "/dashboard/roadmap",
+        icon: "🗺️",
+        badge: "8-Week Plan",
       }
     ],
   },
@@ -70,6 +97,15 @@ const campaignStages: PipelineStage[] = [
         href: "/dashboard/jobs",
         icon: "🔍",
         badge: "Live Feed",
+      },
+      {
+        id: "outreach-engine",
+        title: "Recruiter Outreach & Cold Drips",
+        tagline: "3-Step Follow-Up Sequence Synthesizer",
+        description: "Generate high-converting recruiter connection notes and hiring manager cold pitches.",
+        href: "/dashboard/outreach",
+        icon: "✉️",
+        badge: "Outreach",
       },
       {
         id: "hunter-swarm",
@@ -126,6 +162,15 @@ const campaignStages: PipelineStage[] = [
         href: "/dashboard/challenges",
         icon: "💻",
         badge: "IDE",
+      },
+      {
+        id: "system-design",
+        title: "System Design Whiteboard Arena",
+        tagline: "SVG Vector Canvas & SPOF Capacity Grader",
+        description: "Drag-and-drop distributed systems diagrams and export clean Mermaid.js code.",
+        href: "/dashboard/whiteboard",
+        icon: "📐",
+        badge: "Arena",
       },
       {
         id: "video-analytics",

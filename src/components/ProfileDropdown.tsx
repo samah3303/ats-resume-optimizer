@@ -8,7 +8,6 @@ import { useWorkspaceMode } from "./WorkspaceModeContext";
 export default function ProfileDropdown() {
   const { data: session } = useSession();
   const { dark, toggle } = useTheme();
-  const { mode, toggleMode } = useWorkspaceMode();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const toggleButtonRef = useRef<HTMLButtonElement>(null);
@@ -62,7 +61,7 @@ export default function ProfileDropdown() {
                 {session?.user?.name || "User"}
               </p>
               <span className="px-1.5 py-0.2 rounded-md bg-[#27272A] border border-[#3F3F46] text-[#FAFAFA] text-[9px] font-black uppercase">
-                {mode === "candidate" ? "Candidate" : "Recruiter"}
+                Candidate
               </span>
             </div>
             <p className="text-[11px] text-zinc-400 font-mono truncate mt-0.5">
