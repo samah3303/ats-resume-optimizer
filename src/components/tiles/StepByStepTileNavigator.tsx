@@ -211,6 +211,10 @@ export function StepByStepTileNavigator() {
   const [selectedStage, setSelectedStage] = useState<PipelineStage | null>(null);
   const [stages, setStages] = useState<PipelineStage[]>(campaignStages);
   const [loading, setLoading] = useState(true);
+  const [latestAnalysis, setLatestAnalysis] = useState<{ id: string | null; score: number | null }>({
+    id: null,
+    score: null,
+  });
 
   useEffect(() => {
     fetch("/api/progress")
@@ -291,6 +295,10 @@ export function StepByStepTileNavigator() {
         }
 
         setStages(updatedStages);
+        setLatestAnalysis({
+          id: data.latestAnalysisId,
+          score: data.latestAnalysisScore,
+        });
       })
       .finally(() => setLoading(false));
   }, []);
@@ -418,6 +426,54 @@ export function StepByStepTileNavigator() {
           </p>
         </div>
       </div>
+
+      {/* Primary Baseline ATS Score Banner */}
+      {latestAnalysis.id && latestAnalysis.score !== null && (
+        <Link 
+          href={`/dashboard/analyze/${latestAnalysis.id}`}
+          className={`block p-5 sm:p-6 rounded-3xl border transition-all shadow-lg hover:-translate-y-1 active:scale-[0.99] group ${
+            latestAnalysis.score >= 80 
+              ? 'bg-emerald-500/10 border-emerald-500/30 hover:border-emerald-500/60' 
+              : latestAnalysis.score >= 60 
+                ? 'bg-amber-500/10 border-amber-500/30 hover:border-amber-500/60' 
+                : 'bg-rose-500/10 border-rose-500/30 hover:border-rose-500/60'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4 sm:gap-6">
+              <div className={`flex flex-col items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border bg-[#09090B] ${
+                latestAnalysis.score >= 80 
+                  ? 'border-emerald-500/50 text-emerald-400' 
+                  : latestAnalysis.score >= 60 
+                    ? 'border-amber-500/50 text-amber-400' 
+                    : 'border-rose-500/50 text-rose-400'
+              }`}>
+                <span className="text-xl sm:text-3xl font-black tracking-tighter">{latestAnalysis.score}</span>
+                <span className="text-[9px] sm:text-[10px] font-bold uppercase font-mono mt-0.5">Score</span>
+              </div>
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-2">
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                    latestAnalysis.score >= 80 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'
+                  }`}>
+                    {latestAnalysis.score >= 80 ? 'Primary Baseline Ready' : 'Optimization Required'}
+                  </span>
+                </div>
+                <h2 className="text-lg sm:text-xl font-bold text-[#FAFAFA] group-hover:text-white transition-colors">
+                  Latest ATS Analysis Results
+                </h2>
+                <p className="text-xs text-zinc-400 max-w-lg">
+                  Click here to view detailed line-by-line AI suggestions, keyword gaps, and formatting red flags to improve your match score.
+                </p>
+              </div>
+            </div>
+            <div className="hidden sm:flex items-center gap-2 text-sm font-bold text-[#FAFAFA] group-hover:underline">
+              <span>View Suggestions</span>
+              <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
+            </div>
+          </div>
+        </Link>
+      )}
 
       {/* Campaign Pipeline Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
