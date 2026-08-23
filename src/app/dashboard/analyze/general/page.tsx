@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { toast } from "sonner";
+import { useToast } from "@/components/Toast";
 import { useRouter } from "next/navigation";
 
 interface ResumeImprovement {
@@ -15,6 +15,7 @@ interface ResumeImprovement {
 
 export default function GeneralAtsPage() {
   const router = useRouter();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [applying, setApplying] = useState<number | null>(null);
   const [recalculating, setRecalculating] = useState(false);
@@ -34,7 +35,7 @@ export default function GeneralAtsPage() {
         }
       }
     } catch (error) {
-      toast.error("Failed to load data");
+      toast("Failed to load data", "error");
     } finally {
       setLoading(false);
     }
@@ -58,18 +59,18 @@ export default function GeneralAtsPage() {
       if (!res.ok) throw new Error("Failed to update resume");
       
       const data = await res.json();
-      toast.success("Resume updated successfully!");
+      toast("Resume updated successfully!", "success");
       
       // Re-fetch data to get new score and suggestions
       setRecalculating(true);
       await fetchData();
       
       if (data.newScore && data.newScore >= 80) {
-        toast.success("LinkedIn Optimization unlocked! 🎉", { duration: 5000 });
+        toast("LinkedIn Optimization unlocked! 🎉", "success");
       }
       
     } catch (error) {
-      toast.error("Failed to apply suggestion");
+      toast("Failed to apply suggestion", "error");
     } finally {
       setApplying(null);
       setRecalculating(false);
