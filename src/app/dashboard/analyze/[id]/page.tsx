@@ -127,6 +127,9 @@ function AnalysisDetailContent() {
         const data = await res.json();
         setAnalysis(data.analysis);
         setSuggestions(data.analysis?.suggestions || []);
+        if (data.analysis?.overallScore >= 80) {
+          setTimeout(() => toast("LinkedIn Optimization unlocked! 🎉", "success"), 500);
+        }
       } else {
         setFetchError("Failed to load analysis. Please try again.");
         toast("Failed to load analysis", "error");

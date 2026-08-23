@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -231,17 +231,18 @@ export function StepByStepTileNavigator() {
         // ATS Engine & Builder are unlocked.
         // LinkedIn is locked until Primary Resume exists.
         const stage1 = updatedStages[0];
-        const linkedInTool = stage1.features.find(f => f.id === "linkedin");
-        if (linkedInTool) {
-          if (data.hasPrimaryResume) {
-            linkedInTool.isLocked = false;
-            linkedInTool.badge = "Unlocked";
-          } else {
-            linkedInTool.isLocked = true;
-            linkedInTool.badge = "Locked";
-            linkedInTool.unlockCondition = "Hit 80+ and set Primary Baseline to unlock";
+          const linkedInTool = stage1.features.find(f => f.id === "linkedin");
+          if (linkedInTool) {
+            const has80Plus = (data.generalAtsScore && data.generalAtsScore >= 80) || (data.latestAnalysisScore && data.latestAnalysisScore >= 80);
+            if (has80Plus) {
+              linkedInTool.isLocked = false;
+              linkedInTool.badge = "Unlocked";
+            } else {
+              linkedInTool.isLocked = true;
+              linkedInTool.badge = "Locked";
+              linkedInTool.unlockCondition = "Hit 80+ ATS Score to unlock";
+            }
           }
-        }
         
         // --- STAGE 2: The Hunt ---
         // Locked until LinkedIn is generated
@@ -433,14 +434,14 @@ export function StepByStepTileNavigator() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             
-            {/* Card 1: ATS Analysis */}
+            {/* Card 1: General ATS Analysis */}
             <Link
-              href={latestAnalysis.id ? `/dashboard/analyze/${latestAnalysis.id}` : `/dashboard/analyze`}
+              href="/dashboard/analyze/general"
               className={`p-5 rounded-2xl border transition-all flex flex-col group ${
-                latestAnalysis.score !== null 
-                  ? latestAnalysis.score >= 80 
+                progress.generalAtsScore !== null 
+                  ? progress.generalAtsScore >= 80 
                     ? 'bg-emerald-500/10 border-emerald-500/30 hover:border-emerald-500/60' 
-                    : latestAnalysis.score >= 60 
+                    : progress.generalAtsScore >= 60 
                       ? 'bg-amber-500/10 border-amber-500/30 hover:border-amber-500/60' 
                       : 'bg-rose-500/10 border-rose-500/30 hover:border-rose-500/60'
                   : 'bg-[#18181B] border-[#27272A] hover:border-[#FAFAFA]'
@@ -448,27 +449,27 @@ export function StepByStepTileNavigator() {
             >
               <div className="flex items-center justify-between mb-3">
                 <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-400">Step 1</span>
-                {latestAnalysis.score !== null && (
+                {progress.generalAtsScore !== null && (
                   <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${
-                    latestAnalysis.score >= 80 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'
+                    progress.generalAtsScore >= 80 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'
                   }`}>
-                    {latestAnalysis.score >= 80 ? 'Ready' : 'Improve'}
+                    {progress.generalAtsScore >= 80 ? 'Ready' : 'Improve'}
                   </span>
                 )}
               </div>
               <h3 className="font-bold text-[#FAFAFA] text-sm group-hover:text-white transition-colors">
-                ATS Baseline Analysis
+                General ATS Analysis
               </h3>
               <p className="text-[11px] text-zinc-400 mt-1 flex-1">
-                {latestAnalysis.score !== null 
+                {progress.generalAtsScore !== null 
                   ? 'Click to view line-by-line suggestions.'
-                  : 'Scan your resume against JDs to hit 80+.'}
+                  : 'Scan your resume against target market.'}
               </p>
               <div className="mt-4 flex items-center justify-between text-xs font-bold text-[#FAFAFA]">
-                {latestAnalysis.score !== null ? (
+                {progress.generalAtsScore !== null ? (
                   <span className={`text-lg font-black ${
-                    latestAnalysis.score >= 80 ? 'text-emerald-400' : latestAnalysis.score >= 60 ? 'text-amber-400' : 'text-rose-400'
-                  }`}>{latestAnalysis.score}%</span>
+                    progress.generalAtsScore >= 80 ? 'text-emerald-400' : progress.generalAtsScore >= 60 ? 'text-amber-400' : 'text-rose-400'
+                  }`}>{progress.generalAtsScore}%</span>
                 ) : (
                   <span>Launch Tool</span>
                 )}
@@ -477,7 +478,7 @@ export function StepByStepTileNavigator() {
             </Link>
 
             {/* Card 2: LinkedIn Updates */}
-            {progress.hasPrimaryResume ? (
+            {(progress.generalAtsScore && progress.generalAtsScore >= 80) || (progress.latestAnalysisScore && progress.latestAnalysisScore >= 80) ? (
               <Link
                 href="/dashboard/linkedin"
                 className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] transition-all flex flex-col group"
@@ -507,7 +508,7 @@ export function StepByStepTileNavigator() {
                 </div>
                 <h3 className="font-bold text-zinc-500 text-sm">LinkedIn Optimization</h3>
                 <p className="text-[11px] text-zinc-600 mt-1 flex-1">
-                  Hit 80+ ATS score & set Primary Baseline to unlock.
+                  Hit 80+ General ATS Score to unlock.
                 </p>
               </div>
             )}

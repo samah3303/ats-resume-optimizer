@@ -51,6 +51,7 @@ export async function GET() {
       hasRoadmap,
       hasInterview,
       hasOffer,
+      generalAtsScore: profile?.generalAtsScore || null,
       latestAnalysisId: latestAnalysis?.id || null,
       latestAnalysisScore: latestAnalysis?.overallScore || null,
     });
