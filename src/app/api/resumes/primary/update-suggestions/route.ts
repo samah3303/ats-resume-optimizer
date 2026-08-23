@@ -73,11 +73,10 @@ Return ONLY the complete updated resume text, maintaining the original structure
     });
 
     // Re-run ATS analysis
-    const positions = [
-      profile.targetRole1,
-      profile.targetRole2,
-      profile.targetRole3,
-    ].filter(Boolean) as string[];
+    const positions = profile.targetPositions
+      .split(",")
+      .map((p) => p.trim())
+      .filter(Boolean);
 
     const mode1Result = await mode1OnboardingAnalysis(
       updatedText,
