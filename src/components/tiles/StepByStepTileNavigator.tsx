@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -32,19 +32,10 @@ const campaignStages: PipelineStage[] = [
     id: "stage-1-foundation",
     title: "Stage 1: Foundation",
     description: "Build a pixel-perfect ATS resume and a high-ranking LinkedIn profile.",
-    icon: "ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â°ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â",
+    icon: "ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â°ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ",
     badge: "Unlocked",
     isLocked: false,
     features: [
-      {
-        id: "ats-analysis-engine",
-        title: "ATS Match & Gap Analysis Hub",
-        tagline: "Multi-JD Compatibility & 80+ Fit Scoring",
-        description: "Scan your resume against target job postings to uncover missing technical skills.",
-        href: "/dashboard/analyze",
-        icon: "ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â°ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â ",
-        badge: "Top Priority",
-      },
       {
         id: "builder",
         title: "ATS Resume Studio",
@@ -489,20 +480,23 @@ export function StepByStepTileNavigator() {
               </div>
             )}
 
-            {/* Card 4: Kanban Tracker */}
+            {/* Card 4: JD ATS Analysis */}
             {progress.hasRoadmap ? (
               <Link
-                href="/dashboard/tracker"
+                href="/dashboard/analyze"
                 className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] transition-all flex flex-col group"
               >
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-400">Step 4</span>
+                  {progress.latestAnalysisId && (
+                    <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-emerald-500/20 text-emerald-400">Active</span>
+                  )}
                 </div>
                 <h3 className="font-bold text-[#FAFAFA] text-sm group-hover:text-white transition-colors">
-                  Kanban Job Tracker
+                  JD Match Analysis
                 </h3>
                 <p className="text-[11px] text-zinc-400 mt-1 flex-1">
-                  Tailor resumes per JD and track applications.
+                  Tailor your baseline resume specifically for target Job Descriptions.
                 </p>
                 <div className="mt-4 flex items-center justify-between text-xs font-bold text-[#FAFAFA]">
                   <span>Launch Tool</span>
@@ -515,7 +509,7 @@ export function StepByStepTileNavigator() {
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 4</span>
                   <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                 </div>
-                <h3 className="font-bold text-zinc-500 text-sm">Kanban Job Tracker</h3>
+                <h3 className="font-bold text-zinc-500 text-sm">JD Match Analysis</h3>
                 <p className="text-[11px] text-zinc-600 mt-1 flex-1">
                   Generate your 8-Week roadmap to unlock.
                 </p>
@@ -524,15 +518,48 @@ export function StepByStepTileNavigator() {
 
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            {/* Card 5: Mock Interviews (Only shown/unlocked based on hasInterview) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+            {/* Card 5: Kanban Tracker */}
+            {progress.latestAnalysisId ? (
+              <Link
+                href="/dashboard/tracker"
+                className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] transition-all flex flex-col group"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-400">Step 5</span>
+                </div>
+                <h3 className="font-bold text-[#FAFAFA] text-sm group-hover:text-white transition-colors">
+                  Kanban Job Tracker
+                </h3>
+                <p className="text-[11px] text-zinc-400 mt-1 flex-1">
+                  Track applied, interview, and offer stages.
+                </p>
+                <div className="mt-4 flex items-center justify-between text-xs font-bold text-[#FAFAFA]">
+                  <span>Launch Tool</span>
+                  <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
+                </div>
+              </Link>
+            ) : (
+              <div className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-75 grayscale flex flex-col cursor-not-allowed">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 5</span>
+                  <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                </div>
+                <h3 className="font-bold text-zinc-500 text-sm">Kanban Job Tracker</h3>
+                <p className="text-[11px] text-zinc-600 mt-1 flex-1">
+                  Run 1 JD Analysis to unlock.
+                </p>
+              </div>
+            )}
+
+            {/* Card 6: Mock Interviews (Only shown/unlocked based on hasInterview) */}
             {progress.hasInterview ? (
               <Link
                 href="/dashboard/mock-interview"
                 className="p-5 rounded-2xl bg-[#18181B] border border-amber-500/30 hover:border-amber-500 transition-all flex flex-col group shadow-[0_0_15px_rgba(245,158,11,0.1)]"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-amber-500">Step 5</span>
+                  <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-amber-500">Step 6</span>
                   <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-amber-500/20 text-amber-500 animate-pulse">Unlocked!</span>
                 </div>
                 <h3 className="font-bold text-[#FAFAFA] text-sm group-hover:text-white transition-colors">
@@ -549,7 +576,7 @@ export function StepByStepTileNavigator() {
             ) : (
               <div className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-50 grayscale flex flex-col cursor-not-allowed hidden md:flex">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 5</span>
+                  <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 6</span>
                   <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                 </div>
                 <h3 className="font-bold text-zinc-500 text-sm">AI Mock Interviews</h3>
@@ -559,14 +586,14 @@ export function StepByStepTileNavigator() {
               </div>
             )}
 
-            {/* Card 6: Salary War Room (Only shown/unlocked based on hasOffer) */}
+            {/* Card 7: Salary War Room (Only shown/unlocked based on hasOffer) */}
             {progress.hasOffer ? (
               <Link
                 href="/dashboard/offers"
                 className="p-5 rounded-2xl bg-[#18181B] border border-emerald-500/30 hover:border-emerald-500 transition-all flex flex-col group shadow-[0_0_15px_rgba(16,185,129,0.1)]"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-emerald-500">Step 6</span>
+                  <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-emerald-500">Step 7</span>
                   <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-emerald-500/20 text-emerald-400 animate-pulse">Unlocked!</span>
                 </div>
                 <h3 className="font-bold text-[#FAFAFA] text-sm group-hover:text-white transition-colors">
@@ -583,7 +610,7 @@ export function StepByStepTileNavigator() {
             ) : (
               <div className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-50 grayscale flex flex-col cursor-not-allowed hidden md:flex">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 6</span>
+                  <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 7</span>
                   <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                 </div>
                 <h3 className="font-bold text-zinc-500 text-sm">Salary War Room</h3>
@@ -592,6 +619,7 @@ export function StepByStepTileNavigator() {
                 </p>
               </div>
             )}
+
           </div>
         </div>
       )}
