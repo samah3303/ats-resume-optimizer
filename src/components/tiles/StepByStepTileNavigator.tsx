@@ -28,218 +28,127 @@ export interface PipelineStage {
 }
 
 const campaignStages: PipelineStage[] = [
-  {
-    id: "stage-1-foundation",
-    title: "Stage 1: Foundation",
-    description: "Build a pixel-perfect ATS resume and a high-ranking LinkedIn profile.",
-    icon: "ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â°ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ",
-    badge: "Unlocked",
-    isLocked: false,
-    features: [
-      {
-        id: "builder",
-        title: "ATS Resume Studio",
-        tagline: "6 Pro Templates & Drag-Drop Editor",
-        description: "Pixel-perfect A4 canvas with live print styles and high-res PDF downloads.",
-        href: "/dashboard/builder",
-        icon: "ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â°ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¾",
-        badge: "Core Studio",
-      },
-      {
-        id: "public-share",
-        title: "Public Verified Portfolio & Share Link",
-        tagline: "1-Click Sharable Candidate Profile",
-        description: "Generate a clean, verified candidate portfolio link to send directly to recruiters.",
-        href: "/portfolio",
-        icon: "ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â°ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â",
-        badge: "Live Link",
-      }
-    ],
-  },
-  {
-    id: "stage-2-hunt",
-    title: "Stage 2: The Hunt",
-    description: "Deploy background AI agents and semantic job discovery.",
-    icon: "ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¤ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“",
-    badge: "In Progress",
-    isLocked: false,
-    features: [
-      {
-        id: "job-discovery",
-        title: "Semantic Job Discovery Hub",
-        tagline: "140k+ Multi-Board Live Job Stream",
-        description: "Discover live job postings ranked by semantic compatibility with your resume.",
-        href: "/dashboard/jobs",
-        icon: "ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â",
-        badge: "Live Feed",
-      },
-      {
-        id: "outreach-engine",
-        title: "Recruiter Outreach & Cold Drips",
-        tagline: "3-Step Follow-Up Sequence Synthesizer",
-        description: "Generate high-converting recruiter connection notes and hiring manager cold pitches.",
-        href: "/dashboard/outreach",
-        icon: "ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¯Ãƒâ€šÃ‚Â¸Ãƒâ€šÃ‚Â",
-        badge: "Outreach",
-      },
-      {
-        id: "hunter-swarm",
-        title: "Autonomous Hunter Agent Swarm",
-        tagline: "24/7 Background Application Packets",
-        description: "Autonomous background agents generate tailored STAR bullets and cover letters.",
-        href: "/dashboard/agents",
-        icon: "ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚Â¤ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“",
-        badge: "Autonomous",
-      }
-    ],
-  },
-  {
-    id: "stage-3-loop",
-    title: "Stage 3: Active Loop",
-    description: "Practice out loud with AI interviewer personas and video composure tracking.",
-    icon: "ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â½ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã‚Â¯Ãƒâ€šÃ‚Â¸Ãƒâ€šÃ‚Â",
-    badge: "Locked",
-    isLocked: true,
-    unlockCondition: "Unlocks when an interview is scheduled in Tracker",
-    features: [
-      {
-        id: "company-radar",
-        title: "Company Interview Question Radar",
-        tagline: "Predict Loop Questions for Google, Stripe & Meta",
-        description: "Uncover top predicted interview loop questions and Bar Raiser expectations.",
-        href: "/dashboard/interview",
-        icon: "ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â½Ãƒâ€šÃ‚Â¯",
-        badge: "Radar",
-      },
-      {
-        id: "coding-sandbox",
-        title: "Technical Coding Sandbox",
-        tagline: "In-Browser Algorithms IDE",
-        description: "Solve algorithmic problems with real-time test assertions.",
-        href: "/dashboard/challenges",
-        icon: "ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â»",
-        badge: "IDE",
-      },
-      {
-        id: "system-design",
-        title: "System Design Whiteboard Arena",
-        tagline: "SVG Vector Canvas & SPOF Capacity Grader",
-        description: "Drag-and-drop distributed systems diagrams and export clean Mermaid.js code.",
-        href: "/dashboard/whiteboard",
-        icon: "ðŸ“‹",
-        badge: "Arena",
-      },
-      {
-        id: "video-analytics",
-        title: "Video Composure & Gaze HUD",
-        tagline: "Webcam Computer Vision Overlay",
-        description: "Track real-time direct eye contact % and posture stability.",
-        href: "/dashboard/video-analytics",
-        icon: "ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¹Ãƒâ€¦Ã¢â‚¬Å“ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡ ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡ ",
-        badge: "Vision HUD",
-      }
+    {
+      id: "all-tools",
+      title: "Career OS Toolkit",
+      description: "All the auxiliary tools you need to build, track, and land your next role.",
+      icon: "🛠️",
+      badge: "Unlocked",
+      isLocked: false,
+      features: [
+        {
+          id: "builder",
+          title: "ATS Resume Studio",
+          tagline: "6 Pro Templates & Drag-Drop Editor",
+          description: "Pixel-perfect A4 canvas with live print styles and high-res PDF downloads.",
+          href: "/dashboard/builder",
+          icon: "📄",
+          badge: "Core Studio",
+        },
+        {
+          id: "public-share",
+          title: "Public Verified Portfolio & Share Link",
+          tagline: "1-Click Sharable Candidate Profile",
+          description: "Generate a clean, verified candidate portfolio link to send directly to recruiters.",
+          href: "/portfolio",
+          icon: "🔗",
+          badge: "Live Link",
+        },
+        {
+          id: "job-discovery",
+          title: "Semantic Job Discovery Hub",
+          tagline: "140k+ Multi-Board Live Job Stream",
+          description: "Discover live job postings ranked by semantic compatibility with your resume.",
+          href: "/dashboard/jobs",
+          icon: "🔍",
+          badge: "Live Feed",
+        },
+        {
+          id: "outreach-engine",
+          title: "Recruiter Outreach & Cold Drips",
+          tagline: "3-Step Follow-Up Sequence Synthesizer",
+          description: "Generate high-converting recruiter connection notes and hiring manager cold pitches.",
+          href: "/dashboard/outreach",
+          icon: "✉️",
+          badge: "Outreach",
+        },
+        {
+          id: "hunter-swarm",
+          title: "Autonomous Hunter Agent Swarm",
+          tagline: "24/7 Background Application Packets",
+          description: "Autonomous background agents generate tailored STAR bullets and cover letters.",
+          href: "/dashboard/agents",
+          icon: "🤖",
+          badge: "Autonomous",
+        },
+        {
+          id: "company-radar",
+          title: "Company Interview Question Radar",
+          tagline: "Predict Loop Questions for Google, Stripe & Meta",
+          description: "Uncover top predicted interview loop questions and Bar Raiser expectations.",
+          href: "/dashboard/interview",
+          icon: "🎯",
+          badge: "Radar",
+        },
+        {
+          id: "coding-sandbox",
+          title: "Technical Coding Sandbox",
+          tagline: "In-Browser Algorithms IDE",
+          description: "Solve algorithmic problems with real-time test assertions.",
+          href: "/dashboard/challenges",
+          icon: "💻",
+          badge: "IDE",
+        },
+        {
+          id: "system-design",
+          title: "System Design Whiteboard Arena",
+          tagline: "SVG Vector Canvas & SPOF Capacity Grader",
+          description: "Drag-and-drop distributed systems diagrams and export clean Mermaid.js code.",
+          href: "/dashboard/whiteboard",
+          icon: "📐",
+          badge: "Arena",
+        },
+        {
+          id: "video-analytics",
+          title: "Video Composure & Gaze HUD",
+          tagline: "Webcam Computer Vision Overlay",
+          description: "Track real-time direct eye contact % and posture stability.",
+          href: "/dashboard/video-analytics",
+          icon: "🎥",
+          badge: "Vision HUD",
+        }
       ],
-    },
+    }
   ];
 
-export function StepByStepTileNavigator() {
-  const [selectedStage, setSelectedStage] = useState<PipelineStage | null>(null);
-  const [stages, setStages] = useState<PipelineStage[]>(campaignStages);
-  const [loading, setLoading] = useState(true);
-  const [latestAnalysis, setLatestAnalysis] = useState<{ id: string | null; score: number | null }>({
-    id: null,
-    score: null,
-  });
-  const [progress, setProgress] = useState<any>(null);
-
-  useEffect(() => {
-    fetch("/api/progress")
-      .then((res) => res.json())
-      .then((data) => {
-        if (!data) return;
-        setProgress(data);
-
-        // Deep clone so we can modify nested features
-        const updatedStages = JSON.parse(JSON.stringify(campaignStages)) as PipelineStage[];
-        
-        // --- STAGE 1: Foundation ---
-        // ATS Engine & Builder are unlocked.
-        // LinkedIn is locked until Primary Resume exists.
-        const stage1 = updatedStages[0];
-          const linkedInTool = stage1.features.find(f => f.id === "linkedin");
-          if (linkedInTool) {
-            const has80Plus = (data.generalAtsScore && data.generalAtsScore >= 80) || (data.latestAnalysisScore && data.latestAnalysisScore >= 80);
-            if (has80Plus) {
-              linkedInTool.isLocked = false;
-              linkedInTool.badge = "Unlocked";
-            } else {
-              linkedInTool.isLocked = true;
-              linkedInTool.badge = "Locked";
-              linkedInTool.unlockCondition = "Hit 80+ ATS Score to unlock";
-            }
-          }
-        
-        // --- STAGE 2: The Hunt ---
-        // Locked until LinkedIn is generated
-        const stage2 = updatedStages[1];
-        if (data.hasLinkedin) {
-          stage2.isLocked = false;
-          stage2.badge = "Unlocked";
-          stage2.unlockCondition = undefined;
-        } else {
-          stage2.isLocked = true;
-          stage2.badge = "Locked";
-          stage2.unlockCondition = "Unlocks after finishing LinkedIn Delta Report";
-        }
-
-        // Inside Stage 2, Roadmap is unlocked.
-        // Tracker, Tailor vs JD, Jobs, Resumes are locked until Roadmap exists.
-        if (stage2.features) {
-          stage2.features.forEach(f => {
-            if (f.id !== "roadmap") {
-              if (data.hasRoadmap) {
-                f.isLocked = false;
-              } else {
-                f.isLocked = true;
-                f.badge = "Locked";
-                f.unlockCondition = "Generate 2-Month Roadmap to unlock";
-              }
-            }
+  export function StepByStepTileNavigator() {
+    const [selectedStage, setSelectedStage] = useState<PipelineStage | null>(null);
+    const [stages, setStages] = useState<PipelineStage[]>(campaignStages);
+    const [loading, setLoading] = useState(true);
+    const [latestAnalysis, setLatestAnalysis] = useState<{ id: string | null; score: number | null }>({
+      id: null,
+      score: null,
+    });
+    const [progress, setProgress] = useState<any>(null);
+  
+    useEffect(() => {
+      fetch("/api/progress")
+        .then((res) => res.json())
+        .then((data) => {
+          if (!data) return;
+          setProgress(data);
+  
+          // Deep clone so we can modify nested features
+          const updatedStages = JSON.parse(JSON.stringify(campaignStages)) as PipelineStage[];
+          
+          setStages(updatedStages);
+          setLatestAnalysis({
+            id: data.latestAnalysisId,
+            score: data.latestAnalysisScore,
           });
-        }
-
-        // --- STAGE 3: The Loop (Interviews) ---
-        const stage3 = updatedStages[2];
-        if (data.hasInterview) {
-          stage3.isLocked = false;
-          stage3.badge = "Unlocked";
-          stage3.unlockCondition = undefined;
-        } else {
-          stage3.isLocked = true;
-          stage3.badge = "Locked";
-          stage3.unlockCondition = "Unlocks when an interview is added to Tracker";
-        }
-
-        // --- STAGE 4: The Close (Offers) ---
-        const stage4 = updatedStages[3];
-        if (data.hasOffer) {
-          stage4.isLocked = false;
-          stage4.badge = "Unlocked";
-          stage4.unlockCondition = undefined;
-        } else {
-          stage4.isLocked = true;
-          stage4.badge = "Locked";
-          stage4.unlockCondition = "Unlocks when an offer is added to Tracker";
-        }
-
-        setStages(updatedStages);
-        setLatestAnalysis({
-          id: data.latestAnalysisId,
-          score: data.latestAnalysisScore,
-        });
-      })
-      .finally(() => setLoading(false));
-  }, []);
+        })
+        .finally(() => setLoading(false));
+    }, []);
 
   if (loading) {
     return (
@@ -659,7 +568,7 @@ export function StepByStepTileNavigator() {
       )}
 
       {/* Campaign Pipeline Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 md:max-w-md gap-5">
         {stages.map((stage) => (
           <div
             key={stage.id}
@@ -706,6 +615,7 @@ export function StepByStepTileNavigator() {
     </div>
   );
 }
+
 
 
 
