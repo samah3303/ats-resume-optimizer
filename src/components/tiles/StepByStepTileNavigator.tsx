@@ -620,6 +620,40 @@ export function StepByStepTileNavigator() {
               </div>
             )}
 
+            {/* Card 8: Career Knowledge Graph */}
+            {progress.latestAnalysisId ? (
+              <Link
+                href="/dashboard/graph"
+                className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] transition-all flex flex-col group"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-400">Step 8</span>
+                  <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-blue-500/20 text-blue-400">New</span>
+                </div>
+                <h3 className="font-bold text-[#FAFAFA] text-sm group-hover:text-white transition-colors">
+                  Career Knowledge Graph
+                </h3>
+                <p className="text-[11px] text-zinc-400 mt-1 flex-1">
+                  Visualize connections between your skills, resumes, and target jobs.
+                </p>
+                <div className="mt-4 flex items-center justify-between text-xs font-bold text-[#FAFAFA]">
+                  <span>Launch Tool</span>
+                  <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
+                </div>
+              </Link>
+            ) : (
+              <div className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-50 grayscale flex flex-col cursor-not-allowed hidden md:flex">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 8</span>
+                  <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                </div>
+                <h3 className="font-bold text-zinc-500 text-sm">Career Knowledge Graph</h3>
+                <p className="text-[11px] text-zinc-600 mt-1 flex-1">
+                  Run 1 JD Analysis to map your footprint.
+                </p>
+              </div>
+            )}
+
           </div>
         </div>
       )}
