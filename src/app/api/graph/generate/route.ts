@@ -48,10 +48,10 @@ export async function GET() {
     }
 
     // 3. Resumes
-    const resumes = await prisma.resume.findMany({ where: { userId }, select: { id: true, title: true, isPrimary: true } });
+    const resumes = await prisma.resume.findMany({ where: { userId }, select: { id: true, name: true, isPrimary: true } });
     resumes.forEach((resume: any) => {
       const resId = `resume-${resume.id}`;
-      addNode(resId, "resume", resume.title || "Resume", resume.isPrimary ? 4 : 2);
+      addNode(resId, "resume", resume.name || "Resume", resume.isPrimary ? 4 : 2);
       addLink(userNodeId, resId, "OWNS");
     });
 
