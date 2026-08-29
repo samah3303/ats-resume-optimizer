@@ -11,7 +11,7 @@ const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), {
 export function CareerKnowledgeGraph() {
   const [data, setData] = useState<{ nodes: any[]; links: any[] }>({ nodes: [], links: [] });
   const [loading, setLoading] = useState(true);
-  const fgRef = useRef<any>();
+  const fgRef = useRef<any>(null);
 
   useEffect(() => {
     async function loadData() {
