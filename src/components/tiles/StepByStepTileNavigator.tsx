@@ -330,7 +330,7 @@ const campaignStages: PipelineStage[] = [
             {(progress.generalAtsScore && progress.generalAtsScore >= 80) || (progress.latestAnalysisScore && progress.latestAnalysisScore >= 80) ? (
               <Link
                 href="/dashboard/linkedin"
-                className="h-full p-5 rounded-2xl bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] transition-all flex flex-col group"
+                className="h-[190px] p-5 rounded-2xl bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] transition-all flex flex-col group"
               >
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-400">Step 2</span>
@@ -350,7 +350,7 @@ const campaignStages: PipelineStage[] = [
                 </div>
               </Link>
             ) : (
-              <div className="h-full p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-75 grayscale flex flex-col cursor-not-allowed">
+              <div className="h-[190px] p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-75 grayscale flex flex-col cursor-not-allowed">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 2</span>
                   <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
@@ -366,7 +366,7 @@ const campaignStages: PipelineStage[] = [
             {(progress.generalAtsScore && progress.generalAtsScore >= 80) || (progress.latestAnalysisScore && progress.latestAnalysisScore >= 80) ? (
               <Link
                 href="/dashboard/tracker"
-                className="h-full p-5 rounded-2xl bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] transition-all flex flex-col group"
+                className="h-[190px] p-5 rounded-2xl bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] transition-all flex flex-col group"
               >
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-400">Step 3</span>
@@ -383,7 +383,7 @@ const campaignStages: PipelineStage[] = [
                 </div>
               </Link>
             ) : (
-              <div className="h-full p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-75 grayscale flex flex-col cursor-not-allowed">
+              <div className="h-[190px] p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-75 grayscale flex flex-col cursor-not-allowed">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 3</span>
                   <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
@@ -399,7 +399,7 @@ const campaignStages: PipelineStage[] = [
             {(progress.generalAtsScore && progress.generalAtsScore >= 80) || (progress.latestAnalysisScore && progress.latestAnalysisScore >= 80) ? (
               <Link
                 href="/dashboard/analyze"
-                className="h-full p-5 rounded-2xl bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] transition-all flex flex-col group"
+                className="h-[190px] p-5 rounded-2xl bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] transition-all flex flex-col group"
               >
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-400">Step 4</span>
@@ -419,7 +419,7 @@ const campaignStages: PipelineStage[] = [
                 </div>
               </Link>
             ) : (
-              <div className="h-full p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-75 grayscale flex flex-col cursor-not-allowed">
+              <div className="h-[190px] p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-75 grayscale flex flex-col cursor-not-allowed">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 4</span>
                   <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
@@ -436,7 +436,7 @@ const campaignStages: PipelineStage[] = [
             {progress.hasLinkedin ? (
               <Link
                 href="/dashboard/roadmap"
-                className="h-full p-5 rounded-2xl bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] transition-all flex flex-col group"
+                className="h-[190px] p-5 rounded-2xl bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] transition-all flex flex-col group"
               >
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-400">Step 5</span>
@@ -456,7 +456,7 @@ const campaignStages: PipelineStage[] = [
                 </div>
               </Link>
             ) : (
-              <div className="h-full p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-75 grayscale flex flex-col cursor-not-allowed">
+              <div className="h-[190px] p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-75 grayscale flex flex-col cursor-not-allowed">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 5</span>
                   <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
@@ -472,7 +472,7 @@ const campaignStages: PipelineStage[] = [
             {progress.hasInterview ? (
               <Link
                 href="/dashboard/mock-interview"
-                className="h-full p-5 rounded-2xl bg-[#18181B] border border-amber-500/30 hover:border-amber-500 transition-all flex flex-col group shadow-[0_0_15px_rgba(245,158,11,0.1)]"
+                className="h-[190px] p-5 rounded-2xl bg-[#18181B] border border-amber-500/30 hover:border-amber-500 transition-all flex flex-col group shadow-[0_0_15px_rgba(245,158,11,0.1)]"
               >
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-amber-500">Step 6</span>
@@ -490,7 +490,7 @@ const campaignStages: PipelineStage[] = [
                 </div>
               </Link>
             ) : (
-              <div className="h-full p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-50 grayscale flex flex-col cursor-not-allowed hidden md:flex">
+              <div className="h-[190px] p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-50 grayscale flex flex-col cursor-not-allowed hidden md:flex">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 6</span>
                   <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
@@ -506,7 +506,7 @@ const campaignStages: PipelineStage[] = [
             {progress.hasOffer ? (
               <Link
                 href="/dashboard/offers"
-                className="h-full p-5 rounded-2xl bg-[#18181B] border border-emerald-500/30 hover:border-emerald-500 transition-all flex flex-col group shadow-[0_0_15px_rgba(16,185,129,0.1)]"
+                className="h-[190px] p-5 rounded-2xl bg-[#18181B] border border-emerald-500/30 hover:border-emerald-500 transition-all flex flex-col group shadow-[0_0_15px_rgba(16,185,129,0.1)]"
               >
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-emerald-500">Step 7</span>
@@ -524,7 +524,7 @@ const campaignStages: PipelineStage[] = [
                 </div>
               </Link>
             ) : (
-              <div className="h-full p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-50 grayscale flex flex-col cursor-not-allowed hidden md:flex">
+              <div className="h-[190px] p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-50 grayscale flex flex-col cursor-not-allowed hidden md:flex">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 7</span>
                   <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
@@ -542,7 +542,7 @@ const campaignStages: PipelineStage[] = [
       )}
 
       {/* Campaign Pipeline Grid */}
-      <div className="grid grid-cols-1 md:max-w-md gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-4">
         {stages.map((stage) => (
           <div
             key={stage.id}
