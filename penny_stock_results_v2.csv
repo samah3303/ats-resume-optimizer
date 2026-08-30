@@ -1,0 +1,13 @@
+Symbol,Price,Total Score,Tech Score,Fund Score,Sent Score,Signals
+PCJEWELLER,10.94,94,50,15,24,"Price > SMA20, Bullish SMA Cross, Near Period Low"
+IDEA,14.68,90,30,25,30,"Price > SMA20, Low Debt, High Pos Sentiment"
+ALLCARGO,12.19,75,50,-10,30,"Vol Surge 20d, Price > SMA20, Bullish SMA Cross"
+ALOKINDS,9.24,75,45,25,0,"Vol Surge 20d, Vol Spike 5d, Near Period Low"
+UTKARSHBNK,14.68,60,30,25,0,"Price > SMA20, Near Period Low, Low Debt"
+JPPOWER,16.82,40,20,15,0,"Bullish SMA Cross, Near Period Low, Pos Earnings Gr"
+RCOM,0.81,40,25,15,-5,"RSI Sweet Spot, Near Period Low, Low Debt"
+GREENPOWER,9.39,40,10,-5,30,"Near Period Low, Reasonable PE, High Pos Sentiment"
+FRETAIL,2.28,35,10,25,0,"Near Period Low, Low Debt"
+GTLINFRA,1.2,30,10,15,0,"Near Period Low, Low Debt"
+EASEMYTRIP,6.12,30,25,0,0,"RSI Sweet Spot, Near Period Low"
+RTNPOWER,7.95,5,10,-10,0,Near Period Low

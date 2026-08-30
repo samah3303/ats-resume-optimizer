@@ -37,6 +37,16 @@ const campaignStages: PipelineStage[] = [
       isLocked: false,
       features: [
         {
+          id: "knowledge-graph",
+          title: "Career Knowledge Graph",
+          tagline: "Visualize connections",
+          description: "Visualize connections between your skills, resumes, and target jobs.",
+          href: "/dashboard/graph",
+          icon: "🕸️",
+          badge: "New",
+        },
+
+        {
           id: "builder",
           title: "ATS Resume Studio",
           tagline: "6 Pro Templates & Drag-Drop Editor",
@@ -321,7 +331,7 @@ const campaignStages: PipelineStage[] = [
             {(progress.generalAtsScore && progress.generalAtsScore >= 80) || (progress.latestAnalysisScore && progress.latestAnalysisScore >= 80) ? (
               <Link
                 href="/dashboard/linkedin"
-                className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] transition-all flex flex-col group"
+                className="h-full p-5 rounded-2xl bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] transition-all flex flex-col group"
               >
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-400">Step 2</span>
@@ -341,7 +351,7 @@ const campaignStages: PipelineStage[] = [
                 </div>
               </Link>
             ) : (
-              <div className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-75 grayscale flex flex-col cursor-not-allowed">
+              <div className="h-full p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-75 grayscale flex flex-col cursor-not-allowed">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 2</span>
                   <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
@@ -357,7 +367,7 @@ const campaignStages: PipelineStage[] = [
             {progress.hasLinkedin ? (
               <Link
                 href="/dashboard/roadmap"
-                className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] transition-all flex flex-col group"
+                className="h-full p-5 rounded-2xl bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] transition-all flex flex-col group"
               >
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-400">Step 3</span>
@@ -377,7 +387,7 @@ const campaignStages: PipelineStage[] = [
                 </div>
               </Link>
             ) : (
-              <div className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-75 grayscale flex flex-col cursor-not-allowed">
+              <div className="h-full p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-75 grayscale flex flex-col cursor-not-allowed">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 3</span>
                   <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
@@ -393,7 +403,7 @@ const campaignStages: PipelineStage[] = [
             {progress.hasRoadmap ? (
               <Link
                 href="/dashboard/analyze"
-                className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] transition-all flex flex-col group"
+                className="h-full p-5 rounded-2xl bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] transition-all flex flex-col group"
               >
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-400">Step 4</span>
@@ -413,7 +423,7 @@ const campaignStages: PipelineStage[] = [
                 </div>
               </Link>
             ) : (
-              <div className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-75 grayscale flex flex-col cursor-not-allowed">
+              <div className="h-full p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-75 grayscale flex flex-col cursor-not-allowed">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 4</span>
                   <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
@@ -432,7 +442,7 @@ const campaignStages: PipelineStage[] = [
             {progress.latestAnalysisId ? (
               <Link
                 href="/dashboard/tracker"
-                className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] transition-all flex flex-col group"
+                className="h-full p-5 rounded-2xl bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] transition-all flex flex-col group"
               >
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-400">Step 5</span>
@@ -449,7 +459,7 @@ const campaignStages: PipelineStage[] = [
                 </div>
               </Link>
             ) : (
-              <div className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-75 grayscale flex flex-col cursor-not-allowed">
+              <div className="h-full p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-75 grayscale flex flex-col cursor-not-allowed">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 5</span>
                   <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
@@ -465,7 +475,7 @@ const campaignStages: PipelineStage[] = [
             {progress.hasInterview ? (
               <Link
                 href="/dashboard/mock-interview"
-                className="p-5 rounded-2xl bg-[#18181B] border border-amber-500/30 hover:border-amber-500 transition-all flex flex-col group shadow-[0_0_15px_rgba(245,158,11,0.1)]"
+                className="h-full p-5 rounded-2xl bg-[#18181B] border border-amber-500/30 hover:border-amber-500 transition-all flex flex-col group shadow-[0_0_15px_rgba(245,158,11,0.1)]"
               >
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-amber-500">Step 6</span>
@@ -483,7 +493,7 @@ const campaignStages: PipelineStage[] = [
                 </div>
               </Link>
             ) : (
-              <div className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-50 grayscale flex flex-col cursor-not-allowed hidden md:flex">
+              <div className="h-full p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-50 grayscale flex flex-col cursor-not-allowed hidden md:flex">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 6</span>
                   <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
@@ -499,7 +509,7 @@ const campaignStages: PipelineStage[] = [
             {progress.hasOffer ? (
               <Link
                 href="/dashboard/offers"
-                className="p-5 rounded-2xl bg-[#18181B] border border-emerald-500/30 hover:border-emerald-500 transition-all flex flex-col group shadow-[0_0_15px_rgba(16,185,129,0.1)]"
+                className="h-full p-5 rounded-2xl bg-[#18181B] border border-emerald-500/30 hover:border-emerald-500 transition-all flex flex-col group shadow-[0_0_15px_rgba(16,185,129,0.1)]"
               >
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-emerald-500">Step 7</span>
@@ -517,7 +527,7 @@ const campaignStages: PipelineStage[] = [
                 </div>
               </Link>
             ) : (
-              <div className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-50 grayscale flex flex-col cursor-not-allowed hidden md:flex">
+              <div className="h-full p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-50 grayscale flex flex-col cursor-not-allowed hidden md:flex">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 7</span>
                   <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
@@ -529,40 +539,7 @@ const campaignStages: PipelineStage[] = [
               </div>
             )}
 
-            {/* Card 8: Career Knowledge Graph */}
-            {progress.latestAnalysisId ? (
-              <Link
-                href="/dashboard/graph"
-                className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] transition-all flex flex-col group"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-400">Step 8</span>
-                  <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-blue-500/20 text-blue-400">New</span>
-                </div>
-                <h3 className="font-bold text-[#FAFAFA] text-sm group-hover:text-white transition-colors">
-                  Career Knowledge Graph
-                </h3>
-                <p className="text-[11px] text-zinc-400 mt-1 flex-1">
-                  Visualize connections between your skills, resumes, and target jobs.
-                </p>
-                <div className="mt-4 flex items-center justify-between text-xs font-bold text-[#FAFAFA]">
-                  <span>Launch Tool</span>
-                  <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
-                </div>
-              </Link>
-            ) : (
-              <div className="p-5 rounded-2xl bg-[#18181B] border border-[#27272A] opacity-50 grayscale flex flex-col cursor-not-allowed hidden md:flex">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 8</span>
-                  <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                </div>
-                <h3 className="font-bold text-zinc-500 text-sm">Career Knowledge Graph</h3>
-                <p className="text-[11px] text-zinc-600 mt-1 flex-1">
-                  Run 1 JD Analysis to map your footprint.
-                </p>
-              </div>
-            )}
-
+            
           </div>
         </div>
       )}

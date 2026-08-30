@@ -10,7 +10,7 @@ if sys.platform == 'win32':
         sys.stderr.reconfigure(encoding='utf-8')
     except: pass
 
-PENNY_STOCK_MAX_PRICE = 20
+PENNY_STOCK_MAX_PRICE = 50
 MIN_WINNER_GAIN_PCT = 30
 LOOKBACK_MONTHS = 6
 TOP_N_RESULTS = 30
@@ -478,20 +478,24 @@ def main():
     if is_backtest:
         print("\n[STEP 11] Backtest Validation (checking 6M forward returns)...")
         future_date = ref_date + timedelta(days=180)
-        future_prices = fetch_prices(results_df['Symbol'].tolist(), future_date, False)
+        future_prices = fetch_prices(results_df['Symbol'].tolist(), future_date, True)
         
         validations = []
         for _, row in results_df.iterrows():
             sym = row['Symbol']
             price_then = row['Price']
-            price_now = future_prices.get(sym, price_then)
-            ret = ((price_now - price_then) / price_then) * 100 if price_then > 0 else 0
-            verdict = "WIN" if ret > 20 else ("LOSS" if ret < -10 else "FLAT")
+            price_now = future_prices.get(sym, None)
+            if price_now is not None and price_then > 0:
+                ret = ((price_now - price_then) / price_then) * 100
+                verdict = "++ WIN" if ret > 20 else ("+ ok" if ret >= 0 else ("~ flat" if ret >= -10 else "- LOSS"))
+            else:
+                ret = None
+                verdict = "N/A"
             validations.append({
                 'Symbol': sym,
-                'Price Then': price_then,
-                'Price After 6M': round(price_now, 2),
-                'Actual Return %': round(ret, 2),
+                'Price Then': round(price_then, 2),
+                'Price After 6M': round(price_now, 2) if price_now else 'N/A',
+                'Actual Return %': round(ret, 1) if ret is not None else 'N/A',
                 'Verdict': verdict
             })
             
@@ -500,15 +504,22 @@ def main():
         print("                   BACKTEST VALIDATION                          ")
         print("================================================================")
         print(val_df.to_string(index=False))
-        avg_ret = val_df['Actual Return %'].mean()
         
-        top5_ret = val_df.head(5)['Actual Return %'].mean()
-        bot5_ret = val_df.tail(5)['Actual Return %'].mean() if len(val_df) >= 10 else 0
-        
-        print(f"\nAverage Overall Pick Return: {avg_ret:.2f}%")
-        print(f"Average Top 5 Return: {top5_ret:.2f}%")
-        if len(val_df) >= 10:
-            print(f"Average Bottom 5 Return: {bot5_ret:.2f}%")
+        # Calculate summary stats only for stocks with valid returns
+        valid_returns = [v['Actual Return %'] for v in validations if isinstance(v['Actual Return %'], (int, float))]
+        if valid_returns:
+            avg_ret = np.mean(valid_returns)
+            print(f"\nStocks with valid data: {len(valid_returns)}/{len(validations)}")
+            print(f"Average Overall Return: {avg_ret:.1f}%")
+            print(f"Positive returns: {sum(1 for r in valid_returns if r >= 0)} ({sum(1 for r in valid_returns if r >= 0)/len(valid_returns)*100:.0f}%)")
+            print(f"Negative returns: {sum(1 for r in valid_returns if r < 0)} ({sum(1 for r in valid_returns if r < 0)/len(valid_returns)*100:.0f}%)")
+            
+            if len(valid_returns) >= 5:
+                top5_ret = np.mean(valid_returns[:5])
+                bot5_ret = np.mean(valid_returns[-5:])
+                print(f"\nAvg return (Top 5 scored):    {top5_ret:+.1f}%")
+                print(f"Avg return (Bottom 5 scored): {bot5_ret:+.1f}%")
+                print(f"Scoring Edge (Top5 - Bot5):   {top5_ret - bot5_ret:+.1f}% pts")
         
     elapsed = time.time() - start_time
     print(f"\nTotal time taken: {elapsed:.2f} seconds.")
