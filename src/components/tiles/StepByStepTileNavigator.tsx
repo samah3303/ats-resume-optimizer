@@ -282,8 +282,7 @@ const campaignStages: PipelineStage[] = [
       {progress && (
         <div className="space-y-4 mb-8">
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {/* Card 1: General ATS Analysis */}
             <Link
               href="/dashboard/analyze/general"
@@ -363,23 +362,20 @@ const campaignStages: PipelineStage[] = [
               </div>
             )}
 
-            {/* Card 3: 2-Month Roadmap */}
-            {progress.hasLinkedin ? (
+            {/* Card 5: Kanban Tracker */}
+            {(progress.generalAtsScore && progress.generalAtsScore >= 80) || (progress.latestAnalysisScore && progress.latestAnalysisScore >= 80) ? (
               <Link
-                href="/dashboard/roadmap"
+                href="/dashboard/tracker"
                 className="h-full p-5 rounded-2xl bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] transition-all flex flex-col group"
               >
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-400">Step 3</span>
-                  {progress.hasRoadmap && (
-                    <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-emerald-500/20 text-emerald-400">Active</span>
-                  )}
                 </div>
                 <h3 className="font-bold text-[#FAFAFA] text-sm group-hover:text-white transition-colors">
-                  2-Month Master Plan
+                  Kanban Job Tracker
                 </h3>
                 <p className="text-[11px] text-zinc-400 mt-1 flex-1">
-                  Generate your 8-week structured roadmap for local markets.
+                  Track applied, interview, and offer stages.
                 </p>
                 <div className="mt-4 flex items-center justify-between text-xs font-bold text-[#FAFAFA]">
                   <span>Launch Tool</span>
@@ -392,15 +388,15 @@ const campaignStages: PipelineStage[] = [
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 3</span>
                   <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                 </div>
-                <h3 className="font-bold text-zinc-500 text-sm">2-Month Master Plan</h3>
+                <h3 className="font-bold text-zinc-500 text-sm">Kanban Job Tracker</h3>
                 <p className="text-[11px] text-zinc-600 mt-1 flex-1">
-                  Complete LinkedIn optimization to unlock.
+                  Hit 80+ General ATS Score to unlock.
                 </p>
               </div>
             )}
 
             {/* Card 4: JD ATS Analysis */}
-            {progress.hasRoadmap ? (
+            {(progress.generalAtsScore && progress.generalAtsScore >= 80) || (progress.latestAnalysisScore && progress.latestAnalysisScore >= 80) ? (
               <Link
                 href="/dashboard/analyze"
                 className="h-full p-5 rounded-2xl bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] transition-all flex flex-col group"
@@ -430,28 +426,29 @@ const campaignStages: PipelineStage[] = [
                 </div>
                 <h3 className="font-bold text-zinc-500 text-sm">JD Match Analysis</h3>
                 <p className="text-[11px] text-zinc-600 mt-1 flex-1">
-                  Generate your 8-Week roadmap to unlock.
+                  Hit 80+ General ATS Score to unlock.
                 </p>
               </div>
             )}
 
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-            {/* Card 5: Kanban Tracker */}
-            {progress.latestAnalysisId ? (
+
+            {/* Card 3: 2-Month Roadmap */}
+            {progress.hasLinkedin ? (
               <Link
-                href="/dashboard/tracker"
+                href="/dashboard/roadmap"
                 className="h-full p-5 rounded-2xl bg-[#18181B] border border-[#27272A] hover:border-[#FAFAFA] transition-all flex flex-col group"
               >
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-400">Step 5</span>
+                  {progress.hasRoadmap && (
+                    <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-emerald-500/20 text-emerald-400">Active</span>
+                  )}
                 </div>
                 <h3 className="font-bold text-[#FAFAFA] text-sm group-hover:text-white transition-colors">
-                  Kanban Job Tracker
+                  2-Month Master Plan
                 </h3>
                 <p className="text-[11px] text-zinc-400 mt-1 flex-1">
-                  Track applied, interview, and offer stages.
+                  Generate your 8-week structured roadmap for local markets.
                 </p>
                 <div className="mt-4 flex items-center justify-between text-xs font-bold text-[#FAFAFA]">
                   <span>Launch Tool</span>
@@ -464,9 +461,9 @@ const campaignStages: PipelineStage[] = [
                   <span className="text-[10px] font-bold uppercase font-mono tracking-wider text-zinc-500">Step 5</span>
                   <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                 </div>
-                <h3 className="font-bold text-zinc-500 text-sm">Kanban Job Tracker</h3>
+                <h3 className="font-bold text-zinc-500 text-sm">2-Month Master Plan</h3>
                 <p className="text-[11px] text-zinc-600 mt-1 flex-1">
-                  Run 1 JD Analysis to unlock.
+                  Complete LinkedIn optimization to unlock.
                 </p>
               </div>
             )}
