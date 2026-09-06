@@ -158,7 +158,7 @@ export default function HomePage() {
       localStorage.removeItem("onboarding_resumeId");
       localStorage.removeItem("onboarding_resumeName");
       localStorage.removeItem("onboarding_step");
-      router.push("/account");
+      router.push("/dashboard/analyze/general");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
       setAnalyzing(false);
