@@ -135,6 +135,8 @@ export interface ResumeParseResult {
   email: string | null;
   phone: string | null;
   location: string | null;
+  country?: string | null;
+  targetRole?: string | null;
   summary: string | null;
   skills: string[];
   experience: ExperienceEntry[];

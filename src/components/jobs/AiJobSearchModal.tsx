@@ -52,7 +52,7 @@ export function AiJobSearchModal({
     if (profileSummary && !aiPrompt) {
       setAiPrompt(profileSummary.role || "");
       const prefLoc = profileSummary.preferences?.locations?.[0];
-      setAiLocation(prefLoc || profileSummary.location || "Dubai, UAE / Remote");
+      setAiLocation(prefLoc || profileSummary.location || "Remote");
     }
   }, [profileSummary, aiPrompt]);
 
@@ -286,14 +286,21 @@ export function AiJobSearchModal({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
-              Location
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-bold text-[#111111] uppercase tracking-wide">
+                Target Location
+              </label>
+              {profileSummary?.location && (
+                <span className="text-[10px] text-[#0A8A00] font-semibold">
+                  ✓ Resume/Preference detected
+                </span>
+              )}
+            </div>
             <input
               type="text"
               value={aiLocation}
               onChange={(e) => setAiLocation(e.target.value)}
-              placeholder="e.g. Dubai, UAE / Gulf or Remote"
+              placeholder="e.g. London, UK / New York, NY / Remote"
               className="w-full h-11 px-3.5 bg-white border border-[#DFDFDF] rounded-[4px] text-sm text-[#111111] focus:outline-none focus:border-[#003399]"
             />
           </div>

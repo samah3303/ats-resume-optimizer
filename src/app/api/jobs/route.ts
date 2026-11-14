@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createJobSchema } from "@/lib/validations";
+import { autoPopulateJobsForUser } from "@/lib/job-matcher";
 import { apiSuccess, apiError, handleApiError } from "@/lib/api-response";
 
 export async function GET(request: Request) {
@@ -20,7 +21,7 @@ export async function GET(request: Request) {
       where.isBookmarked = true;
     }
 
-    const jobs = await prisma.job.findMany({
+    let jobs = await prisma.job.findMany({
       where,
       orderBy: { createdAt: "desc" },
       include: {
@@ -30,6 +31,24 @@ export async function GET(request: Request) {
         },
       },
     });
+
+    // If candidate has no jobs listed yet and is requesting all jobs,
+    // auto-fetch matching jobs based on their extracted resume location & role
+    if (jobs.length === 0 && bookmarked !== "true") {
+      const populated = await autoPopulateJobsForUser(userId, { maxJobs: 5 });
+      if (populated.length > 0) {
+        jobs = await prisma.job.findMany({
+          where,
+          orderBy: { createdAt: "desc" },
+          include: {
+            _count: { select: { applications: true } },
+            applications: {
+              select: { id: true, status: true, appliedAt: true },
+            },
+          },
+        });
+      }
+    }
 
     return apiSuccess(jobs);
   } catch (error) {

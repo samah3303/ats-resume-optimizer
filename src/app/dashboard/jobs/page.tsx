@@ -66,15 +66,17 @@ export default function JobsPage() {
       if (res.ok) {
         const data = await res.json();
         const targetRole =
-          Array.isArray(data.targetRoles) && data.targetRoles.length > 0
-            ? data.targetRoles[0]
-            : "Software Engineer";
+          (Array.isArray(data.targetRoles) && data.targetRoles.length > 0 && data.targetRoles[0]) ||
+          (Array.isArray(data.experience) && data.experience[0]?.title) ||
+          "Software Engineer";
         const skillsList = Array.isArray(data.skills) ? data.skills : [];
         const pref = data.preferences || null;
         const loc =
           pref?.locations && pref.locations.length > 0
             ? pref.locations.join(", ")
-            : data.location || "Dubai, UAE or Remote";
+            : data.location ||
+              (Array.isArray(data.experience) && data.experience[0]?.location) ||
+              "Remote";
 
         setProfileSummary({
           role: targetRole,
@@ -87,7 +89,7 @@ export default function JobsPage() {
       setProfileSummary({
         role: "Software Engineer",
         skills: ["React", "TypeScript", "Node.js"],
-        location: "Dubai, UAE or Remote",
+        location: "Remote",
         preferences: null,
       });
     }

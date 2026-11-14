@@ -34,7 +34,11 @@ function CompleteProfileContent() {
         .then((res) => (res.ok ? res.json() : null))
         .then((data) => {
           if (data) {
-            setTargetRole(data.targetRole || "");
+            const initialRole =
+              (Array.isArray(data.targetRoles) && data.targetRoles[0]) ||
+              data.targetRole ||
+              "";
+            setTargetRole(initialRole);
             setTargetIndustry(data.targetIndustry || "");
             setTargetCompanyTier(data.targetCompanyTier || "Tier 1 Tech");
             setMinSalary(data.minSalary ? String(data.minSalary) : "");

@@ -2,15 +2,22 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { parseResumeFile, extractProfileFromResume } from "@/lib/resume-parser";
+import { autoPopulateJobsForUser } from "@/lib/job-matcher";
 import { apiSuccess, apiError, handleApiError } from "@/lib/api-response";
 
 const ALLOWED_EXTENSIONS = ["pdf", "docx", "doc", "txt"];
 const ALLOWED_MIME_TYPES = [
   "application/pdf",
+  "application/x-pdf",
+  "application/acrobat",
+  "applications/vnd.pdf",
+  "text/pdf",
+  "text/x-pdf",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   "application/msword",
   "text/plain",
   "application/octet-stream",
+  "",
 ];
 
 export async function POST(request: Request) {
@@ -19,12 +26,12 @@ export async function POST(request: Request) {
     const file = formData.get("file") as File | null;
 
     if (!file) {
-      return apiError("No file provided", 400);
+      return apiError("No resume file provided.", 400);
     }
 
     const maxSize = 10 * 1024 * 1024; // 10MB
     if (file.size > maxSize) {
-      return apiError("File size must be under 10MB", 400);
+      return apiError("File size must be under 10MB.", 400);
     }
 
     // Whitelist file extension & mime type to prevent arbitrary file upload attacks
@@ -36,18 +43,34 @@ export async function POST(request: Request) {
       );
     }
 
-    if (file.type && !ALLOWED_MIME_TYPES.includes(file.type)) {
+    const normalizedMime = (file.type || "").toLowerCase().trim();
+    const isMimePermitted =
+      !normalizedMime ||
+      ALLOWED_MIME_TYPES.includes(normalizedMime) ||
+      (extension === "pdf" && normalizedMime.includes("pdf")) ||
+      normalizedMime === "application/octet-stream";
+
+    if (!isMimePermitted) {
       return apiError("Unsupported MIME type detected.", 400);
     }
 
     // Parse the resume file
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    const resumeText = await parseResumeFile(buffer, file.type, file.name);
+    let resumeText = "";
+    try {
+      resumeText = await parseResumeFile(buffer, file.type, file.name);
+    } catch (parseErr) {
+      const msg =
+        parseErr instanceof Error
+          ? parseErr.message
+          : "Could not extract readable text from this file.";
+      return apiError(msg, 422);
+    }
 
-    if (!resumeText || resumeText.trim().length < 50) {
+    if (!resumeText || resumeText.trim().length < 30) {
       return apiError(
-        "Could not extract enough text from the resume. Try a different file format.",
+        "Could not extract readable text from the resume. If this is a scanned document or image-only PDF, please upload a text-based PDF or DOCX file.",
         422
       );
     }
@@ -67,7 +90,7 @@ export async function POST(request: Request) {
       const extractedEmail = extracted.email?.toLowerCase().trim();
       if (!extractedEmail) {
         return apiError(
-          "Could not extract email from resume. Please register first or ensure your resume contains an email address.",
+          "Could not detect an email address in this resume. Please ensure your contact email is clearly visible in the resume or register an account first.",
           422
         );
       }
@@ -78,17 +101,18 @@ export async function POST(request: Request) {
 
       if (existingUser) {
         userId = existingUser.id;
-        // If they already have a password, they should log in instead
+        // If they already have a password set, direct them to sign in
         if (existingUser.passwordHash) {
           return apiError(
-            "An account with this email already exists. Please log in first.",
+            "An account with this email already exists. Please log in to view or update your profile.",
             409,
-            { code: "LOGIN_REQUIRED" }
+            { code: "LOGIN_REQUIRED", email: extractedEmail }
           );
         }
-        isNewUser = false;
+        // If passwordHash is null, they started onboarding before but didn't finish setting a password
+        isNewUser = true;
       } else {
-        // Create user without password — they'll set one up later
+        // Create user without password — they'll set one up on /setup-password
         const newUser = await prisma.user.create({
           data: {
             email: extractedEmail,
@@ -101,6 +125,54 @@ export async function POST(request: Request) {
       }
     }
 
+    // Load existing profile to preserve any user custom settings
+    const existingProfile = await prisma.profile.findUnique({
+      where: { userId },
+    });
+
+    let currentPrefs: any = {};
+    if (existingProfile?.preferences) {
+      try {
+        currentPrefs = JSON.parse(existingProfile.preferences);
+      } catch {}
+    }
+
+    // Determine candidate location & target role from extracted resume
+    const candidateLocation =
+      extracted.location ||
+      extracted.country ||
+      currentPrefs.locations?.[0] ||
+      existingProfile?.location ||
+      "Remote";
+
+    const candidateRole =
+      extracted.targetRole ||
+      extracted.experience?.[0]?.title ||
+      (existingProfile?.targetRoles ? JSON.parse(existingProfile.targetRoles)[0] : null) ||
+      "Professional";
+
+    // Initialize or merge job preferences with extracted location & keywords
+    const prefLocations =
+      currentPrefs.locations && currentPrefs.locations.length > 0
+        ? currentPrefs.locations
+        : [candidateLocation];
+
+    const isGulfRegion = /dubai|uae|emirates|qatar|saudi|riyadh|kuwait|bahrain|oman/i.test(candidateLocation);
+
+    const mergedPreferences = {
+      ...currentPrefs,
+      locations: prefLocations,
+      platforms:
+        currentPrefs.platforms ||
+        (isGulfRegion
+          ? ["naukrigulf", "indeed", "linkedin"]
+          : ["linkedin", "indeed", "greenhouse_lever"]),
+      keywords:
+        currentPrefs.keywords && currentPrefs.keywords.length > 0
+          ? currentPrefs.keywords
+          : extracted.skills.slice(0, 5),
+    };
+
     // Create or update profile
     const profileData = {
       resumeText,
@@ -108,7 +180,9 @@ export async function POST(request: Request) {
       resumeMimeType: file.type,
       resumeData: resumeText,
       phone: extracted.phone || undefined,
-      location: extracted.location || undefined,
+      location: candidateLocation,
+      targetRoles: JSON.stringify([candidateRole]),
+      preferences: JSON.stringify(mergedPreferences),
       summary: extracted.summary || undefined,
       skills:
         extracted.skills.length > 0
@@ -139,6 +213,13 @@ export async function POST(request: Request) {
         where: { id: userId },
         data: { name: extracted.name },
       });
+    }
+
+    // Automatically fetch and populate matching jobs for this candidate's country/location & role
+    try {
+      await autoPopulateJobsForUser(userId, { maxJobs: 5 });
+    } catch (jobErr) {
+      console.warn("Auto job search during resume upload warning:", jobErr);
     }
 
     // Log activity

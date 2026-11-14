@@ -17,6 +17,7 @@ function LandingContent() {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState("");
+  const [loginRequiredEmail, setLoginRequiredEmail] = useState<string | null>(null);
 
   if (session?.user) {
     router.replace("/dashboard");
@@ -27,6 +28,7 @@ function LandingContent() {
     async (selectedFile: File) => {
       setFile(selectedFile);
       setError("");
+      setLoginRequiredEmail(null);
       setUploading(true);
       setProgress(0);
 
@@ -47,7 +49,14 @@ function LandingContent() {
 
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
-          throw new Error(data.error || "Resume processing failed");
+          const errMsg = data.error || "Resume processing failed";
+          const errCode = data.code || (data.details && data.details.code);
+          const errEmail = data.details?.email || (typeof data.email === "string" ? data.email : null);
+
+          if (errCode === "LOGIN_REQUIRED" || res.status === 409) {
+            setLoginRequiredEmail(errEmail || "");
+          }
+          throw new Error(errMsg);
         }
 
         setProgress(100);
@@ -207,8 +216,26 @@ function LandingContent() {
                   )}
 
                   {error && (
-                    <div className="mt-2.5 p-2.5 bg-[#CC0008]/10 text-[#CC0008] border border-[#CC0008] rounded-[4px] text-xs font-semibold">
-                      {error}
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="mt-2.5 p-3 bg-[#CC0008]/10 text-[#CC0008] border border-[#CC0008] rounded-[4px] text-xs font-semibold flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-left"
+                    >
+                      <div className="flex items-center gap-2">
+                        <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <circle cx="12" cy="12" r="10" />
+                          <line x1="12" y1="8" x2="12" y2="12" />
+                          <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                        <span>{error}</span>
+                      </div>
+                      {loginRequiredEmail !== null && (
+                        <Link
+                          href={`/login${loginRequiredEmail ? `?email=${encodeURIComponent(loginRequiredEmail)}` : ""}`}
+                          className="nordic-btn-blue text-xs py-1 px-3 whitespace-nowrap self-end sm:self-auto shrink-0"
+                        >
+                          Sign In Now &rarr;
+                        </Link>
+                      )}
                     </div>
                   )}
                 </div>
