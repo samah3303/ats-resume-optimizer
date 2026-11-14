@@ -12,6 +12,40 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
+interface BulletUpgradeItem {
+  section: string;
+  original: string;
+  updated: string;
+  reason: string;
+  keywordsAdded?: string[];
+}
+
+interface NewPointItem {
+  section: string;
+  suggestedBullet: string;
+  targetedRequirement: string;
+  reason: string;
+}
+
+interface SummaryUpgradeItem {
+  suggestedSummary: string;
+  reason: string;
+}
+
+interface DetailedResumeUpdatesState {
+  atsScoreForJob: number;
+  missingSkills: string[];
+  bulletUpgrades: BulletUpgradeItem[];
+  newPointsToAdd: NewPointItem[];
+  summaryUpgrade?: SummaryUpgradeItem;
+  suggestions: Array<{
+    section: string;
+    current: string;
+    suggested: string;
+    reason: string;
+  }>;
+}
+
 export default function JobDetailPage({ params }: PageProps) {
   const { id } = use(params);
   const router = useRouter();
@@ -25,16 +59,7 @@ export default function JobDetailPage({ params }: PageProps) {
   // AI Generation States
   const [generating, setGenerating] = useState(false);
   const [coverLetter, setCoverLetter] = useState("");
-  const [resumeUpdates, setResumeUpdates] = useState<{
-    suggestions: Array<{
-      section: string;
-      current: string;
-      suggested: string;
-      reason: string;
-    }>;
-    missingSkills: string[];
-    atsScoreForJob: number;
-  } | null>(null);
+  const [resumeUpdates, setResumeUpdates] = useState<DetailedResumeUpdatesState | null>(null);
   const [followupEmail, setFollowupEmail] = useState("");
   const [followupContext, setFollowupContext] = useState("post_interview");
   const [linkedinMessage, setLinkedinMessage] = useState("");
@@ -49,7 +74,7 @@ export default function JobDetailPage({ params }: PageProps) {
   const [addedSkills, setAddedSkills] = useState<Set<string>>(new Set());
 
   // Helper to safely parse and normalize resume updates payload
-  const normalizeResumeUpdates = (raw: unknown) => {
+  const normalizeResumeUpdates = (raw: unknown): DetailedResumeUpdatesState | null => {
     if (!raw) return null;
     let parsed: any = raw;
     if (typeof raw === "string") {
@@ -59,11 +84,38 @@ export default function JobDetailPage({ params }: PageProps) {
         return null;
       }
     }
-    const obj = parsed?.content || parsed;
+    let obj = parsed?.content || parsed;
+    if (typeof obj === "string") {
+      try {
+        obj = JSON.parse(obj);
+      } catch {
+        // keep as is
+      }
+    }
+
+    const rawBulletUpgrades = Array.isArray(obj?.bulletUpgrades) ? obj.bulletUpgrades : [];
+    const rawSuggestions = Array.isArray(obj?.suggestions) ? obj.suggestions : [];
+
+    let bulletUpgrades: BulletUpgradeItem[] = rawBulletUpgrades;
+    if (bulletUpgrades.length === 0 && rawSuggestions.length > 0) {
+      bulletUpgrades = rawSuggestions.map((s: any) => ({
+        section: s.section || "Experience",
+        original: s.current || "",
+        updated: s.suggested || "",
+        reason: s.reason || "",
+      }));
+    }
+
     return {
-      suggestions: Array.isArray(obj?.suggestions) ? obj.suggestions : [],
+      atsScoreForJob: typeof obj?.atsScoreForJob === "number" ? obj.atsScoreForJob : 65,
       missingSkills: Array.isArray(obj?.missingSkills) ? obj.missingSkills : [],
-      atsScoreForJob: typeof obj?.atsScoreForJob === "number" ? obj.atsScoreForJob : 50,
+      bulletUpgrades,
+      newPointsToAdd: Array.isArray(obj?.newPointsToAdd) ? obj.newPointsToAdd : [],
+      summaryUpgrade:
+        obj?.summaryUpgrade && typeof obj.summaryUpgrade.suggestedSummary === "string"
+          ? obj.summaryUpgrade
+          : undefined,
+      suggestions: rawSuggestions,
     };
   };
 
@@ -260,7 +312,7 @@ export default function JobDetailPage({ params }: PageProps) {
       if (res.ok) {
         setResumeUpdates(normalizeResumeUpdates(data));
         setToastMessage({
-          text: "✓ Resume suggestions and missing skills generated!",
+          text: "✓ Detailed resume suggestions and optimizations generated!",
           type: "success",
         });
       } else {
@@ -278,6 +330,52 @@ export default function JobDetailPage({ params }: PageProps) {
     } finally {
       setGenerating(false);
     }
+  };
+
+  const handleCopyAllRecommendations = () => {
+    if (!resumeUpdates) return;
+    const lines: string[] = [];
+    lines.push(`# Resume Optimization Plan for ${job?.title || "Role"} at ${job?.company || "Company"}`);
+    lines.push(`\n**Targeted ATS Match Score:** ${resumeUpdates.atsScoreForJob}%\n`);
+
+    if (resumeUpdates.missingSkills.length > 0) {
+      lines.push(`## 🔴 Missing Keywords & Skills`);
+      lines.push(resumeUpdates.missingSkills.map((s) => `- [ ] ${s}`).join("\n"));
+      lines.push("");
+    }
+
+    if (resumeUpdates.summaryUpgrade) {
+      lines.push(`## 🔵 Tailored Professional Summary`);
+      lines.push(`> ${resumeUpdates.summaryUpgrade.suggestedSummary}`);
+      lines.push(`*Why: ${resumeUpdates.summaryUpgrade.reason}*\n`);
+    }
+
+    if (resumeUpdates.bulletUpgrades.length > 0) {
+      lines.push(`## 🟡 Bullet Point Upgrades (Before vs. After)`);
+      resumeUpdates.bulletUpgrades.forEach((b, idx) => {
+        lines.push(`### Upgrade ${idx + 1} (${b.section})`);
+        lines.push(`- **Original:** ${b.original}`);
+        lines.push(`- **Updated:** ${b.updated}`);
+        lines.push(`- **Why:** ${b.reason}`);
+        if (b.keywordsAdded && b.keywordsAdded.length > 0) {
+          lines.push(`- **Keywords Injected:** ${b.keywordsAdded.join(", ")}`);
+        }
+        lines.push("");
+      });
+    }
+
+    if (resumeUpdates.newPointsToAdd.length > 0) {
+      lines.push(`## 🟢 New Accomplishment Bullets to Add`);
+      resumeUpdates.newPointsToAdd.forEach((n, idx) => {
+        lines.push(`### Addition ${idx + 1} (${n.section})`);
+        lines.push(`- **Target Requirement:** ${n.targetedRequirement}`);
+        lines.push(`- **Suggested Bullet:** ${n.suggestedBullet}`);
+        lines.push(`- **Why:** ${n.reason}`);
+        lines.push("");
+      });
+    }
+
+    copyToClipboard(lines.join("\n"), "All recommendations");
   };
 
   const handleGenerateFollowup = async () => {
@@ -510,7 +608,7 @@ export default function JobDetailPage({ params }: PageProps) {
           </div>
         )}
 
-        {/* TAB 2: RESUME UPDATES */}
+        {/* TAB 2: RESUME UPDATES & DETAILED DIFF SUGGESTIONS */}
         {activeTab === "resume_updates" && (
           <div
             role="tabpanel"
@@ -518,40 +616,76 @@ export default function JobDetailPage({ params }: PageProps) {
             aria-labelledby="tab-resume_updates"
             className="space-y-6"
           >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#DFDFDF] pb-4">
+            {/* Header & Master Controls */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#DFDFDF] pb-4">
               <div>
-                <h2 className="text-lg font-bold text-[#111111]">
-                  Resume Suggestions & Missing Skills
-                </h2>
-                <p className="text-xs text-[#484848] mt-0.5">
-                  See which skills you are missing and how to improve your bullet points for this job.
+                <div className="flex items-center gap-2 mb-1">
+                  <h2 className="text-lg font-bold text-[#111111]">
+                    Tailored Resume Optimization Plan
+                  </h2>
+                  {resumeUpdates && (
+                    <span className="px-2 py-0.5 bg-[#003399] text-white text-[11px] font-mono font-bold rounded-[3px]">
+                      {resumeUpdates.atsScoreForJob}% ATS Match Potential
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-[#484848]">
+                  Detailed itemized suggestions: missing keywords, bullet point upgrades (Old vs. Updated), and new accomplishment additions to paste into your resume.
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={handleGenerateResumeUpdates}
-                disabled={generating}
-                aria-busy={generating}
-                className="nordic-btn-primary text-xs h-10 px-4 disabled:opacity-50 cursor-pointer shrink-0"
-              >
-                {generating ? "Checking..." : "Get Suggestions"}
-              </button>
+
+              <div className="flex flex-wrap items-center gap-2 shrink-0">
+                {resumeUpdates && (
+                  <button
+                    type="button"
+                    onClick={handleCopyAllRecommendations}
+                    className="nordic-btn-yellow text-xs h-10 px-3.5 cursor-pointer font-bold tap-active flex items-center gap-1.5"
+                    title="Copy all recommendations as Markdown checklist"
+                  >
+                    <span>📋</span>
+                    <span>Copy All Recommendations</span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={handleGenerateResumeUpdates}
+                  disabled={generating}
+                  aria-busy={generating}
+                  className="nordic-btn-primary text-xs h-10 px-4 disabled:opacity-50 cursor-pointer shrink-0"
+                >
+                  {generating ? "Analyzing Resume..." : resumeUpdates ? "Re-analyze" : "⚡ Get Suggestions"}
+                </button>
+              </div>
             </div>
 
             {resumeUpdates ? (
-              <div className="space-y-6">
+              <div className="space-y-8">
+                {/* 1. MISSING KEYWORDS & SKILLS */}
                 {(resumeUpdates.missingSkills?.length ?? 0) > 0 && (
-                  <div className="border border-[#CC0008] bg-[#CC0008]/10 p-4 rounded-[4px]">
-                    <span className="text-xs font-bold uppercase block mb-2 text-[#CC0008]">
-                      Skills in Job Description Missing from Your Resume
-                    </span>
-                    <div className="flex flex-wrap gap-2">
-                      {resumeUpdates.missingSkills?.map((sk) => {
+                  <div className="border border-[#CC0008] bg-[#CC0008]/5 p-4 sm:p-5 rounded-[4px] space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#CC0008]" />
+                        <h3 className="text-xs font-bold uppercase tracking-wide text-[#CC0008]">
+                          Missing Target Keywords ({resumeUpdates.missingSkills.length})
+                        </h3>
+                      </div>
+                      <span className="text-[11px] text-[#767676] font-medium hidden sm:inline">
+                        High ATS filter weighting
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-[#484848] leading-relaxed">
+                      These keywords are explicitly prioritized in the job posting but are absent from your resume text. Add them to your skills list or weave them into your experience bullets.
+                    </p>
+
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {resumeUpdates.missingSkills.map((sk) => {
                         const isAdded = addedSkills.has(sk);
                         return (
                           <div
                             key={sk}
-                            className="px-3 py-1.5 bg-white border border-[#DFDFDF] text-xs font-semibold rounded-[4px] text-[#111111] flex items-center gap-2 shadow-2xs"
+                            className="px-3 py-1.5 bg-white border border-[#DFDFDF] text-xs font-semibold rounded-[4px] text-[#111111] flex items-center gap-2 shadow-2xs hover:border-[#CC0008] transition-colors"
                           >
                             <span>{sk}</span>
                             <button
@@ -574,49 +708,197 @@ export default function JobDetailPage({ params }: PageProps) {
                   </div>
                 )}
 
-                {(resumeUpdates.suggestions?.length ?? 0) > 0 ? (
-                  <div className="space-y-4">
-                    {resumeUpdates.suggestions?.map((sug, i) => (
-                      <div key={i} className="border border-[#DFDFDF] p-4 rounded-[4px] bg-[#F5F5F5]">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs font-bold uppercase text-[#484848]">
-                            Section: {sug.section}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => copyToClipboard(sug.suggested, "Suggested text")}
-                            className="text-xs text-[#003399] hover:underline font-bold cursor-pointer"
-                          >
-                            Copy Text
-                          </button>
-                        </div>
-
-                        <div className="mb-2 text-xs font-mono line-through text-[#767676]">
-                          {sug.current}
-                        </div>
-
-                        <div className="p-3 bg-white border border-[#DFDFDF] rounded-[4px] text-xs font-mono font-bold text-[#111111]">
-                          {sug.suggested}
-                        </div>
-
-                        <div className="mt-2 text-[11px] text-[#484848]">
-                          Why this helps: {sug.reason}
-                        </div>
+                {/* 2. TAILORED PROFESSIONAL SUMMARY */}
+                {resumeUpdates.summaryUpgrade && (
+                  <div className="border border-[#003399] bg-[#003399]/5 p-4 sm:p-5 rounded-[4px] space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#003399]" />
+                        <h3 className="text-xs font-bold uppercase tracking-wide text-[#003399]">
+                          Tailored Professional Summary
+                        </h3>
                       </div>
-                    ))}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          copyToClipboard(
+                            resumeUpdates.summaryUpgrade!.suggestedSummary,
+                            "Tailored summary"
+                          )
+                        }
+                        className="text-xs text-[#003399] font-bold hover:underline cursor-pointer flex items-center gap-1"
+                      >
+                        Copy Summary ➔
+                      </button>
+                    </div>
+
+                    <blockquote className="p-3.5 bg-white border border-[#DFDFDF] rounded-[4px] text-xs sm:text-sm text-[#111111] leading-relaxed font-sans border-l-4 border-l-[#003399]">
+                      &ldquo;{resumeUpdates.summaryUpgrade.suggestedSummary}&rdquo;
+                    </blockquote>
+
+                    <p className="text-[11px] text-[#484848]">
+                      <span className="font-bold text-[#111111]">Why this works:</span>{" "}
+                      {resumeUpdates.summaryUpgrade.reason}
+                    </p>
                   </div>
-                ) : (
-                  <div className="p-4 border border-[#DFDFDF] rounded-[4px] text-xs text-[#484848] bg-[#FAFAFA]">
-                    No specific bullet edits needed for this role. Check your missing skills above.
+                )}
+
+                {/* 3. BULLET POINT UPGRADES (OLD VS. UPDATED POINT) */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between border-b border-[#DFDFDF] pb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#FFDA1A]" />
+                      <h3 className="text-xs font-bold uppercase tracking-wide text-[#111111]">
+                        Bullet Point Upgrades (Old vs. Updated)
+                      </h3>
+                      <span className="px-2 py-0.5 bg-[#F5F5F5] border border-[#DFDFDF] text-[10px] font-bold rounded-full">
+                        {resumeUpdates.bulletUpgrades?.length || resumeUpdates.suggestions?.length || 0}
+                      </span>
+                    </div>
+                    <span className="text-[11px] text-[#767676]">
+                      Rewritten with action verbs, metrics & keywords
+                    </span>
+                  </div>
+
+                  {resumeUpdates.bulletUpgrades && resumeUpdates.bulletUpgrades.length > 0 ? (
+                    <div className="space-y-4">
+                      {resumeUpdates.bulletUpgrades.map((item, idx) => (
+                        <div
+                          key={idx}
+                          className="border border-[#DFDFDF] rounded-[4px] p-4 sm:p-5 bg-white space-y-3.5 hover:border-[#003399] transition-all shadow-xs"
+                        >
+                          {/* Header row */}
+                          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#F0F0F0] pb-2.5">
+                            <span className="text-xs font-bold text-[#003399] uppercase tracking-wider font-mono">
+                              Section: {item.section}
+                            </span>
+                            {item.keywordsAdded && item.keywordsAdded.length > 0 && (
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                <span className="text-[10px] text-[#767676] font-medium">Injected:</span>
+                                {item.keywordsAdded.map((kw) => (
+                                  <span
+                                    key={kw}
+                                    className="px-1.5 py-0.5 bg-[#0A8A00]/10 text-[#0A8A00] font-mono text-[10px] font-bold rounded-[2px]"
+                                  >
+                                    +{kw}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Old Point */}
+                          <div className="space-y-1">
+                            <span className="text-[10px] font-bold uppercase text-[#767676] tracking-wider block">
+                              Old Point (Generic / Lower Impact)
+                            </span>
+                            <div className="p-3 bg-[#F5F5F5] border border-[#DFDFDF] rounded-[4px] text-xs font-mono text-[#555555] line-through leading-relaxed">
+                              {item.original}
+                            </div>
+                          </div>
+
+                          {/* Updated Point */}
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-bold uppercase text-[#0A8A00] tracking-wider flex items-center gap-1">
+                                <span>★</span> ATS-Optimized Point (High Impact)
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => copyToClipboard(item.updated, "Updated bullet")}
+                                className="nordic-btn-primary text-xs h-7 px-2.5 cursor-pointer font-bold flex items-center gap-1 tap-active"
+                              >
+                                <span>Copy Point</span>
+                              </button>
+                            </div>
+                            <div className="p-3.5 bg-white border-2 border-[#0A8A00]/40 rounded-[4px] text-xs font-mono font-bold text-[#111111] leading-relaxed shadow-2xs">
+                              {item.updated}
+                            </div>
+                          </div>
+
+                          {/* Explanation */}
+                          <div className="pt-1 text-[11px] text-[#484848] flex items-start gap-1.5 bg-[#F9F9F9] p-2.5 rounded-[4px]">
+                            <span className="text-[#003399] font-bold shrink-0">Why this helps:</span>
+                            <span className="leading-snug">{item.reason}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-4 border border-[#DFDFDF] rounded-[4px] text-xs text-[#484848] bg-[#FAFAFA]">
+                      No existing bullet rewrites needed. Check the missing skills and new points below.
+                    </div>
+                  )}
+                </div>
+
+                {/* 4. BRAND NEW POINTS TO ADD */}
+                {(resumeUpdates.newPointsToAdd?.length ?? 0) > 0 && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between border-b border-[#DFDFDF] pb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#0A8A00]" />
+                        <h3 className="text-xs font-bold uppercase tracking-wide text-[#111111]">
+                          Brand New Points to Add ({resumeUpdates.newPointsToAdd.length})
+                        </h3>
+                      </div>
+                      <span className="text-[11px] text-[#767676]">
+                        Directly addresses unmet job requirements
+                      </span>
+                    </div>
+
+                    <div className="space-y-4">
+                      {resumeUpdates.newPointsToAdd.map((pt, idx) => (
+                        <div
+                          key={idx}
+                          className="border border-[#DFDFDF] rounded-[4px] p-4 sm:p-5 bg-white space-y-3.5 hover:border-[#0A8A00] transition-all shadow-xs"
+                        >
+                          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#F0F0F0] pb-2">
+                            <div className="flex items-center gap-2">
+                              <span className="px-2 py-0.5 bg-[#0A8A00] text-white text-[10px] font-bold uppercase tracking-wide rounded-[2px]">
+                                New Addition
+                              </span>
+                              <span className="text-xs font-semibold text-[#111111]">
+                                Target: {pt.targetedRequirement}
+                              </span>
+                            </div>
+                            <span className="text-[11px] text-[#767676] font-mono">
+                              Placement: {pt.section}
+                            </span>
+                          </div>
+
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-bold uppercase text-[#484848] tracking-wider">
+                                Suggested Accomplishment Bullet
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => copyToClipboard(pt.suggestedBullet, "New bullet point")}
+                                className="nordic-btn-yellow text-xs h-7 px-2.5 cursor-pointer font-bold flex items-center gap-1 tap-active"
+                              >
+                                <span>Copy New Bullet</span>
+                              </button>
+                            </div>
+                            <div className="p-3.5 bg-white border border-[#DFDFDF] rounded-[4px] text-xs font-mono font-bold text-[#111111] leading-relaxed shadow-2xs border-l-4 border-l-[#0A8A00]">
+                              • {pt.suggestedBullet}
+                            </div>
+                          </div>
+
+                          <div className="pt-1 text-[11px] text-[#484848] bg-[#F9F9F9] p-2.5 rounded-[4px]">
+                            <span className="font-bold text-[#111111]">Strategy:</span> {pt.reason}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
             ) : (
               <EmptyState
-                title="No Resume Suggestions Yet"
-                description="Scan your resume against this job posting to discover missing keywords and bullet point optimizations."
+                title="No Resume Optimization Plan Generated Yet"
+                description="Scan your resume against this job posting to uncover missing target keywords, bullet point upgrades (Old vs. Updated), and new accomplishment additions."
                 action={{
-                  label: "⚡ Get Suggestions",
+                  label: "⚡ Generate Resume Optimization Plan",
                   onClick: handleGenerateResumeUpdates,
                   variant: "primary",
                 }}

@@ -61,6 +61,7 @@ export async function POST(request: Request) {
       type: saved.type,
       content: saved.content,
       createdAt: saved.createdAt,
+      ...result,
     }, 201);
   } catch (error) {
     return handleApiError(error, "Failed to generate resume updates");
