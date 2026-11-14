@@ -1,30 +1,40 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
-export async function POST(req: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const { name, email, password } = await req.json();
+    const body = await request.json();
+    const { email, password, name } = body as {
+      email: string;
+      password: string;
+      name?: string;
+    };
 
     if (!email || !password) {
       return NextResponse.json(
-        { error: "Email and password are required." },
-        { status: 400 }
+        { error: "Email and password are required" },
+        { status: 400 },
       );
     }
 
-    if (password.length < 6) {
+    const normalizedEmail = email.toLowerCase().trim();
+
+    if (password.length < 8) {
       return NextResponse.json(
-        { error: "Password must be at least 6 characters." },
-        { status: 400 }
+        { error: "Password must be at least 8 characters" },
+        { status: 400 },
       );
     }
 
-    const existing = await prisma.user.findUnique({ where: { email } });
+    const existing = await prisma.user.findUnique({
+      where: { email: normalizedEmail },
+    });
+
     if (existing) {
       return NextResponse.json(
-        { error: "An account with this email already exists." },
-        { status: 409 }
+        { error: "An account with this email already exists" },
+        { status: 409 },
       );
     }
 
@@ -32,27 +42,27 @@ export async function POST(req: NextRequest) {
 
     const user = await prisma.user.create({
       data: {
-        name: name || null,
-        email,
+        email: normalizedEmail,
         passwordHash,
+        name: name?.trim() || null,
+      },
+      select: { id: true, email: true },
+    });
+
+    await prisma.activityLog.create({
+      data: {
+        userId: user.id,
+        action: "account_created",
+        details: "Account registered via email/password",
       },
     });
 
+    return NextResponse.json(user, { status: 201 });
+  } catch (error) {
+    console.error("Registration error:", error);
     return NextResponse.json(
-      {
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-        },
-      },
-      { status: 201 }
-    );
-  } catch (err) {
-    console.error("Registration error:", err);
-    return NextResponse.json(
-      { error: "Registration failed. Please try again." },
-      { status: 500 }
+      { error: "Failed to create account" },
+      { status: 500 },
     );
   }
 }

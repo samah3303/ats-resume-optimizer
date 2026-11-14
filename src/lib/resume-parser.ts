@@ -1,220 +1,146 @@
 import mammoth from "mammoth";
 import zlib from "zlib";
+import type { ResumeParseResult } from "@/types";
+import { aiChat, parseJsonSafely } from "@/lib/ai";
 
-// Ensure DOMMatrix polyfill in Node runtime for pdfjs-dist / pdf-parse
-if (typeof globalThis.DOMMatrix === "undefined") {
-  // @ts-ignore
-  globalThis.DOMMatrix = class DOMMatrix {
-    a = 1; b = 0; c = 0; d = 1; e = 0; f = 0;
-    constructor(init?: number[]) {
-      if (Array.isArray(init) && init.length >= 6) {
-        this.a = init[0]; this.b = init[1];
-        this.c = init[2]; this.d = init[3];
-        this.e = init[4]; this.f = init[5];
-      }
-    }
-    transformPoint(p?: unknown) { return p || { x: 0, y: 0 }; }
-    translate() { return this; }
-    scale() { return this; }
-    multiply() { return this; }
-    inverse() { return this; }
-  };
-}
-
-/**
- * Validates whether an extracted string is readable human text
- * with genuine words and standard alphanumeric ratio (eliminating custom font encoding garble).
- */
-export function isHumanReadableText(str: string): boolean {
+function isHumanReadableText(str: string): boolean {
   if (!str || str.trim().length < 5) return false;
   const clean = str.trim();
   let normalCount = 0;
-  let symbolNoiseCount = 0;
-
+  let noiseCount = 0;
   for (let i = 0; i < clean.length; i++) {
-    const char = clean[i];
     const code = clean.charCodeAt(i);
-
     if (
-      (code >= 48 && code <= 57) ||   // 0-9
-      (code >= 65 && code <= 90) ||   // A-Z
-      (code >= 97 && code <= 122) ||  // a-z
-      code === 32 || code === 10 || code === 13 || code === 9 || // spaces/newlines
-      (code >= 160 && code <= 383) || // extended latin
-      (code >= 1536 && code <= 1791)  // Arabic characters
-    ) {
+      (code >= 48 && code <= 57) ||
+      (code >= 65 && code <= 90) ||
+      (code >= 97 && code <= 122) ||
+      code === 32 ||
+      code === 10 ||
+      code === 13 ||
+      code === 9 ||
+      (code >= 160 && code <= 383)
+    )
       normalCount++;
-    } else if (/[.,\-_@:\/()+|]/.test(char)) {
-      normalCount++;
-    } else if (/[%*;!&$\"#^~`<>=?\\{}[\]]/.test(char)) {
-      symbolNoiseCount++;
-    }
+    else if (/[%*;!&$"#^~`<>=?\\{}[\]]/.test(clean[i])) noiseCount++;
   }
-
-  const normalRatio = normalCount / clean.length;
-  const noiseRatio = symbolNoiseCount / clean.length;
-
-  return normalRatio >= 0.65 && noiseRatio < 0.20;
+  return normalCount / clean.length >= 0.65 && noiseCount / clean.length < 0.2;
 }
 
-/**
- * Strips out font subset noise symbols and extracts clean alphanumeric words
- */
-function cleanAndExtractReadableWords(rawText: string): string {
-  if (!rawText || rawText.length < 10) return "";
-  const words = rawText.match(/[a-zA-Z0-9.,\-_@:\/()+|]{2,}/g) || [];
-  const cleaned = words.join(" ").replace(/\s+/g, " ").trim();
-  if (cleaned.length > 20 && isHumanReadableText(cleaned)) {
-    return cleaned;
-  }
-  return "";
-}
-
-/**
- * Extracts plain text from decompressed FlateDecode streams in PDFs
- */
 function parsePdfFlateStreams(buffer: Buffer): string {
   try {
     const chunks: string[] = [];
     const str = buffer.toString("binary");
-
-    // Match stream blocks in PDF
-    const streamRegex = /stream\r?\n([\s\S]*?)\r?\nendstream/g;
-    let match: RegExpExecArray | null;
-
-    while ((match = streamRegex.exec(str)) !== null) {
-      const rawStream = Buffer.from(match[1], "binary");
-      let decompressedText = "";
-
-      // Try zlib inflate
+    const regex = /stream\r?\n([\s\S]*?)\r?\nendstream/g;
+    let match;
+    while ((match = regex.exec(str)) !== null) {
+      const raw = Buffer.from(match[1], "binary");
+      let text = "";
       try {
-        const inflated = zlib.inflateSync(rawStream);
-        decompressedText = inflated.toString("utf-8");
+        text = zlib.inflateSync(raw).toString("utf-8");
       } catch {
         try {
-          const unzipped = zlib.unzipSync(rawStream);
-          decompressedText = unzipped.toString("utf-8");
+          text = zlib.unzipSync(raw).toString("utf-8");
         } catch {
-          decompressedText = rawStream.toString("utf-8");
+          text = raw.toString("utf-8");
         }
       }
-
-      if (decompressedText) {
-        // Match text literal parenthesis: (Text here) Tj or (Text) TJ
-        const textLiteralRegex = /\(([^()\\]*(?:\\.[^()\\]*)*)\)\s*(?:Tj|TJ|'|")/g;
-        let textMatch: RegExpExecArray | null;
-
-        while ((textMatch = textLiteralRegex.exec(decompressedText)) !== null) {
-          const cleaned = textMatch[1]
+      if (text) {
+        const tReg = /\(([^()\\]*(?:\\.[^()\\]*)*)\)\s*(?:Tj|TJ|'|")/g;
+        let tm;
+        while ((tm = tReg.exec(text)) !== null) {
+          const cleaned = tm[1]
             .replace(/\\([()\\])/g, "$1")
             .replace(/\\n/g, "\n")
-            .replace(/\\r/g, "\r")
-            .replace(/\\t/g, "\t")
             .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, "")
             .trim();
-
-          if (cleaned.length > 0) {
-            chunks.push(cleaned);
-          }
+          if (cleaned.length > 0) chunks.push(cleaned);
         }
       }
     }
-
     const result = chunks.join(" ").replace(/\s+/g, " ").trim();
-    if (isHumanReadableText(result)) {
-      return result;
-    }
-    const sanitized = cleanAndExtractReadableWords(result);
-    if (sanitized) return sanitized;
-
-    return "";
-  } catch (err) {
-    console.warn("Flate stream extraction error:", err);
+    return isHumanReadableText(result) ? result : "";
+  } catch {
     return "";
   }
 }
 
 async function parsePdf(buffer: Buffer): Promise<string> {
-  // 1. Primary: pdf-parse v2 API
   try {
     const { PDFParse } = await import("pdf-parse");
-    
-    // Allocate clean standalone Uint8Array
     const uint8 = new Uint8Array(buffer.length);
     uint8.set(buffer);
-
     const parser = new PDFParse({ data: uint8 });
     const result = await parser.getText();
     await parser.destroy().catch(() => null);
-
     let text = typeof result === "string" ? result : result?.text || "";
-    
-    // Clean up page markers like "-- 1 of 2 --"
     text = text.replace(/--\s*\d+\s*of\s*\d+\s*--/gi, "").trim();
-
-    if (text && text.length > 15) {
-      if (isHumanReadableText(text)) {
-        return text;
-      }
-      const sanitized = cleanAndExtractReadableWords(text);
-      if (sanitized) return sanitized;
-    }
-  } catch (v2Err) {
-    console.warn("PDFParse v2 primary failed:", v2Err);
-  }
-
-  // 2. Fallback: Decompress FlateDecode streams and parse text
-  const flateText = parsePdfFlateStreams(buffer);
-  if (flateText && flateText.length > 10) {
-    if (isHumanReadableText(flateText)) return flateText;
-    const sanitizedFlate = cleanAndExtractReadableWords(flateText);
-    if (sanitizedFlate) return sanitizedFlate;
-  }
-
-  throw new Error(
-    "Unable to extract readable text from PDF due to custom font encodings or image-based formatting. Please export your resume using standard 'Save as PDF' (with standard system fonts) or upload as DOCX."
-  );
+    if (text && text.length > 15 && isHumanReadableText(text)) return text;
+  } catch {}
+  const flate = parsePdfFlateStreams(buffer);
+  if (flate && flate.length > 10) return flate;
+  throw new Error("Unable to extract readable text from PDF. Try DOCX format.");
 }
 
 export async function parseResumeFile(
   buffer: Buffer,
   mimeType: string,
-  fileName?: string
+  fileName?: string,
 ): Promise<string> {
-  try {
-    let effectiveType = mimeType;
-    if (!effectiveType || effectiveType === "application/octet-stream") {
-      const ext = fileName?.toLowerCase().split(".").pop() || "";
-      if (ext === "pdf") effectiveType = "application/pdf";
-      else if (ext === "docx") effectiveType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-      else if (ext === "doc") effectiveType = "application/msword";
-      else if (ext === "txt") effectiveType = "text/plain";
-    }
-
-    if (effectiveType === "application/pdf") {
-      return await parsePdf(buffer);
-    }
-
-    if (
-      effectiveType ===
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-      effectiveType === "application/msword"
-    ) {
-      const result = await mammoth.extractRawText({ buffer });
-      return result.value;
-    }
-
-    if (effectiveType === "text/plain") {
-      return buffer.toString("utf-8");
-    }
-
-    throw new Error(
-      `Unsupported file type: ${effectiveType || mimeType}. Please upload a PDF, DOC, DOCX, or TXT file.`
-    );
-  } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(`Failed to parse resume: ${error.message}`);
-    }
-    throw new Error("Failed to parse resume file.");
+  let effectiveType = mimeType;
+  if (!effectiveType || effectiveType === "application/octet-stream") {
+    const ext = fileName?.toLowerCase().split(".").pop() || "";
+    if (ext === "pdf") effectiveType = "application/pdf";
+    else if (ext === "docx")
+      effectiveType =
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    else if (ext === "doc") effectiveType = "application/msword";
+    else if (ext === "txt") effectiveType = "text/plain";
   }
+  if (effectiveType === "application/pdf") return parsePdf(buffer);
+  if (
+    effectiveType.includes("wordprocessingml") ||
+    effectiveType === "application/msword"
+  ) {
+    const r = await mammoth.extractRawText({ buffer });
+    return r.value;
+  }
+  if (effectiveType === "text/plain") return buffer.toString("utf-8");
+  throw new Error(
+    `Unsupported file type: ${effectiveType}. Please upload PDF, DOC, DOCX, or TXT.`,
+  );
+}
+
+export async function extractProfileFromResume(
+  rawText: string,
+): Promise<ResumeParseResult> {
+  const prompt = `Extract structured information from this resume text. Return JSON:
+{
+  "name": "Full Name or null",
+  "email": "email@example.com or null",
+  "phone": "phone number or null",
+  "location": "city, country or null",
+  "summary": "professional summary in 2-3 sentences or null",
+  "skills": ["skill1", "skill2"],
+  "experience": [{"title":"Job Title","company":"Company","location":"Location","startDate":"YYYY-MM","endDate":"YYYY-MM or Present","description":"brief","highlights":["achievement1"]}],
+  "education": [{"degree":"Degree","institution":"University","location":"Location","year":"YYYY","gpa":"GPA or null"}]
+}
+
+Be thorough. Extract ALL skills, ALL experience entries, ALL education entries.`;
+
+  const response = await aiChat(prompt, rawText.slice(0, 6000), {
+    temperature: 0.1,
+  });
+  const parsed = parseJsonSafely<Partial<ResumeParseResult>>(response, {});
+
+  return {
+    name: parsed.name || null,
+    email: parsed.email || null,
+    phone: parsed.phone || null,
+    location: parsed.location || null,
+    summary: parsed.summary || null,
+    skills: Array.isArray(parsed.skills) ? parsed.skills : [],
+    experience: Array.isArray(parsed.experience) ? parsed.experience : [],
+    education: Array.isArray(parsed.education) ? parsed.education : [],
+    rawText,
+  };
 }

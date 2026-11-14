@@ -1,450 +1,362 @@
 "use client";
 
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { useToast } from "@/components/Toast";
+import {
+  ApplicationEntry,
+  ApplicationStatus,
+  APPLICATION_STATUSES,
+} from "@/types";
 
-interface JDInfo {
-  id: string;
-  title: string;
-  company: string | null;
-  sourceUrl: string | null;
-  rawText?: string;
-}
-
-interface Application {
-  id: string;
-  jdId: string;
-  status: string;
-  notes: string | null;
-  appliedAt: string | null;
-  createdAt: string;
-  jobDescription: JDInfo;
-}
-
-interface OutreachPack {
-  coverLetter?: string;
-  linkedinMessage?: string;
-  whatsappMessage?: string;
-  coldEmailSubject?: string;
-  coldEmailBody?: string;
-  followupEmailBody?: string;
-  postInterviewEmailBody?: string;
-}
-
-const STATUSES = [
-  { key: "wishlist", label: "Wishlist", color: "bg-[#27272A] text-[#FAFAFA] border border-[#27272A]" },
-  { key: "applied", label: "Applied", color: "bg-[#27272A] text-[#FAFAFA] border border-[#27272A]" },
-  { key: "phone_screen", label: "Phone Screen", color: "bg-zinc-800 text-white" },
-  { key: "interview", label: "Interview", color: "bg-black text-white" },
-  { key: "offer", label: "Offer", color: "bg-emerald-50 text-emerald-950 border border-emerald-300" },
-  { key: "rejected", label: "Rejected", color: "bg-rose-50 text-rose-950 border border-rose-300" },
-] as const;
-
-export default function TrackerPage() {
-  const { status } = useSession();
-  const router = useRouter();
-  const { toast } = useToast();
-  const [applications, setApplications] = useState<Application[]>([]);
+export default function ApplicationTrackerPage() {
+  const [applications, setApplications] = useState<ApplicationEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [movingId, setMovingId] = useState<string | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [mobileColumn, setMobileColumn] = useState<string>("all");
+  const [activeAppModal, setActiveAppModal] = useState<ApplicationEntry | null>(
+    null
+  );
+  const [editingNotes, setEditingNotes] = useState("");
+  const [editingContact, setEditingContact] = useState("");
+  const [editingDate, setEditingDate] = useState("");
+  const [updating, setUpdating] = useState(false);
 
-  // Outreach Modal State
-  const [activeOutreachApp, setActiveOutreachApp] = useState<Application | null>(null);
-  const [generatingOutreach, setGeneratingOutreach] = useState(false);
-  const [outreachPack, setOutreachPack] = useState<OutreachPack | null>(null);
-  const [activeChannelTab, setActiveChannelTab] = useState<"linkedin" | "whatsapp" | "email">("linkedin");
-  const [copiedKey, setCopiedKey] = useState<string | null>(null);
-
-  const fetchApplications = useCallback(async () => {
+  const loadApplications = useCallback(async () => {
     try {
-      const res = await fetch("/api/tracker");
+      setLoading(true);
+      const res = await fetch("/api/applications");
       if (res.ok) {
         const data = await res.json();
-        setApplications(data.applications || []);
+        setApplications(data);
       }
-    } catch {
-      // silently fail
+    } catch (err) {
+      console.error("Failed to load applications", err);
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.replace("/login");
-      return;
-    }
-    if (status === "authenticated") {
-      fetchApplications();
-    }
-  }, [status, router, fetchApplications]);
+    loadApplications();
+  }, [loadApplications]);
 
-  const moveApplication = async (appId: string, newStatus: string) => {
-    setMovingId(appId);
+  const handleStatusChange = async (
+    appId: string,
+    newStatus: ApplicationStatus
+  ) => {
     try {
-      const res = await fetch("/api/tracker", {
+      const res = await fetch(`/api/applications/${appId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: appId, status: newStatus }),
+        body: JSON.stringify({ status: newStatus }),
       });
+
       if (res.ok) {
         setApplications((prev) =>
           prev.map((a) => (a.id === appId ? { ...a, status: newStatus } : a))
         );
-        
-        if (newStatus === "interview") {
-          toast("Interview tools unlocked on Dashboard! 🎉", "success");
-        } else if (newStatus === "offer") {
-          toast("Salary War Room unlocked on Dashboard! 💰", "success");
-        } else {
-          toast(`Moved to ${STATUSES.find(s => s.key === newStatus)?.label}`, "info");
-        }
       }
-    } catch {
-      toast("Failed to update status", "error");
-    } finally {
-      setMovingId(null);
+    } catch (err) {
+      console.error("Failed to update status", err);
     }
   };
 
-  const deleteApplication = async (appId: string) => {
-    if (!confirm("Remove this application from tracker?")) return;
-    setDeletingId(appId);
-    try {
-      const res = await fetch(`/api/tracker?id=${appId}`, { method: "DELETE" });
-      if (res.ok) {
-        setApplications((prev) => prev.filter((a) => a.id !== appId));
-        toast("Application removed", "success");
-      }
-    } catch {
-      toast("Failed to remove application", "error");
-    } finally {
-      setDeletingId(null);
-    }
+  const openModal = (app: ApplicationEntry) => {
+    setActiveAppModal(app);
+    setEditingNotes(app.notes || "");
+    setEditingContact(app.contactPerson || "");
+    setEditingDate(app.interviewDate || "");
   };
 
-  const handleOpenOutreach = async (app: Application) => {
-    setActiveOutreachApp(app);
-    setOutreachPack(null);
-    setGeneratingOutreach(true);
+  const handleSaveModal = async () => {
+    if (!activeAppModal) return;
+    setUpdating(true);
 
     try {
-      // Get primary resume ID if available
-      const rRes = await fetch("/api/resumes/primary");
-      let primaryResumeId: string | undefined;
-      if (rRes.ok) {
-        const rData = await rRes.json();
-        primaryResumeId = rData.resume?.id;
-      }
-
-      const res = await fetch("/api/outreach", {
-        method: "POST",
+      const res = await fetch(`/api/applications/${activeAppModal.id}`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          resumeId: primaryResumeId,
-          resumeText: "Experienced Software & AI Engineer",
-          jdId: app.jdId,
+          notes: editingNotes,
+          contactPerson: editingContact,
+          interviewDate: editingDate || null,
         }),
       });
 
       if (res.ok) {
-        const data = await res.json();
-        setOutreachPack(data.pack);
-      } else {
-        toast("Failed to generate outreach templates", "error");
+        const updated = await res.json();
+        setApplications((prev) =>
+          prev.map((a) => (a.id === updated.id ? updated : a))
+        );
+        setActiveAppModal(null);
       }
-    } catch {
-      toast("Failed to generate outreach templates", "error");
+    } catch (err) {
+      console.error("Failed to save application updates", err);
     } finally {
-      setGeneratingOutreach(false);
+      setUpdating(false);
     }
   };
 
-  const copyToClipboard = async (text: string, key: string) => {
-    await navigator.clipboard.writeText(text);
-    setCopiedKey(key);
-    toast("Copied to clipboard!", "success");
-    setTimeout(() => setCopiedKey(null), 2000);
-  };
-
-  const getAppsByStatus = (statusKey: string) =>
-    applications.filter((a) => a.status === statusKey);
-
-  const statusIndex = (statusKey: string) =>
-    STATUSES.findIndex((s) => s.key === statusKey);
-
-  if (status === "loading" || loading) {
-    return (
-      <div className="min-h-screen bg-[#09090B] text-[#FAFAFA] py-8 px-4 sm:px-6 lg:px-8 space-y-6">
-        <div className="h-8 bg-[#27272A] rounded w-48 animate-pulse mb-8 max-w-7xl mx-auto" />
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-4 max-w-7xl mx-auto">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="bg-[#09090B] rounded-2xl p-4 border border-[#27272A]">
-              <div className="h-6 bg-[#27272A] rounded w-20 animate-pulse mb-4" />
-              {[...Array(2)].map((_, j) => (
-                <div key={j} className="h-24 bg-[#18181B] rounded-xl mb-3 animate-pulse border border-[#27272A]" />
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (status === "unauthenticated") return null;
+  const kanbanColumns: { status: ApplicationStatus; label: string; dot: string }[] = [
+    { status: "wishlist", label: "Wishlist", dot: "bg-[#767676]" },
+    { status: "applied", label: "Applied", dot: "bg-[#003399]" },
+    { status: "phone_screen", label: "Screening", dot: "bg-[#FFDA1A]" },
+    { status: "interview", label: "Interview", dot: "bg-[#E87400]" },
+    { status: "offer", label: "Offer", dot: "bg-[#0A8A00]" },
+    { status: "rejected", label: "Archived", dot: "bg-[#DFDFDF]" },
+  ];
 
   return (
-    <div className="min-h-screen bg-[#09090B] text-[#FAFAFA] py-8 px-4 sm:px-6 lg:px-8 space-y-6 pb-24">
-      <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <Link href="/dashboard" className="text-xs font-bold text-[#FAFAFA] hover:underline">
-                ← Back to Dashboard
-              </Link>
-            </div>
-            <h1 className="text-2xl sm:text-4xl font-black text-[#FAFAFA] tracking-tight mt-1">Application Kanban Tracker</h1>
-            <p className="text-xs sm:text-sm text-zinc-400 mt-1 font-medium">
-              {applications.length} application{applications.length !== 1 ? "s" : ""} tracked with 1-click multi-channel outreach
-            </p>
+    <div className="space-y-4 sm:space-y-6 font-sans">
+      {/* Header Banner */}
+      <div className="nordic-card rounded-2xl sm:rounded-[4px] p-4.5 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-5">
+        <div>
+          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-[#FFDA1A] text-[#111111] text-[10px] font-bold rounded-[2px] uppercase tracking-wide mb-2 sm:mb-3">
+            <span className="w-2 h-2 rounded-full bg-[#003399]" />
+            Tracker
           </div>
+          <h1 className="text-xl sm:text-3xl font-bold text-[#111111] tracking-tight">
+            Application Tracker
+          </h1>
+          <p className="text-xs sm:text-sm text-[#484848] mt-0.5 sm:mt-1">
+            Track your job applications, upcoming interviews, and offers in one place.
+          </p>
         </div>
 
-        {/* Kanban board */}
-        <div className="overflow-x-auto pb-4 md:overflow-visible">
-          <div className="flex gap-4 min-w-[900px] md:min-w-0 md:grid md:grid-cols-6">
-            {STATUSES.map((statusCol) => {
-              const apps = getAppsByStatus(statusCol.key);
-              const idx = statusIndex(statusCol.key);
-
-              return (
-                <div
-                  key={statusCol.key}
-                  className="flex-1 md:flex-none min-w-[260px] md:min-w-0 bg-[#09090B] rounded-3xl border border-[#27272A] p-4 shadow-sm flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-3 border-b border-[#27272A] pb-2.5">
-                      <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${statusCol.color}`}>
-                        {statusCol.label}
-                      </span>
-                      <span className="text-xs text-[#FAFAFA] font-mono font-bold">
-                        {apps.length}
-                      </span>
-                    </div>
-
-                    <div className="space-y-3">
-                      {apps.length === 0 ? (
-                        <p className="text-xs text-zinc-400 text-center py-6 italic font-medium">
-                          No applications
-                        </p>
-                      ) : (
-                        apps.map((app) => (
-                          <div
-                            key={app.id}
-                            className="bg-[#18181B] rounded-2xl border border-[#27272A] hover:border-zinc-400 p-4 shadow-sm transition-all space-y-2 group"
-                          >
-                            <h4 className="font-bold text-xs text-[#FAFAFA] truncate group-hover:underline transition-colors">
-                              {app.jobDescription.title}
-                            </h4>
-                            {app.jobDescription.company && (
-                              <p className="text-[11px] font-medium text-zinc-400 truncate">
-                                {app.jobDescription.company}
-                              </p>
-                            )}
-                            
-                            <Link
-                              href={`/dashboard/analyze?jdId=${app.jobDescription.id}`}
-                              className="w-full mt-1 px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-700 text-[10px] font-bold rounded-xl transition-colors flex items-center justify-center gap-1 shadow-sm"
-                            >
-                              <span>⭐ Tailor vs Primary Resume</span>
-                            </Link>
-
-                            <button
-                              onClick={() => handleOpenOutreach(app)}
-                              className="w-full mt-1 px-2.5 py-1.5 bg-black hover:bg-zinc-800 text-white border border-black text-[10px] font-bold rounded-xl transition-colors flex items-center justify-center gap-1 shadow-sm"
-                            >
-                              <span>🚀 Multi-Channel Outreach</span>
-                            </button>
-
-                            <div className="flex items-center justify-between pt-2 border-t border-[#27272A]">
-                              <div className="flex gap-1">
-                                {idx > 0 && (
-                                  <button
-                                    onClick={() => moveApplication(app.id, STATUSES[idx - 1].key)}
-                                    disabled={movingId === app.id}
-                                    className="p-1 text-zinc-400 hover:text-[#FAFAFA] hover:bg-[#27272A] rounded-lg transition-colors"
-                                    title={`Move to ${STATUSES[idx - 1].label}`}
-                                  >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                                    </svg>
-                                  </button>
-                                )}
-                                {idx < STATUSES.length - 1 && (
-                                  <button
-                                    onClick={() => moveApplication(app.id, STATUSES[idx + 1].key)}
-                                    disabled={movingId === app.id}
-                                    className="p-1 text-zinc-400 hover:text-[#FAFAFA] hover:bg-[#27272A] rounded-lg transition-colors"
-                                    title={`Move to ${STATUSES[idx + 1].label}`}
-                                  >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
-                                  </button>
-                                )}
-                              </div>
-                              <button
-                                onClick={() => deleteApplication(app.id)}
-                                disabled={deletingId === app.id}
-                                className="text-xs font-bold text-zinc-400 hover:text-rose-400 hover:bg-rose-950/40 px-2 py-0.5 rounded-lg transition-colors disabled:opacity-50"
-                              >
-                                {deletingId === app.id ? "..." : "✕"}
-                              </button>
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        <Link
+          href="/dashboard/jobs"
+          className="nordic-btn-primary text-xs sm:text-sm h-11 px-4 sm:px-5 cursor-pointer text-center shrink-0 flex items-center justify-center gap-2 tap-active font-bold"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
+          </svg>
+          Add a Job
+        </Link>
       </div>
 
-      {/* Multi-Channel Outreach Modal */}
-      {activeOutreachApp && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-[#18181B] border border-[#27272A] rounded-3xl p-6 max-w-xl w-full text-[#FAFAFA] shadow-2xl space-y-5 animate-fadeIn">
-            <div className="flex items-center justify-between border-b border-[#27272A] pb-4">
-              <div>
-                <span className="text-[10px] font-black text-zinc-400 uppercase tracking-wider">
-                  Outreach Assistant
-                </span>
-                <h3 className="text-base font-black text-[#FAFAFA]">
-                  {activeOutreachApp.jobDescription.title}
-                </h3>
-                <p className="text-xs text-zinc-400 font-medium">
-                  {activeOutreachApp.jobDescription.company || "Target Company"}
-                </p>
-              </div>
-              <button
-                onClick={() => setActiveOutreachApp(null)}
-                className="text-xs font-bold text-zinc-400 hover:text-[#FAFAFA]"
-              >
-                ✕ Close
-              </button>
-            </div>
+      {/* Mobile Column Filter Pills */}
+      <div className="md:hidden flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 -mx-1 px-1">
+        <button
+          onClick={() => setMobileColumn("all")}
+          className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors tap-active shrink-0 ${
+            mobileColumn === "all"
+              ? "bg-[#003399] text-white"
+              : "bg-white text-[#484848] border border-[#DFDFDF]"
+          }`}
+        >
+          All ({applications.length})
+        </button>
+        {kanbanColumns.map((col) => {
+          const count = applications.filter((a) => a.status === col.status).length;
+          const isSelected = mobileColumn === col.status;
+          return (
+            <button
+              key={col.status}
+              onClick={() => setMobileColumn(col.status)}
+              className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors tap-active flex items-center gap-1.5 shrink-0 ${
+                isSelected
+                  ? "bg-[#003399] text-white"
+                  : "bg-white text-[#484848] border border-[#DFDFDF]"
+              }`}
+            >
+              <span
+                className={`w-2 h-2 rounded-full ${
+                  isSelected ? "bg-[#FFDA1A]" : col.dot
+                }`}
+              />
+              {col.label} ({count})
+            </button>
+          );
+        })}
+      </div>
 
-            {generatingOutreach ? (
-              <div className="flex flex-col items-center justify-center py-12 space-y-3">
-                <span className="w-8 h-8 border-2 border-[#FAFAFA] border-t-transparent rounded-full animate-spin" />
-                <span className="text-xs font-bold text-[#FAFAFA] uppercase tracking-wider">
-                  Drafting LinkedIn, WhatsApp & Email messages...
-                </span>
-              </div>
-            ) : outreachPack ? (
-              <div className="space-y-4">
-                {/* Channel Selector */}
-                <div className="flex gap-2 bg-[#27272A] border border-[#27272A] rounded-2xl p-1.5">
-                  <button
-                    onClick={() => setActiveChannelTab("linkedin")}
-                    className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${
-                      activeChannelTab === "linkedin"
-                        ? "bg-black text-white font-bold shadow-sm"
-                        : "text-zinc-400 hover:text-[#FAFAFA]"
-                    }`}
-                  >
-                    💼 LinkedIn InMail
-                  </button>
-                  <button
-                    onClick={() => setActiveChannelTab("whatsapp")}
-                    className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${
-                      activeChannelTab === "whatsapp"
-                        ? "bg-black text-white font-bold shadow-sm"
-                        : "text-zinc-400 hover:text-[#FAFAFA]"
-                    }`}
-                  >
-                    📱 WhatsApp DM
-                  </button>
-                  <button
-                    onClick={() => setActiveChannelTab("email")}
-                    className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${
-                      activeChannelTab === "email"
-                        ? "bg-black text-white font-bold shadow-sm"
-                        : "text-zinc-400 hover:text-[#FAFAFA]"
-                    }`}
-                  >
-                    ✉️ Follow-Up Email
-                  </button>
+      {/* Kanban Board Container */}
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div
+              key={i}
+              className="h-96 border border-[#DFDFDF] bg-white rounded-[4px] animate-pulse"
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 items-start">
+          {kanbanColumns.map((col) => {
+            const colApps = applications.filter((a) => a.status === col.status);
+            const isMatch = mobileColumn === "all" || mobileColumn === col.status;
+
+            return (
+              <div
+                key={col.status}
+                className={`bg-white border border-[#DFDFDF] rounded-2xl md:rounded-[4px] shadow-2xs flex-col min-h-[300px] md:min-h-[460px] ${
+                  isMatch ? "flex" : "hidden md:flex"
+                }`}
+              >
+                {/* Column Header */}
+                <div className="p-3 border-b border-[#DFDFDF] bg-[#F5F5F5] rounded-t-[4px] flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2 font-bold text-[#111111]">
+                    <span className={`w-2.5 h-2.5 rounded-full ${col.dot}`} />
+                    <span>{col.label}</span>
+                  </div>
+                  <span className="px-2 py-0.5 bg-white border border-[#DFDFDF] font-bold text-[11px] rounded-[2px] font-mono text-[#111111]">
+                    {colApps.length}
+                  </span>
                 </div>
 
-                {/* Tab Content */}
-                {activeChannelTab === "linkedin" && (
-                  <div className="p-4 bg-[#09090B] border border-[#27272A] rounded-2xl space-y-3">
-                    <p className="text-[11px] font-black text-[#FAFAFA] uppercase tracking-wider">
-                      LinkedIn Connection / InMail Note (Max 250 chars):
-                    </p>
-                    <p className="text-xs text-zinc-300 font-sans leading-relaxed whitespace-pre-wrap font-medium">
-                      {outreachPack.linkedinMessage}
-                    </p>
-                    <button
-                      onClick={() => copyToClipboard(outreachPack.linkedinMessage || "", "li")}
-                      className="px-4 py-2 bg-black hover:bg-zinc-800 text-white border border-black text-xs font-bold rounded-xl transition-colors shadow-sm"
-                    >
-                      {copiedKey === "li" ? "✓ Copied!" : "📋 Copy LinkedIn Message"}
-                    </button>
-                  </div>
-                )}
-
-                {activeChannelTab === "whatsapp" && (
-                  <div className="p-4 bg-[#09090B] border border-[#27272A] rounded-2xl space-y-3">
-                    <p className="text-[11px] font-black text-[#FAFAFA] uppercase tracking-wider">
-                      WhatsApp Direct Message (Short & Professional):
-                    </p>
-                    <p className="text-xs text-zinc-300 font-sans leading-relaxed whitespace-pre-wrap font-medium">
-                      {outreachPack.whatsappMessage}
-                    </p>
-                    <button
-                      onClick={() => copyToClipboard(outreachPack.whatsappMessage || "", "wa")}
-                      className="px-4 py-2 bg-black hover:bg-zinc-800 text-white border border-black text-xs font-bold rounded-xl transition-colors shadow-sm"
-                    >
-                      {copiedKey === "wa" ? "✓ Copied!" : "📋 Copy WhatsApp Message"}
-                    </button>
-                  </div>
-                )}
-
-                {activeChannelTab === "email" && (
-                  <div className="p-4 bg-[#09090B] border border-[#27272A] rounded-2xl space-y-3">
-                    <p className="text-[11px] font-black text-[#FAFAFA] uppercase tracking-wider">
-                      Follow-up Email (Day 3-7 After Applying):
-                    </p>
-                    <div className="space-y-1 border-b border-[#27272A] pb-2">
-                      <span className="text-[10px] text-zinc-400 font-mono block font-bold">Subject:</span>
-                      <p className="text-xs font-bold text-[#FAFAFA]">{outreachPack.coldEmailSubject}</p>
+                {/* Cards Container */}
+                <div className="p-2.5 space-y-2.5 flex-1 overflow-y-auto">
+                  {colApps.length === 0 ? (
+                    <div className="h-28 border border-dashed border-[#DFDFDF] rounded-[4px] flex items-center justify-center text-xs text-[#767676] text-center p-3">
+                      No jobs here
                     </div>
-                    <p className="text-xs text-zinc-300 font-sans leading-relaxed whitespace-pre-wrap font-medium">
-                      {outreachPack.followupEmailBody}
-                    </p>
-                    <button
-                      onClick={() => copyToClipboard(`${outreachPack.coldEmailSubject}\n\n${outreachPack.followupEmailBody}`, "em")}
-                      className="px-4 py-2 bg-black hover:bg-zinc-800 text-white border border-black text-xs font-bold rounded-xl transition-colors shadow-sm"
-                    >
-                      {copiedKey === "em" ? "✓ Copied!" : "📋 Copy Email Template"}
-                    </button>
-                  </div>
-                )}
+                  ) : (
+                    colApps.map((app) => (
+                      <div
+                        key={app.id}
+                        className="border border-[#DFDFDF] rounded-[4px] bg-white p-3 hover:border-[#003399] transition-all shadow-2xs"
+                      >
+                        <div className="flex items-start justify-between gap-1 mb-1">
+                          <span className="text-[11px] text-[#767676] uppercase tracking-wider truncate block font-medium">
+                            {app.job?.company || "Company"}
+                          </span>
+                          {app.job?.matchScore !== null && (
+                            <span className="text-[10px] font-mono font-bold bg-[#003399] text-white px-1.5 py-0.5 rounded-[2px]">
+                              {app.job.matchScore}%
+                            </span>
+                          )}
+                        </div>
+
+                        <h4 className="font-bold text-xs text-[#111111] line-clamp-1 mb-2">
+                          {app.job?.title}
+                        </h4>
+
+                        {app.interviewDate && (
+                          <div className="text-[11px] text-[#003399] font-semibold mb-2 flex items-center gap-1">
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span>{app.interviewDate}</span>
+                          </div>
+                        )}
+
+                        <div className="pt-2 border-t border-[#DFDFDF] flex items-center justify-between">
+                          <button
+                            onClick={() => openModal(app)}
+                            className="text-[11px] font-bold text-[#003399] hover:underline cursor-pointer"
+                          >
+                            Edit
+                          </button>
+
+                          <select
+                            value={app.status}
+                            onChange={(e) =>
+                              handleStatusChange(
+                                app.id,
+                                e.target.value as ApplicationStatus
+                              )
+                            }
+                            className="text-[10px] border border-[#DFDFDF] rounded-[2px] bg-white px-1 py-0.5 cursor-pointer font-semibold text-[#111111] focus:outline-none"
+                          >
+                            {APPLICATION_STATUSES.map((st) => (
+                              <option key={st.value} value={st.value}>
+                                → {st.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
-            ) : (
-              <p className="text-xs text-rose-600 font-bold py-4 text-center">
-                Failed to generate outreach messages. Please try again.
-              </p>
-            )}
+            );
+          })}
+        </div>
+      )}
+
+      {/* Detail & Notes Modal (Mobile Bottom Sheet / Desktop Dialog) */}
+      {activeAppModal && (
+        <div className="fixed inset-0 z-50 bg-[#111111]/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="w-full max-w-lg bg-white border-t sm:border border-[#DFDFDF] rounded-t-2xl sm:rounded-[8px] shadow-2xl overflow-hidden max-h-[92vh] overflow-y-auto">
+            <div className="bg-[#003399] text-white p-4 flex flex-col rounded-t-2xl sm:rounded-t-[8px]">
+              <div className="w-10 h-1 bg-white/40 rounded-full mx-auto mb-2.5 sm:hidden" />
+              <div className="flex items-center justify-between w-full">
+                <span className="text-sm font-bold tracking-tight">
+                  Edit Application
+                </span>
+                <button
+                  onClick={() => setActiveAppModal(null)}
+                  className="w-7 h-7 rounded-[4px] bg-[#002B80] hover:bg-[#FFDA1A] hover:text-[#111111] text-white font-bold text-sm transition-colors cursor-pointer flex items-center justify-center tap-active"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+
+            <div className="p-4 sm:p-6 space-y-4 text-xs">
+              <div>
+                <span className="text-[11px] text-[#767676] font-semibold uppercase block">Job</span>
+                <div className="text-base font-bold text-[#111111] mt-0.5">
+                  {activeAppModal.job?.title} @ {activeAppModal.job?.company}
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-[#111111] uppercase mb-1">
+                  Recruiter or Interviewer
+                </label>
+                <input
+                  type="text"
+                  value={editingContact}
+                  onChange={(e) => setEditingContact(e.target.value)}
+                  placeholder="e.g. Sarah Miller"
+                  className="w-full h-10 px-3 border border-[#DFDFDF] rounded-[4px] text-sm text-[#111111] focus:outline-none focus:border-[#003399]"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-[#111111] uppercase mb-1">
+                  Interview Date
+                </label>
+                <input
+                  type="date"
+                  value={editingDate}
+                  onChange={(e) => setEditingDate(e.target.value)}
+                  className="w-full h-10 px-3 border border-[#DFDFDF] rounded-[4px] text-sm text-[#111111] focus:outline-none focus:border-[#003399]"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-[#111111] uppercase mb-1">
+                  Notes
+                </label>
+                <textarea
+                  rows={4}
+                  value={editingNotes}
+                  onChange={(e) => setEditingNotes(e.target.value)}
+                  placeholder="Add notes from interviews, questions asked, or salary discussed..."
+                  className="w-full p-3 border border-[#DFDFDF] rounded-[4px] text-sm text-[#111111] focus:outline-none focus:border-[#003399]"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-[#DFDFDF]">
+                <button
+                  type="button"
+                  onClick={() => setActiveAppModal(null)}
+                  className="nordic-btn-outline h-10 px-4 text-xs font-semibold cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveModal}
+                  disabled={updating}
+                  className="nordic-btn-primary h-10 px-6 text-xs font-bold uppercase tracking-wide disabled:opacity-50 cursor-pointer"
+                >
+                  {updating ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

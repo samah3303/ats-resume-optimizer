@@ -1,454 +1,136 @@
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  extensions = [pgvector(map: "vector", schema: "public")]
 }
 
 model User {
-  id              String   @id @default(uuid())
-  name            String?
-  email           String   @unique
-  passwordHash    String?
-  image           String?
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  id           String   @id @default(uuid())
+  name         String?
+  email        String   @unique
+  passwordHash String?  @map("password_hash")
+  image        String?
+  role         String   @default("user")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
-  resumes          Resume[]
-  positionProfiles PositionProfile[]
-  jobDescriptions  JobDescription[]
-  analyses         Analysis[]
-  onboardingProfile OnboardingProfile?
-  roadmaps          Roadmap[]
+  profile          Profile?
+  jobs             Job[]
   applications     Application[]
-  suggestionFeedbacks SuggestionFeedback[]
-  aiUsageLogs      AiUsageLog[]
-  savedSearches    SavedSearch[]
-  resumeDrafts     ResumeDraft[]
-  recruiterProfile RecruiterProfile?
-  candidateApplications CandidateApplication[]
-  scorecardsReviewed   CandidateScorecard[]
+  generatedContent GeneratedContent[]
+  activityLogs     ActivityLog[]
 
   @@map("users")
 }
 
-model Resume {
-  id         String   @id @default(uuid())
-  userId     String   @map("user_id")
-  name       String
-  filePath   String?  @map("file_path")
-  parsedText String   @map("parsed_text") @db.Text
-  isPrimary  Boolean  @default(false) @map("is_primary")
-  docType    String?  @map("doc_type")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
-
-  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  analyses           Analysis[]
-  onboardingProfiles OnboardingProfile[]
-  originalFile       OriginalFile?
-  chunks             ResumeChunk[]
-
-  @@index([userId])
-  @@index([userId, isPrimary])
-  @@map("resumes")
-}
-
-model OriginalFile {
-  id        String   @id @default(uuid())
-  resumeId  String   @unique @map("resume_id")
-  data      String   @db.Text
-  mimeType  String   @map("mime_type")
-  createdAt DateTime @default(now()) @map("created_at")
-
-  resume Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
-
-  @@map("original_files")
-}
-
-model PositionProfile {
-  id         String   @id @default(uuid())
-  userId     String   @map("user_id")
-  title      String
-  targetRole String   @map("target_role")
-  industry   String?
-  notes      String?
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
-
-  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  jobDescriptions JobDescription[]
-
-  @@index([userId])
-  @@map("position_profiles")
-}
-
-model JobDescription {
-  id                 String   @id @default(uuid())
-  userId             String   @map("user_id")
-  positionProfileId  String?  @map("position_profile_id")
-  title              String
-  company            String?
-  rawText            String   @map("raw_text") @db.Text
-  sourceUrl          String?  @map("source_url")
-  notes              String?  @map("notes")
-  createdAt          DateTime @default(now()) @map("created_at")
-
-  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  positionProfile PositionProfile? @relation(fields: [positionProfileId], references: [id], onDelete: SetNull)
-  analyses        Analysis[]
-  applications    Application[]
-  chunks          JDChunk[]
-
-  @@index([userId])
-  @@map("job_descriptions")
-}
-
-model Analysis {
-  id               String   @id @default(uuid())
-  userId           String   @map("user_id")
-  resumeId         String?  @map("resume_id")
-  jobDescriptionId String   @map("job_description_id")
-  overallScore     Int?     @map("overall_score")
-  keywordsMatchPct Float?   @map("keywords_match_pct")
-  skillsGapJson    String?  @map("skills_gap_json") @db.Text
-  formatScore      Int?     @map("format_score")
-  impactScore      Int?     @map("impact_score")
-  summaryText      String?  @map("summary_text") @db.Text
-  rawAiResponse    String   @map("raw_ai_response") @db.Text
-  createdAt        DateTime @default(now()) @map("created_at")
-
-  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  resume           Resume?          @relation(fields: [resumeId], references: [id], onDelete: SetNull)
-  jobDescription   JobDescription   @relation(fields: [jobDescriptionId], references: [id], onDelete: Cascade)
-  suggestions      Suggestion[]
-  sharedAnalyses   SharedAnalysis[]
-
-  @@index([userId])
-  @@index([userId, createdAt])
-  @@map("analyses")
-}
-
-model Suggestion {
-  id            String   @id @default(uuid())
-  analysisId    String   @map("analysis_id")
-  section       String
-  originalText  String   @map("original_text") @db.Text
-  suggestedText String   @map("suggested_text") @db.Text
-  rationale     String   @db.Text
-  accepted      Boolean  @default(false)
-  createdAt     DateTime @default(now()) @map("created_at")
-
-  analysis Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
-  feedbacks SuggestionFeedback[]
-
-  @@index([analysisId])
-  @@map("suggestions")
-}
-
-model SharedAnalysis {
-  id         String   @id @default(uuid())
-  analysisId String   @map("analysis_id")
-  token      String   @unique
-  createdAt  DateTime @default(now()) @map("created_at")
-
-  analysis Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
-
-  @@map("shared_analyses")
-}
-
-model OnboardingProfile {
+model Profile {
   id              String   @id @default(uuid())
   userId          String   @unique @map("user_id")
-  resumeId        String?  @map("resume_id")
-  targetPositions String   @map("target_positions") @db.Text
-  targetCountry   String   @map("target_country")
-  targetCity      String?  @map("target_city")
+  phone           String?
+  location        String?
+  targetRoles     String?  @map("target_roles") @db.Text
+  jobType         String?  @map("job_type")
   linkedinUrl     String?  @map("linkedin_url")
   portfolioUrl    String?  @map("portfolio_url")
   githubUrl       String?  @map("github_url")
-  industry        String?  @map("industry")
-  jobType         String?  @map("job_type")
-  profileSummary  String?  @map("profile_summary") @db.Text
-  coreSkills      String?  @map("core_skills") @db.Text
-  marketGaps      String?  @map("market_gaps") @db.Text
-  aiSuggestions   String?  @map("ai_suggestions") @db.Text
-  linkedinOpts        String?  @map("linkedin_optimizations") @db.Text
-  generalAtsScore     Int?     @map("general_ats_score")
-  resumeImprovements  String?  @map("resume_improvements") @db.Text
-  createdAt           DateTime @default(now()) @map("created_at")
+  skills          String?  @db.Text
+  experience      String?  @db.Text
+  education       String?  @db.Text
+  summary         String?  @db.Text
+  resumeText      String?  @map("resume_text") @db.Text
+  resumeFileName  String?  @map("resume_file_name")
+  resumeMimeType  String?  @map("resume_mime_type")
+  resumeData      String?  @map("resume_data") @db.Text
+  atsScore        Int?     @map("ats_score")
+  atsBreakdown    String?  @map("ats_breakdown") @db.Text
+  recommendations String?  @db.Text
+  preferences     String?  @db.Text
+  onboardingDone  Boolean  @default(false) @map("onboarding_done")
+  createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  resume Resume? @relation(fields: [resumeId], references: [id], onDelete: SetNull)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("onboarding_profiles")
+  @@map("profiles")
+}
+
+model Job {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  title        String
+  company      String?
+  location     String?
+  salary       String?
+  jobType      String?  @map("job_type")
+  description  String?  @db.Text
+  requirements String?  @db.Text
+  sourceUrl    String?  @map("source_url")
+  source       String   @default("manual")
+  matchScore   Int?     @map("match_score")
+  isBookmarked Boolean  @default(false) @map("is_bookmarked")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applications Application[]
+
+  @@index([userId])
+  @@index([userId, isBookmarked])
+  @@map("jobs")
 }
 
 model Application {
-  id          String   @id @default(uuid())
-  userId      String   @map("user_id")
-  jdId        String   @map("jd_id")
-  status      String   @default("wishlist")
-  notes       String?  @db.Text
-  appliedAt   DateTime? @map("applied_at")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  jobId         String    @map("job_id")
+  status        String    @default("wishlist")
+  notes         String?   @db.Text
+  contactPerson String?   @map("contact_person")
+  interviewDate DateTime? @map("interview_date")
+  appliedAt     DateTime? @map("applied_at")
+  statusHistory String?   @map("status_history") @db.Text
+  coverLetter   String?   @map("cover_letter") @db.Text
+  resumeUpdates String?   @map("resume_updates") @db.Text
+  atsScore      Int?      @map("ats_score")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
 
-  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  jobDescription JobDescription @relation(fields: [jdId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job  Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([userId, status])
   @@map("applications")
 }
 
-model Roadmap {
-  id               String   @id @default(uuid())
-  userId           String   @map("user_id")
-  strategyOverview String?  @map("strategy_overview") @db.Text
-  generationCount  Int      @default(1) @map("generation_count")
-  generatedAt      DateTime @default(now()) @map("generated_at")
-  createdAt        DateTime @default(now()) @map("created_at")
-
-  user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  weeks WeekTask[]
-
-  @@index([userId])
-  @@map("roadmaps")
-}
-
-model WeekTask {
-  id             String   @id @default(uuid())
-  roadmapId      String   @map("roadmap_id")
-  weekNumber     Int      @map("week_number")
-  phase          String
-  focusTitle     String   @map("focus_title")
-  tasks          String   @db.Text
-  completedTasks String?  @default("[]") @map("completed_tasks") @db.Text
-  milestone      String
-
-  roadmap Roadmap @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
-
-  @@index([roadmapId])
-  @@map("week_tasks")
-}
-
-model ResumeChunk {
+model GeneratedContent {
   id        String   @id @default(uuid())
-  resumeId  String   @map("resume_id")
-  chunkText String   @map("chunk_text") @db.Text
-  chunkIndex Int     @map("chunk_index")
-  embedding Unsupported("vector(384)")
+  userId    String   @map("user_id")
+  jobId     String?  @map("job_id")
+  type      String
+  content   String   @db.Text
   createdAt DateTime @default(now()) @map("created_at")
-
-  resume Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
-
-  @@index([resumeId])
-  @@map("resume_chunks")
-}
-
-model JDChunk {
-  id        String   @id @default(uuid())
-  jdId      String   @map("jd_id")
-  chunkText String   @map("chunk_text") @db.Text
-  chunkIndex Int     @map("chunk_index")
-  embedding Unsupported("vector(384)")
-  createdAt DateTime @default(now()) @map("created_at")
-
-  jobDescription JobDescription @relation(fields: [jdId], references: [id], onDelete: Cascade)
-
-  @@index([jdId])
-  @@map("jd_chunks")
-}
-
-model SuggestionFeedback {
-  id           String   @id @default(uuid())
-  suggestionId String   @map("suggestion_id")
-  userId       String   @map("user_id")
-  accepted     Boolean
-  appliedScore Int?     @map("applied_score")
-  feedback     String?  @db.Text
-  createdAt    DateTime @default(now()) @map("created_at")
-
-  suggestion Suggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([suggestionId])
-  @@index([userId])
-  @@map("suggestion_feedback")
-}
-
-model AiUsageLog {
-  id               String   @id @default(uuid())
-  userId           String?  @map("user_id")
-  feature          String   // "analysis", "roadmap", "onboarding", "interview", "cover_letter", "star_rewrite", "compare"
-  model            String   @default("deepseek-chat")
-  promptTokens     Int      @default(0) @map("prompt_tokens")
-  completionTokens Int      @default(0) @map("completion_tokens")
-  totalTokens      Int      @default(0) @map("total_tokens")
-  costINR          Float    @default(0.0) @map("cost_inr")
-  costUSD          Float    @default(0.0) @map("cost_usd")
-  createdAt        DateTime @default(now()) @map("created_at")
-
-  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([feature])
-  @@map("ai_usage_logs")
-}
-
-model SavedSearch {
-  id           String   @id @default(uuid())
-  userId       String   @map("user_id")
-  query        String
-  filters      String?  @db.Text
-  alertEnabled Boolean  @default(false) @map("alert_enabled")
-  lastRunAt    DateTime? @map("last_run_at")
-  createdAt    DateTime @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-  @@map("saved_searches")
+  @@index([userId, type])
+  @@map("generated_content")
 }
 
-model JobCache {
-  id          String   @id @default(uuid())
-  sourceId    String   @map("source_id")
-  source      String
-  title       String
-  company     String?
-  location    String?
-  salary      String?
-  description String   @db.Text
-  url         String
-  postedAt    DateTime? @map("posted_at")
-  cachedAt    DateTime @default(now()) @map("cached_at")
-  expiresAt   DateTime @map("expires_at")
-
-  @@unique([sourceId, source])
-  @@index([source])
-  @@map("job_cache")
-}
-
-model ResumeDraft {
-  id          String   @id @default(uuid())
-  userId      String   @map("user_id")
-  templateId  String   @default("classic-corporate") @map("template_id")
-  title       String   @default("Untitled Resume")
-  dataJson    String   @map("data_json") @db.Text
-  isComplete  Boolean  @default(false) @map("is_complete")
-  lastSection String?  @map("last_section")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+model ActivityLog {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  action    String
+  details   String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-  @@map("resume_drafts")
+  @@index([userId, createdAt])
+  @@map("activity_logs")
 }
-
-model Organization {
-  id          String   @id @default(uuid())
-  name        String
-  logo        String?
-  domain      String?
-  industry    String?
-  size        String?
-  createdAt   DateTime @default(now()) @map("created_at")
-
-  recruiters  RecruiterProfile[]
-  jobPostings JobPosting[]
-
-  @@map("organizations")
-}
-
-model RecruiterProfile {
-  id             String   @id @default(uuid())
-  userId         String   @unique @map("user_id")
-  organizationId String?  @map("organization_id")
-  companyName    String   @default("My Company") @map("company_name")
-  role           String   @default("recruiter")
-  createdAt      DateTime @default(now()) @map("created_at")
-
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
-
-  @@map("recruiter_profiles")
-}
-
-model JobPosting {
-  id             String   @id @default(uuid())
-  organizationId String?  @map("organization_id")
-  userId         String   @map("user_id")
-  title          String
-  department     String?
-  location       String   @default("Remote")
-  jobType        String   @default("full-time") @map("job_type")
-  remotePolicy   String   @default("remote") @map("remote_policy")
-  salaryMin      Int?     @map("salary_min")
-  salaryMax      Int?     @map("salary_max")
-  currency       String   @default("USD")
-  description    String   @db.Text
-  requirements   String   @db.Text
-  status         String   @default("active") // active, draft, closed
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
-
-  organization Organization?          @relation(fields: [organizationId], references: [id], onDelete: SetNull)
-  applications CandidateApplication[]
-
-  @@index([userId])
-  @@index([status])
-  @@map("job_postings")
-}
-
-model CandidateApplication {
-  id           String   @id @default(uuid())
-  jobPostingId String   @map("job_posting_id")
-  candidateId  String?  @map("candidate_id")
-  candidateName String  @map("candidate_name")
-  candidateEmail String @map("candidate_email")
-  resumeText   String   @map("resume_text") @db.Text
-  stage        String   @default("applied") // applied, screened, coding, ai_interview, live_interview, offer, hired, rejected
-  fitScore     Int?     @map("fit_score")
-  fitSummary   String?  @map("fit_summary") @db.Text
-  matchedSkills String? @map("matched_skills") @db.Text // JSON string array
-  missingSkills String? @map("missing_skills") @db.Text // JSON string array
-  notes        String?  @db.Text
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
-
-  jobPosting JobPosting           @relation(fields: [jobPostingId], references: [id], onDelete: Cascade)
-  candidate  User?                @relation(fields: [candidateId], references: [id], onDelete: SetNull)
-  scorecards CandidateScorecard[]
-
-  @@index([jobPostingId])
-  @@index([stage])
-  @@map("candidate_applications")
-}
-
-model CandidateScorecard {
-  id            String   @id @default(uuid())
-  applicationId String   @map("application_id")
-  reviewerId    String   @map("reviewer_id")
-  stage         String
-  overallScore  Int      @map("overall_score") // 1-100
-  criteriaJson  String   @map("criteria_json") @db.Text // Technical, Problem Solving, Communication, Culture
-  feedback      String   @db.Text
-  recommendation String  @default("hire") // strong_hire, hire, hold, reject
-  createdAt     DateTime @default(now()) @map("created_at")
-
-  application CandidateApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
-  reviewer    User                 @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
-
-  @@index([applicationId])
-  @@map("candidate_scorecards")
-}
-
-
