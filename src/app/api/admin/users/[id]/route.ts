@@ -1,6 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAdminSession } from "@/lib/admin";
+import { adminUserUpdateSchema } from "@/lib/validations";
+import { apiSuccess, apiError, handleApiError } from "@/lib/api-response";
 
 export async function PATCH(
   req: NextRequest,
@@ -8,17 +10,18 @@ export async function PATCH(
 ) {
   const admin = await getAdminSession();
   if (!admin) {
-    return NextResponse.json({ error: "Unauthorized. Admin privileges required." }, { status: 403 });
+    return apiError("Unauthorized. Admin privileges required.", 403);
   }
 
   const { id } = await params;
 
   try {
     const body = await req.json();
-    const { role } = body;
+    const { role } = adminUserUpdateSchema.parse(body);
 
-    if (role && role !== "admin" && role !== "user") {
-      return NextResponse.json({ error: "Invalid role. Must be 'admin' or 'user'." }, { status: 400 });
+    // Prevent admin self-lockout: Admin cannot demote their own account to "user"
+    if (admin.user.id === id && role && role !== "admin") {
+      return apiError("Security policy: You cannot demote your own admin account.", 400);
     }
 
     const updated = await prisma.user.update({
@@ -35,9 +38,8 @@ export async function PATCH(
       },
     });
 
-    return NextResponse.json(updated);
+    return apiSuccess(updated);
   } catch (error) {
-    console.error("Admin user update error:", error);
-    return NextResponse.json({ error: "Failed to update user" }, { status: 500 });
+    return handleApiError(error, "Failed to update user");
   }
 }

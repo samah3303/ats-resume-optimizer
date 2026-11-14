@@ -83,8 +83,13 @@ function DashboardLayoutContent({
 
   return (
     <div className="min-h-screen bg-[#F5F5F5] text-[#111111] flex flex-col font-sans selection:bg-[#FFDA1A] selection:text-[#111111]">
+      {/* Skip to Main Content Link (WCAG 2.1 AA 2.4.1 Bypass Blocks) */}
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
+
       {/* ==================== TOP NAVIGATION BAR (Desktop 60px / Mobile 54px) ==================== */}
-      <header className="sticky top-0 z-40 bg-[#003399] text-white shadow-sm">
+      <header className="sticky top-0 z-40 bg-[#003399] text-white shadow-sm" role="banner">
         <div className="flex h-13 sm:h-[60px] items-center justify-between px-3.5 sm:px-8 max-w-[1400px] mx-auto w-full">
           {/* Logo Left */}
           <div className="flex items-center gap-4 sm:gap-6">
@@ -92,13 +97,14 @@ function DashboardLayoutContent({
 
             {/* Quick search input (desktop only) */}
             <div className="hidden lg:flex items-center bg-white rounded-[4px] px-3 h-9 w-72 text-sm text-[#111111] border border-transparent focus-within:ring-2 focus-within:ring-[#FFDA1A]">
-              <svg className="w-4 h-4 text-[#767676] mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-4 h-4 text-[#484848] mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               <input
                 type="text"
+                aria-label="Search jobs, skills, and keywords"
                 placeholder="Search jobs, skills, keywords..."
-                className="bg-transparent border-none outline-none text-xs w-full text-[#111111] placeholder-[#767676]"
+                className="bg-transparent border-none outline-none text-xs w-full text-[#111111] placeholder-[#484848]"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     router.push(`/dashboard/jobs?q=${encodeURIComponent((e.target as HTMLInputElement).value)}`);
@@ -113,10 +119,11 @@ function DashboardLayoutContent({
             {isAdmin && (
               <Link
                 href="/admin"
-                className="h-8 sm:h-9 px-2.5 sm:px-3 rounded-[4px] bg-[#FFDA1A] text-[#111111] hover:bg-white text-xs font-bold transition-colors flex items-center gap-1 shadow-xs tap-active"
+                className="h-9 sm:h-9 px-2.5 sm:px-3 rounded-[4px] bg-[#FFDA1A] text-[#111111] hover:bg-white text-xs font-bold transition-colors flex items-center gap-1 shadow-xs tap-active touch-target"
                 title="Admin Control Center"
+                aria-label="Admin Control Center"
               >
-                <span>⚡</span>
+                <span aria-hidden="true">⚡</span>
                 <span className="hidden sm:inline">Admin</span>
               </Link>
             )}
@@ -126,25 +133,29 @@ function DashboardLayoutContent({
               <span className="font-bold text-white leading-tight">
                 {session?.user?.name || session?.user?.email?.split("@")[0]}
               </span>
-              <span className="text-[11px] text-white/70">
+              <span className="text-[11px] text-white/80">
                 {session?.user?.email}
               </span>
             </div>
 
-            <div className="h-8 w-[1px] bg-white/20 hidden sm:block" />
+            <div className="h-8 w-[1px] bg-white/20 hidden sm:block" aria-hidden="true" />
 
-            {/* Mobile User Avatar pill */}
+            {/* Mobile User Avatar pill with 44x44px touch target */}
             <Link
               href="/dashboard/profile"
-              className="sm:hidden w-8 h-8 rounded-full bg-[#FFDA1A] text-[#003399] font-bold text-xs flex items-center justify-center shadow-xs tap-active"
+              className="sm:hidden touch-target w-11 h-11 flex items-center justify-center tap-active"
               title="View Profile"
+              aria-label={`View profile for ${session?.user?.name || "current user"}`}
             >
-              {userInitial}
+              <span className="w-8 h-8 rounded-full bg-[#FFDA1A] text-[#003399] font-bold text-xs flex items-center justify-center shadow-xs">
+                {userInitial}
+              </span>
             </Link>
 
             <button
               onClick={() => signOut({ callbackUrl: "/" })}
-              className="h-8 sm:h-9 px-2.5 sm:px-3.5 rounded-[4px] bg-[#002B80] hover:bg-[#FFDA1A] hover:text-[#111111] text-white text-xs font-bold transition-colors cursor-pointer tap-active"
+              aria-label="Sign out of account"
+              className="h-9 sm:h-9 px-2.5 sm:px-3.5 rounded-[4px] bg-[#002B80] hover:bg-[#FFDA1A] hover:text-[#111111] text-white text-xs font-bold transition-colors cursor-pointer tap-active flex items-center justify-center touch-target"
             >
               Sign Out
             </button>
@@ -152,7 +163,7 @@ function DashboardLayoutContent({
         </div>
 
         {/* ==================== SECONDARY NAVIGATION BAR (Desktop Only 44px) ==================== */}
-        <div className="hidden md:block bg-white border-b border-[#DFDFDF] shadow-xs">
+        <nav aria-label="Desktop primary navigation" className="hidden md:block bg-white border-b border-[#DFDFDF] shadow-xs">
           <div className="flex h-[44px] items-center px-4 sm:px-8 max-w-[1400px] mx-auto w-full overflow-x-auto gap-8">
             {navItems.map((item) => {
               const isActive = pathname === item.href;
@@ -160,6 +171,7 @@ function DashboardLayoutContent({
                 <Link
                   key={item.href}
                   href={item.href}
+                  aria-current={isActive ? "page" : undefined}
                   className={`h-full flex items-center text-sm font-semibold whitespace-nowrap transition-colors relative ${
                     isActive
                       ? "text-[#003399] font-bold border-b-[3px] border-[#003399]"
@@ -171,16 +183,23 @@ function DashboardLayoutContent({
               );
             })}
           </div>
-        </div>
+        </nav>
       </header>
 
       {/* Main Content Viewport (padded on mobile for bottom bar) */}
-      <main className="flex-1 max-w-[1400px] w-full mx-auto px-3 py-4 sm:p-6 lg:p-8 pb-24 md:pb-8">
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="flex-1 max-w-[1400px] w-full mx-auto px-3 py-4 sm:p-6 lg:p-8 pb-24 md:pb-8 outline-none"
+      >
         {children}
       </main>
 
       {/* ==================== MOBILE APP BOTTOM NAVIGATION BAR (md:hidden) ==================== */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-[#DFDFDF] shadow-[0_-4px_20px_rgba(0,0,0,0.06)] pb-safe">
+      <nav
+        aria-label="Mobile app navigation"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-[#DFDFDF] shadow-[0_-4px_20px_rgba(0,0,0,0.06)] pb-safe"
+      >
         <div className="grid grid-cols-4 h-15 max-w-md mx-auto">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
@@ -188,8 +207,9 @@ function DashboardLayoutContent({
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex flex-col items-center justify-center relative tap-active py-1 transition-all ${
-                  isActive ? "text-[#003399]" : "text-[#767676] hover:text-[#111111]"
+                aria-current={isActive ? "page" : undefined}
+                className={`flex flex-col items-center justify-center relative tap-active py-1 transition-all touch-target ${
+                  isActive ? "text-[#003399]" : "text-[#484848] hover:text-[#111111]"
                 }`}
               >
                 {/* Active indicator bar atop icon */}
@@ -197,7 +217,7 @@ function DashboardLayoutContent({
                   <span className="absolute top-0 w-8 h-[3px] bg-[#003399] rounded-b-full shadow-2xs" />
                 )}
                 
-                <div className={`transition-transform duration-150 ${isActive ? "scale-110" : ""}`}>
+                <div className={`transition-transform duration-150 ${isActive ? "scale-110" : ""}`} aria-hidden="true">
                   {item.icon}
                 </div>
 

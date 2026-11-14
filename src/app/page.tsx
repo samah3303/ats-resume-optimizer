@@ -133,27 +133,27 @@ function LandingContent() {
       </header>
 
       {/* ===================== HERO / INSTANT ACTION SECTION ===================== */}
-      <section className="py-12 sm:py-16 lg:py-20">
+      <section className="py-6 sm:py-8 lg:py-10">
         <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
-          <div className="text-center max-w-3xl mx-auto mb-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-[#DFDFDF] rounded-full text-xs font-semibold text-[#003399] mb-6 shadow-2xs">
+          <div className="text-center max-w-4xl mx-auto mb-6">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-white border border-[#DFDFDF] rounded-full text-[11px] font-semibold text-[#003399] mb-3 shadow-2xs">
               <span className="w-2 h-2 rounded-full bg-[#0A8A00]" />
               Smart Job Search & Application Workspace
             </div>
 
-            <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-[#111111] leading-tight mb-4">
-              Stop rewriting resumes for every job. <br className="hidden sm:inline" />
+            <h1 className="text-lg sm:text-2xl md:text-3xl font-bold tracking-tight text-[#111111] leading-snug mb-2 whitespace-normal sm:whitespace-nowrap">
+              Stop rewriting resumes for every job.{" "}
               <span className="text-[#003399]">Land interviews faster.</span>
             </h1>
 
-            <p className="text-base sm:text-lg text-[#484848] leading-relaxed max-w-2xl mx-auto">
+            <p className="text-xs sm:text-sm text-[#484848] leading-relaxed max-w-2xl mx-auto">
               paniund analyzes your experience, matches it against any job posting in seconds, generates tailored application materials, and keeps your entire search organized in one place.
             </p>
           </div>
 
           {/* Dropzone Container: Prioritizing Immediate UX */}
           <div className="max-w-2xl mx-auto">
-            <div className="nordic-card p-6 sm:p-8 bg-white shadow-sm">
+            <div className="nordic-card p-4 sm:p-6 bg-white shadow-sm">
               <div
                 onDragOver={(e) => {
                   e.preventDefault();
@@ -162,7 +162,7 @@ function LandingContent() {
                 onDragLeave={() => setDragging(false)}
                 onDrop={onDrop}
                 onClick={() => fileInputRef.current?.click()}
-                className={`border-2 border-dashed rounded-[4px] transition-all p-8 sm:p-10 text-center cursor-pointer ${
+                className={`border-2 border-dashed rounded-[4px] transition-all p-5 sm:p-7 text-center cursor-pointer ${
                   dragging
                     ? "border-[#003399] bg-[#003399]/5"
                     : "border-[#DFDFDF] bg-[#F5F5F5] hover:border-[#003399] hover:bg-white"
@@ -176,38 +176,38 @@ function LandingContent() {
                   className="hidden"
                 />
 
-                <div className="flex flex-col items-center justify-center gap-3">
-                  <div className="w-14 h-14 rounded-full bg-[#FFDA1A] text-[#003399] flex items-center justify-center shadow-xs">
-                    <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <div className="flex flex-col items-center justify-center gap-2.5">
+                  <div className="w-11 h-11 rounded-full bg-[#FFDA1A] text-[#003399] flex items-center justify-center shadow-xs">
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
 
                   <div>
-                    <p className="text-base font-bold text-[#111111]">
+                    <p className="text-sm sm:text-base font-bold text-[#111111]">
                       {file ? file.name : "Drop your resume here or click to browse"}
                     </p>
-                    <p className="text-xs text-[#767676] mt-1 font-medium">
+                    <p className="text-[11px] sm:text-xs text-[#767676] mt-0.5 font-medium">
                       Supports PDF & DOCX • Instant analysis • No credit card required
                     </p>
                   </div>
 
                   {uploading && (
-                    <div className="w-full max-w-xs mt-4">
-                      <div className="h-2.5 w-full bg-[#DFDFDF] rounded-full overflow-hidden">
+                    <div className="w-full max-w-xs mt-3">
+                      <div className="h-2 w-full bg-[#DFDFDF] rounded-full overflow-hidden">
                         <div
                           className="h-full bg-[#003399] rounded-full transition-all duration-200"
                           style={{ width: `${progress}%` }}
                         />
                       </div>
-                      <span className="text-xs font-semibold text-[#003399] mt-2 block">
+                      <span className="text-xs font-semibold text-[#003399] mt-1.5 block">
                         Analyzing resume... {progress}%
                       </span>
                     </div>
                   )}
 
                   {error && (
-                    <div className="mt-3 p-3 bg-[#CC0008]/10 text-[#CC0008] border border-[#CC0008] rounded-[4px] text-xs font-semibold">
+                    <div className="mt-2.5 p-2.5 bg-[#CC0008]/10 text-[#CC0008] border border-[#CC0008] rounded-[4px] text-xs font-semibold">
                       {error}
                     </div>
                   )}
@@ -215,7 +215,7 @@ function LandingContent() {
               </div>
 
               {/* Value Signals Below Dropzone */}
-              <div className="mt-6 pt-5 border-t border-[#DFDFDF] flex flex-wrap items-center justify-between gap-3 text-xs text-[#484848]">
+              <div className="mt-4 pt-3.5 border-t border-[#DFDFDF] flex flex-wrap items-center justify-between gap-2.5 text-xs text-[#484848]">
                 <div className="flex items-center gap-1.5 font-medium">
                   <span className="text-[#0A8A00] font-bold">✓</span> Free resume evaluation
                 </div>

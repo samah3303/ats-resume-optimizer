@@ -105,8 +105,13 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-[#F5F5F5] text-[#111111] flex flex-col font-sans selection:bg-[#FFDA1A] selection:text-[#111111]">
+      {/* Skip to Main Content Link (WCAG 2.1 AA 2.4.1 Bypass Blocks) */}
+      <a href="#admin-main-content" className="skip-link">
+        Skip to main content
+      </a>
+
       {/* ==================== ADMIN TOP BAR ==================== */}
-      <header className="sticky top-0 z-40 bg-[#111111] text-white shadow-sm border-b border-white/10">
+      <header className="sticky top-0 z-40 bg-[#111111] text-white shadow-sm border-b border-white/10" role="banner">
         <div className="flex h-13 sm:h-[60px] items-center justify-between px-3.5 sm:px-8 max-w-[1400px] mx-auto w-full">
           {/* Logo & Admin Badge */}
           <div className="flex items-center gap-3 sm:gap-4">
@@ -120,15 +125,17 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-2 sm:gap-3">
             <Link
               href="/dashboard"
-              className="text-xs font-bold text-white/80 hover:text-[#FFDA1A] px-2.5 py-1.5 rounded-[4px] border border-white/20 transition-colors flex items-center gap-1.5 tap-active"
+              aria-label="Return to candidate dashboard"
+              className="text-xs font-bold text-white/90 hover:text-[#FFDA1A] px-2.5 py-1.5 rounded-[4px] border border-white/20 transition-colors flex items-center gap-1.5 tap-active touch-target"
             >
-              <span>←</span>
+              <span aria-hidden="true">←</span>
               <span className="hidden sm:inline">Candidate View</span>
             </Link>
 
             <button
               onClick={() => signOut({ callbackUrl: "/" })}
-              className="h-8 px-3 rounded-[4px] bg-[#CC0008] hover:bg-[#CC0008]/85 text-white text-xs font-bold transition-colors cursor-pointer tap-active"
+              aria-label="Sign out of admin portal"
+              className="h-9 px-3 rounded-[4px] bg-[#CC0008] hover:bg-[#CC0008]/85 text-white text-xs font-bold transition-colors cursor-pointer tap-active touch-target flex items-center justify-center"
             >
               Sign Out
             </button>
@@ -136,7 +143,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Secondary Nav Bar (Desktop Only) */}
-        <div className="hidden md:block bg-white border-b border-[#DFDFDF] shadow-xs">
+        <nav aria-label="Admin desktop navigation" className="hidden md:block bg-white border-b border-[#DFDFDF] shadow-xs">
           <div className="flex h-[44px] items-center px-4 sm:px-8 max-w-[1400px] mx-auto w-full overflow-x-auto gap-8">
             {navItems.map((item) => {
               const isActive = pathname === item.href;
@@ -144,6 +151,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                 <Link
                   key={item.href}
                   href={item.href}
+                  aria-current={isActive ? "page" : undefined}
                   className={`h-full flex items-center text-sm font-semibold whitespace-nowrap transition-colors relative ${
                     isActive
                       ? "text-[#003399] font-bold border-b-[3px] border-[#003399]"
@@ -155,16 +163,23 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
               );
             })}
           </div>
-        </div>
+        </nav>
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-[1400px] w-full mx-auto px-3.5 py-4 sm:p-6 lg:p-8 pb-24 md:pb-8">
+      <main
+        id="admin-main-content"
+        tabIndex={-1}
+        className="flex-1 max-w-[1400px] w-full mx-auto px-3.5 py-4 sm:p-6 lg:p-8 pb-24 md:pb-8 outline-none"
+      >
         {children}
       </main>
 
       {/* Mobile App Bottom Navigation Bar for Admin */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-[#DFDFDF] shadow-[0_-4px_20px_rgba(0,0,0,0.06)] pb-safe">
+      <nav
+        aria-label="Admin mobile navigation"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-[#DFDFDF] shadow-[0_-4px_20px_rgba(0,0,0,0.06)] pb-safe"
+      >
         <div className="grid grid-cols-4 h-15 max-w-md mx-auto">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
@@ -172,7 +187,8 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex flex-col items-center justify-center relative tap-active py-1 transition-all ${
+                aria-current={isActive ? "page" : undefined}
+                className={`flex flex-col items-center justify-center relative tap-active py-1 transition-all touch-target ${
                   isActive ? "text-[#003399]" : "text-[#767676] hover:text-[#111111]"
                 }`}
               >

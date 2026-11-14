@@ -1,8 +1,17 @@
-import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { parseResumeFile, extractProfileFromResume } from "@/lib/resume-parser";
+import { apiSuccess, apiError, handleApiError } from "@/lib/api-response";
+
+const ALLOWED_EXTENSIONS = ["pdf", "docx", "doc", "txt"];
+const ALLOWED_MIME_TYPES = [
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/msword",
+  "text/plain",
+  "application/octet-stream",
+];
 
 export async function POST(request: Request) {
   try {
@@ -10,15 +19,25 @@ export async function POST(request: Request) {
     const file = formData.get("file") as File | null;
 
     if (!file) {
-      return NextResponse.json({ error: "No file provided" }, { status: 400 });
+      return apiError("No file provided", 400);
     }
 
     const maxSize = 10 * 1024 * 1024; // 10MB
     if (file.size > maxSize) {
-      return NextResponse.json(
-        { error: "File size must be under 10MB" },
-        { status: 400 },
+      return apiError("File size must be under 10MB", 400);
+    }
+
+    // Whitelist file extension & mime type to prevent arbitrary file upload attacks
+    const extension = file.name.split(".").pop()?.toLowerCase();
+    if (!extension || !ALLOWED_EXTENSIONS.includes(extension)) {
+      return apiError(
+        "Invalid file type. Only PDF, DOCX, DOC, and TXT resumes are supported.",
+        400
       );
+    }
+
+    if (file.type && !ALLOWED_MIME_TYPES.includes(file.type)) {
+      return apiError("Unsupported MIME type detected.", 400);
     }
 
     // Parse the resume file
@@ -27,12 +46,9 @@ export async function POST(request: Request) {
     const resumeText = await parseResumeFile(buffer, file.type, file.name);
 
     if (!resumeText || resumeText.trim().length < 50) {
-      return NextResponse.json(
-        {
-          error:
-            "Could not extract enough text from the resume. Try a different file format.",
-        },
-        { status: 422 },
+      return apiError(
+        "Could not extract enough text from the resume. Try a different file format.",
+        422
       );
     }
 
@@ -50,12 +66,9 @@ export async function POST(request: Request) {
       // Unauthenticated upload — look up or create user by email
       const extractedEmail = extracted.email?.toLowerCase().trim();
       if (!extractedEmail) {
-        return NextResponse.json(
-          {
-            error:
-              "Could not extract email from resume. Please register first or ensure your resume contains an email address.",
-          },
-          { status: 422 },
+        return apiError(
+          "Could not extract email from resume. Please register first or ensure your resume contains an email address.",
+          422
         );
       }
 
@@ -67,13 +80,10 @@ export async function POST(request: Request) {
         userId = existingUser.id;
         // If they already have a password, they should log in instead
         if (existingUser.passwordHash) {
-          return NextResponse.json(
-            {
-              error:
-                "An account with this email already exists. Please log in first.",
-              code: "LOGIN_REQUIRED",
-            },
-            { status: 409 },
+          return apiError(
+            "An account with this email already exists. Please log in first.",
+            409,
+            { code: "LOGIN_REQUIRED" }
           );
         }
         isNewUser = false;
@@ -96,7 +106,7 @@ export async function POST(request: Request) {
       resumeText,
       resumeFileName: file.name,
       resumeMimeType: file.type,
-      resumeData: resumeText, // store raw text; binary handled separately if needed
+      resumeData: resumeText,
       phone: extracted.phone || undefined,
       location: extracted.location || undefined,
       summary: extracted.summary || undefined,
@@ -146,7 +156,7 @@ export async function POST(request: Request) {
       select: { id: true, email: true, name: true },
     });
 
-    return NextResponse.json({
+    return apiSuccess({
       userId,
       email: user?.email,
       profile: {
@@ -163,9 +173,6 @@ export async function POST(request: Request) {
       name: extracted.name,
     });
   } catch (error) {
-    console.error("Resume upload error:", error);
-    const message =
-      error instanceof Error ? error.message : "Failed to process resume";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return handleApiError(error, "Failed to process resume");
   }
 }

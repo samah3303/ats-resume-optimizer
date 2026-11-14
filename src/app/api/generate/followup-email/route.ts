@@ -1,26 +1,20 @@
-import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateFollowupEmail } from "@/lib/ai-tools";
+import { generateFollowupSchema } from "@/lib/validations";
+import { apiSuccess, apiError, handleApiError } from "@/lib/api-response";
 
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return apiError("Unauthorized", 401);
     }
 
     const userId = (session.user as { id: string }).id;
     const body = await request.json();
-    const { jobId, context } = body as { jobId: string; context: string };
-
-    if (!jobId) {
-      return NextResponse.json(
-        { error: "Job ID is required" },
-        { status: 400 },
-      );
-    }
+    const { jobId, context } = generateFollowupSchema.parse(body);
 
     // Get user's profile and resume
     const profile = await prisma.profile.findUnique({
@@ -28,16 +22,13 @@ export async function POST(request: Request) {
     });
 
     if (!profile?.resumeText) {
-      return NextResponse.json(
-        { error: "No resume found. Please upload your resume first." },
-        { status: 404 },
-      );
+      return apiError("No resume found. Please upload your resume first.", 404);
     }
 
-    // Get job details
+    // Verify job belongs to user (anti-IDOR)
     const job = await prisma.job.findUnique({ where: { id: jobId } });
     if (!job || job.userId !== userId) {
-      return NextResponse.json({ error: "Job not found" }, { status: 404 });
+      return apiError("Job not found", 404);
     }
 
     const content = await generateFollowupEmail(
@@ -66,19 +57,13 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json({
+    return apiSuccess({
       id: saved.id,
       type: saved.type,
       content: saved.content,
-      email: saved.content,
-      jobId: saved.jobId,
-      createdAt: saved.createdAt.toISOString(),
-    });
+      createdAt: saved.createdAt,
+    }, 201);
   } catch (error) {
-    console.error("Follow-up email generation error:", error);
-    return NextResponse.json(
-      { error: "Failed to generate follow-up email" },
-      { status: 500 },
-    );
+    return handleApiError(error, "Failed to generate follow-up email");
   }
 }

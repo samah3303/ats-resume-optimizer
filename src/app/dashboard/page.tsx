@@ -11,6 +11,8 @@ import ResumeRecommendationsTile from "@/components/dashboard/ResumeRecommendati
 import QuickLinksTile from "@/components/dashboard/QuickLinksTile";
 import RecentActivityTile from "@/components/dashboard/RecentActivityTile";
 import JobSearchTipsTile from "@/components/dashboard/JobSearchTipsTile";
+import { Skeleton, DashboardMetricSkeleton } from "@/components/ui/Skeleton";
+import Toast from "@/components/ui/Toast";
 
 export default function DashboardPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -27,6 +29,11 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [toastMessage, setToastMessage] = useState<{
+    text: string;
+    type: "success" | "error" | "info";
+  } | null>(null);
 
   const loadData = useCallback(async () => {
     try {
@@ -88,7 +95,10 @@ export default function DashboardPage() {
       setRecommendedJobs(matchedJobList);
     } catch (err) {
       console.error("Failed to load dashboard data:", err);
-      setError("Failed to fetch dashboard updates.");
+      setToastMessage({
+        text: "Failed to fetch dashboard updates. Please try again.",
+        type: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -100,7 +110,6 @@ export default function DashboardPage() {
 
   const handleAnalyzeResume = async () => {
     setAnalyzing(true);
-    setError(null);
     try {
       const res = await fetch("/api/resume/analyze", { method: "POST" });
       if (!res.ok) {
@@ -108,10 +117,15 @@ export default function DashboardPage() {
         throw new Error(errJson.error || "Analysis failed");
       }
       await loadData();
+      setToastMessage({
+        text: "✓ Resume scanned successfully! Your ATS score and recommendations have been refreshed.",
+        type: "success",
+      });
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to run ATS analysis"
-      );
+      setToastMessage({
+        text: err instanceof Error ? err.message : "Failed to run ATS analysis",
+        type: "error",
+      });
     } finally {
       setAnalyzing(false);
     }
@@ -126,14 +140,44 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="h-28 w-full border border-[#DFDFDF] bg-white rounded-[4px] p-6 animate-pulse" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="space-y-4 sm:space-y-6" aria-busy="true" aria-label="Loading dashboard content">
+        {/* Context-aware Hero Skeleton */}
+        <div className="nordic-card rounded-2xl sm:rounded-[4px] p-5 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-5">
+          <div className="space-y-2.5">
+            <Skeleton className="h-4 w-24 rounded-[2px]" />
+            <Skeleton className="h-8 w-64 rounded-[4px]" />
+            <Skeleton className="h-4 w-80 rounded-[2px]" />
+          </div>
+          <div className="flex gap-2.5">
+            <Skeleton className="h-11 w-32 rounded-[4px]" />
+            <Skeleton className="h-11 w-28 rounded-[4px]" />
+          </div>
+        </div>
+
+        {/* 3-Step Checklist Skeleton */}
+        <div className="nordic-card rounded-2xl sm:rounded-[4px] p-5 sm:p-6 space-y-4">
+          <div className="flex justify-between items-center pb-3 border-b border-[#DFDFDF]">
+            <div className="space-y-1">
+              <Skeleton className="h-5 w-48 rounded-[2px]" />
+              <Skeleton className="h-3.5 w-64 rounded-[2px]" />
+            </div>
+            <Skeleton className="h-6 w-28 rounded-[3px]" />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="p-3.5 border border-[#DFDFDF] rounded-xl sm:rounded-[4px] space-y-2">
+                <Skeleton className="w-6 h-6 rounded-full" />
+                <Skeleton className="h-4 w-3/4 rounded-[2px]" />
+                <Skeleton className="h-3 w-5/6 rounded-[2px]" />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Metric Cards Skeleton Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div
-              key={i}
-              className="h-64 border border-[#DFDFDF] bg-white rounded-[4px] animate-pulse"
-            />
+            <DashboardMetricSkeleton key={i} />
           ))}
         </div>
       </div>
@@ -295,23 +339,6 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {error && (
-        <div className="border border-[#CC0008] bg-[#CC0008]/10 text-[#CC0008] p-3.5 sm:p-4 rounded-xl sm:rounded-[4px] text-xs sm:text-sm font-semibold flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            <span>{error}</span>
-          </div>
-          <button
-            onClick={() => setError(null)}
-            className="px-2.5 py-1 bg-white text-[#CC0008] border border-[#CC0008] rounded-[4px] hover:bg-[#CC0008] hover:text-white transition-colors text-xs font-bold cursor-pointer tap-active"
-          >
-            Dismiss
-          </button>
-        </div>
-      )}
-
       {/* Grid Composition of Tiles */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-6 items-stretch">
         <AtsScoreTile
@@ -340,6 +367,13 @@ export default function DashboardPage() {
 
         <RecentActivityTile />
       </div>
+
+      {/* Accessible Toast Notification */}
+      <Toast
+        message={toastMessage?.text || null}
+        type={toastMessage?.type}
+        onClose={() => setToastMessage(null)}
+      />
     </div>
   );
 }

@@ -1,13 +1,14 @@
-import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { createApplicationSchema } from "@/lib/validations";
+import { apiSuccess, apiError, handleApiError } from "@/lib/api-response";
 
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return apiError("Unauthorized", 401);
     }
 
     const userId = (session.user as { id: string }).id;
@@ -20,19 +21,15 @@ export async function GET() {
       },
     });
 
-    // Parse statusHistory JSON for each application
+    // Safely parse statusHistory JSON for each application
     const parsed = applications.map((app) => ({
       ...app,
       statusHistory: app.statusHistory ? JSON.parse(app.statusHistory) : [],
     }));
 
-    return NextResponse.json(parsed);
+    return apiSuccess(parsed);
   } catch (error) {
-    console.error("Applications fetch error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch applications" },
-      { status: 500 },
-    );
+    return handleApiError(error, "Failed to fetch applications");
   }
 }
 
@@ -40,28 +37,18 @@ export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return apiError("Unauthorized", 401);
     }
 
     const userId = (session.user as { id: string }).id;
     const body = await request.json();
 
-    const { jobId, status } = body as {
-      jobId: string;
-      status?: string;
-    };
+    const { jobId, status } = createApplicationSchema.parse(body);
 
-    if (!jobId) {
-      return NextResponse.json(
-        { error: "Job ID is required" },
-        { status: 400 },
-      );
-    }
-
-    // Verify the job exists and belongs to user
+    // Verify the job exists and belongs to user (Anti-IDOR)
     const job = await prisma.job.findUnique({ where: { id: jobId } });
     if (!job || job.userId !== userId) {
-      return NextResponse.json({ error: "Job not found" }, { status: 404 });
+      return apiError("Job not found", 404);
     }
 
     // Check for existing application - if exists, update status
@@ -89,7 +76,10 @@ export async function POST(request: Request) {
         include: { job: true },
       });
 
-      return NextResponse.json(updated);
+      return apiSuccess({
+        ...updated,
+        statusHistory: updated.statusHistory ? JSON.parse(updated.statusHistory) : [],
+      });
     }
 
     const initialStatus = status || "wishlist";
@@ -116,18 +106,14 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json(
+    return apiSuccess(
       {
         ...application,
         statusHistory: JSON.parse(application.statusHistory || "[]"),
       },
-      { status: 201 },
+      201,
     );
   } catch (error) {
-    console.error("Application creation error:", error);
-    return NextResponse.json(
-      { error: "Failed to create application" },
-      { status: 500 },
-    );
+    return handleApiError(error, "Failed to create application");
   }
 }

@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useRef } from "react";
 import { UserProfile, ExperienceEntry, EducationEntry } from "@/types";
+import { ProfileSectionSkeleton, Skeleton } from "@/components/ui/Skeleton";
+import Toast from "@/components/ui/Toast";
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -11,8 +13,12 @@ export default function ProfilePage() {
   const [analyzingAts, setAnalyzingAts] = useState(false);
   const [message, setMessage] = useState<{
     text: string;
-    type: "success" | "error";
+    type: "success" | "error" | "info";
   } | null>(null);
+
+  // Real-time inline field validation errors
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -31,6 +37,45 @@ export default function ProfilePage() {
   const [experience, setExperience] = useState<ExperienceEntry[]>([]);
   const [education, setEducation] = useState<EducationEntry[]>([]);
   const [summary, setSummary] = useState("");
+
+  const validateField = (field: string, val: string): string => {
+    const trimmed = val.trim();
+    if (field === "name") {
+      if (!trimmed || trimmed.length < 2) {
+        return "Full name must be at least 2 characters long.";
+      }
+    } else if (field === "phone") {
+      if (trimmed && !/^[0-9+\-()\s]{6,25}$/.test(trimmed)) {
+        return "Please enter a valid phone number (digits, +, -, spaces only).";
+      }
+    } else if (field === "linkedinUrl") {
+      if (trimmed && (!trimmed.startsWith("http://") && !trimmed.startsWith("https://"))) {
+        return "LinkedIn URL must start with https:// (e.g. https://linkedin.com/in/username).";
+      }
+    } else if (field === "githubUrl") {
+      if (trimmed && (!trimmed.startsWith("http://") && !trimmed.startsWith("https://"))) {
+        return "GitHub URL must start with https:// (e.g. https://github.com/username).";
+      }
+    } else if (field === "portfolioUrl") {
+      if (trimmed && (!trimmed.startsWith("http://") && !trimmed.startsWith("https://"))) {
+        return "Portfolio URL must start with https:// (e.g. https://yourportfolio.com).";
+      }
+    }
+    return "";
+  };
+
+  const handleFieldBlur = (field: string, val: string) => {
+    setTouchedFields((prev) => ({ ...prev, [field]: true }));
+    const errorMsg = validateField(field, val);
+    setFieldErrors((prev) => ({ ...prev, [field]: errorMsg }));
+  };
+
+  const handleFieldChange = (field: string, val: string) => {
+    if (touchedFields[field]) {
+      const errorMsg = validateField(field, val);
+      setFieldErrors((prev) => ({ ...prev, [field]: errorMsg }));
+    }
+  };
 
   // Job Search Preferences
   const [prefPlatforms, setPrefPlatforms] = useState<string[]>([
@@ -107,6 +152,37 @@ export default function ProfilePage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Perform validation across all relevant fields
+    const nameErr = validateField("name", name);
+    const phoneErr = validateField("phone", phone);
+    const linkErr = validateField("linkedinUrl", linkedinUrl);
+    const gitErr = validateField("githubUrl", githubUrl);
+    const portErr = validateField("portfolioUrl", portfolioUrl);
+
+    const errors: Record<string, string> = {};
+    if (nameErr) errors.name = nameErr;
+    if (phoneErr) errors.phone = phoneErr;
+    if (linkErr) errors.linkedinUrl = linkErr;
+    if (gitErr) errors.githubUrl = gitErr;
+    if (portErr) errors.portfolioUrl = portErr;
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setTouchedFields({
+        name: true,
+        phone: true,
+        linkedinUrl: true,
+        githubUrl: true,
+        portfolioUrl: true,
+      });
+      setMessage({
+        text: "Please correct the highlighted form errors before saving.",
+        type: "error",
+      });
+      return;
+    }
+
     setSaving(true);
     setMessage(null);
 
@@ -115,17 +191,17 @@ export default function ProfilePage() {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name,
-          phone,
-          location,
+          name: name.trim(),
+          phone: phone.trim(),
+          location: location.trim(),
           targetRoles: targetRoles
             .split(",")
             .map((r) => r.trim())
             .filter(Boolean),
           jobType,
-          linkedinUrl,
-          portfolioUrl,
-          githubUrl,
+          linkedinUrl: linkedinUrl.trim(),
+          portfolioUrl: portfolioUrl.trim(),
+          githubUrl: githubUrl.trim(),
           skills,
           experience,
           education,
@@ -147,7 +223,7 @@ export default function ProfilePage() {
       const updated = await res.json();
       setProfile(updated);
       setMessage({
-        text: "Candidate dossier updated successfully.",
+        text: "✓ Candidate profile and job search preferences saved.",
         type: "success",
       });
     } catch (err) {
@@ -318,9 +394,23 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="h-28 border border-[#DFDFDF] bg-white rounded-[4px] animate-pulse" />
-        <div className="h-96 border border-[#DFDFDF] bg-white rounded-[4px] animate-pulse" />
+      <div className="space-y-4 sm:space-y-6" aria-busy="true" aria-label="Loading candidate profile">
+        {/* Banner Skeleton */}
+        <div className="nordic-card rounded-2xl sm:rounded-[4px] p-5 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-5">
+          <div className="flex items-center gap-4">
+            <Skeleton className="w-16 h-16 rounded-full" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-28 rounded-[2px]" />
+              <Skeleton className="h-7 w-48 rounded-[3px]" />
+              <Skeleton className="h-4 w-64 rounded-[2px]" />
+            </div>
+          </div>
+          <Skeleton className="h-11 w-36 rounded-[4px]" />
+        </div>
+
+        {/* Section Cards Skeleton */}
+        <ProfileSectionSkeleton />
+        <ProfileSectionSkeleton />
       </div>
     );
   }
@@ -374,24 +464,9 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {message && (
-        <div
-          className={`border p-3.5 sm:p-4 rounded-xl sm:rounded-[4px] text-xs font-semibold flex items-center gap-2 ${
-            message.type === "success"
-              ? "bg-[#0A8A00]/10 border-[#0A8A00] text-[#0A8A00]"
-              : "bg-[#CC0008]/10 border-[#CC0008] text-[#CC0008]"
-          }`}
-        >
-          <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d={message.type === "success" ? "M5 13l4 4L19 7" : "M6 18L18 6M6 6l12 12"} />
-          </svg>
-          <span>{message.text}</span>
-        </div>
-      )}
-
       {/* Main Form Card */}
       <div className="nordic-card rounded-2xl sm:rounded-[4px] p-4.5 sm:p-8">
-        <form onSubmit={handleSave} className="space-y-6">
+        <form onSubmit={handleSave} className="space-y-6" noValidate>
           {/* Identity Section */}
           <div>
             <h2 className="text-lg font-bold text-[#111111] border-b border-[#DFDFDF] pb-2 mb-4">
@@ -400,48 +475,83 @@ export default function ProfilePage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
-                  Full Name
+                <label htmlFor="input-name" className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
+                  Full Name *
                 </label>
                 <input
+                  id="input-name"
                   type="text"
+                  required
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    handleFieldChange("name", e.target.value);
+                  }}
+                  onBlur={(e) => handleFieldBlur("name", e.target.value)}
                   placeholder="e.g. Alex Morgan"
-                  className="w-full h-11 px-3.5 bg-white border border-[#DFDFDF] rounded-[4px] text-sm text-[#111111] focus:outline-none focus:border-[#003399]"
+                  aria-invalid={Boolean(fieldErrors.name)}
+                  aria-describedby={fieldErrors.name ? "name-error" : undefined}
+                  className={`w-full h-11 px-3.5 bg-white border rounded-[4px] text-sm text-[#111111] focus:outline-none transition-colors ${
+                    fieldErrors.name
+                      ? "border-[#CC0008] focus:border-[#CC0008] ring-1 ring-[#CC0008]"
+                      : "border-[#DFDFDF] focus:border-[#003399]"
+                  }`}
                 />
+                {fieldErrors.name && (
+                  <p id="name-error" className="mt-1 text-xs text-[#CC0008] font-semibold flex items-center gap-1" role="alert">
+                    <span aria-hidden="true">⚠</span> {fieldErrors.name}
+                  </p>
+                )}
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
+                <label htmlFor="input-email" className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
                   Email
                 </label>
                 <input
+                  id="input-email"
                   type="email"
                   disabled
                   value={email}
-                  className="w-full h-11 px-3.5 bg-[#F5F5F5] border border-[#DFDFDF] rounded-[4px] text-sm font-mono text-[#767676] cursor-not-allowed"
+                  className="w-full h-11 px-3.5 bg-[#F5F5F5] border border-[#DFDFDF] rounded-[4px] text-sm font-mono text-[#484848] cursor-not-allowed"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
+                <label htmlFor="input-phone" className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
                   Phone Number
                 </label>
                 <input
+                  id="input-phone"
                   type="tel"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => {
+                    setPhone(e.target.value);
+                    handleFieldChange("phone", e.target.value);
+                  }}
+                  onBlur={(e) => handleFieldBlur("phone", e.target.value)}
                   placeholder="+1 (555) 019-2834"
-                  className="w-full h-11 px-3.5 bg-white border border-[#DFDFDF] rounded-[4px] text-sm font-mono text-[#111111] focus:outline-none focus:border-[#003399]"
+                  aria-invalid={Boolean(fieldErrors.phone)}
+                  aria-describedby={fieldErrors.phone ? "phone-error" : undefined}
+                  className={`w-full h-11 px-3.5 bg-white border rounded-[4px] text-sm font-mono text-[#111111] focus:outline-none transition-colors ${
+                    fieldErrors.phone
+                      ? "border-[#CC0008] focus:border-[#CC0008] ring-1 ring-[#CC0008]"
+                      : "border-[#DFDFDF] focus:border-[#003399]"
+                  }`}
                 />
+                {fieldErrors.phone && (
+                  <p id="phone-error" className="mt-1 text-xs text-[#CC0008] font-semibold flex items-center gap-1" role="alert">
+                    <span aria-hidden="true">⚠</span> {fieldErrors.phone}
+                  </p>
+                )}
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
+                <label htmlFor="input-location" className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
                   Location
                 </label>
                 <input
+                  id="input-location"
                   type="text"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
@@ -738,42 +848,90 @@ export default function ProfilePage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
+                <label htmlFor="input-linkedin" className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
                   LinkedIn
                 </label>
                 <input
+                  id="input-linkedin"
                   type="url"
                   value={linkedinUrl}
-                  onChange={(e) => setLinkedinUrl(e.target.value)}
+                  onChange={(e) => {
+                    setLinkedinUrl(e.target.value);
+                    handleFieldChange("linkedinUrl", e.target.value);
+                  }}
+                  onBlur={(e) => handleFieldBlur("linkedinUrl", e.target.value)}
                   placeholder="https://linkedin.com/in/username"
-                  className="w-full h-11 px-3.5 bg-white border border-[#DFDFDF] rounded-[4px] text-sm text-[#111111] focus:outline-none focus:border-[#003399]"
+                  aria-invalid={Boolean(fieldErrors.linkedinUrl)}
+                  aria-describedby={fieldErrors.linkedinUrl ? "linkedin-error" : undefined}
+                  className={`w-full h-11 px-3.5 bg-white border rounded-[4px] text-sm text-[#111111] focus:outline-none transition-colors ${
+                    fieldErrors.linkedinUrl
+                      ? "border-[#CC0008] focus:border-[#CC0008] ring-1 ring-[#CC0008]"
+                      : "border-[#DFDFDF] focus:border-[#003399]"
+                  }`}
                 />
+                {fieldErrors.linkedinUrl && (
+                  <p id="linkedin-error" className="mt-1 text-xs text-[#CC0008] font-semibold flex items-center gap-1" role="alert">
+                    <span aria-hidden="true">⚠</span> {fieldErrors.linkedinUrl}
+                  </p>
+                )}
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
+                <label htmlFor="input-github" className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
                   GitHub
                 </label>
                 <input
+                  id="input-github"
                   type="url"
                   value={githubUrl}
-                  onChange={(e) => setGithubUrl(e.target.value)}
+                  onChange={(e) => {
+                    setGithubUrl(e.target.value);
+                    handleFieldChange("githubUrl", e.target.value);
+                  }}
+                  onBlur={(e) => handleFieldBlur("githubUrl", e.target.value)}
                   placeholder="https://github.com/username"
-                  className="w-full h-11 px-3.5 bg-white border border-[#DFDFDF] rounded-[4px] text-sm text-[#111111] focus:outline-none focus:border-[#003399]"
+                  aria-invalid={Boolean(fieldErrors.githubUrl)}
+                  aria-describedby={fieldErrors.githubUrl ? "github-error" : undefined}
+                  className={`w-full h-11 px-3.5 bg-white border rounded-[4px] text-sm text-[#111111] focus:outline-none transition-colors ${
+                    fieldErrors.githubUrl
+                      ? "border-[#CC0008] focus:border-[#CC0008] ring-1 ring-[#CC0008]"
+                      : "border-[#DFDFDF] focus:border-[#003399]"
+                  }`}
                 />
+                {fieldErrors.githubUrl && (
+                  <p id="github-error" className="mt-1 text-xs text-[#CC0008] font-semibold flex items-center gap-1" role="alert">
+                    <span aria-hidden="true">⚠</span> {fieldErrors.githubUrl}
+                  </p>
+                )}
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
+                <label htmlFor="input-portfolio" className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
                   Portfolio or Website
                 </label>
                 <input
+                  id="input-portfolio"
                   type="url"
                   value={portfolioUrl}
-                  onChange={(e) => setPortfolioUrl(e.target.value)}
+                  onChange={(e) => {
+                    setPortfolioUrl(e.target.value);
+                    handleFieldChange("portfolioUrl", e.target.value);
+                  }}
+                  onBlur={(e) => handleFieldBlur("portfolioUrl", e.target.value)}
                   placeholder="https://yourportfolio.com"
-                  className="w-full h-11 px-3.5 bg-white border border-[#DFDFDF] rounded-[4px] text-sm text-[#111111] focus:outline-none focus:border-[#003399]"
+                  aria-invalid={Boolean(fieldErrors.portfolioUrl)}
+                  aria-describedby={fieldErrors.portfolioUrl ? "portfolio-error" : undefined}
+                  className={`w-full h-11 px-3.5 bg-white border rounded-[4px] text-sm text-[#111111] focus:outline-none transition-colors ${
+                    fieldErrors.portfolioUrl
+                      ? "border-[#CC0008] focus:border-[#CC0008] ring-1 ring-[#CC0008]"
+                      : "border-[#DFDFDF] focus:border-[#003399]"
+                  }`}
                 />
+                {fieldErrors.portfolioUrl && (
+                  <p id="portfolio-error" className="mt-1 text-xs text-[#CC0008] font-semibold flex items-center gap-1" role="alert">
+                    <span aria-hidden="true">⚠</span> {fieldErrors.portfolioUrl}
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -1041,6 +1199,7 @@ export default function ProfilePage() {
             <button
               type="submit"
               disabled={saving}
+              aria-busy={saving}
               className="nordic-btn-primary h-11 px-8 text-sm font-bold tracking-wide disabled:opacity-50 cursor-pointer tap-active"
             >
               {saving ? "Saving..." : "Save Changes"}
@@ -1052,6 +1211,7 @@ export default function ProfilePage() {
             <button
               type="submit"
               disabled={saving}
+              aria-busy={saving}
               className="nordic-btn-primary w-full h-12 text-xs font-bold uppercase tracking-wider disabled:opacity-50 shadow-md tap-active cursor-pointer"
             >
               {saving ? "Saving Changes..." : "✓ Save Profile & Preferences"}
@@ -1059,6 +1219,13 @@ export default function ProfilePage() {
           </div>
         </form>
       </div>
+
+      {/* Accessible Toast Notification System */}
+      <Toast
+        message={message?.text || null}
+        type={message?.type}
+        onClose={() => setMessage(null)}
+      />
     </div>
   );
 }

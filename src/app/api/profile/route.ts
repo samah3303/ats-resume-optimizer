@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { updateProfileSchema } from "@/lib/validations";
+import { apiSuccess, apiError, handleApiError } from "@/lib/api-response";
 
 function safeParse<T>(val: string | null | undefined, fallback: T): T {
   if (!val) return fallback;
@@ -16,22 +18,23 @@ export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return apiError("Unauthorized", 401);
     }
 
     const userId = (session.user as { id: string }).id;
 
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { id: true, name: true, email: true, image: true },
-    });
-
-    const profile = await prisma.profile.findUnique({
-      where: { userId },
-    });
+    const [user, profile] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true, name: true, email: true, image: true },
+      }),
+      prisma.profile.findUnique({
+        where: { userId },
+      }),
+    ]);
 
     if (!profile) {
-      return NextResponse.json({
+      return apiSuccess({
         id: userId,
         name: user?.name || null,
         email: user?.email || "",
@@ -53,7 +56,7 @@ export async function GET() {
       });
     }
 
-    return NextResponse.json({
+    return apiSuccess({
       id: userId,
       name: user?.name || null,
       email: user?.email || "",
@@ -76,11 +79,7 @@ export async function GET() {
       resumeFileName: profile.resumeFileName,
     });
   } catch (error) {
-    console.error("Profile fetch error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch profile" },
-      { status: 500 },
-    );
+    return handleApiError(error, "Failed to fetch profile");
   }
 }
 
@@ -88,72 +87,46 @@ export async function PUT(request: Request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return apiError("Unauthorized", 401);
     }
 
     const userId = (session.user as { id: string }).id;
-    const body = await request.json();
+    const rawBody = await request.json().catch(() => null);
+    if (!rawBody) {
+      return apiError("Invalid JSON body", 400);
+    }
 
-    const {
-      name,
-      phone,
-      location,
-      targetRoles,
-      jobType,
-      linkedinUrl,
-      portfolioUrl,
-      githubUrl,
-      skills,
-      experience,
-      education,
-      summary,
-      preferences,
-      onboardingDone,
-    } = body as {
-      name?: string;
-      phone?: string;
-      location?: string;
-      targetRoles?: string[];
-      jobType?: string;
-      linkedinUrl?: string;
-      portfolioUrl?: string;
-      githubUrl?: string;
-      skills?: string[];
-      experience?: unknown[];
-      education?: unknown[];
-      summary?: string;
-      preferences?: Record<string, unknown> | null;
-      onboardingDone?: boolean;
-    };
+    // Schema validation and XSS sanitization
+    const validated = updateProfileSchema.parse(rawBody);
 
     // Update user name if provided
-    if (name !== undefined) {
+    if (validated.name !== undefined) {
       await prisma.user.update({
         where: { id: userId },
-        data: { name: name.trim() || null },
+        data: { name: validated.name || null },
       });
     }
 
-    // Build profile update data — only include fields that were sent
+    // Build profile update data
     const profileUpdate: Record<string, unknown> = {};
-    if (phone !== undefined) profileUpdate.phone = phone || null;
-    if (location !== undefined) profileUpdate.location = location || null;
-    if (targetRoles !== undefined)
-      profileUpdate.targetRoles = JSON.stringify(targetRoles);
-    if (jobType !== undefined) profileUpdate.jobType = jobType || null;
-    if (linkedinUrl !== undefined)
-      profileUpdate.linkedinUrl = linkedinUrl || null;
-    if (portfolioUrl !== undefined)
-      profileUpdate.portfolioUrl = portfolioUrl || null;
-    if (githubUrl !== undefined) profileUpdate.githubUrl = githubUrl || null;
-    if (skills !== undefined) profileUpdate.skills = JSON.stringify(skills);
-    if (experience !== undefined) profileUpdate.experience = JSON.stringify(experience);
-    if (education !== undefined) profileUpdate.education = JSON.stringify(education);
-    if (summary !== undefined) profileUpdate.summary = summary || null;
-    if (preferences !== undefined)
-      profileUpdate.preferences = preferences ? JSON.stringify(preferences) : null;
-    if (onboardingDone !== undefined)
-      profileUpdate.onboardingDone = onboardingDone;
+    if (validated.phone !== undefined) profileUpdate.phone = validated.phone;
+    if (validated.location !== undefined) profileUpdate.location = validated.location;
+    if (validated.targetRoles !== undefined)
+      profileUpdate.targetRoles = JSON.stringify(validated.targetRoles);
+    if (validated.jobType !== undefined) profileUpdate.jobType = validated.jobType;
+    if (validated.linkedinUrl !== undefined)
+      profileUpdate.linkedinUrl = validated.linkedinUrl;
+    if (validated.portfolioUrl !== undefined)
+      profileUpdate.portfolioUrl = validated.portfolioUrl;
+    if (validated.githubUrl !== undefined) profileUpdate.githubUrl = validated.githubUrl;
+    if (validated.skills !== undefined) profileUpdate.skills = JSON.stringify(validated.skills);
+    if (validated.experience !== undefined) profileUpdate.experience = JSON.stringify(validated.experience);
+    if (validated.education !== undefined) profileUpdate.education = JSON.stringify(validated.education);
+    if (validated.summary !== undefined) profileUpdate.summary = validated.summary;
+    if (validated.preferences !== undefined)
+      profileUpdate.preferences = validated.preferences ? JSON.stringify(validated.preferences) : null;
+    if (validated.onboardingDone !== undefined)
+      profileUpdate.onboardingDone = validated.onboardingDone;
 
     const profile = await prisma.profile.upsert({
       where: { userId },
@@ -164,27 +137,23 @@ export async function PUT(request: Request) {
       update: profileUpdate,
     });
 
-    return NextResponse.json({
+    return apiSuccess({
       id: userId,
       phone: profile.phone,
       location: profile.location,
-      targetRoles: profile.targetRoles ? JSON.parse(profile.targetRoles) : [],
+      targetRoles: safeParse(profile.targetRoles, []),
       jobType: profile.jobType,
       linkedinUrl: profile.linkedinUrl,
       portfolioUrl: profile.portfolioUrl,
       githubUrl: profile.githubUrl,
-      skills: profile.skills ? JSON.parse(profile.skills) : [],
-      experience: profile.experience ? JSON.parse(profile.experience) : [],
-      education: profile.education ? JSON.parse(profile.education) : [],
+      skills: safeParse(profile.skills, []),
+      experience: safeParse(profile.experience, []),
+      education: safeParse(profile.education, []),
       summary: profile.summary,
-      preferences: profile.preferences ? JSON.parse(profile.preferences) : null,
+      preferences: safeParse(profile.preferences, null),
       onboardingDone: profile.onboardingDone,
     });
   } catch (error) {
-    console.error("Profile update error:", error);
-    return NextResponse.json(
-      { error: "Failed to update profile" },
-      { status: 500 },
-    );
+    return handleApiError(error, "Failed to update profile");
   }
 }

@@ -4,6 +4,9 @@ import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { JobListing } from "@/types";
+import { JobDetailSkeleton } from "@/components/ui/Skeleton";
+import EmptyState from "@/components/ui/EmptyState";
+import Toast from "@/components/ui/Toast";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -36,7 +39,10 @@ export default function JobDetailPage({ params }: PageProps) {
   const [followupContext, setFollowupContext] = useState("post_interview");
   const [linkedinMessage, setLinkedinMessage] = useState("");
   const [linkedinType, setLinkedinType] = useState("connection_request");
-  const [copyFeedback, setCopyFeedback] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<{
+    text: string;
+    type: "success" | "error" | "info";
+  } | null>(null);
   const [isApplied, setIsApplied] = useState(false);
   const [appliedDate, setAppliedDate] = useState<string | null>(null);
   const [markingApplied, setMarkingApplied] = useState(false);
@@ -108,6 +114,17 @@ export default function JobDetailPage({ params }: PageProps) {
   }, [id, router]);
 
   const handleMarkApplied = async () => {
+    const prevApplied = isApplied;
+    const prevDate = appliedDate;
+
+    // 1. Optimistic update
+    setIsApplied(true);
+    setAppliedDate(new Date().toISOString());
+    setToastMessage({
+      text: "✓ Marked as Applied! Saved to your Application Tracker.",
+      type: "success",
+    });
+
     setMarkingApplied(true);
     try {
       const res = await fetch("/api/applications", {
@@ -115,13 +132,17 @@ export default function JobDetailPage({ params }: PageProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ jobId: id, status: "applied" }),
       });
-      if (res.ok) {
-        setIsApplied(true);
-        setAppliedDate(new Date().toISOString());
-        setCopyFeedback("✓ Marked as Applied! Saved to your Application Tracker.");
-        setTimeout(() => setCopyFeedback(null), 4000);
+      if (!res.ok) {
+        throw new Error("Failed to register application status");
       }
     } catch (err) {
+      // 2. Rollback on failure
+      setIsApplied(prevApplied);
+      setAppliedDate(prevDate);
+      setToastMessage({
+        text: "Could not mark job as applied. Reverted.",
+        type: "error",
+      });
       console.error("Failed to mark as applied", err);
     } finally {
       setMarkingApplied(false);
@@ -143,9 +164,15 @@ export default function JobDetailPage({ params }: PageProps) {
         });
       }
       setAddedSkills((prev) => new Set(prev).add(skill));
-      setCopyFeedback(`✓ Added "${skill}" to your Candidate Profile skills!`);
-      setTimeout(() => setCopyFeedback(null), 3500);
+      setToastMessage({
+        text: `✓ Added "${skill}" to your Candidate Profile skills!`,
+        type: "success",
+      });
     } catch (err) {
+      setToastMessage({
+        text: "Failed to add skill to profile.",
+        type: "error",
+      });
       console.error("Failed to add skill", err);
     }
   };
@@ -175,14 +202,18 @@ export default function JobDetailPage({ params }: PageProps) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    setCopyFeedback("✓ Cover letter downloaded as Word (.doc) document!");
-    setTimeout(() => setCopyFeedback(null), 3000);
+    setToastMessage({
+      text: "✓ Cover letter downloaded as Word (.doc) document!",
+      type: "success",
+    });
   };
 
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
-    setCopyFeedback(`${label} copied to clipboard!`);
-    setTimeout(() => setCopyFeedback(null), 3000);
+    setToastMessage({
+      text: `✓ ${label} copied to clipboard!`,
+      type: "info",
+    });
   };
 
   const handleGenerateCoverLetter = async () => {
@@ -196,16 +227,22 @@ export default function JobDetailPage({ params }: PageProps) {
       const data = await res.json();
       if (res.ok) {
         setCoverLetter(data.coverLetter || data.content || "");
-        setCopyFeedback("✓ Cover letter generated successfully!");
-        setTimeout(() => setCopyFeedback(null), 3000);
+        setToastMessage({
+          text: "✓ Cover letter generated successfully!",
+          type: "success",
+        });
       } else {
-        setCopyFeedback(`❌ ${data.error || "Failed to generate cover letter"}`);
-        setTimeout(() => setCopyFeedback(null), 5000);
+        setToastMessage({
+          text: data.error || "Failed to generate cover letter",
+          type: "error",
+        });
       }
     } catch (err) {
       console.error("Cover letter generation failed", err);
-      setCopyFeedback("❌ Network error generating cover letter");
-      setTimeout(() => setCopyFeedback(null), 5000);
+      setToastMessage({
+        text: "Network error generating cover letter",
+        type: "error",
+      });
     } finally {
       setGenerating(false);
     }
@@ -222,16 +259,22 @@ export default function JobDetailPage({ params }: PageProps) {
       const data = await res.json();
       if (res.ok) {
         setResumeUpdates(normalizeResumeUpdates(data));
-        setCopyFeedback("✓ Resume suggestions generated!");
-        setTimeout(() => setCopyFeedback(null), 3000);
+        setToastMessage({
+          text: "✓ Resume suggestions and missing skills generated!",
+          type: "success",
+        });
       } else {
-        setCopyFeedback(`❌ ${data.error || "Failed to generate suggestions"}`);
-        setTimeout(() => setCopyFeedback(null), 5000);
+        setToastMessage({
+          text: data.error || "Failed to generate suggestions",
+          type: "error",
+        });
       }
     } catch (err) {
       console.error("Resume updates generation failed", err);
-      setCopyFeedback("❌ Network error generating suggestions");
-      setTimeout(() => setCopyFeedback(null), 5000);
+      setToastMessage({
+        text: "Network error generating suggestions",
+        type: "error",
+      });
     } finally {
       setGenerating(false);
     }
@@ -248,16 +291,22 @@ export default function JobDetailPage({ params }: PageProps) {
       const data = await res.json();
       if (res.ok) {
         setFollowupEmail(data.email || data.content || "");
-        setCopyFeedback("✓ Follow-up email generated!");
-        setTimeout(() => setCopyFeedback(null), 3000);
+        setToastMessage({
+          text: "✓ Follow-up email generated!",
+          type: "success",
+        });
       } else {
-        setCopyFeedback(`❌ ${data.error || "Failed to generate follow-up email"}`);
-        setTimeout(() => setCopyFeedback(null), 5000);
+        setToastMessage({
+          text: data.error || "Failed to generate follow-up email",
+          type: "error",
+        });
       }
     } catch (err) {
-      console.error("Follow-up generation failed", err);
-      setCopyFeedback("❌ Network error generating email");
-      setTimeout(() => setCopyFeedback(null), 5000);
+      console.error("Follow-up email generation failed", err);
+      setToastMessage({
+        text: "Network error generating follow-up email",
+        type: "error",
+      });
     } finally {
       setGenerating(false);
     }
@@ -278,28 +327,29 @@ export default function JobDetailPage({ params }: PageProps) {
       const data = await res.json();
       if (res.ok) {
         setLinkedinMessage(data.message || data.content || "");
-        setCopyFeedback("✓ LinkedIn message generated!");
-        setTimeout(() => setCopyFeedback(null), 3000);
+        setToastMessage({
+          text: "✓ LinkedIn message generated!",
+          type: "success",
+        });
       } else {
-        setCopyFeedback(`❌ ${data.error || "Failed to generate LinkedIn message"}`);
-        setTimeout(() => setCopyFeedback(null), 5000);
+        setToastMessage({
+          text: data.error || "Failed to generate LinkedIn message",
+          type: "error",
+        });
       }
     } catch (err) {
       console.error("LinkedIn outreach generation failed", err);
-      setCopyFeedback("❌ Network error generating LinkedIn message");
-      setTimeout(() => setCopyFeedback(null), 5000);
+      setToastMessage({
+        text: "Network error generating LinkedIn message",
+        type: "error",
+      });
     } finally {
       setGenerating(false);
     }
   };
 
   if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="h-28 border border-[#DFDFDF] bg-white rounded-[4px] animate-pulse" />
-        <div className="h-96 border border-[#DFDFDF] bg-white rounded-[4px] animate-pulse" />
-      </div>
-    );
+    return <JobDetailSkeleton />;
   }
 
   if (!job) return null;
@@ -397,14 +447,19 @@ export default function JobDetailPage({ params }: PageProps) {
         </div>
 
         {/* Tab Controls */}
-        <div className="flex overflow-x-auto gap-2 pt-4">
+        <div role="tablist" aria-label="Job preparation tools" className="flex overflow-x-auto gap-2 pt-4">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.key;
             return (
               <button
                 key={tab.key}
+                role="tab"
+                id={`tab-${tab.key}`}
+                aria-controls={`panel-${tab.key}`}
+                aria-selected={isActive}
+                type="button"
                 onClick={() => setActiveTab(tab.key as typeof activeTab)}
-                className={`h-10 px-4 rounded-[4px] text-xs font-bold uppercase tracking-wide cursor-pointer transition-colors whitespace-nowrap ${
+                className={`h-10 px-4 rounded-[4px] text-xs font-bold uppercase tracking-wide cursor-pointer transition-colors whitespace-nowrap touch-target ${
                   isActive
                     ? "bg-[#003399] text-white"
                     : "bg-white text-[#484848] border border-[#DFDFDF] hover:bg-[#F5F5F5]"
@@ -417,21 +472,17 @@ export default function JobDetailPage({ params }: PageProps) {
         </div>
       </div>
 
-      {copyFeedback && (
-        <div className="border border-[#FFDA1A] bg-[#FFDA1A] text-[#111111] p-3 rounded-[4px] text-xs font-bold flex items-center gap-2">
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
-          </svg>
-          <span>{copyFeedback}</span>
-        </div>
-      )}
-
       {/* Tab Panels */}
       <div className="nordic-card p-6 sm:p-8">
         
         {/* TAB 1: DETAILS */}
         {activeTab === "details" && (
-          <div className="space-y-6">
+          <div
+            role="tabpanel"
+            id="panel-details"
+            aria-labelledby="tab-details"
+            className="space-y-6"
+          >
             <div>
               <h2 className="text-lg font-bold text-[#111111] border-b border-[#DFDFDF] pb-2 mb-4">
                 Full Description
@@ -449,7 +500,7 @@ export default function JobDetailPage({ params }: PageProps) {
                 <ul className="space-y-2 text-xs">
                   {job.requirements.map((req, i) => (
                     <li key={i} className="flex items-start gap-2.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#003399] mt-1.5 shrink-0" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#003399] mt-1.5 shrink-0" aria-hidden="true" />
                       <span className="text-[#111111] leading-relaxed">{req}</span>
                     </li>
                   ))}
@@ -461,19 +512,26 @@ export default function JobDetailPage({ params }: PageProps) {
 
         {/* TAB 2: RESUME UPDATES */}
         {activeTab === "resume_updates" && (
-          <div className="space-y-6">
+          <div
+            role="tabpanel"
+            id="panel-resume_updates"
+            aria-labelledby="tab-resume_updates"
+            className="space-y-6"
+          >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#DFDFDF] pb-4">
               <div>
                 <h2 className="text-lg font-bold text-[#111111]">
                   Resume Suggestions & Missing Skills
                 </h2>
-                <p className="text-xs text-[#767676] mt-0.5">
+                <p className="text-xs text-[#484848] mt-0.5">
                   See which skills you are missing and how to improve your bullet points for this job.
                 </p>
               </div>
               <button
+                type="button"
                 onClick={handleGenerateResumeUpdates}
                 disabled={generating}
+                aria-busy={generating}
                 className="nordic-btn-primary text-xs h-10 px-4 disabled:opacity-50 cursor-pointer shrink-0"
               >
                 {generating ? "Checking..." : "Get Suggestions"}
@@ -497,8 +555,10 @@ export default function JobDetailPage({ params }: PageProps) {
                           >
                             <span>{sk}</span>
                             <button
+                              type="button"
                               onClick={() => handleAddSkillToProfile(sk)}
                               disabled={isAdded}
+                              aria-label={`Add skill ${sk} to candidate profile`}
                               className={`text-[10px] font-bold px-2 py-0.5 rounded-[2px] transition-colors cursor-pointer tap-active ${
                                 isAdded
                                   ? "bg-[#0A8A00] text-white cursor-default"
@@ -519,10 +579,11 @@ export default function JobDetailPage({ params }: PageProps) {
                     {resumeUpdates.suggestions?.map((sug, i) => (
                       <div key={i} className="border border-[#DFDFDF] p-4 rounded-[4px] bg-[#F5F5F5]">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs font-bold uppercase text-[#767676]">
+                          <span className="text-xs font-bold uppercase text-[#484848]">
                             Section: {sug.section}
                           </span>
                           <button
+                            type="button"
                             onClick={() => copyToClipboard(sug.suggested, "Suggested text")}
                             className="text-xs text-[#003399] hover:underline font-bold cursor-pointer"
                           >
@@ -538,35 +599,46 @@ export default function JobDetailPage({ params }: PageProps) {
                           {sug.suggested}
                         </div>
 
-                        <div className="mt-2 text-[11px] text-[#767676]">
+                        <div className="mt-2 text-[11px] text-[#484848]">
                           Why this helps: {sug.reason}
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="p-4 border border-[#DFDFDF] rounded-[4px] text-xs text-[#767676] bg-[#FAFAFA]">
+                  <div className="p-4 border border-[#DFDFDF] rounded-[4px] text-xs text-[#484848] bg-[#FAFAFA]">
                     No specific bullet edits needed for this role. Check your missing skills above.
                   </div>
                 )}
               </div>
             ) : (
-              <div className="p-8 border border-dashed border-[#DFDFDF] rounded-[4px] text-center text-xs text-[#767676] bg-[#F5F5F5]">
-                Click &ldquo;Get Suggestions&rdquo; to see recommendations and missing skills for this job.
-              </div>
+              <EmptyState
+                title="No Resume Suggestions Yet"
+                description="Scan your resume against this job posting to discover missing keywords and bullet point optimizations."
+                action={{
+                  label: "⚡ Get Suggestions",
+                  onClick: handleGenerateResumeUpdates,
+                  variant: "primary",
+                }}
+              />
             )}
           </div>
         )}
 
         {/* TAB 3: COVER LETTER */}
         {activeTab === "cover_letter" && (
-          <div className="space-y-6">
+          <div
+            role="tabpanel"
+            id="panel-cover_letter"
+            aria-labelledby="tab-cover_letter"
+            className="space-y-6"
+          >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#DFDFDF] pb-4">
               <div>
                 <h2 className="text-lg font-bold text-[#111111]">
                   Cover Letter
                 </h2>
-                <p className="text-xs text-[#767676] mt-0.5">
+                <p className="text-xs text-[#484848] mt-0.5">
                   A tailored cover letter written specifically for this job.
                 </p>
               </div>
@@ -574,12 +646,14 @@ export default function JobDetailPage({ params }: PageProps) {
                 {coverLetter && (
                   <>
                     <button
+                      type="button"
                       onClick={() => copyToClipboard(coverLetter, "Cover Letter")}
                       className="nordic-btn-yellow text-xs h-10 px-3.5 cursor-pointer font-bold tap-active"
                     >
                       Copy Letter
                     </button>
                     <button
+                      type="button"
                       onClick={handleDownloadCoverLetterDoc}
                       className="nordic-btn-secondary text-xs h-10 px-3.5 cursor-pointer font-bold tap-active flex items-center gap-1.5"
                       title="Download as Word document"
@@ -587,6 +661,7 @@ export default function JobDetailPage({ params }: PageProps) {
                       📄 Download (.doc)
                     </button>
                     <button
+                      type="button"
                       onClick={() => window.print()}
                       className="nordic-btn-outline text-xs h-10 px-3.5 cursor-pointer font-bold tap-active hidden sm:flex items-center gap-1"
                       title="Print or save as PDF"
@@ -596,8 +671,10 @@ export default function JobDetailPage({ params }: PageProps) {
                   </>
                 )}
                 <button
+                  type="button"
                   onClick={handleGenerateCoverLetter}
                   disabled={generating}
+                  aria-busy={generating}
                   className="nordic-btn-primary text-xs h-10 px-4 disabled:opacity-50 cursor-pointer font-bold tap-active"
                 >
                   {generating ? "Writing..." : coverLetter ? "Re-write" : "Write Letter"}
@@ -610,22 +687,33 @@ export default function JobDetailPage({ params }: PageProps) {
                 {coverLetter}
               </div>
             ) : (
-              <div className="p-8 border border-dashed border-[#DFDFDF] rounded-[4px] text-center text-xs text-[#767676] bg-[#F5F5F5]">
-                Click &ldquo;Write Letter&rdquo; to generate a cover letter for this job.
-              </div>
+              <EmptyState
+                title="No Cover Letter Generated"
+                description="Tailor a high-impact, ATS-optimized cover letter targeted to this specific position with 1 click."
+                action={{
+                  label: "✨ Write Cover Letter",
+                  onClick: handleGenerateCoverLetter,
+                  variant: "yellow",
+                }}
+              />
             )}
           </div>
         )}
 
         {/* TAB 4: FOLLOW-UP EMAIL */}
         {activeTab === "followup" && (
-          <div className="space-y-6">
+          <div
+            role="tabpanel"
+            id="panel-followup"
+            aria-labelledby="tab-followup"
+            className="space-y-6"
+          >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#DFDFDF] pb-4">
               <div>
                 <h2 className="text-lg font-bold text-[#111111]">
                   Follow-Up Email
                 </h2>
-                <p className="text-xs text-[#767676] mt-0.5">
+                <p className="text-xs text-[#484848] mt-0.5">
                   Send a polite message after applying or interviewing.
                 </p>
               </div>
@@ -633,6 +721,7 @@ export default function JobDetailPage({ params }: PageProps) {
               <div className="flex items-center gap-2">
                 <select
                   value={followupContext}
+                  aria-label="Follow-up email context"
                   onChange={(e) => setFollowupContext(e.target.value)}
                   className="h-10 px-3 text-xs bg-white border border-[#DFDFDF] rounded-[4px] text-[#111111] focus:outline-none focus:border-[#003399]"
                 >
@@ -642,9 +731,11 @@ export default function JobDetailPage({ params }: PageProps) {
                 </select>
 
                 <button
+                  type="button"
                   onClick={handleGenerateFollowup}
                   disabled={generating}
-                  className="nordic-btn-primary text-xs h-10 px-4 disabled:opacity-50 cursor-pointer"
+                  aria-busy={generating}
+                  className="nordic-btn-primary text-xs h-10 px-4 disabled:opacity-50 cursor-pointer font-bold"
                 >
                   {generating ? "Writing..." : "Write Email"}
                 </button>
@@ -655,8 +746,9 @@ export default function JobDetailPage({ params }: PageProps) {
               <div className="space-y-4">
                 <div className="flex justify-end">
                   <button
+                    type="button"
                     onClick={() => copyToClipboard(followupEmail, "Follow-up email")}
-                    className="nordic-btn-yellow text-xs h-9 px-4 cursor-pointer"
+                    className="nordic-btn-yellow text-xs h-9 px-4 cursor-pointer font-bold"
                   >
                     Copy Email
                   </button>
@@ -666,22 +758,33 @@ export default function JobDetailPage({ params }: PageProps) {
                 </div>
               </div>
             ) : (
-              <div className="p-8 border border-dashed border-[#DFDFDF] rounded-[4px] text-center text-xs text-[#767676] bg-[#F5F5F5]">
-                Choose an email type and click &ldquo;Write Email&rdquo;.
-              </div>
+              <EmptyState
+                title="No Follow-Up Email Drafted"
+                description="Draft a professional post-interview thank you or polite status check email."
+                action={{
+                  label: "✉️ Write Email",
+                  onClick: handleGenerateFollowup,
+                  variant: "primary",
+                }}
+              />
             )}
           </div>
         )}
 
         {/* TAB 5: LINKEDIN OUTREACH */}
         {activeTab === "linkedin" && (
-          <div className="space-y-6">
+          <div
+            role="tabpanel"
+            id="panel-linkedin"
+            aria-labelledby="tab-linkedin"
+            className="space-y-6"
+          >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#DFDFDF] pb-4">
               <div>
                 <h2 className="text-lg font-bold text-[#111111]">
                   LinkedIn Message
                 </h2>
-                <p className="text-xs text-[#767676] mt-0.5">
+                <p className="text-xs text-[#484848] mt-0.5">
                   Reach out directly to recruiters or hiring managers.
                 </p>
               </div>
@@ -689,6 +792,7 @@ export default function JobDetailPage({ params }: PageProps) {
               <div className="flex items-center gap-2">
                 <select
                   value={linkedinType}
+                  aria-label="LinkedIn message type"
                   onChange={(e) => setLinkedinType(e.target.value)}
                   className="h-10 px-3 text-xs bg-white border border-[#DFDFDF] rounded-[4px] text-[#111111] focus:outline-none focus:border-[#003399]"
                 >
@@ -698,9 +802,11 @@ export default function JobDetailPage({ params }: PageProps) {
                 </select>
 
                 <button
+                  type="button"
                   onClick={handleGenerateLinkedin}
                   disabled={generating}
-                  className="nordic-btn-primary text-xs h-10 px-4 disabled:opacity-50 cursor-pointer"
+                  aria-busy={generating}
+                  className="nordic-btn-primary text-xs h-10 px-4 disabled:opacity-50 cursor-pointer font-bold"
                 >
                   {generating ? "Writing..." : "Write Message"}
                 </button>
@@ -711,8 +817,9 @@ export default function JobDetailPage({ params }: PageProps) {
               <div className="space-y-4">
                 <div className="flex justify-end">
                   <button
+                    type="button"
                     onClick={() => copyToClipboard(linkedinMessage, "LinkedIn message")}
-                    className="nordic-btn-yellow text-xs h-9 px-4 cursor-pointer"
+                    className="nordic-btn-yellow text-xs h-9 px-4 cursor-pointer font-bold"
                   >
                     Copy Message
                   </button>
@@ -722,14 +829,27 @@ export default function JobDetailPage({ params }: PageProps) {
                 </div>
               </div>
             ) : (
-              <div className="p-8 border border-dashed border-[#DFDFDF] rounded-[4px] text-center text-xs text-[#767676] bg-[#F5F5F5]">
-                Choose a message type and click &ldquo;Write Message&rdquo;.
-              </div>
+              <EmptyState
+                title="No LinkedIn Message Drafted"
+                description="Craft a high-converting, personalized LinkedIn message to recruiter or hiring team."
+                action={{
+                  label: "💼 Write Message",
+                  onClick: handleGenerateLinkedin,
+                  variant: "primary",
+                }}
+              />
             )}
           </div>
         )}
 
       </div>
+
+      {/* Accessible Toast Notification System */}
+      <Toast
+        message={toastMessage?.text || null}
+        type={toastMessage?.type}
+        onClose={() => setToastMessage(null)}
+      />
     </div>
   );
 }

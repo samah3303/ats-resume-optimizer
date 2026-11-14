@@ -1,6 +1,16 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import "./globals.css";
+import ErrorBoundary from "@/components/ErrorBoundary";
+import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import PwaInstallPrompt from "@/components/PwaInstallPrompt";
+
+export const viewport: Viewport = {
+  themeColor: "#003399",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
 
 export const metadata: Metadata = {
   title: {
@@ -16,12 +26,18 @@ export const metadata: Metadata = {
     "job search tracker",
     "career operating system",
     "application tracking",
+    "PWA",
   ],
   authors: [{ name: "paniund" }],
-  viewport: "width=device-width, initial-scale=1",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "paniund",
+  },
   icons: {
     icon: "/icon.svg",
-    apple: "/icon.svg",
+    apple: "/icons/icon-192.svg",
   },
   openGraph: {
     title: "paniund — ATS Resume Optimizer",
@@ -56,7 +72,11 @@ export default function RootLayout({
             strategy="afterInteractive"
           />
         )}
-        {children}
+        <ErrorBoundary>
+          {children}
+          <PwaInstallPrompt />
+        </ErrorBoundary>
+        <ServiceWorkerRegister />
       </body>
     </html>
   );

@@ -45,6 +45,61 @@
     background-color: #FFDA1A;
     color: #111111;
   }
+
+  /* Universal Accessible Focus Indicator (WCAG 2.1 AA 2.4.7) */
+  :focus-visible {
+    outline: 2px solid #003399;
+    outline-offset: 2px;
+  }
+}
+
+/* ============================================================
+   ACCESSIBILITY & PERCEIVED PERFORMANCE UTILITIES
+   ============================================================ */
+
+/* Skip Link for screen reader and keyboard power users */
+.skip-link {
+  position: absolute;
+  top: -999px;
+  left: 16px;
+  z-index: 100;
+  padding: 10px 16px;
+  background-color: #FFDA1A;
+  color: #111111;
+  font-weight: 700;
+  font-size: 14px;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(17, 17, 17, 0.2);
+  text-decoration: none;
+  transition: top 0.15s ease-out;
+}
+.skip-link:focus {
+  top: 16px;
+}
+
+/* Context-Aware Skeleton Shimmer */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #F0F0F0 25%, #E4E4E4 37%, #F0F0F0 63%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Minimum 44x44px touch targets for mobile accessibility */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ============================================================

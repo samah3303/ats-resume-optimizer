@@ -1,50 +1,35 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { registerSchema } from "@/lib/validations";
+import { apiSuccess, apiError, handleApiError } from "@/lib/api-response";
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { email, password, name } = body as {
-      email: string;
-      password: string;
-      name?: string;
-    };
-
-    if (!email || !password) {
-      return NextResponse.json(
-        { error: "Email and password are required" },
-        { status: 400 },
-      );
+    const rawBody = await request.json().catch(() => null);
+    if (!rawBody) {
+      return apiError("Invalid JSON body", 400);
     }
 
-    const normalizedEmail = email.toLowerCase().trim();
-
-    if (password.length < 8) {
-      return NextResponse.json(
-        { error: "Password must be at least 8 characters" },
-        { status: 400 },
-      );
-    }
+    // Strict Zod validation & sanitization
+    const { email, password, name } = registerSchema.parse(rawBody);
 
     const existing = await prisma.user.findUnique({
-      where: { email: normalizedEmail },
+      where: { email },
     });
 
     if (existing) {
-      return NextResponse.json(
-        { error: "An account with this email already exists" },
-        { status: 409 },
-      );
+      return apiError("An account with this email already exists", 409);
     }
 
+    // Bcrypt with factor 12 for strong brute-force resistance
     const passwordHash = await bcrypt.hash(password, 12);
 
     const user = await prisma.user.create({
       data: {
-        email: normalizedEmail,
+        email,
         passwordHash,
-        name: name?.trim() || null,
+        name: name || null,
       },
       select: { id: true, email: true },
     });
@@ -57,12 +42,8 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json(user, { status: 201 });
+    return apiSuccess(user, 201);
   } catch (error) {
-    console.error("Registration error:", error);
-    return NextResponse.json(
-      { error: "Failed to create account" },
-      { status: 500 },
-    );
+    return handleApiError(error, "Failed to create account");
   }
 }

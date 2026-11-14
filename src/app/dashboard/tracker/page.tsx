@@ -7,6 +7,10 @@ import {
   ApplicationStatus,
   APPLICATION_STATUSES,
 } from "@/types";
+import Modal from "@/components/ui/Modal";
+import { TrackerColumnSkeleton } from "@/components/ui/Skeleton";
+import EmptyState from "@/components/ui/EmptyState";
+import Toast from "@/components/ui/Toast";
 
 export default function ApplicationTrackerPage() {
   const [applications, setApplications] = useState<ApplicationEntry[]>([]);
@@ -19,6 +23,10 @@ export default function ApplicationTrackerPage() {
   const [editingContact, setEditingContact] = useState("");
   const [editingDate, setEditingDate] = useState("");
   const [updating, setUpdating] = useState(false);
+  const [toastMessage, setToastMessage] = useState<{
+    text: string;
+    type: "success" | "error" | "info";
+  } | null>(null);
 
   const loadApplications = useCallback(async () => {
     try {
@@ -30,6 +38,10 @@ export default function ApplicationTrackerPage() {
       }
     } catch (err) {
       console.error("Failed to load applications", err);
+      setToastMessage({
+        text: "Failed to load tracked applications.",
+        type: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -43,6 +55,19 @@ export default function ApplicationTrackerPage() {
     appId: string,
     newStatus: ApplicationStatus
   ) => {
+    const target = applications.find((a) => a.id === appId);
+    if (!target) return;
+    const oldStatus = target.status;
+
+    // 1. Optimistic status update
+    setApplications((prev) =>
+      prev.map((a) => (a.id === appId ? { ...a, status: newStatus } : a))
+    );
+    setToastMessage({
+      text: `✓ Moved to ${newStatus.replace("_", " ")}`,
+      type: "info",
+    });
+
     try {
       const res = await fetch(`/api/applications/${appId}`, {
         method: "PUT",
@@ -50,12 +75,18 @@ export default function ApplicationTrackerPage() {
         body: JSON.stringify({ status: newStatus }),
       });
 
-      if (res.ok) {
-        setApplications((prev) =>
-          prev.map((a) => (a.id === appId ? { ...a, status: newStatus } : a))
-        );
+      if (!res.ok) {
+        throw new Error("Server rejected status transition");
       }
     } catch (err) {
+      // 2. Rollback on failure
+      setApplications((prev) =>
+        prev.map((a) => (a.id === appId ? { ...a, status: oldStatus } : a))
+      );
+      setToastMessage({
+        text: "Could not update application status. Reverted.",
+        type: "error",
+      });
       console.error("Failed to update status", err);
     }
   };
@@ -88,8 +119,18 @@ export default function ApplicationTrackerPage() {
           prev.map((a) => (a.id === updated.id ? updated : a))
         );
         setActiveAppModal(null);
+        setToastMessage({
+          text: "✓ Application notes and interview details updated.",
+          type: "success",
+        });
+      } else {
+        throw new Error("Failed to save changes");
       }
     } catch (err) {
+      setToastMessage({
+        text: "Failed to save application updates.",
+        type: "error",
+      });
       console.error("Failed to save application updates", err);
     } finally {
       setUpdating(false);
@@ -134,8 +175,15 @@ export default function ApplicationTrackerPage() {
       </div>
 
       {/* Mobile Column Filter Pills */}
-      <div className="md:hidden flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 -mx-1 px-1">
+      <div
+        role="tablist"
+        aria-label="Application stages"
+        className="md:hidden flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 -mx-1 px-1"
+      >
         <button
+          type="button"
+          role="tab"
+          aria-selected={mobileColumn === "all"}
           onClick={() => setMobileColumn("all")}
           className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors tap-active shrink-0 ${
             mobileColumn === "all"
@@ -151,6 +199,9 @@ export default function ApplicationTrackerPage() {
           return (
             <button
               key={col.status}
+              type="button"
+              role="tab"
+              aria-selected={isSelected}
               onClick={() => setMobileColumn(col.status)}
               className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors tap-active flex items-center gap-1.5 shrink-0 ${
                 isSelected
@@ -162,6 +213,7 @@ export default function ApplicationTrackerPage() {
                 className={`w-2 h-2 rounded-full ${
                   isSelected ? "bg-[#FFDA1A]" : col.dot
                 }`}
+                aria-hidden="true"
               />
               {col.label} ({count})
             </button>
@@ -171,14 +223,21 @@ export default function ApplicationTrackerPage() {
 
       {/* Kanban Board Container */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4" aria-busy="true" aria-label="Loading application pipeline">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div
-              key={i}
-              className="h-96 border border-[#DFDFDF] bg-white rounded-[4px] animate-pulse"
-            />
+            <TrackerColumnSkeleton key={i} />
           ))}
         </div>
+      ) : applications.length === 0 ? (
+        <EmptyState
+          title="No Job Applications Tracked Yet"
+          description="Track every stage of your job hunt from screening to offer. Save or apply to jobs to start tracking your pipeline."
+          action={{
+            label: "✨ Find Matching Jobs",
+            href: "/dashboard/jobs",
+            variant: "yellow",
+          }}
+        />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 items-start">
           {kanbanColumns.map((col) => {
@@ -195,7 +254,7 @@ export default function ApplicationTrackerPage() {
                 {/* Column Header */}
                 <div className="p-3 border-b border-[#DFDFDF] bg-[#F5F5F5] rounded-t-[4px] flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2 font-bold text-[#111111]">
-                    <span className={`w-2.5 h-2.5 rounded-full ${col.dot}`} />
+                    <span className={`w-2.5 h-2.5 rounded-full ${col.dot}`} aria-hidden="true" />
                     <span>{col.label}</span>
                   </div>
                   <span className="px-2 py-0.5 bg-white border border-[#DFDFDF] font-bold text-[11px] rounded-[2px] font-mono text-[#111111]">
@@ -207,7 +266,7 @@ export default function ApplicationTrackerPage() {
                 <div className="p-2.5 space-y-2.5 flex-1 overflow-y-auto">
                   {colApps.length === 0 ? (
                     <div className="h-28 border border-dashed border-[#DFDFDF] rounded-[4px] flex items-center justify-center text-xs text-[#767676] text-center p-3">
-                      No jobs here
+                      No jobs in this stage
                     </div>
                   ) : (
                     colApps.map((app) => (
@@ -216,7 +275,7 @@ export default function ApplicationTrackerPage() {
                         className="border border-[#DFDFDF] rounded-[4px] bg-white p-3 hover:border-[#003399] transition-all shadow-2xs"
                       >
                         <div className="flex items-start justify-between gap-1 mb-1">
-                          <span className="text-[11px] text-[#767676] uppercase tracking-wider truncate block font-medium">
+                          <span className="text-[11px] text-[#484848] uppercase tracking-wider truncate block font-bold">
                             {app.job?.company || "Company"}
                           </span>
                           {app.job?.matchScore !== null && (
@@ -232,7 +291,7 @@ export default function ApplicationTrackerPage() {
 
                         {app.interviewDate && (
                           <div className="text-[11px] text-[#003399] font-semibold mb-2 flex items-center gap-1">
-                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                             <span>{app.interviewDate}</span>
@@ -241,21 +300,24 @@ export default function ApplicationTrackerPage() {
 
                         <div className="pt-2 border-t border-[#DFDFDF] flex items-center justify-between">
                           <button
+                            type="button"
                             onClick={() => openModal(app)}
-                            className="text-[11px] font-bold text-[#003399] hover:underline cursor-pointer"
+                            aria-label={`Edit application notes for ${app.job?.title}`}
+                            className="text-[11px] font-bold text-[#003399] hover:underline cursor-pointer touch-target min-w-[32px] min-h-[32px] flex items-center justify-center"
                           >
                             Edit
                           </button>
 
                           <select
                             value={app.status}
+                            aria-label={`Move stage for ${app.job?.title}`}
                             onChange={(e) =>
                               handleStatusChange(
                                 app.id,
                                 e.target.value as ApplicationStatus
                               )
                             }
-                            className="text-[10px] border border-[#DFDFDF] rounded-[2px] bg-white px-1 py-0.5 cursor-pointer font-semibold text-[#111111] focus:outline-none"
+                            className="text-[10px] border border-[#DFDFDF] rounded-[2px] bg-white px-1 py-1 cursor-pointer font-semibold text-[#111111] focus:outline-none"
                           >
                             {APPLICATION_STATUSES.map((st) => (
                               <option key={st.value} value={st.value}>
@@ -274,92 +336,90 @@ export default function ApplicationTrackerPage() {
         </div>
       )}
 
-      {/* Detail & Notes Modal (Mobile Bottom Sheet / Desktop Dialog) */}
-      {activeAppModal && (
-        <div className="fixed inset-0 z-50 bg-[#111111]/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="w-full max-w-lg bg-white border-t sm:border border-[#DFDFDF] rounded-t-2xl sm:rounded-[8px] shadow-2xl overflow-hidden max-h-[92vh] overflow-y-auto">
-            <div className="bg-[#003399] text-white p-4 flex flex-col rounded-t-2xl sm:rounded-t-[8px]">
-              <div className="w-10 h-1 bg-white/40 rounded-full mx-auto mb-2.5 sm:hidden" />
-              <div className="flex items-center justify-between w-full">
-                <span className="text-sm font-bold tracking-tight">
-                  Edit Application
-                </span>
-                <button
-                  onClick={() => setActiveAppModal(null)}
-                  className="w-7 h-7 rounded-[4px] bg-[#002B80] hover:bg-[#FFDA1A] hover:text-[#111111] text-white font-bold text-sm transition-colors cursor-pointer flex items-center justify-center tap-active"
-                >
-                  ×
-                </button>
-              </div>
-            </div>
-
-            <div className="p-4 sm:p-6 space-y-4 text-xs">
-              <div>
-                <span className="text-[11px] text-[#767676] font-semibold uppercase block">Job</span>
-                <div className="text-base font-bold text-[#111111] mt-0.5">
-                  {activeAppModal.job?.title} @ {activeAppModal.job?.company}
-                </div>
-              </div>
-
-              <div>
-                <label className="block font-bold text-[#111111] uppercase mb-1">
-                  Recruiter or Interviewer
-                </label>
-                <input
-                  type="text"
-                  value={editingContact}
-                  onChange={(e) => setEditingContact(e.target.value)}
-                  placeholder="e.g. Sarah Miller"
-                  className="w-full h-10 px-3 border border-[#DFDFDF] rounded-[4px] text-sm text-[#111111] focus:outline-none focus:border-[#003399]"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-[#111111] uppercase mb-1">
-                  Interview Date
-                </label>
-                <input
-                  type="date"
-                  value={editingDate}
-                  onChange={(e) => setEditingDate(e.target.value)}
-                  className="w-full h-10 px-3 border border-[#DFDFDF] rounded-[4px] text-sm text-[#111111] focus:outline-none focus:border-[#003399]"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-[#111111] uppercase mb-1">
-                  Notes
-                </label>
-                <textarea
-                  rows={4}
-                  value={editingNotes}
-                  onChange={(e) => setEditingNotes(e.target.value)}
-                  placeholder="Add notes from interviews, questions asked, or salary discussed..."
-                  className="w-full p-3 border border-[#DFDFDF] rounded-[4px] text-sm text-[#111111] focus:outline-none focus:border-[#003399]"
-                />
-              </div>
-
-              <div className="flex justify-end gap-3 pt-4 border-t border-[#DFDFDF]">
-                <button
-                  type="button"
-                  onClick={() => setActiveAppModal(null)}
-                  className="nordic-btn-outline h-10 px-4 text-xs font-semibold cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSaveModal}
-                  disabled={updating}
-                  className="nordic-btn-primary h-10 px-6 text-xs font-bold uppercase tracking-wide disabled:opacity-50 cursor-pointer"
-                >
-                  {updating ? "Saving..." : "Save Changes"}
-                </button>
-              </div>
+      {/* Detail & Notes Modal */}
+      <Modal
+        isOpen={Boolean(activeAppModal)}
+        onClose={() => setActiveAppModal(null)}
+        title="Edit Application"
+        subtitle={activeAppModal ? `${activeAppModal.job?.title} @ ${activeAppModal.job?.company}` : undefined}
+        maxWidth="md"
+      >
+        <div className="p-4 sm:p-6 space-y-4 text-xs">
+          <div>
+            <span className="text-[11px] text-[#484848] font-semibold uppercase block">Job</span>
+            <div className="text-base font-bold text-[#111111] mt-0.5">
+              {activeAppModal?.job?.title} @ {activeAppModal?.job?.company}
             </div>
           </div>
+
+          <div>
+            <label htmlFor="modal-recruiter" className="block font-bold text-[#111111] uppercase mb-1">
+              Recruiter or Interviewer
+            </label>
+            <input
+              id="modal-recruiter"
+              type="text"
+              value={editingContact}
+              onChange={(e) => setEditingContact(e.target.value)}
+              placeholder="e.g. Sarah Miller"
+              className="w-full h-10 px-3 border border-[#DFDFDF] rounded-[4px] text-sm text-[#111111] focus:outline-none focus:border-[#003399]"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="modal-interview-date" className="block font-bold text-[#111111] uppercase mb-1">
+              Interview Date
+            </label>
+            <input
+              id="modal-interview-date"
+              type="date"
+              value={editingDate}
+              onChange={(e) => setEditingDate(e.target.value)}
+              className="w-full h-10 px-3 border border-[#DFDFDF] rounded-[4px] text-sm text-[#111111] focus:outline-none focus:border-[#003399]"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="modal-notes" className="block font-bold text-[#111111] uppercase mb-1">
+              Notes
+            </label>
+            <textarea
+              id="modal-notes"
+              rows={4}
+              value={editingNotes}
+              onChange={(e) => setEditingNotes(e.target.value)}
+              placeholder="Add notes from interviews, questions asked, or salary discussed..."
+              className="w-full p-3 border border-[#DFDFDF] rounded-[4px] text-sm text-[#111111] focus:outline-none focus:border-[#003399]"
+            />
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-[#DFDFDF]">
+            <button
+              type="button"
+              onClick={() => setActiveAppModal(null)}
+              className="nordic-btn-outline h-10 px-4 text-xs font-semibold cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleSaveModal}
+              disabled={updating}
+              aria-busy={updating}
+              className="nordic-btn-primary h-10 px-6 text-xs font-bold uppercase tracking-wide disabled:opacity-50 cursor-pointer"
+            >
+              {updating ? "Saving..." : "Save Changes"}
+            </button>
+          </div>
         </div>
-      )}
+      </Modal>
+
+      {/* Accessible Toast Notification System */}
+      <Toast
+        message={toastMessage?.text || null}
+        type={toastMessage?.type}
+        onClose={() => setToastMessage(null)}
+      />
     </div>
   );
 }
