@@ -23,6 +23,31 @@ export const registerSchema = z.object({
     .transform((val) => (val ? sanitizeText(val) : null)),
 });
 
+export const setupPasswordSchema = z.object({
+  userId: z.string().min(1, "User ID is required"),
+  password: z
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .max(128, "Password must not exceed 128 characters"),
+});
+
+export const forgotPasswordSchema = z.object({
+  email: z
+    .string()
+    .min(3, "Email is required")
+    .max(255, "Email is too long")
+    .email("Invalid email format")
+    .transform(sanitizeEmail),
+});
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(10, "Invalid reset token"),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .max(128, "Password must not exceed 128 characters"),
+});
+
 // ==========================================
 // Candidate Profile Schemas
 // ==========================================

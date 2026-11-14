@@ -1,14 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import SessionProvider from "@/components/SessionProvider";
 import Logo from "@/components/Logo";
 
 function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isResetSuccess = searchParams.get("reset") === "success";
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -86,6 +89,13 @@ function LoginContent() {
             </p>
           </div>
 
+          {isResetSuccess && (
+            <div className="mb-6 border border-[#0A8A00] bg-[#0A8A00]/10 text-[#0A8A00] p-3 rounded-[4px] text-xs font-semibold flex items-center gap-2">
+              <span className="font-bold">✓</span>
+              <span>Your password has been successfully updated! Please sign in with your new credentials.</span>
+            </div>
+          )}
+
           {error && (
             <div className="mb-6 border border-[#CC0008] bg-[#CC0008]/10 text-[#CC0008] p-3 rounded-[4px] text-xs font-semibold flex items-center gap-2">
               <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -118,7 +128,7 @@ function LoginContent() {
                   Password
                 </label>
                 <Link
-                  href="/login"
+                  href="/forgot-password"
                   className="text-xs text-[#003399] hover:underline font-semibold"
                 >
                   Forgot?
@@ -199,7 +209,9 @@ function LoginContent() {
 export default function LoginPage() {
   return (
     <SessionProvider>
-      <LoginContent />
+      <Suspense fallback={<div className="min-h-screen bg-[#F5F5F5]" />}>
+        <LoginContent />
+      </Suspense>
     </SessionProvider>
   );
 }
