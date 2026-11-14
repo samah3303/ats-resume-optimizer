@@ -13,10 +13,8 @@ export async function POST(request: Request) {
 
     const userId = (session.user as { id: string }).id;
     const body = await request.json();
-    const { jobId, messageType } = body as {
-      jobId: string;
-      messageType: string;
-    };
+    const jobId = body?.jobId;
+    const messageType = body?.messageType || body?.type || "connection_request";
 
     if (!jobId) {
       return NextResponse.json(
@@ -73,6 +71,7 @@ export async function POST(request: Request) {
       id: saved.id,
       type: saved.type,
       content: saved.content,
+      message: saved.content,
       jobId: saved.jobId,
       createdAt: saved.createdAt.toISOString(),
     });

@@ -42,6 +42,25 @@ export default function JobDetailPage({ params }: PageProps) {
   const [markingApplied, setMarkingApplied] = useState(false);
   const [addedSkills, setAddedSkills] = useState<Set<string>>(new Set());
 
+  // Helper to safely parse and normalize resume updates payload
+  const normalizeResumeUpdates = (raw: unknown) => {
+    if (!raw) return null;
+    let parsed: any = raw;
+    if (typeof raw === "string") {
+      try {
+        parsed = JSON.parse(raw);
+      } catch {
+        return null;
+      }
+    }
+    const obj = parsed?.content || parsed;
+    return {
+      suggestions: Array.isArray(obj?.suggestions) ? obj.suggestions : [],
+      missingSkills: Array.isArray(obj?.missingSkills) ? obj.missingSkills : [],
+      atsScoreForJob: typeof obj?.atsScoreForJob === "number" ? obj.atsScoreForJob : 50,
+    };
+  };
+
   useEffect(() => {
     async function fetchJob() {
       try {
@@ -58,14 +77,21 @@ export default function JobDetailPage({ params }: PageProps) {
             }
             if (latestApp.coverLetter) setCoverLetter(latestApp.coverLetter);
             if (latestApp.resumeUpdates) {
-              try {
-                setResumeUpdates(
-                  typeof latestApp.resumeUpdates === "string"
-                    ? JSON.parse(latestApp.resumeUpdates)
-                    : latestApp.resumeUpdates
-                );
-              } catch {
-                // Ignore
+              setResumeUpdates(normalizeResumeUpdates(latestApp.resumeUpdates));
+            }
+          }
+
+          // Hydrate from saved generated contents
+          if (Array.isArray(data.generatedContents)) {
+            for (const item of data.generatedContents) {
+              if (item.type === "cover_letter" && item.content) {
+                setCoverLetter((prev) => prev || item.content);
+              } else if (item.type === "resume_updates" && item.content) {
+                setResumeUpdates((prev) => prev || normalizeResumeUpdates(item.content));
+              } else if (item.type === "followup_email" && item.content) {
+                setFollowupEmail((prev) => prev || item.content);
+              } else if (item.type === "linkedin_message" && item.content) {
+                setLinkedinMessage((prev) => prev || item.content);
               }
             }
           }
@@ -167,12 +193,19 @@ export default function JobDetailPage({ params }: PageProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ jobId: id }),
       });
+      const data = await res.json();
       if (res.ok) {
-        const data = await res.json();
-        setCoverLetter(data.coverLetter);
+        setCoverLetter(data.coverLetter || data.content || "");
+        setCopyFeedback("✓ Cover letter generated successfully!");
+        setTimeout(() => setCopyFeedback(null), 3000);
+      } else {
+        setCopyFeedback(`❌ ${data.error || "Failed to generate cover letter"}`);
+        setTimeout(() => setCopyFeedback(null), 5000);
       }
     } catch (err) {
       console.error("Cover letter generation failed", err);
+      setCopyFeedback("❌ Network error generating cover letter");
+      setTimeout(() => setCopyFeedback(null), 5000);
     } finally {
       setGenerating(false);
     }
@@ -186,12 +219,19 @@ export default function JobDetailPage({ params }: PageProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ jobId: id }),
       });
+      const data = await res.json();
       if (res.ok) {
-        const data = await res.json();
-        setResumeUpdates(data);
+        setResumeUpdates(normalizeResumeUpdates(data));
+        setCopyFeedback("✓ Resume suggestions generated!");
+        setTimeout(() => setCopyFeedback(null), 3000);
+      } else {
+        setCopyFeedback(`❌ ${data.error || "Failed to generate suggestions"}`);
+        setTimeout(() => setCopyFeedback(null), 5000);
       }
     } catch (err) {
       console.error("Resume updates generation failed", err);
+      setCopyFeedback("❌ Network error generating suggestions");
+      setTimeout(() => setCopyFeedback(null), 5000);
     } finally {
       setGenerating(false);
     }
@@ -205,12 +245,19 @@ export default function JobDetailPage({ params }: PageProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ jobId: id, context: followupContext }),
       });
+      const data = await res.json();
       if (res.ok) {
-        const data = await res.json();
-        setFollowupEmail(data.email);
+        setFollowupEmail(data.email || data.content || "");
+        setCopyFeedback("✓ Follow-up email generated!");
+        setTimeout(() => setCopyFeedback(null), 3000);
+      } else {
+        setCopyFeedback(`❌ ${data.error || "Failed to generate follow-up email"}`);
+        setTimeout(() => setCopyFeedback(null), 5000);
       }
     } catch (err) {
       console.error("Follow-up generation failed", err);
+      setCopyFeedback("❌ Network error generating email");
+      setTimeout(() => setCopyFeedback(null), 5000);
     } finally {
       setGenerating(false);
     }
@@ -222,14 +269,25 @@ export default function JobDetailPage({ params }: PageProps) {
       const res = await fetch("/api/generate/linkedin-message", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ jobId: id, type: linkedinType }),
+        body: JSON.stringify({
+          jobId: id,
+          type: linkedinType,
+          messageType: linkedinType,
+        }),
       });
+      const data = await res.json();
       if (res.ok) {
-        const data = await res.json();
-        setLinkedinMessage(data.message);
+        setLinkedinMessage(data.message || data.content || "");
+        setCopyFeedback("✓ LinkedIn message generated!");
+        setTimeout(() => setCopyFeedback(null), 3000);
+      } else {
+        setCopyFeedback(`❌ ${data.error || "Failed to generate LinkedIn message"}`);
+        setTimeout(() => setCopyFeedback(null), 5000);
       }
     } catch (err) {
       console.error("LinkedIn outreach generation failed", err);
+      setCopyFeedback("❌ Network error generating LinkedIn message");
+      setTimeout(() => setCopyFeedback(null), 5000);
     } finally {
       setGenerating(false);
     }
@@ -424,13 +482,13 @@ export default function JobDetailPage({ params }: PageProps) {
 
             {resumeUpdates ? (
               <div className="space-y-6">
-                {resumeUpdates.missingSkills.length > 0 && (
+                {(resumeUpdates.missingSkills?.length ?? 0) > 0 && (
                   <div className="border border-[#CC0008] bg-[#CC0008]/10 p-4 rounded-[4px]">
                     <span className="text-xs font-bold uppercase block mb-2 text-[#CC0008]">
                       Skills in Job Description Missing from Your Resume
                     </span>
                     <div className="flex flex-wrap gap-2">
-                      {resumeUpdates.missingSkills.map((sk) => {
+                      {resumeUpdates.missingSkills?.map((sk) => {
                         const isAdded = addedSkills.has(sk);
                         return (
                           <div
@@ -456,35 +514,41 @@ export default function JobDetailPage({ params }: PageProps) {
                   </div>
                 )}
 
-                <div className="space-y-4">
-                  {resumeUpdates.suggestions.map((sug, i) => (
-                    <div key={i} className="border border-[#DFDFDF] p-4 rounded-[4px] bg-[#F5F5F5]">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-bold uppercase text-[#767676]">
-                          Section: {sug.section}
-                        </span>
-                        <button
-                          onClick={() => copyToClipboard(sug.suggested, "Suggested text")}
-                          className="text-xs text-[#003399] hover:underline font-bold cursor-pointer"
-                        >
-                          Copy Text
-                        </button>
-                      </div>
+                {(resumeUpdates.suggestions?.length ?? 0) > 0 ? (
+                  <div className="space-y-4">
+                    {resumeUpdates.suggestions?.map((sug, i) => (
+                      <div key={i} className="border border-[#DFDFDF] p-4 rounded-[4px] bg-[#F5F5F5]">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-bold uppercase text-[#767676]">
+                            Section: {sug.section}
+                          </span>
+                          <button
+                            onClick={() => copyToClipboard(sug.suggested, "Suggested text")}
+                            className="text-xs text-[#003399] hover:underline font-bold cursor-pointer"
+                          >
+                            Copy Text
+                          </button>
+                        </div>
 
-                      <div className="mb-2 text-xs font-mono line-through text-[#767676]">
-                        {sug.current}
-                      </div>
+                        <div className="mb-2 text-xs font-mono line-through text-[#767676]">
+                          {sug.current}
+                        </div>
 
-                      <div className="p-3 bg-white border border-[#DFDFDF] rounded-[4px] text-xs font-mono font-bold text-[#111111]">
-                        {sug.suggested}
-                      </div>
+                        <div className="p-3 bg-white border border-[#DFDFDF] rounded-[4px] text-xs font-mono font-bold text-[#111111]">
+                          {sug.suggested}
+                        </div>
 
-                      <div className="mt-2 text-[11px] text-[#767676]">
-                        Why this helps: {sug.reason}
+                        <div className="mt-2 text-[11px] text-[#767676]">
+                          Why this helps: {sug.reason}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-4 border border-[#DFDFDF] rounded-[4px] text-xs text-[#767676] bg-[#FAFAFA]">
+                    No specific bullet edits needed for this role. Check your missing skills above.
+                  </div>
+                )}
               </div>
             ) : (
               <div className="p-8 border border-dashed border-[#DFDFDF] rounded-[4px] text-center text-xs text-[#767676] bg-[#F5F5F5]">

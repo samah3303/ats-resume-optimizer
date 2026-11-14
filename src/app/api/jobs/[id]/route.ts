@@ -16,20 +16,29 @@ export async function GET(
     const userId = (session.user as { id: string }).id;
     const { id } = await params;
 
-    const job = await prisma.job.findUnique({
-      where: { id },
-      include: {
-        applications: {
-          orderBy: { createdAt: "desc" },
+    const [job, generatedContents] = await Promise.all([
+      prisma.job.findUnique({
+        where: { id },
+        include: {
+          applications: {
+            orderBy: { createdAt: "desc" },
+          },
         },
-      },
-    });
+      }),
+      prisma.generatedContent.findMany({
+        where: { userId, jobId: id },
+        orderBy: { createdAt: "desc" },
+      }),
+    ]);
 
     if (!job || job.userId !== userId) {
       return NextResponse.json({ error: "Job not found" }, { status: 404 });
     }
 
-    return NextResponse.json(job);
+    return NextResponse.json({
+      ...job,
+      generatedContents,
+    });
   } catch (error) {
     console.error("Job fetch error:", error);
     return NextResponse.json({ error: "Failed to fetch job" }, { status: 500 });

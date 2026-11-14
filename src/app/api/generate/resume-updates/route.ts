@@ -71,6 +71,9 @@ export async function POST(request: Request) {
       content: result,
       jobId: saved.jobId,
       createdAt: saved.createdAt.toISOString(),
+      suggestions: result.suggestions || [],
+      missingSkills: result.missingSkills || [],
+      atsScoreForJob: result.atsScoreForJob ?? 50,
     });
   } catch (error) {
     console.error("Resume updates generation error:", error);

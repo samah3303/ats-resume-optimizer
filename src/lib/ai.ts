@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 
 let _client: OpenAI | null = null;
-let _model = "deepseek-v4-flash";
+let _model = "deepseek-flash";
 
 export function getAI(): OpenAI {
   if (!_client) {
@@ -31,7 +31,7 @@ export function getAI(): OpenAI {
         baseURL: "https://openrouter.ai/api/v1",
       });
     } else if (deepseekKey) {
-      _model = process.env.DEEPSEEK_MODEL || "deepseek-v4-flash";
+      _model = process.env.DEEPSEEK_MODEL || "deepseek-flash";
       _client = new OpenAI({
         apiKey: deepseekKey,
         baseURL: process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com",

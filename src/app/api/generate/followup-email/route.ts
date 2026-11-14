@@ -70,6 +70,7 @@ export async function POST(request: Request) {
       id: saved.id,
       type: saved.type,
       content: saved.content,
+      email: saved.content,
       jobId: saved.jobId,
       createdAt: saved.createdAt.toISOString(),
     });
