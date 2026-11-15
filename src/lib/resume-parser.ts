@@ -3,37 +3,27 @@ import zlib from "zlib";
 import type { ResumeParseResult } from "@/types";
 import { aiChat, parseJsonSafely } from "@/lib/ai";
 
-function isHumanReadableText(str: string): boolean {
-  if (!str || str.trim().length < 15) return false;
-  const clean = str.trim();
-  let controlChars = 0;
-  let wordChars = 0;
+export function cleanExtractedText(str: string): string {
+  if (!str) return "";
+  return str
+    .replace(/\0/g, "") // Remove null bytes from UTF-16 / font streams
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, " ") // Replace non-printable ASCII control chars with space
+    .replace(/[\uFFF0-\uFFFF]/g, "") // Remove Unicode specials
+    .replace(/\s+/g, " ") // Normalize redundant whitespace
+    .trim();
+}
 
-  for (let i = 0; i < clean.length; i++) {
-    const code = clean.charCodeAt(i);
-    // Non-printable control characters (excluding tab 9, LF 10, CR 13)
-    if (
-      (code >= 0 && code <= 8) ||
-      code === 11 ||
-      code === 12 ||
-      (code >= 14 && code <= 31)
-    ) {
-      controlChars++;
-    } else if (
-      (code >= 48 && code <= 57) || // 0-9
-      (code >= 65 && code <= 90) || // A-Z
-      (code >= 97 && code <= 122) || // a-z
-      code >= 128 // Unicode characters (accents, bullets, dashes, etc.)
-    ) {
-      wordChars++;
-    }
-  }
+export function isHumanReadableText(str: string): boolean {
+  if (!str) return false;
+  const clean = cleanExtractedText(str);
+  if (clean.length < 25) return false;
 
-  // Corrupted binary stream check
-  if (controlChars / clean.length > 0.05) return false;
+  // Genuine readable resume text has at least 20 alphanumeric characters
+  const alphanumeric = clean.replace(/[^a-zA-Z0-9]/g, "");
+  if (alphanumeric.length < 20) return false;
 
-  // Genuine readable resume text has at least 25% alphanumeric / word characters
-  return wordChars / clean.length >= 0.25;
+  // At least 20% of the characters should be alphanumeric
+  return alphanumeric.length / clean.length >= 0.2;
 }
 
 function parsePdfFlateStreams(buffer: Buffer): string {
@@ -55,19 +45,20 @@ function parsePdfFlateStreams(buffer: Buffer): string {
         }
       }
       if (text) {
-        const tReg = /\(([^()\\]*(?:\\.[^()\\]*)*)\)\s*(?:Tj|TJ|'|")/g;
+        // Match all strings enclosed in parentheses (covers Tj, TJ arrays, and quotes)
+        const tReg = /\(([^()\\]*(?:\\.[^()\\]*)*)\)/g;
         let tm;
         while ((tm = tReg.exec(text)) !== null) {
           const cleaned = tm[1]
             .replace(/\\([()\\])/g, "$1")
             .replace(/\\n/g, "\n")
-            .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, "")
+            .replace(/\\r/g, "")
             .trim();
           if (cleaned.length > 0) chunks.push(cleaned);
         }
       }
     }
-    const result = chunks.join(" ").replace(/\s+/g, " ").trim();
+    const result = cleanExtractedText(chunks.join(" "));
     return isHumanReadableText(result) ? result : "";
   } catch {
     return "";
@@ -95,9 +86,9 @@ async function parsePdf(buffer: Buffer): Promise<string> {
       }
     }
 
-    text = text.replace(/--\s*\d+\s*of\s*\d+\s*--/gi, "").trim();
-    if (text && text.length > 20 && isHumanReadableText(text)) {
-      return text;
+    const cleaned = cleanExtractedText(text.replace(/--\s*\d+\s*of\s*\d+\s*--/gi, ""));
+    if (cleaned.length >= 25 && isHumanReadableText(cleaned)) {
+      return cleaned;
     }
   } catch (err) {
     console.warn("pdf-parse extraction warning, falling back to pdfjs-dist:", err);
@@ -130,22 +121,22 @@ async function parsePdf(buffer: Buffer): Promise<string> {
       }
     }
 
-    const text = pageTexts.join("\n\n").trim();
-    if (text && text.length > 20 && isHumanReadableText(text)) {
+    const text = cleanExtractedText(pageTexts.join("\n\n"));
+    if (text.length >= 25 && isHumanReadableText(text)) {
       return text;
     }
   } catch (err) {
     console.warn("pdfjs-dist direct fallback warning:", err);
   }
 
-  // Method 3: Raw Flate streams fallback
+  // Method 3: Raw Flate streams fallback (handles compressed text streams & TJ kerning)
   const flate = parsePdfFlateStreams(buffer);
-  if (flate && flate.length > 20 && isHumanReadableText(flate)) {
+  if (flate && flate.length >= 25 && isHumanReadableText(flate)) {
     return flate;
   }
 
   throw new Error(
-    "Unable to extract readable text from this PDF. If this is a scanned document or image-only PDF, please upload a text-based PDF or DOCX file."
+    "Unable to extract readable text from this PDF. If this is a scanned document, image-only PDF, or flattened Canva export, please upload a text-based PDF or DOCX file."
   );
 }
 
