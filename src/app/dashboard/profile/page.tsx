@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { UserProfile, ExperienceEntry, EducationEntry } from "@/types";
 import { ProfileSectionSkeleton, Skeleton } from "@/components/ui/Skeleton";
+import BrowserExtensionCard from "@/components/profile/BrowserExtensionCard";
 import Toast from "@/components/ui/Toast";
 
 export default function ProfilePage() {
@@ -839,6 +840,9 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
+
+          {/* 1-Click Job Clipper Browser Extension */}
+          <BrowserExtensionCard />
 
           {/* Social Profiles */}
           <div>

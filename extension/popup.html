@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>paniund Job Clipper</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <header class="popup-header">
+      <div class="brand">
+        <div class="logo-box">P.</div>
+        <div class="brand-text">
+          <span class="brand-name">paniund</span>
+          <span class="brand-sub">Job Clipper</span>
+        </div>
+      </div>
+      <div id="connectionStatus" class="status-pill status-loading">
+        <span class="status-dot"></span>
+        <span id="statusLabel">Checking...</span>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="popup-main">
+      <!-- Loading State -->
+      <div id="loadingView" class="state-view">
+        <div class="spinner"></div>
+        <p>Scanning active job listing...</p>
+      </div>
+
+      <!-- Not Connected State -->
+      <div id="notConnectedView" class="state-view hidden">
+        <div class="alert-box">
+          <span class="alert-icon">🔒</span>
+          <div>
+            <strong>Sign in required</strong>
+            <p>Log into your paniund dashboard or paste your Personal Access Token.</p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="tokenInput">Personal API Token</label>
+          <input type="password" id="tokenInput" placeholder="pnd_live_..." />
+          <span class="help-text">Found in your Profile Settings &rarr; Browser Extension</span>
+        </div>
+
+        <button id="btnSaveToken" class="btn btn-primary full-width">Connect Extension</button>
+        <a href="http://localhost:3000/login" target="_blank" class="btn btn-secondary full-width">
+          Open paniund &rarr;
+        </a>
+      </div>
+
+      <!-- Scraped Job Preview Form -->
+      <div id="jobView" class="state-view hidden">
+        <div class="source-tag-bar">
+          <div class="tag-group">
+            <span id="sourceTag" class="tag tag-blue">Indeed</span>
+            <button id="btnRescan" type="button" class="btn-rescan" title="Rescan active job from page">
+              ↻ Rescan
+            </button>
+          </div>
+          <span id="fitScorePreview" class="tag tag-yellow">ATS Fit Analysis</span>
+        </div>
+
+        <form id="clipForm" class="job-form">
+          <div class="form-group">
+            <label for="jobTitle">Job Title</label>
+            <input type="text" id="jobTitle" required />
+          </div>
+
+          <div class="form-group">
+            <label for="jobCompany">Company</label>
+            <input type="text" id="jobCompany" required />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="jobLocation">Location</label>
+              <input type="text" id="jobLocation" placeholder="Remote or City" />
+            </div>
+            <div class="form-group flex-1">
+              <label for="jobSalary">Salary (Optional)</label>
+              <input type="text" id="jobSalary" placeholder="e.g. $120k / AED 25k" />
+            </div>
+          </div>
+
+          <!-- Description Status Row -->
+          <div class="desc-status-box" id="descStatusBox">
+            <div class="desc-status-left">
+              <span id="descStatusIcon" class="desc-icon ok">✓</span>
+              <span id="descStatusText">Description captured (0 chars)</span>
+            </div>
+            <button type="button" id="btnToggleDesc" class="btn-desc-toggle">View / Edit ▾</button>
+          </div>
+          <div id="descDrawer" class="desc-drawer hidden">
+            <textarea id="jobDescriptionTextarea" rows="4" placeholder="Full job description..."></textarea>
+          </div>
+
+          <!-- Pipeline Target Stage -->
+          <div class="form-group">
+            <label>Save to Pipeline as:</label>
+            <div class="stage-toggle">
+              <label class="toggle-option">
+                <input type="radio" name="pipelineStage" value="wishlist" checked />
+                <span class="toggle-box">
+                  <span class="stage-dot dot-gray"></span>
+                  ★ Wishlist
+                </span>
+              </label>
+              <label class="toggle-option">
+                <input type="radio" name="pipelineStage" value="applied" />
+                <span class="toggle-box">
+                  <span class="stage-dot dot-blue"></span>
+                  ✓ Applied
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" id="btnClip" class="btn btn-primary full-width">
+            <span>Save to paniund Pipeline</span>
+            <span class="btn-arrow">&rarr;</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Success State -->
+      <div id="successView" class="state-view hidden">
+        <div class="success-card">
+          <div class="success-icon">✓</div>
+          <h3>Clipped Successfully!</h3>
+          <p id="successSummary">Job saved to your pipeline.</p>
+          
+          <div id="successScoreBox" class="score-box">
+            <div class="score-meta">
+              <span class="score-label">Estimated ATS Resume Fit</span>
+              <span id="scoreTagSubtitle" class="score-subtitle">Direct Requirement Match</span>
+            </div>
+            <span id="successScoreVal" class="score-val">88%</span>
+          </div>
+
+          <div id="matchedSkillsPills" class="skills-preview-list"></div>
+
+          <div class="success-actions">
+            <a id="btnViewJob" href="#" target="_blank" class="btn btn-primary full-width">
+              View Tailored Resume Suggestions &rarr;
+            </a>
+            <button id="btnClipAnother" class="btn btn-secondary full-width">
+              Clip Another Listing
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="popup-footer">
+      <span>Auto-syncs with your ATS Workspace</span>
+      <a href="http://localhost:3000/dashboard" target="_blank">Open Dashboard ↗</a>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

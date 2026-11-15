@@ -146,6 +146,18 @@ export default function ApplicationTrackerPage() {
     { status: "rejected", label: "Archived", dot: "bg-[#DFDFDF]" },
   ];
 
+  const submittedCount = applications.filter((a) => a.status !== "wishlist").length;
+  const interviewCount = applications.filter((a) =>
+    ["phone_screen", "interview", "offer", "accepted"].includes(a.status),
+  ).length;
+  const offerCount = applications.filter((a) =>
+    ["offer", "accepted"].includes(a.status),
+  ).length;
+  const responseRate =
+    submittedCount > 0
+      ? Math.round((interviewCount / submittedCount) * 1000) / 10
+      : 0;
+
   return (
     <div className="space-y-4 sm:space-y-6 font-sans">
       {/* Header Banner */}
@@ -172,6 +184,57 @@ export default function ApplicationTrackerPage() {
           </svg>
           Add a Job
         </Link>
+      </div>
+
+      {/* Funnel Velocity & Response Rate Strip */}
+      <div className="p-3.5 sm:p-4 bg-white border border-[#DFDFDF] rounded-xl sm:rounded-[4px] shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-6">
+          <div className="flex items-center gap-2">
+            <span className="font-bold uppercase tracking-wider text-[10px] text-[#767676]">
+              Funnel Conversion:
+            </span>
+            <span className="font-mono font-bold text-sm text-[#111111]">
+              {submittedCount} Submitted
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 pl-3 border-l border-[#DFDFDF]">
+            <span className="w-2 h-2 rounded-full bg-[#E87400]" />
+            <span className="font-medium text-[#484848]">Interviews:</span>
+            <span className="font-mono font-bold text-sm text-[#003399]">
+              {responseRate}%
+            </span>
+            <span className="text-[#767676] text-[11px]">
+              ({interviewCount} calls)
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 pl-3 border-l border-[#DFDFDF]">
+            <span className="w-2 h-2 rounded-full bg-[#0A8A00]" />
+            <span className="font-medium text-[#484848]">Offers:</span>
+            <span className="font-mono font-bold text-sm text-[#0A8A00]">
+              {offerCount}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 text-xs">
+          {responseRate >= 15 ? (
+            <span className="font-bold text-[#0A8A00] bg-[#0A8A00]/10 px-2.5 py-1 rounded-[3px] flex items-center gap-1">
+              <span>🔥</span> Response rate outperforming industry avg (6%)
+            </span>
+          ) : (
+            <span className="text-[#767676]">
+              Benchmark: ~6% tech industry average
+            </span>
+          )}
+          <Link
+            href="/dashboard"
+            className="text-[#003399] font-bold hover:underline ml-2"
+          >
+            Funnel Analytics &rarr;
+          </Link>
+        </div>
       </div>
 
       {/* Mobile Column Filter Pills */}

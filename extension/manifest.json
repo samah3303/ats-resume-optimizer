@@ -1,0 +1,71 @@
+{
+  "manifest_version": 3,
+  "name": "paniund — 1-Click Job Clipper",
+  "version": "1.0.1",
+  "description": "Clip and save job postings from LinkedIn, Indeed, Naukri Gulf, Glassdoor, Greenhouse, Lever, and career sites directly into your paniund workspace with instant ATS fit analysis.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "*://*.linkedin.com/*",
+    "*://*.indeed.com/*",
+    "*://*.indeed.ae/*",
+    "*://*.indeed.co.uk/*",
+    "*://*.indeed.ca/*",
+    "*://*.indeed.in/*",
+    "*://*.indeed.com.au/*",
+    "*://*.naukrigulf.com/*",
+    "*://*.naukri.com/*",
+    "*://*.bayt.com/*",
+    "*://*.glassdoor.com/*",
+    "*://*.greenhouse.io/*",
+    "*://*.lever.co/*",
+    "*://*.ashbyhq.com/*",
+    "*://*.myworkdayjobs.com/*",
+    "http://localhost:3000/*",
+    "https://*.paniund.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Clip to paniund",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.linkedin.com/*",
+        "*://*.indeed.com/*",
+        "*://*.indeed.ae/*",
+        "*://*.indeed.co.uk/*",
+        "*://*.indeed.ca/*",
+        "*://*.indeed.in/*",
+        "*://*.indeed.com.au/*",
+        "*://*.naukrigulf.com/*",
+        "*://*.naukri.com/*",
+        "*://*.bayt.com/*",
+        "*://*.glassdoor.com/*",
+        "*://*.greenhouse.io/*",
+        "*://*.lever.co/*",
+        "*://*.ashbyhq.com/*",
+        "*://*.myworkdayjobs.com/*"
+      ],
+      "all_frames": true,
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  }
+}

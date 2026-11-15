@@ -37,11 +37,12 @@ export async function fetchAiJobs(query: CandidateJobQuery): Promise<MatchedJobI
   let platformQuery = "site:linkedin.com OR site:indeed.com";
   const isGulf = /dubai|uae|emirates|qatar|saudi|riyadh|kuwait|bahrain|oman/i.test(location);
   if (isGulf) {
-    platformQuery = "site:naukrigulf.com OR site:indeed.com OR site:linkedin.com";
+    platformQuery = "site:bayt.com OR site:naukrigulf.com OR site:indeed.com OR site:linkedin.com";
   }
 
   if (prefs.platforms && prefs.platforms.length > 0) {
     const siteMap: Record<string, string> = {
+      bayt: "site:bayt.com",
       naukrigulf: "site:naukrigulf.com",
       indeed: "site:indeed.com",
       linkedin: "site:linkedin.com",
@@ -89,7 +90,7 @@ CRITICAL INSTRUCTIONS:
 - LOCATION REQUIREMENT: All jobs must be based in or hire from "${location}". If "${location}" is a specific city/country, provide vacancies based in or open to candidates in "${location}".
 - ROLE: Focus on "${role}".
 - SKILLS FIT: Leverage key candidate competencies: ${primarySkills}.
-- PLATFORMS: Prioritize LinkedIn, Indeed, Naukri Gulf (for Middle East), Greenhouse, and Lever.
+- PLATFORMS: Prioritize Bayt.com, Naukri Gulf, LinkedIn, and Indeed (especially for Middle East / UAE).
 - Output ONLY valid JSON with an array named "jobs".
 
 JSON Schema:
@@ -103,8 +104,8 @@ JSON Schema:
       "jobType": "Full-time" | "Contract" | "Part-time",
       "description": "Clear 2-3 sentence overview of responsibilities and mission",
       "requirements": "Key 3-5 bullet requirements separated by newline",
-      "sourceUrl": "Realistic job link URL from linkedin.com/jobs, indeed.com, naukrigulf.com, etc.",
-      "source": "linkedin" | "indeed" | "naukrigulf" | "greenhouse" | "lever" | "web",
+      "sourceUrl": "Realistic job link URL from bayt.com, linkedin.com/jobs, indeed.com, naukrigulf.com, etc.",
+      "source": "bayt" | "linkedin" | "indeed" | "naukrigulf" | "greenhouse" | "lever" | "web",
       "matchScore": number between 75 and 98 based on fit
     }
   ]

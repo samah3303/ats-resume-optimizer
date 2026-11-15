@@ -144,6 +144,23 @@ export interface ResumeParseResult {
   rawText: string;
 }
 
+export interface FunnelAnalytics {
+  appliedCount: number;
+  interviewCount: number;
+  offerCount: number;
+  responseRate: number;
+  offerRate: number;
+  interviewToOfferRate: number;
+  thisWeekApplied: number;
+  lastWeekApplied: number;
+  weeklyTrend: number;
+  avgMatchScoreInterviewed: number | null;
+  avgMatchScoreTotal: number | null;
+  benchmarkStatus: "exceptional" | "strong" | "average" | "needs_boost";
+  benchmarkMultiplier: number | null;
+  coachingInsight: string;
+}
+
 export interface DashboardStats {
   totalApplications: number;
   activeApplications: number;
@@ -152,6 +169,7 @@ export interface DashboardStats {
   atsScore: number | null;
   recentActivity: ActivityEntry[];
   statusDistribution: Record<ApplicationStatus, number>;
+  funnel?: FunnelAnalytics;
 }
 
 export interface ActivityEntry {

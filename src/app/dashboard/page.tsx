@@ -6,6 +6,7 @@ import { UserProfile, DashboardStats } from "@/types";
 import AtsScoreTile from "@/components/dashboard/AtsScoreTile";
 import ProfileSummaryTile from "@/components/dashboard/ProfileSummaryTile";
 import JobsAppliedTile from "@/components/dashboard/JobsAppliedTile";
+import ApplicationFunnelTile from "@/components/dashboard/ApplicationFunnelTile";
 import RecommendedJobsTile from "@/components/dashboard/RecommendedJobsTile";
 import ResumeRecommendationsTile from "@/components/dashboard/ResumeRecommendationsTile";
 import QuickLinksTile from "@/components/dashboard/QuickLinksTile";
@@ -338,6 +339,12 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Featured Application Funnel & Conversion Engine */}
+      <ApplicationFunnelTile
+        funnel={stats?.funnel}
+        totalTracked={stats?.totalApplications || 0}
+      />
 
       {/* Grid Composition of Tiles */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-6 items-stretch">
