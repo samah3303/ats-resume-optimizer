@@ -14,7 +14,7 @@ export async function POST(request: Request) {
 
     const userId = (session.user as { id: string }).id;
     const body = await request.json();
-    const { jobId } = generateResumeUpdatesSchema.parse(body);
+    const { jobId, tone } = generateResumeUpdatesSchema.parse(body);
 
     // Get user's profile and resume
     const profile = await prisma.profile.findUnique({
@@ -35,6 +35,7 @@ export async function POST(request: Request) {
       profile.resumeText,
       job.description || "",
       job.title,
+      tone || "professional",
     );
 
     // Save to GeneratedContent

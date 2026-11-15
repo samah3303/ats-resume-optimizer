@@ -34,14 +34,14 @@ export default function Logo({
 
   const containerBg =
     theme === "on-blue"
-      ? "bg-[#FFDA1A] text-[#003399]" // Yellow badge with blue 'p' glyph on blue navbar
-      : "bg-[#003399] text-[#FFDA1A]"; // Blue badge with yellow 'p' glyph on white/light pages
+      ? "bg-nordic-secondary text-nordic-primary" // Yellow badge with blue 'p' glyph on blue navbar
+      : "bg-nordic-primary text-nordic-secondary"; // Blue badge with yellow 'p' glyph on white/light pages
 
-  const textColor = theme === "on-blue" ? "text-white" : "text-[#111111]";
+  const textColor = theme === "on-blue" ? "text-white" : "text-nordic-text";
   const tagColor =
     theme === "on-blue"
-      ? "bg-white/20 text-[#FFDA1A]"
-      : "bg-[#FFDA1A] text-[#111111]";
+      ? "bg-white/20 text-nordic-secondary"
+      : "bg-nordic-secondary text-nordic-text";
 
   return (
     <Link
@@ -98,7 +98,7 @@ export default function Logo({
             )}
           </div>
           {subtitle && (
-            <span className="text-[10px] text-[#767676] tracking-normal font-medium mt-0.5">
+            <span className="text-[10px] text-nordic-neutral tracking-normal font-medium mt-0.5">
               {subtitle}
             </span>
           )}

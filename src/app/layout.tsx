@@ -64,7 +64,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-[100dvh] bg-[#F5F5F5] text-[#111111] antialiased">
+      <body className="min-h-[100dvh] bg-nordic-bg text-nordic-text antialiased">
         {umamiWebsiteId && (
           <Script
             src={umamiScriptUrl}

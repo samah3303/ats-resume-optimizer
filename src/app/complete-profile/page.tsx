@@ -95,9 +95,9 @@ function CompleteProfileContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F5F5F5] text-sm font-semibold text-[#484848]">
+      <div className="min-h-screen flex items-center justify-center bg-nordic-bg text-sm font-semibold text-nordic-text-secondary">
         <div className="flex items-center gap-3">
-          <div className="w-5 h-5 border-2 border-[#003399] border-t-transparent rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-nordic-primary border-t-transparent rounded-full animate-spin" />
           <span>Loading Career Target Profile...</span>
         </div>
       </div>
@@ -105,26 +105,26 @@ function CompleteProfileContent() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#F5F5F5] px-4 py-12 selection:bg-[#FFDA1A] selection:text-[#111111]">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-nordic-bg px-4 py-12 selection:bg-nordic-secondary selection:text-nordic-text">
       {/* Brand Header */}
       <Logo size="lg" theme="on-light" subtitle="Career Target Configuration" className="mb-8" />
 
-      <div className="w-full max-w-2xl bg-white border border-[#DFDFDF] rounded-[4px] shadow-sm overflow-hidden">
+      <div className="w-full max-w-2xl bg-white border border-nordic-border rounded-[4px] shadow-sm overflow-hidden">
         {/* Accent Bar */}
-        <div className="h-1.5 bg-[#003399] w-full" />
+        <div className="h-1.5 bg-nordic-primary w-full" />
 
         <div className="p-8">
           <div className="mb-6">
-            <h1 className="text-2xl font-bold text-[#111111] tracking-tight">
+            <h1 className="text-2xl font-bold text-nordic-text tracking-tight">
               Calibrate Career Targets
             </h1>
-            <p className="text-sm text-[#484848] mt-1">
+            <p className="text-sm text-nordic-text-secondary mt-1">
               These preferences configure the ATS matching engine and keyword alignment metrics.
             </p>
           </div>
 
           {error && (
-            <div className="mb-6 border border-[#CC0008] bg-[#CC0008]/10 text-[#CC0008] p-3 rounded-[4px] text-xs font-semibold">
+            <div className="mb-6 border border-nordic-error bg-nordic-error/10 text-nordic-error p-3 rounded-[4px] text-xs font-semibold">
               {error}
             </div>
           )}
@@ -132,7 +132,7 @@ function CompleteProfileContent() {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
+                <label className="block text-xs font-bold text-nordic-text uppercase tracking-wide mb-1.5">
                   Primary Target Role
                 </label>
                 <input
@@ -141,12 +141,12 @@ function CompleteProfileContent() {
                   value={targetRole}
                   onChange={(e) => setTargetRole(e.target.value)}
                   placeholder="e.g. Lead Software Engineer"
-                  className="w-full h-11 px-3.5 bg-white border border-[#DFDFDF] rounded-[4px] text-sm text-[#111111] placeholder-[#767676] focus:outline-none focus:border-[#003399] focus:ring-2 focus:ring-[#003399]/15 transition-all"
+                  className="w-full h-11 px-3.5 bg-white border border-nordic-border rounded-[4px] text-sm text-nordic-text placeholder-nordic-neutral focus:outline-none focus:border-nordic-primary focus:ring-2 focus:ring-nordic-primary/15 transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
+                <label className="block text-xs font-bold text-nordic-text uppercase tracking-wide mb-1.5">
                   Target Industry
                 </label>
                 <input
@@ -154,20 +154,20 @@ function CompleteProfileContent() {
                   value={targetIndustry}
                   onChange={(e) => setTargetIndustry(e.target.value)}
                   placeholder="e.g. Cloud Computing / SaaS"
-                  className="w-full h-11 px-3.5 bg-white border border-[#DFDFDF] rounded-[4px] text-sm text-[#111111] placeholder-[#767676] focus:outline-none focus:border-[#003399] focus:ring-2 focus:ring-[#003399]/15 transition-all"
+                  className="w-full h-11 px-3.5 bg-white border border-nordic-border rounded-[4px] text-sm text-nordic-text placeholder-nordic-neutral focus:outline-none focus:border-nordic-primary focus:ring-2 focus:ring-nordic-primary/15 transition-all"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
+                <label className="block text-xs font-bold text-nordic-text uppercase tracking-wide mb-1.5">
                   Company Tier
                 </label>
                 <select
                   value={targetCompanyTier}
                   onChange={(e) => setTargetCompanyTier(e.target.value)}
-                  className="w-full h-11 px-3 bg-white border border-[#DFDFDF] rounded-[4px] text-sm text-[#111111] focus:outline-none focus:border-[#003399] focus:ring-2 focus:ring-[#003399]/15 transition-all"
+                  className="w-full h-11 px-3 bg-white border border-nordic-border rounded-[4px] text-sm text-nordic-text focus:outline-none focus:border-nordic-primary focus:ring-2 focus:ring-nordic-primary/15 transition-all"
                 >
                   <option value="Tier 1 Tech">Tier 1 Tech / FAANG</option>
                   <option value="Unicorn / High-Growth">High-Growth Unicorn</option>
@@ -177,7 +177,7 @@ function CompleteProfileContent() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
+                <label className="block text-xs font-bold text-nordic-text uppercase tracking-wide mb-1.5">
                   Min Comp ($ / yr)
                 </label>
                 <input
@@ -185,12 +185,12 @@ function CompleteProfileContent() {
                   value={minSalary}
                   onChange={(e) => setMinSalary(e.target.value)}
                   placeholder="140000"
-                  className="w-full h-11 px-3.5 bg-white border border-[#DFDFDF] rounded-[4px] text-sm font-mono text-[#111111] placeholder-[#767676] focus:outline-none focus:border-[#003399] focus:ring-2 focus:ring-[#003399]/15 transition-all"
+                  className="w-full h-11 px-3.5 bg-white border border-nordic-border rounded-[4px] text-sm font-mono text-nordic-text placeholder-nordic-neutral focus:outline-none focus:border-nordic-primary focus:ring-2 focus:ring-nordic-primary/15 transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
+                <label className="block text-xs font-bold text-nordic-text uppercase tracking-wide mb-1.5">
                   Max Comp ($ / yr)
                 </label>
                 <input
@@ -198,14 +198,14 @@ function CompleteProfileContent() {
                   value={maxSalary}
                   onChange={(e) => setMaxSalary(e.target.value)}
                   placeholder="220000"
-                  className="w-full h-11 px-3.5 bg-white border border-[#DFDFDF] rounded-[4px] text-sm font-mono text-[#111111] placeholder-[#767676] focus:outline-none focus:border-[#003399] focus:ring-2 focus:ring-[#003399]/15 transition-all"
+                  className="w-full h-11 px-3.5 bg-white border border-nordic-border rounded-[4px] text-sm font-mono text-nordic-text placeholder-nordic-neutral focus:outline-none focus:border-nordic-primary focus:ring-2 focus:ring-nordic-primary/15 transition-all"
                 />
               </div>
             </div>
 
             {/* Core Competency Chips */}
             <div>
-              <label className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
+              <label className="block text-xs font-bold text-nordic-text uppercase tracking-wide mb-1.5">
                 Core ATS Keywords & Skills
               </label>
               <div className="flex gap-2 mb-3">
@@ -220,7 +220,7 @@ function CompleteProfileContent() {
                     }
                   }}
                   placeholder="Add skill (e.g. Next.js, Distributed Systems, Docker)"
-                  className="flex-1 h-11 px-3.5 bg-white border border-[#DFDFDF] rounded-[4px] text-sm text-[#111111] placeholder-[#767676] focus:outline-none focus:border-[#003399] focus:ring-2 focus:ring-[#003399]/15 transition-all"
+                  className="flex-1 h-11 px-3.5 bg-white border border-nordic-border rounded-[4px] text-sm text-nordic-text placeholder-nordic-neutral focus:outline-none focus:border-nordic-primary focus:ring-2 focus:ring-nordic-primary/15 transition-all"
                 />
                 <button
                   type="button"
@@ -231,22 +231,22 @@ function CompleteProfileContent() {
                 </button>
               </div>
 
-              <div className="flex flex-wrap gap-2 min-h-12 border border-[#DFDFDF] p-3 rounded-[4px] bg-[#F5F5F5]">
+              <div className="flex flex-wrap gap-2 min-h-12 border border-nordic-border p-3 rounded-[4px] bg-nordic-bg">
                 {skills.length === 0 ? (
-                  <span className="text-xs text-[#767676] self-center">
+                  <span className="text-xs text-nordic-neutral self-center">
                     No custom keywords added yet. Type a skill above and press Enter.
                   </span>
                 ) : (
                   skills.map((skill) => (
                     <span
                       key={skill}
-                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-[#DFDFDF] text-xs font-semibold rounded-[4px] text-[#111111] shadow-2xs"
+                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-nordic-border text-xs font-semibold rounded-[4px] text-nordic-text shadow-2xs"
                     >
                       {skill}
                       <button
                         type="button"
                         onClick={() => removeSkill(skill)}
-                        className="text-[#767676] hover:text-[#CC0008] font-bold cursor-pointer ml-1"
+                        className="text-nordic-neutral hover:text-nordic-error font-bold cursor-pointer ml-1"
                       >
                         ×
                       </button>
@@ -266,9 +266,9 @@ function CompleteProfileContent() {
           </form>
         </div>
 
-        <div className="border-t border-[#DFDFDF] bg-[#F5F5F5] px-6 py-2.5 flex items-center justify-between text-xs text-[#767676]">
+        <div className="border-t border-nordic-border bg-nordic-bg px-6 py-2.5 flex items-center justify-between text-xs text-nordic-neutral">
           <span>Step 2 of 2</span>
-          <span className="font-semibold text-[#003399]">Calibration</span>
+          <span className="font-semibold text-nordic-primary">Calibration</span>
         </div>
       </div>
     </div>

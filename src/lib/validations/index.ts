@@ -65,6 +65,9 @@ export const educationItemSchema = z.object({
   year: z.string().max(30).transform(sanitizeText),
 });
 
+export const toneEnum = z.enum(["professional", "conversational", "confident", "humble"]);
+export type GenerationTone = z.infer<typeof toneEnum>;
+
 export const profilePreferencesSchema = z
   .object({
     platforms: z.array(z.string().max(50)).optional(),
@@ -72,6 +75,7 @@ export const profilePreferencesSchema = z
     workModes: z.array(z.string().max(50)).optional(),
     minSalary: z.string().max(50).optional().nullable(),
     experienceLevel: z.string().max(50).optional().nullable(),
+    preferredTone: toneEnum.optional().nullable(),
   })
   .optional()
   .nullable();
@@ -272,21 +276,25 @@ export const updateApplicationSchema = z.object({
 // ==========================================
 export const generateCoverLetterSchema = z.object({
   jobId: z.string().min(1, "Job ID is required").max(100),
+  tone: toneEnum.optional().default("professional"),
 });
 
 export const generateResumeUpdatesSchema = z.object({
   jobId: z.string().min(1, "Job ID is required").max(100),
+  tone: toneEnum.optional().default("professional"),
 });
 
 export const generateFollowupSchema = z.object({
   jobId: z.string().min(1, "Job ID is required").max(100),
   context: z.string().max(200).optional().default("following up on application"),
+  tone: toneEnum.optional().default("professional"),
 });
 
 export const generateLinkedInSchema = z.object({
   jobId: z.string().min(1, "Job ID is required").max(100),
   type: z.string().max(100).optional(),
   messageType: z.string().max(100).optional(),
+  tone: toneEnum.optional().default("professional"),
 });
 
 // ==========================================

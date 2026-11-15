@@ -102,7 +102,7 @@ export default function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-[60] bg-[#111111]/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto animate-in fade-in duration-150"
+      className="fixed inset-0 z-[60] bg-nordic-text/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto animate-in fade-in duration-150"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           onClose();
@@ -115,10 +115,10 @@ export default function Modal({
         aria-modal="true"
         aria-labelledby={titleId.current}
         tabIndex={-1}
-        className={`w-full ${maxWidthClass} bg-white border-t sm:border border-[#DFDFDF] rounded-t-2xl sm:rounded-[8px] shadow-2xl max-h-[92vh] sm:max-h-[90vh] flex flex-col overflow-hidden outline-none`}
+        className={`w-full ${maxWidthClass} bg-white border-t sm:border border-nordic-border rounded-t-2xl sm:rounded-[8px] shadow-2xl max-h-[92vh] sm:max-h-[90vh] flex flex-col overflow-hidden outline-none`}
       >
         {/* Modal Header */}
-        <div className="bg-[#003399] text-white p-4 sm:p-5 flex flex-col rounded-t-2xl sm:rounded-t-[8px] shrink-0">
+        <div className="bg-nordic-primary text-white p-4 sm:p-5 flex flex-col rounded-t-2xl sm:rounded-t-[8px] shrink-0">
           {/* Mobile Bottom Sheet Pull Bar */}
           <div
             className="w-12 h-1.5 bg-white/40 rounded-full mx-auto mb-2.5 sm:hidden"
@@ -146,7 +146,7 @@ export default function Modal({
               type="button"
               onClick={onClose}
               aria-label="Close dialog"
-              className="touch-target w-10 h-10 -mr-2 rounded-[4px] bg-[#002B80] hover:bg-[#FFDA1A] hover:text-[#111111] text-white font-bold text-base transition-colors cursor-pointer tap-active flex items-center justify-center"
+              className="touch-target w-10 h-10 -mr-2 rounded-[4px] bg-nordic-primary-hover hover:bg-nordic-secondary hover:text-nordic-text text-white font-bold text-base transition-colors cursor-pointer tap-active flex items-center justify-center"
             >
               ×
             </button>

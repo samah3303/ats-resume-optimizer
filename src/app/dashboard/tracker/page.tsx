@@ -28,6 +28,11 @@ export default function ApplicationTrackerPage() {
     type: "success" | "error" | "info";
   } | null>(null);
 
+  // Drag and Drop States
+  const [draggingAppId, setDraggingAppId] = useState<string | null>(null);
+  const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
+  const [justDroppedAppId, setJustDroppedAppId] = useState<string | null>(null);
+
   const loadApplications = useCallback(async () => {
     try {
       setLoading(true);
@@ -56,7 +61,7 @@ export default function ApplicationTrackerPage() {
     newStatus: ApplicationStatus
   ) => {
     const target = applications.find((a) => a.id === appId);
-    if (!target) return;
+    if (!target || target.status === newStatus) return;
     const oldStatus = target.status;
 
     // 1. Optimistic status update
@@ -70,7 +75,7 @@ export default function ApplicationTrackerPage() {
 
     try {
       const res = await fetch(`/api/applications/${appId}`, {
-        method: "PUT",
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
       });
@@ -88,6 +93,48 @@ export default function ApplicationTrackerPage() {
         type: "error",
       });
       console.error("Failed to update status", err);
+    }
+  };
+
+  const handleDragStart = (e: React.DragEvent, appId: string) => {
+    e.dataTransfer.setData("text/plain", appId);
+    e.dataTransfer.effectAllowed = "move";
+    setDraggingAppId(appId);
+  };
+
+  const handleDragEnd = () => {
+    setDraggingAppId(null);
+    setDragOverColumn(null);
+  };
+
+  const handleDragOver = (e: React.DragEvent, status: ApplicationStatus) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    if (dragOverColumn !== status) {
+      setDragOverColumn(status);
+    }
+  };
+
+  const handleDragLeave = (e: React.DragEvent, status: ApplicationStatus) => {
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      if (dragOverColumn === status) {
+        setDragOverColumn(null);
+      }
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent, newStatus: ApplicationStatus) => {
+    e.preventDefault();
+    const appId = e.dataTransfer.getData("text/plain") || draggingAppId;
+    setDragOverColumn(null);
+    setDraggingAppId(null);
+    if (appId) {
+      const target = applications.find((a) => a.id === appId);
+      if (target && target.status !== newStatus) {
+        setJustDroppedAppId(appId);
+        setTimeout(() => setJustDroppedAppId(null), 800);
+        handleStatusChange(appId, newStatus);
+      }
     }
   };
 
@@ -138,12 +185,12 @@ export default function ApplicationTrackerPage() {
   };
 
   const kanbanColumns: { status: ApplicationStatus; label: string; dot: string }[] = [
-    { status: "wishlist", label: "Wishlist", dot: "bg-[#767676]" },
-    { status: "applied", label: "Applied", dot: "bg-[#003399]" },
-    { status: "phone_screen", label: "Screening", dot: "bg-[#FFDA1A]" },
-    { status: "interview", label: "Interview", dot: "bg-[#E87400]" },
-    { status: "offer", label: "Offer", dot: "bg-[#0A8A00]" },
-    { status: "rejected", label: "Archived", dot: "bg-[#DFDFDF]" },
+    { status: "wishlist", label: "Wishlist", dot: "bg-nordic-neutral" },
+    { status: "applied", label: "Applied", dot: "bg-nordic-primary" },
+    { status: "phone_screen", label: "Screening", dot: "bg-nordic-secondary" },
+    { status: "interview", label: "Interview", dot: "bg-nordic-warning" },
+    { status: "offer", label: "Offer", dot: "bg-nordic-success" },
+    { status: "rejected", label: "Archived", dot: "bg-nordic-border" },
   ];
 
   const submittedCount = applications.filter((a) => a.status !== "wishlist").length;
@@ -163,14 +210,14 @@ export default function ApplicationTrackerPage() {
       {/* Header Banner */}
       <div className="nordic-card rounded-2xl sm:rounded-[4px] p-4.5 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-5">
         <div>
-          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-[#FFDA1A] text-[#111111] text-[10px] font-bold rounded-[2px] uppercase tracking-wide mb-2 sm:mb-3">
-            <span className="w-2 h-2 rounded-full bg-[#003399]" />
+          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-nordic-secondary text-nordic-text text-[10px] font-bold rounded-[2px] uppercase tracking-wide mb-2 sm:mb-3">
+            <span className="w-2 h-2 rounded-full bg-nordic-primary" />
             Tracker
           </div>
-          <h1 className="text-xl sm:text-3xl font-bold text-[#111111] tracking-tight">
+          <h1 className="text-xl sm:text-3xl font-bold text-nordic-text tracking-tight">
             Application Tracker
           </h1>
-          <p className="text-xs sm:text-sm text-[#484848] mt-0.5 sm:mt-1">
+          <p className="text-xs sm:text-sm text-nordic-text-secondary mt-0.5 sm:mt-1">
             Track your job applications, upcoming interviews, and offers in one place.
           </p>
         </div>
@@ -187,32 +234,32 @@ export default function ApplicationTrackerPage() {
       </div>
 
       {/* Funnel Velocity & Response Rate Strip */}
-      <div className="p-3.5 sm:p-4 bg-white border border-[#DFDFDF] rounded-xl sm:rounded-[4px] shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div className="p-3.5 sm:p-4 bg-white border border-nordic-border rounded-xl sm:rounded-[4px] shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex flex-wrap items-center gap-3 sm:gap-6">
           <div className="flex items-center gap-2">
-            <span className="font-bold uppercase tracking-wider text-[10px] text-[#767676]">
+            <span className="font-bold uppercase tracking-wider text-[10px] text-nordic-neutral">
               Funnel Conversion:
             </span>
-            <span className="font-mono font-bold text-sm text-[#111111]">
+            <span className="font-mono font-bold text-sm text-nordic-text">
               {submittedCount} Submitted
             </span>
           </div>
 
-          <div className="flex items-center gap-2 pl-3 border-l border-[#DFDFDF]">
-            <span className="w-2 h-2 rounded-full bg-[#E87400]" />
-            <span className="font-medium text-[#484848]">Interviews:</span>
-            <span className="font-mono font-bold text-sm text-[#003399]">
+          <div className="flex items-center gap-2 pl-3 border-l border-nordic-border">
+            <span className="w-2 h-2 rounded-full bg-nordic-warning" />
+            <span className="font-medium text-nordic-text-secondary">Interviews:</span>
+            <span className="font-mono font-bold text-sm text-nordic-primary">
               {responseRate}%
             </span>
-            <span className="text-[#767676] text-[11px]">
+            <span className="text-nordic-neutral text-[11px]">
               ({interviewCount} calls)
             </span>
           </div>
 
-          <div className="flex items-center gap-2 pl-3 border-l border-[#DFDFDF]">
-            <span className="w-2 h-2 rounded-full bg-[#0A8A00]" />
-            <span className="font-medium text-[#484848]">Offers:</span>
-            <span className="font-mono font-bold text-sm text-[#0A8A00]">
+          <div className="flex items-center gap-2 pl-3 border-l border-nordic-border">
+            <span className="w-2 h-2 rounded-full bg-nordic-success" />
+            <span className="font-medium text-nordic-text-secondary">Offers:</span>
+            <span className="font-mono font-bold text-sm text-nordic-success">
               {offerCount}
             </span>
           </div>
@@ -220,17 +267,17 @@ export default function ApplicationTrackerPage() {
 
         <div className="flex items-center gap-2 text-xs">
           {responseRate >= 15 ? (
-            <span className="font-bold text-[#0A8A00] bg-[#0A8A00]/10 px-2.5 py-1 rounded-[3px] flex items-center gap-1">
+            <span className="font-bold text-nordic-success bg-nordic-success/10 px-2.5 py-1 rounded-[3px] flex items-center gap-1">
               <span>🔥</span> Response rate outperforming industry avg (6%)
             </span>
           ) : (
-            <span className="text-[#767676]">
+            <span className="text-nordic-neutral">
               Benchmark: ~6% tech industry average
             </span>
           )}
           <Link
             href="/dashboard"
-            className="text-[#003399] font-bold hover:underline ml-2"
+            className="text-nordic-primary font-bold hover:underline ml-2"
           >
             Funnel Analytics &rarr;
           </Link>
@@ -250,8 +297,8 @@ export default function ApplicationTrackerPage() {
           onClick={() => setMobileColumn("all")}
           className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors tap-active shrink-0 ${
             mobileColumn === "all"
-              ? "bg-[#003399] text-white"
-              : "bg-white text-[#484848] border border-[#DFDFDF]"
+              ? "bg-nordic-primary text-white"
+              : "bg-white text-nordic-text-secondary border border-nordic-border"
           }`}
         >
           All ({applications.length})
@@ -268,13 +315,13 @@ export default function ApplicationTrackerPage() {
               onClick={() => setMobileColumn(col.status)}
               className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors tap-active flex items-center gap-1.5 shrink-0 ${
                 isSelected
-                  ? "bg-[#003399] text-white"
-                  : "bg-white text-[#484848] border border-[#DFDFDF]"
+                  ? "bg-nordic-primary text-white"
+                  : "bg-white text-nordic-text-secondary border border-nordic-border"
               }`}
             >
               <span
                 className={`w-2 h-2 rounded-full ${
-                  isSelected ? "bg-[#FFDA1A]" : col.dot
+                  isSelected ? "bg-nordic-secondary" : col.dot
                 }`}
                 aria-hidden="true"
               />
@@ -306,54 +353,93 @@ export default function ApplicationTrackerPage() {
           {kanbanColumns.map((col) => {
             const colApps = applications.filter((a) => a.status === col.status);
             const isMatch = mobileColumn === "all" || mobileColumn === col.status;
+            const isOver = dragOverColumn === col.status;
 
             return (
               <div
                 key={col.status}
-                className={`bg-white border border-[#DFDFDF] rounded-2xl md:rounded-[4px] shadow-2xs flex-col min-h-[300px] md:min-h-[460px] ${
-                  isMatch ? "flex" : "hidden md:flex"
-                }`}
+                onDragOver={(e) => handleDragOver(e, col.status)}
+                onDragLeave={(e) => handleDragLeave(e, col.status)}
+                onDrop={(e) => handleDrop(e, col.status)}
+                className={`bg-white border rounded-2xl md:rounded-[4px] shadow-2xs flex-col min-h-[300px] md:min-h-[480px] transition-all duration-200 ${
+                  isOver
+                    ? "border-2 border-nordic-primary bg-nordic-primary/5 ring-2 ring-nordic-primary/20"
+                    : "border-nordic-border"
+                } ${isMatch ? "flex" : "hidden md:flex"}`}
               >
                 {/* Column Header */}
-                <div className="p-3 border-b border-[#DFDFDF] bg-[#F5F5F5] rounded-t-[4px] flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2 font-bold text-[#111111]">
+                <div className="p-3 border-b border-nordic-border bg-nordic-bg rounded-t-[4px] flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2 font-bold text-nordic-text">
                     <span className={`w-2.5 h-2.5 rounded-full ${col.dot}`} aria-hidden="true" />
                     <span>{col.label}</span>
                   </div>
-                  <span className="px-2 py-0.5 bg-white border border-[#DFDFDF] font-bold text-[11px] rounded-[2px] font-mono text-[#111111]">
+                  <span className="px-2 py-0.5 bg-white border border-nordic-border font-bold text-[11px] rounded-[2px] font-mono text-nordic-text">
                     {colApps.length}
                   </span>
                 </div>
 
-                {/* Cards Container */}
+                {/* Cards Container with Drop Zone feedback */}
                 <div className="p-2.5 space-y-2.5 flex-1 overflow-y-auto">
+                  {/* Drop indicator line at top of column when dragging over */}
+                  {isOver && (
+                    <div
+                      className="h-1 bg-nordic-primary rounded-full mx-1 my-1 animate-pulse shadow-xs"
+                      aria-label="Drop target indicator"
+                    />
+                  )}
+
                   {colApps.length === 0 ? (
-                    <div className="h-28 border border-dashed border-[#DFDFDF] rounded-[4px] flex items-center justify-center text-xs text-[#767676] text-center p-3">
-                      No jobs in this stage
+                    <div
+                      className={`h-28 border border-dashed rounded-[4px] flex items-center justify-center text-xs text-center p-3 transition-colors ${
+                        isOver
+                          ? "border-nordic-primary bg-nordic-primary/10 text-nordic-primary font-bold"
+                          : "border-nordic-border text-nordic-neutral"
+                      }`}
+                    >
+                      {isOver ? "Drop application here" : "No jobs in this stage"}
                     </div>
                   ) : (
                     colApps.map((app) => (
                       <div
                         key={app.id}
-                        className="border border-[#DFDFDF] rounded-[4px] bg-white p-3 hover:border-[#003399] transition-all shadow-2xs"
+                        draggable={true}
+                        onDragStart={(e) => handleDragStart(e, app.id)}
+                        onDragEnd={handleDragEnd}
+                        className={`border rounded-[4px] bg-white p-3 hover:border-nordic-primary transition-all duration-200 shadow-2xs group cursor-grab active:cursor-grabbing ${
+                          draggingAppId === app.id
+                            ? "opacity-40 scale-95 border-dashed border-nordic-primary"
+                            : justDroppedAppId === app.id
+                            ? "animate-cardDrop ring-2 ring-nordic-primary"
+                            : "border-nordic-border"
+                        }`}
                       >
                         <div className="flex items-start justify-between gap-1 mb-1">
-                          <span className="text-[11px] text-[#484848] uppercase tracking-wider truncate block font-bold">
-                            {app.job?.company || "Company"}
-                          </span>
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            {/* Subtle drag handle icon (⠿) */}
+                            <span
+                              className="text-sm font-mono text-[#A0A0A0] group-hover:text-nordic-primary select-none shrink-0 leading-none cursor-grab active:cursor-grabbing hidden md:inline-block"
+                              title="Drag to change stage"
+                              aria-hidden="true"
+                            >
+                              ⠿
+                            </span>
+                            <span className="text-[11px] text-nordic-text-secondary uppercase tracking-wider truncate block font-bold">
+                              {app.job?.company || "Company"}
+                            </span>
+                          </div>
                           {app.job?.matchScore !== null && (
-                            <span className="text-[10px] font-mono font-bold bg-[#003399] text-white px-1.5 py-0.5 rounded-[2px]">
+                            <span className="text-[10px] font-mono font-bold bg-nordic-primary text-white px-1.5 py-0.5 rounded-[2px] shrink-0">
                               {app.job.matchScore}%
                             </span>
                           )}
                         </div>
 
-                        <h4 className="font-bold text-xs text-[#111111] line-clamp-1 mb-2">
+                        <h4 className="font-bold text-xs text-nordic-text line-clamp-1 mb-2">
                           {app.job?.title}
                         </h4>
 
                         {app.interviewDate && (
-                          <div className="text-[11px] text-[#003399] font-semibold mb-2 flex items-center gap-1">
+                          <div className="text-[11px] text-nordic-primary font-semibold mb-2 flex items-center gap-1">
                             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
@@ -361,16 +447,17 @@ export default function ApplicationTrackerPage() {
                           </div>
                         )}
 
-                        <div className="pt-2 border-t border-[#DFDFDF] flex items-center justify-between">
+                        <div className="pt-2 border-t border-nordic-border flex items-center justify-between">
                           <button
                             type="button"
                             onClick={() => openModal(app)}
                             aria-label={`Edit application notes for ${app.job?.title}`}
-                            className="text-[11px] font-bold text-[#003399] hover:underline cursor-pointer touch-target min-w-[32px] min-h-[32px] flex items-center justify-center"
+                            className="text-[11px] font-bold text-nordic-primary hover:underline cursor-pointer touch-target min-w-[32px] min-h-[32px] flex items-center justify-center"
                           >
                             Edit
                           </button>
 
+                          {/* Fallback stage selector for mobile */}
                           <select
                             value={app.status}
                             aria-label={`Move stage for ${app.job?.title}`}
@@ -380,7 +467,7 @@ export default function ApplicationTrackerPage() {
                                 e.target.value as ApplicationStatus
                               )
                             }
-                            className="text-[10px] border border-[#DFDFDF] rounded-[2px] bg-white px-1 py-1 cursor-pointer font-semibold text-[#111111] focus:outline-none"
+                            className="text-[10px] border border-nordic-border rounded-[2px] bg-white px-1 py-1 cursor-pointer font-semibold text-nordic-text focus:outline-none"
                           >
                             {APPLICATION_STATUSES.map((st) => (
                               <option key={st.value} value={st.value}>
@@ -409,14 +496,14 @@ export default function ApplicationTrackerPage() {
       >
         <div className="p-4 sm:p-6 space-y-4 text-xs">
           <div>
-            <span className="text-[11px] text-[#484848] font-semibold uppercase block">Job</span>
-            <div className="text-base font-bold text-[#111111] mt-0.5">
+            <span className="text-[11px] text-nordic-text-secondary font-semibold uppercase block">Job</span>
+            <div className="text-base font-bold text-nordic-text mt-0.5">
               {activeAppModal?.job?.title} @ {activeAppModal?.job?.company}
             </div>
           </div>
 
           <div>
-            <label htmlFor="modal-recruiter" className="block font-bold text-[#111111] uppercase mb-1">
+            <label htmlFor="modal-recruiter" className="block font-bold text-nordic-text uppercase mb-1">
               Recruiter or Interviewer
             </label>
             <input
@@ -425,12 +512,12 @@ export default function ApplicationTrackerPage() {
               value={editingContact}
               onChange={(e) => setEditingContact(e.target.value)}
               placeholder="e.g. Sarah Miller"
-              className="w-full h-10 px-3 border border-[#DFDFDF] rounded-[4px] text-sm text-[#111111] focus:outline-none focus:border-[#003399]"
+              className="w-full h-10 px-3 border border-nordic-border rounded-[4px] text-sm text-nordic-text focus:outline-none focus:border-nordic-primary"
             />
           </div>
 
           <div>
-            <label htmlFor="modal-interview-date" className="block font-bold text-[#111111] uppercase mb-1">
+            <label htmlFor="modal-interview-date" className="block font-bold text-nordic-text uppercase mb-1">
               Interview Date
             </label>
             <input
@@ -438,12 +525,12 @@ export default function ApplicationTrackerPage() {
               type="date"
               value={editingDate}
               onChange={(e) => setEditingDate(e.target.value)}
-              className="w-full h-10 px-3 border border-[#DFDFDF] rounded-[4px] text-sm text-[#111111] focus:outline-none focus:border-[#003399]"
+              className="w-full h-10 px-3 border border-nordic-border rounded-[4px] text-sm text-nordic-text focus:outline-none focus:border-nordic-primary"
             />
           </div>
 
           <div>
-            <label htmlFor="modal-notes" className="block font-bold text-[#111111] uppercase mb-1">
+            <label htmlFor="modal-notes" className="block font-bold text-nordic-text uppercase mb-1">
               Notes
             </label>
             <textarea
@@ -452,11 +539,11 @@ export default function ApplicationTrackerPage() {
               value={editingNotes}
               onChange={(e) => setEditingNotes(e.target.value)}
               placeholder="Add notes from interviews, questions asked, or salary discussed..."
-              className="w-full p-3 border border-[#DFDFDF] rounded-[4px] text-sm text-[#111111] focus:outline-none focus:border-[#003399]"
+              className="w-full p-3 border border-nordic-border rounded-[4px] text-sm text-nordic-text focus:outline-none focus:border-nordic-primary"
             />
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-[#DFDFDF]">
+          <div className="flex justify-end gap-3 pt-4 border-t border-nordic-border">
             <button
               type="button"
               onClick={() => setActiveAppModal(null)}

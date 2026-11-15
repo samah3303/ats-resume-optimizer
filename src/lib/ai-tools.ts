@@ -36,13 +36,29 @@ Be honest and specific. Provide 5-8 details and 5-8 recommendations.`;
   });
 }
 
+export function getToneInstruction(tone: string = "professional"): string {
+  switch (tone.toLowerCase()) {
+    case "conversational":
+      return "Tone instruction: Adopt an approachable, warm, engaging, and conversational tone that sounds natural and genuine while remaining workplace-appropriate.";
+    case "confident":
+      return "Tone instruction: Adopt an assertive, bold, high-impact tone that directly highlights leadership, ownership, and measurable achievements with conviction.";
+    case "humble":
+      return "Tone instruction: Adopt a modest, collaborative, and team-oriented tone highlighting eagerness to learn, contribute, and support collective team success.";
+    case "professional":
+    default:
+      return "Tone instruction: Adopt a polished, articulate, formal, and well-structured corporate professional tone.";
+  }
+}
+
 export async function generateCoverLetter(
   resumeText: string,
   jobDescription: string,
   jobTitle: string,
   company: string,
+  tone: string = "professional",
 ): Promise<string> {
-  const prompt = `Write a professional, tailored cover letter for this candidate applying to the specified role. Be specific to both the resume and job description. Keep it concise (3-4 paragraphs). Do NOT use generic filler. Output the cover letter text only, no JSON.`;
+  const toneInstruction = getToneInstruction(tone);
+  const prompt = `Write a tailored cover letter for this candidate applying to the specified role. ${toneInstruction} Be specific to both the resume and job description. Keep it concise (3-4 paragraphs). Do NOT use generic filler. Output the cover letter text only, no JSON.`;
 
   const userMsg = `RESUME:\n${resumeText.slice(0, 3000)}\n\nJOB: ${jobTitle} at ${company}\nDESCRIPTION:\n${jobDescription?.slice(0, 2000) || "Not provided"}`;
 
@@ -87,8 +103,11 @@ export async function generateResumeUpdates(
   resumeText: string,
   jobDescription: string,
   jobTitle: string,
+  tone: string = "professional",
 ): Promise<DetailedResumeUpdates> {
+  const toneInstruction = getToneInstruction(tone);
   const prompt = `You are a world-class ATS Resume Optimization Architect. Compare the candidate's resume against the target job posting.
+${toneInstruction} Apply this tone particularly to rewritten bullet points and the tailored professional summary.
 Provide a detailed, itemized improvement plan categorized into:
 1. "missingSkills": Array of technical skills, tools, and credentials explicitly in the job description that are absent from the resume.
 2. "bulletUpgrades": Array of 3-6 specific bullet point upgrades where you identify a weak or generic bullet from the candidate's resume and rewrite it with high-impact action verbs, quantifiable metrics, and matching job keywords.
@@ -161,8 +180,10 @@ export async function generateFollowupEmail(
   jobTitle: string,
   company: string,
   context: string,
+  tone: string = "professional",
 ): Promise<string> {
-  const prompt = `Write a professional follow-up email for a job application. Context: ${context}. Keep it brief, warm, and professional. Output the email text only, no JSON. Include a subject line at the top.`;
+  const toneInstruction = getToneInstruction(tone);
+  const prompt = `Write a follow-up email for a job application. Context: ${context}. ${toneInstruction} Keep it brief and effective. Output the email text only, no JSON. Include a subject line at the top.`;
 
   const userMsg = `CANDIDATE RESUME:\n${resumeText.slice(0, 2000)}\n\nROLE: ${jobTitle} at ${company}`;
 
@@ -174,8 +195,10 @@ export async function generateLinkedInMessage(
   jobTitle: string,
   company: string,
   messageType: string,
+  tone: string = "professional",
 ): Promise<string> {
-  const prompt = `Write a LinkedIn ${messageType} for this candidate reaching out about the role. Keep it short (under 300 characters for connection request, under 1000 for InMail). Be professional and personalized. Output text only.`;
+  const toneInstruction = getToneInstruction(tone);
+  const prompt = `Write a LinkedIn ${messageType} for this candidate reaching out about the role. ${toneInstruction} Keep it short (under 300 characters for connection request, under 1000 for InMail). Output text only.`;
 
   const userMsg = `CANDIDATE:\n${resumeText.slice(0, 1500)}\n\nROLE: ${jobTitle} at ${company}`;
 

@@ -55,9 +55,9 @@ export default function EmptyState({
   };
 
   return (
-    <div className="nordic-card rounded-2xl sm:rounded-[4px] p-8 sm:p-12 text-center flex flex-col items-center justify-center max-w-xl mx-auto border border-[#DFDFDF]">
+    <div className="nordic-card rounded-2xl sm:rounded-[4px] p-8 sm:p-12 text-center flex flex-col items-center justify-center max-w-xl mx-auto border border-nordic-border">
       <div
-        className="w-14 h-14 rounded-full bg-[#003399]/10 text-[#003399] flex items-center justify-center mb-4 text-2xl"
+        className="w-14 h-14 rounded-full bg-nordic-primary/10 text-nordic-primary flex items-center justify-center mb-4 text-2xl"
         aria-hidden="true"
       >
         {icon || (
@@ -77,10 +77,10 @@ export default function EmptyState({
         )}
       </div>
 
-      <h3 className="text-base sm:text-lg font-bold text-[#111111] mb-1.5">
+      <h3 className="text-base sm:text-lg font-bold text-nordic-text mb-1.5">
         {title}
       </h3>
-      <p className="text-xs sm:text-sm text-[#484848] max-w-md mb-6 leading-relaxed">
+      <p className="text-xs sm:text-sm text-nordic-text-secondary max-w-md mb-6 leading-relaxed">
         {description}
       </p>
 

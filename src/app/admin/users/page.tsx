@@ -91,14 +91,14 @@ export default function AdminUsersPage() {
       {/* Header Banner */}
       <div className="nordic-card rounded-2xl sm:rounded-[4px] p-4.5 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-[#FFDA1A] text-[#111111] text-[10px] font-bold rounded-[2px] uppercase tracking-wide mb-2 sm:mb-3">
-            <span className="w-2 h-2 rounded-full bg-[#003399]" />
+          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-nordic-secondary text-nordic-text text-[10px] font-bold rounded-[2px] uppercase tracking-wide mb-2 sm:mb-3">
+            <span className="w-2 h-2 rounded-full bg-nordic-primary" />
             Candidate Directory
           </div>
-          <h1 className="text-xl sm:text-3xl font-bold text-[#111111] tracking-tight">
+          <h1 className="text-xl sm:text-3xl font-bold text-nordic-text tracking-tight">
             Candidate & User Management
           </h1>
-          <p className="text-xs sm:text-sm text-[#484848] mt-0.5 sm:mt-1">
+          <p className="text-xs sm:text-sm text-nordic-text-secondary mt-0.5 sm:mt-1">
             Search candidates, inspect ATS scores, and configure platform roles.
           </p>
         </div>
@@ -115,8 +115,8 @@ export default function AdminUsersPage() {
         <div
           className={`border p-3.5 sm:p-4 rounded-xl sm:rounded-[4px] text-xs font-semibold flex items-center justify-between ${
             message.type === "success"
-              ? "bg-[#0A8A00]/10 border-[#0A8A00] text-[#0A8A00]"
-              : "bg-[#CC0008]/10 border-[#CC0008] text-[#CC0008]"
+              ? "bg-nordic-success/10 border-nordic-success text-nordic-success"
+              : "bg-nordic-error/10 border-nordic-error text-nordic-error"
           }`}
         >
           <span>{message.text}</span>
@@ -139,8 +139,8 @@ export default function AdminUsersPage() {
               onClick={() => setRoleFilter(tab.id as typeof roleFilter)}
               className={`h-10 px-4 rounded-xl sm:rounded-[4px] text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer tap-active whitespace-nowrap ${
                 roleFilter === tab.id
-                  ? "bg-[#003399] text-white"
-                  : "bg-white text-[#484848] border border-[#DFDFDF] hover:bg-[#F5F5F5]"
+                  ? "bg-nordic-primary text-white"
+                  : "bg-white text-nordic-text-secondary border border-nordic-border hover:bg-nordic-bg"
               }`}
             >
               {tab.label}
@@ -154,7 +154,7 @@ export default function AdminUsersPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search name, email, title, location..."
-            className="w-full h-10 px-3.5 bg-white border border-[#DFDFDF] rounded-xl sm:rounded-[4px] text-sm text-[#111111] placeholder-[#767676] focus:outline-none focus:border-[#003399] focus:ring-2 focus:ring-[#003399]/15"
+            className="w-full h-10 px-3.5 bg-white border border-nordic-border rounded-xl sm:rounded-[4px] text-sm text-nordic-text placeholder-nordic-neutral focus:outline-none focus:border-nordic-primary focus:ring-2 focus:ring-nordic-primary/15"
           />
         </div>
       </div>
@@ -163,13 +163,13 @@ export default function AdminUsersPage() {
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-28 border border-[#DFDFDF] bg-white rounded-2xl sm:rounded-[4px] animate-pulse" />
+            <div key={i} className="h-28 border border-nordic-border bg-white rounded-2xl sm:rounded-[4px] animate-pulse" />
           ))}
         </div>
       ) : candidates.length === 0 ? (
         <div className="nordic-card rounded-2xl sm:rounded-[4px] p-10 text-center space-y-2">
-          <h3 className="font-bold text-base text-[#111111]">No candidates found</h3>
-          <p className="text-xs text-[#767676]">Try adjusting your search query or filter.</p>
+          <h3 className="font-bold text-base text-nordic-text">No candidates found</h3>
+          <p className="text-xs text-nordic-neutral">Try adjusting your search query or filter.</p>
         </div>
       ) : (
         <>
@@ -182,37 +182,37 @@ export default function AdminUsersPage() {
               >
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <h3 className="font-bold text-base text-[#111111]">{u.name}</h3>
-                    <div className="text-xs font-mono text-[#767676]">{u.email}</div>
+                    <h3 className="font-bold text-base text-nordic-text">{u.name}</h3>
+                    <div className="text-xs font-mono text-nordic-neutral">{u.email}</div>
                   </div>
                   <span
                     className={`text-[10px] font-bold px-2 py-0.5 rounded-[2px] ${
                       u.role === "admin"
-                        ? "bg-[#FFDA1A] text-[#111111]"
-                        : "bg-[#003399]/10 text-[#003399]"
+                        ? "bg-nordic-secondary text-nordic-text"
+                        : "bg-nordic-primary/10 text-nordic-primary"
                     }`}
                   >
                     {u.role.toUpperCase()}
                   </span>
                 </div>
 
-                <div className="text-xs text-[#484848] space-y-1">
+                <div className="text-xs text-nordic-text-secondary space-y-1">
                   <div>🎯 {u.targetRoles.join(", ") || "No target roles set"}</div>
                   <div>📍 {u.location || "Location not set"}</div>
                   {u.atsScore !== null && (
-                    <div className="font-mono font-bold text-[#0A8A00]">
+                    <div className="font-mono font-bold text-nordic-success">
                       ATS Score: {u.atsScore}%
                     </div>
                   )}
                   {u.resumeFileName && (
-                    <div className="text-[11px] text-[#767676] font-mono">
+                    <div className="text-[11px] text-nordic-neutral font-mono">
                       📄 {u.resumeFileName}
                     </div>
                   )}
                 </div>
 
-                <div className="pt-3 border-t border-[#DFDFDF] flex items-center justify-between gap-2">
-                  <span className="text-[11px] font-mono text-[#767676]">
+                <div className="pt-3 border-t border-nordic-border flex items-center justify-between gap-2">
+                  <span className="text-[11px] font-mono text-nordic-neutral">
                     {u.jobsCount} jobs • {u.applicationsCount} apps
                   </span>
 
@@ -221,8 +221,8 @@ export default function AdminUsersPage() {
                     disabled={updatingId === u.id}
                     className={`text-xs px-3 py-1.5 rounded-[4px] font-bold border transition-colors cursor-pointer tap-active disabled:opacity-50 ${
                       u.role === "admin"
-                        ? "bg-white border-[#DFDFDF] text-[#767676] hover:text-[#CC0008]"
-                        : "bg-[#003399] border-[#003399] text-white hover:bg-[#002B80]"
+                        ? "bg-white border-nordic-border text-nordic-neutral hover:text-nordic-error"
+                        : "bg-nordic-primary border-nordic-primary text-white hover:bg-nordic-primary-hover"
                     }`}
                   >
                     {updatingId === u.id
@@ -241,7 +241,7 @@ export default function AdminUsersPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="bg-[#F9FAFB] border-b border-[#DFDFDF] text-[#767676] uppercase tracking-wider font-bold">
+                  <tr className="bg-[#F9FAFB] border-b border-nordic-border text-nordic-neutral uppercase tracking-wider font-bold">
                     <th className="py-3 px-4">Candidate</th>
                     <th className="py-3 px-4">Role</th>
                     <th className="py-3 px-4">Target Title</th>
@@ -251,14 +251,14 @@ export default function AdminUsersPage() {
                     <th className="py-3 px-4 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#DFDFDF] bg-white">
+                <tbody className="divide-y divide-nordic-border bg-white">
                   {candidates.map((u) => (
                     <tr key={u.id} className="hover:bg-[#F9FAFB] transition-colors">
                       <td className="py-3.5 px-4">
-                        <div className="font-bold text-sm text-[#111111]">{u.name}</div>
-                        <div className="text-[#767676] font-mono text-[11px]">{u.email}</div>
+                        <div className="font-bold text-sm text-nordic-text">{u.name}</div>
+                        <div className="text-nordic-neutral font-mono text-[11px]">{u.email}</div>
                         {u.resumeFileName && (
-                          <div className="text-[10px] text-[#767676] font-mono mt-0.5">
+                          <div className="text-[10px] text-nordic-neutral font-mono mt-0.5">
                             📄 {u.resumeFileName}
                           </div>
                         )}
@@ -267,29 +267,29 @@ export default function AdminUsersPage() {
                         <span
                           className={`text-[10px] font-bold px-2.5 py-1 rounded-[3px] ${
                             u.role === "admin"
-                              ? "bg-[#FFDA1A] text-[#111111]"
-                              : "bg-[#003399]/10 text-[#003399]"
+                              ? "bg-nordic-secondary text-nordic-text"
+                              : "bg-nordic-primary/10 text-nordic-primary"
                           }`}
                         >
                           {u.role.toUpperCase()}
                         </span>
                       </td>
-                      <td className="py-3.5 px-4 font-medium text-[#111111] max-w-xs truncate">
+                      <td className="py-3.5 px-4 font-medium text-nordic-text max-w-xs truncate">
                         {u.targetRoles.join(", ") || "—"}
                       </td>
-                      <td className="py-3.5 px-4 text-[#484848]">
+                      <td className="py-3.5 px-4 text-nordic-text-secondary">
                         {u.location || "—"}
                       </td>
                       <td className="py-3.5 px-4">
                         {u.atsScore !== null ? (
-                          <span className="font-mono font-bold text-[#0A8A00] bg-[#0A8A00]/10 px-2 py-0.5 rounded-[2px]">
+                          <span className="font-mono font-bold text-nordic-success bg-nordic-success/10 px-2 py-0.5 rounded-[2px]">
                             {u.atsScore}%
                           </span>
                         ) : (
                           <span className="text-[#999]">No scan</span>
                         )}
                       </td>
-                      <td className="py-3.5 px-4 font-mono text-[#767676]">
+                      <td className="py-3.5 px-4 font-mono text-nordic-neutral">
                         {u.jobsCount} jobs • {u.applicationsCount} apps
                       </td>
                       <td className="py-3.5 px-4 text-right">
@@ -298,8 +298,8 @@ export default function AdminUsersPage() {
                           disabled={updatingId === u.id}
                           className={`text-[11px] px-3 py-1.5 rounded-[4px] font-bold border transition-colors cursor-pointer disabled:opacity-50 ${
                             u.role === "admin"
-                              ? "bg-white border-[#DFDFDF] text-[#767676] hover:text-[#CC0008] hover:border-[#CC0008]"
-                              : "bg-[#003399] border-[#003399] text-white hover:bg-[#002B80]"
+                              ? "bg-white border-nordic-border text-nordic-neutral hover:text-nordic-error hover:border-nordic-error"
+                              : "bg-nordic-primary border-nordic-primary text-white hover:bg-nordic-primary-hover"
                           }`}
                         >
                           {updatingId === u.id

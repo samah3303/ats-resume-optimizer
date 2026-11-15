@@ -55,14 +55,14 @@ export default function AdminAnalyticsPage() {
       {/* Header Banner */}
       <div className="nordic-card rounded-2xl sm:rounded-[4px] p-4.5 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-[#FFDA1A] text-[#111111] text-[10px] font-bold rounded-[2px] uppercase tracking-wide mb-2 sm:mb-3">
-            <span className="w-2 h-2 rounded-full bg-[#003399]" />
+          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-nordic-secondary text-nordic-text text-[10px] font-bold rounded-[2px] uppercase tracking-wide mb-2 sm:mb-3">
+            <span className="w-2 h-2 rounded-full bg-nordic-primary" />
             Live Visitor Telemetry
           </div>
-          <h1 className="text-xl sm:text-3xl font-bold text-[#111111] tracking-tight">
+          <h1 className="text-xl sm:text-3xl font-bold text-nordic-text tracking-tight">
             Website Traffic & Analytics
           </h1>
-          <p className="text-xs sm:text-sm text-[#484848] mt-0.5 sm:mt-1">
+          <p className="text-xs sm:text-sm text-nordic-text-secondary mt-0.5 sm:mt-1">
             Privacy-friendly, real-time website tracking powered by Umami. Monitor visitors, pageviews, referrers, and geography.
           </p>
         </div>
@@ -111,27 +111,27 @@ export default function AdminAnalyticsPage() {
 
       {/* Setup & Connection Drawer */}
       {showConfig && (
-        <div className="nordic-card rounded-2xl sm:rounded-[4px] p-5 sm:p-7 border border-[#DFDFDF] bg-white space-y-6">
+        <div className="nordic-card rounded-2xl sm:rounded-[4px] p-5 sm:p-7 border border-nordic-border bg-white space-y-6">
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#003399]" />
-                <h2 className="text-base sm:text-lg font-bold text-[#111111]">
+                <span className="w-2.5 h-2.5 rounded-full bg-nordic-primary" />
+                <h2 className="text-base sm:text-lg font-bold text-nordic-text">
                   Umami Free Tracking Setup (3-Minute Setup)
                 </h2>
               </div>
-              <p className="text-xs sm:text-sm text-[#484848] mt-1">
+              <p className="text-xs sm:text-sm text-nordic-text-secondary mt-1">
                 Follow these simple steps to activate free, cookie-free web tracking on your website and display it directly here.
               </p>
             </div>
-            <span className="px-2.5 py-1 text-[11px] font-bold bg-[#E8F0FE] text-[#003399] rounded-[2px] uppercase">
+            <span className="px-2.5 py-1 text-[11px] font-bold bg-[#E8F0FE] text-nordic-primary rounded-[2px] uppercase">
               100% Free Tier
             </span>
           </div>
 
           {/* Quick Preview Form */}
-          <form onSubmit={handleApplyCustomUrl} className="p-4 bg-[#F5F5F5] border border-[#DFDFDF] rounded-xl sm:rounded-[4px] space-y-3">
-            <label className="block text-xs font-bold text-[#111111] uppercase tracking-wide">
+          <form onSubmit={handleApplyCustomUrl} className="p-4 bg-nordic-bg border border-nordic-border rounded-xl sm:rounded-[4px] space-y-3">
+            <label className="block text-xs font-bold text-nordic-text uppercase tracking-wide">
               Live Preview / Test Share URL
             </label>
             <div className="flex flex-col sm:flex-row gap-2">
@@ -140,7 +140,7 @@ export default function AdminAnalyticsPage() {
                 value={customInput}
                 onChange={(e) => setCustomInput(e.target.value)}
                 placeholder="https://cloud.umami.is/share/YOUR_TOKEN/yourdomain.com"
-                className="flex-1 h-10 px-3.5 bg-white border border-[#DFDFDF] rounded-[4px] text-xs font-mono text-[#111111] placeholder:text-[#999999] focus:outline-none focus:border-[#003399]"
+                className="flex-1 h-10 px-3.5 bg-white border border-nordic-border rounded-[4px] text-xs font-mono text-nordic-text placeholder:text-[#999999] focus:outline-none focus:border-nordic-primary"
               />
               <button
                 type="submit"
@@ -158,7 +158,7 @@ export default function AdminAnalyticsPage() {
                 </button>
               )}
             </div>
-            <p className="text-[11px] text-[#767676]">
+            <p className="text-[11px] text-nordic-neutral">
               Paste your Umami public share URL here to preview instantly, or configure permanent environment variables below.
             </p>
           </form>
@@ -166,20 +166,20 @@ export default function AdminAnalyticsPage() {
           {/* Step by step checklist */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Step 1 */}
-            <div className="p-4 border border-[#DFDFDF] rounded-xl sm:rounded-[4px] bg-[#FAFAFA] space-y-2">
-              <div className="w-6 h-6 rounded-full bg-[#111111] text-white text-xs font-bold flex items-center justify-center">
+            <div className="p-4 border border-nordic-border rounded-xl sm:rounded-[4px] bg-[#FAFAFA] space-y-2">
+              <div className="w-6 h-6 rounded-full bg-nordic-text text-white text-xs font-bold flex items-center justify-center">
                 1
               </div>
-              <h3 className="text-xs font-bold text-[#111111] uppercase tracking-wider">
+              <h3 className="text-xs font-bold text-nordic-text uppercase tracking-wider">
                 Create Free Umami Account
               </h3>
-              <p className="text-xs text-[#484848] leading-relaxed">
+              <p className="text-xs text-nordic-text-secondary leading-relaxed">
                 Sign up at{" "}
                 <a
                   href="https://cloud.umami.is/signup"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#003399] font-semibold underline underline-offset-2"
+                  className="text-nordic-primary font-semibold underline underline-offset-2"
                 >
                   cloud.umami.is
                 </a>
@@ -188,36 +188,36 @@ export default function AdminAnalyticsPage() {
             </div>
 
             {/* Step 2 */}
-            <div className="p-4 border border-[#DFDFDF] rounded-xl sm:rounded-[4px] bg-[#FAFAFA] space-y-2">
-              <div className="w-6 h-6 rounded-full bg-[#111111] text-white text-xs font-bold flex items-center justify-center">
+            <div className="p-4 border border-nordic-border rounded-xl sm:rounded-[4px] bg-[#FAFAFA] space-y-2">
+              <div className="w-6 h-6 rounded-full bg-nordic-text text-white text-xs font-bold flex items-center justify-center">
                 2
               </div>
-              <h3 className="text-xs font-bold text-[#111111] uppercase tracking-wider">
+              <h3 className="text-xs font-bold text-nordic-text uppercase tracking-wider">
                 Add Website & Enable Share Link
               </h3>
-              <p className="text-xs text-[#484848] leading-relaxed">
+              <p className="text-xs text-nordic-text-secondary leading-relaxed">
                 In Umami Dashboard, click <strong>Add Website</strong> (name it e.g. <em>paniund</em>). In <strong>Edit Website</strong> &rarr; <strong>Share URL</strong>, turn on the public share toggle.
               </p>
             </div>
 
             {/* Step 3 */}
-            <div className="p-4 border border-[#DFDFDF] rounded-xl sm:rounded-[4px] bg-[#FAFAFA] space-y-2">
-              <div className="w-6 h-6 rounded-full bg-[#111111] text-white text-xs font-bold flex items-center justify-center">
+            <div className="p-4 border border-nordic-border rounded-xl sm:rounded-[4px] bg-[#FAFAFA] space-y-2">
+              <div className="w-6 h-6 rounded-full bg-nordic-text text-white text-xs font-bold flex items-center justify-center">
                 3
               </div>
-              <h3 className="text-xs font-bold text-[#111111] uppercase tracking-wider">
+              <h3 className="text-xs font-bold text-nordic-text uppercase tracking-wider">
                 Add to .env.local
               </h3>
-              <p className="text-xs text-[#484848] leading-relaxed">
-                Put your <strong>Website ID</strong> and <strong>Share URL</strong> into your project’s <code className="text-[11px] font-mono bg-white px-1 py-0.5 border border-[#DFDFDF]">.env.local</code>.
+              <p className="text-xs text-nordic-text-secondary leading-relaxed">
+                Put your <strong>Website ID</strong> and <strong>Share URL</strong> into your project’s <code className="text-[11px] font-mono bg-white px-1 py-0.5 border border-nordic-border">.env.local</code>.
               </p>
             </div>
           </div>
 
           {/* Env variable snippet */}
-          <div className="p-4 bg-[#111111] text-[#F5F5F5] rounded-xl sm:rounded-[4px] space-y-2 font-mono text-xs">
+          <div className="p-4 bg-nordic-text text-nordic-bg rounded-xl sm:rounded-[4px] space-y-2 font-mono text-xs">
             <div className="flex items-center justify-between text-[11px] text-[#A0A0A0] font-sans">
-              <span>Add these to your <code className="text-[#FFDA1A]">.env.local</code> file:</span>
+              <span>Add these to your <code className="text-nordic-secondary">.env.local</code> file:</span>
               <button
                 type="button"
                 onClick={() =>
@@ -226,7 +226,7 @@ export default function AdminAnalyticsPage() {
                     "env"
                   )
                 }
-                className="text-[#FFDA1A] hover:underline font-bold"
+                className="text-nordic-secondary hover:underline font-bold"
               >
                 {copied === "env" ? "Copied!" : "Copy Snippet"}
               </button>
@@ -242,11 +242,11 @@ NEXT_PUBLIC_UMAMI_SHARE_URL="https://cloud.umami.is/share/TOKEN/yourdomain.com"`
 
       {/* Embedded Dashboard View */}
       {shareUrl ? (
-        <div className="nordic-card rounded-2xl sm:rounded-[4px] overflow-hidden border border-[#DFDFDF] bg-white shadow-xs">
-          <div className="h-10 bg-[#FAFAFA] border-b border-[#DFDFDF] px-4 flex items-center justify-between text-xs text-[#767676]">
+        <div className="nordic-card rounded-2xl sm:rounded-[4px] overflow-hidden border border-nordic-border bg-white shadow-xs">
+          <div className="h-10 bg-[#FAFAFA] border-b border-nordic-border px-4 flex items-center justify-between text-xs text-nordic-neutral">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="font-semibold text-[#111111]">Live Tracking Frame</span>
+              <span className="font-semibold text-nordic-text">Live Tracking Frame</span>
               <span className="text-[11px] text-[#999999] truncate max-w-xs sm:max-w-md">{shareUrl}</span>
             </div>
             <span className="text-[10px] uppercase font-mono tracking-wider text-[#999999]">Umami Cloud</span>
@@ -261,15 +261,15 @@ NEXT_PUBLIC_UMAMI_SHARE_URL="https://cloud.umami.is/share/TOKEN/yourdomain.com"`
           />
         </div>
       ) : (
-        <div className="nordic-card rounded-2xl sm:rounded-[4px] p-8 sm:p-12 text-center bg-white border border-dashed border-[#DFDFDF] space-y-4">
-          <div className="w-14 h-14 rounded-full bg-[#FFDA1A]/20 text-[#111111] mx-auto flex items-center justify-center">
+        <div className="nordic-card rounded-2xl sm:rounded-[4px] p-8 sm:p-12 text-center bg-white border border-dashed border-nordic-border space-y-4">
+          <div className="w-14 h-14 rounded-full bg-nordic-secondary/20 text-nordic-text mx-auto flex items-center justify-center">
             <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
           </div>
           <div className="max-w-md mx-auto space-y-1.5">
-            <h2 className="text-lg font-bold text-[#111111]">No Analytics Share URL Configured Yet</h2>
-            <p className="text-xs sm:text-sm text-[#484848]">
+            <h2 className="text-lg font-bold text-nordic-text">No Analytics Share URL Configured Yet</h2>
+            <p className="text-xs sm:text-sm text-nordic-text-secondary">
               Connect your free Umami account above or paste a public share link to start viewing live visitors inside this admin panel.
             </p>
           </div>

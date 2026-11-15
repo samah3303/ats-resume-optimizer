@@ -60,9 +60,9 @@ export default function PwaInstallPrompt() {
     <div
       role="banner"
       aria-label="Install mobile application"
-      className="fixed bottom-20 left-4 right-4 sm:bottom-6 sm:left-auto sm:right-6 sm:max-w-sm z-50 p-4 bg-[#111111] text-white rounded-2xl sm:rounded-[4px] shadow-2xl border border-white/10 flex items-center gap-3.5 animate-slide-up"
+      className="fixed bottom-20 left-4 right-4 sm:bottom-6 sm:left-auto sm:right-6 sm:max-w-sm z-50 p-4 bg-nordic-text text-white rounded-2xl sm:rounded-[4px] shadow-2xl border border-white/10 flex items-center gap-3.5 animate-slide-up"
     >
-      <div className="w-10 h-10 rounded-xl sm:rounded-[4px] bg-[#FFDA1A] text-[#003399] flex items-center justify-center font-bold text-lg shrink-0 shadow-xs">
+      <div className="w-10 h-10 rounded-xl sm:rounded-[4px] bg-nordic-secondary text-nordic-primary flex items-center justify-center font-bold text-lg shrink-0 shadow-xs">
         ⚡
       </div>
       <div className="flex-1 min-w-0">
@@ -77,7 +77,7 @@ export default function PwaInstallPrompt() {
         <button
           type="button"
           onClick={handleInstall}
-          className="h-8 px-3 rounded-[3px] bg-[#FFDA1A] text-[#111111] text-xs font-bold hover:bg-[#FFE54D] transition-colors cursor-pointer tap-active"
+          className="h-8 px-3 rounded-[3px] bg-nordic-secondary text-nordic-text text-xs font-bold hover:bg-[#FFE54D] transition-colors cursor-pointer tap-active"
         >
           Install
         </button>

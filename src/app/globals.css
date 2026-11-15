@@ -1,5 +1,20 @@
 @import "tailwindcss";
 
+@theme {
+  --color-nordic-primary: #003399;
+  --color-nordic-primary-hover: #002B80;
+  --color-nordic-secondary: #FFDA1A;
+  --color-nordic-neutral: #767676;
+  --color-nordic-bg: #F5F5F5;
+  --color-nordic-surface: #FFFFFF;
+  --color-nordic-text: #111111;
+  --color-nordic-text-secondary: #484848;
+  --color-nordic-border: #DFDFDF;
+  --color-nordic-success: #0A8A00;
+  --color-nordic-warning: #E87400;
+  --color-nordic-error: #CC0008;
+}
+
 @layer base {
   :root {
     --nordic-primary: #003399;
@@ -8,6 +23,7 @@
     --nordic-neutral: #767676;
     --nordic-bg: #F5F5F5;
     --nordic-surface: #FFFFFF;
+    --nordic-text: #111111;
     --nordic-text-primary: #111111;
     --nordic-text-secondary: #484848;
     --nordic-border: #DFDFDF;
@@ -93,6 +109,40 @@
   animation: shimmer 1.5s ease-in-out infinite;
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes cardDrop {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 0.95;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-cardDrop {
+  animation: cardDrop 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 /* Minimum 44x44px touch targets for mobile accessibility */
 .touch-target {
   min-width: 44px;
@@ -122,8 +172,8 @@
 
 /* Cards */
 .nordic-card {
-  background-color: #FFFFFF;
-  border: 1px solid #DFDFDF;
+  background-color: var(--nordic-surface);
+  border: 1px solid var(--nordic-border);
   border-radius: 4px;
   box-shadow: 0 1px 3px rgba(17, 17, 17, 0.06);
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
@@ -140,8 +190,8 @@
   gap: 8px;
   height: 44px;
   padding: 0 20px;
-  background-color: #003399;
-  color: #FFFFFF;
+  background-color: var(--nordic-primary);
+  color: var(--nordic-surface);
   font-weight: 700;
   font-size: 15px;
   border-radius: 4px;
@@ -150,12 +200,12 @@
   transition: background-color 0.15s ease, box-shadow 0.15s ease;
 }
 .nordic-btn-primary:hover {
-  background-color: #002B80;
+  background-color: var(--nordic-primary-hover);
   box-shadow: 0 4px 12px rgba(0, 51, 153, 0.2);
 }
 .nordic-btn-primary:disabled {
-  background-color: #DFDFDF;
-  color: #767676;
+  background-color: var(--nordic-border);
+  color: var(--nordic-neutral);
   cursor: not-allowed;
   box-shadow: none;
 }
@@ -167,18 +217,18 @@
   gap: 8px;
   height: 44px;
   padding: 0 20px;
-  background-color: #FFFFFF;
-  color: #003399;
+  background-color: var(--nordic-surface);
+  color: var(--nordic-primary);
   font-weight: 700;
   font-size: 15px;
   border-radius: 4px;
-  border: 2px solid #003399;
+  border: 2px solid var(--nordic-primary);
   cursor: pointer;
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 .nordic-btn-secondary:hover {
-  background-color: #003399;
-  color: #FFFFFF;
+  background-color: var(--nordic-primary);
+  color: var(--nordic-surface);
 }
 
 .nordic-btn-yellow {
@@ -188,8 +238,8 @@
   gap: 8px;
   height: 44px;
   padding: 0 20px;
-  background-color: #FFDA1A;
-  color: #111111;
+  background-color: var(--nordic-secondary);
+  color: var(--nordic-text);
   font-weight: 700;
   font-size: 15px;
   border-radius: 4px;
@@ -209,38 +259,38 @@
   gap: 8px;
   height: 44px;
   padding: 0 20px;
-  background-color: #FFFFFF;
-  color: #111111;
+  background-color: var(--nordic-surface);
+  color: var(--nordic-text);
   font-weight: 600;
   font-size: 15px;
   border-radius: 4px;
-  border: 1px solid #DFDFDF;
+  border: 1px solid var(--nordic-border);
   cursor: pointer;
   transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 .nordic-btn-outline:hover {
-  background-color: #F5F5F5;
-  border-color: #767676;
+  background-color: var(--nordic-bg);
+  border-color: var(--nordic-neutral);
 }
 
 /* Inputs */
 .nordic-input {
   height: 44px;
   padding: 0 14px;
-  background-color: #FFFFFF;
-  color: #111111;
-  border: 1px solid #DFDFDF;
+  background-color: var(--nordic-surface);
+  color: var(--nordic-text);
+  border: 1px solid var(--nordic-border);
   border-radius: 4px;
   font-size: 15px;
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .nordic-input:focus {
-  border-color: #003399;
+  border-color: var(--nordic-primary);
   box-shadow: 0 0 0 2px rgba(0, 51, 153, 0.2);
 }
 .nordic-input-error {
-  border-color: #CC0008;
+  border-color: var(--nordic-error);
 }
 
 /* Chips & Badges */
@@ -250,27 +300,27 @@
   gap: 6px;
   height: 28px;
   padding: 0 12px;
-  background-color: #F5F5F5;
-  color: #111111;
+  background-color: var(--nordic-bg);
+  color: var(--nordic-text);
   font-size: 13px;
   font-weight: 600;
   border-radius: 4px;
-  border: 1px solid #DFDFDF;
+  border: 1px solid var(--nordic-border);
 }
 .nordic-chip-active {
-  background-color: #003399;
-  color: #FFFFFF;
-  border-color: #003399;
+  background-color: var(--nordic-primary);
+  color: var(--nordic-surface);
+  border-color: var(--nordic-primary);
 }
 .nordic-chip-yellow {
-  background-color: #FFDA1A;
-  color: #111111;
-  border-color: #FFDA1A;
+  background-color: var(--nordic-secondary);
+  color: var(--nordic-text);
+  border-color: var(--nordic-secondary);
 }
 .nordic-chip-success {
-  background-color: #0A8A00;
-  color: #FFFFFF;
-  border-color: #0A8A00;
+  background-color: var(--nordic-success);
+  color: var(--nordic-surface);
+  border-color: var(--nordic-success);
 }
 
 /* Code & Dimensions */

@@ -1,4 +1,6 @@
 // TypeScript interfaces for the application
+export type GenerationTone = "professional" | "conversational" | "confident" | "humble";
+
 export interface JobPreferences {
   locations?: string[];
   workModes?: string[];
@@ -7,6 +9,7 @@ export interface JobPreferences {
   minSalary?: string;
   experienceLevel?: string;
   keywords?: string[];
+  preferredTone?: GenerationTone;
 }
 
 export interface UserProfile {
@@ -66,13 +69,25 @@ export interface JobListing {
   salary: string | null;
   jobType: string | null;
   description: string | null;
-  requirements: string | null;
+  requirements?: string | string[] | null;
+  skills?: string[];
   sourceUrl: string | null;
   source: string;
   matchScore: number | null;
   isBookmarked: boolean;
   createdAt: string;
-  applications?: Array<{ id: string; status: string; appliedAt: string | null }>;
+  applications?: Array<{
+    id: string;
+    status: string;
+    appliedAt: string | null;
+    createdAt?: string;
+    coverLetter?: string | null;
+    resumeUpdates?: any;
+  }>;
+  generatedContents?: Array<{
+    type: string;
+    content: string;
+  }>;
 }
 
 export interface ApplicationEntry {

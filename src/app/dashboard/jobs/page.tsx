@@ -258,14 +258,14 @@ export default function JobsPage() {
       {/* Top Header */}
       <div className="nordic-card rounded-2xl sm:rounded-[4px] p-4.5 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-5">
         <div>
-          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-[#FFDA1A] text-[#111111] text-[10px] font-bold rounded-[2px] uppercase tracking-wide mb-2 sm:mb-3">
-            <span className="w-2 h-2 rounded-full bg-[#003399]" />
+          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-nordic-secondary text-nordic-text text-[10px] font-bold rounded-[2px] uppercase tracking-wide mb-2 sm:mb-3">
+            <span className="w-2 h-2 rounded-full bg-nordic-primary" />
             Jobs
           </div>
-          <h1 className="text-xl sm:text-3xl font-bold text-[#111111] tracking-tight">
+          <h1 className="text-xl sm:text-3xl font-bold text-nordic-text tracking-tight">
             Your Saved Jobs
           </h1>
-          <p className="text-xs sm:text-sm text-[#484848] mt-0.5 sm:mt-1">
+          <p className="text-xs sm:text-sm text-nordic-text-secondary mt-0.5 sm:mt-1">
             Track jobs you want to apply for, check your match scores, and create tailored applications.
           </p>
         </div>

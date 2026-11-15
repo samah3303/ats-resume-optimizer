@@ -27,9 +27,9 @@ export const JobCard = React.memo(function JobCard({
 
   const sourceBadge =
     job.source?.toLowerCase().includes("naukri")
-      ? { name: "Naukri Gulf", bg: "bg-[#0A8A00]", text: "text-white" }
+      ? { name: "Naukri Gulf", bg: "bg-nordic-success", text: "text-white" }
       : job.source?.toLowerCase().includes("indeed")
-      ? { name: "Indeed", bg: "bg-[#003399]", text: "text-white" }
+      ? { name: "Indeed", bg: "bg-nordic-primary", text: "text-white" }
       : job.source?.toLowerCase().includes("linkedin")
       ? { name: "LinkedIn", bg: "bg-[#0077B5]", text: "text-white" }
       : job.source?.toLowerCase().includes("greenhouse") || job.source?.toLowerCase().includes("lever")
@@ -37,7 +37,7 @@ export const JobCard = React.memo(function JobCard({
       : null;
 
   return (
-    <div className="nordic-card rounded-2xl sm:rounded-[4px] p-4.5 sm:p-6 flex flex-col justify-between group hover:border-[#003399] transition-all">
+    <div className="nordic-card rounded-2xl sm:rounded-[4px] p-4.5 sm:p-6 flex flex-col justify-between group hover:border-nordic-primary transition-all">
       <div>
         <div className="flex items-start justify-between gap-3 mb-2.5">
           <div className="truncate">
@@ -49,13 +49,13 @@ export const JobCard = React.memo(function JobCard({
                   {sourceBadge.name}
                 </span>
               )}
-              <span className="text-[11px] font-bold text-[#484848] uppercase tracking-wider block">
+              <span className="text-[11px] font-bold text-nordic-text-secondary uppercase tracking-wider block">
                 {job.company || "Enterprise Employer"}
               </span>
             </div>
             <Link
               href={`/dashboard/jobs/${job.id}`}
-              className="text-base sm:text-lg font-bold text-[#111111] hover:text-[#003399] transition-colors truncate block"
+              className="text-base sm:text-lg font-bold text-nordic-text hover:text-nordic-primary transition-colors truncate block"
             >
               {job.title}
             </Link>
@@ -70,10 +70,10 @@ export const JobCard = React.memo(function JobCard({
                   ? `Remove bookmark for ${job.title}`
                   : `Bookmark ${job.title}`
               }
-              className={`touch-target w-10 h-10 rounded-[4px] border border-[#DFDFDF] flex items-center justify-center text-base font-bold transition-colors cursor-pointer tap-active ${
+              className={`touch-target w-10 h-10 rounded-[4px] border border-nordic-border flex items-center justify-center text-base font-bold transition-colors cursor-pointer tap-active ${
                 job.isBookmarked
-                  ? "bg-[#FFDA1A] text-[#111111] border-[#FFDA1A]"
-                  : "bg-white text-[#484848] hover:text-[#111111]"
+                  ? "bg-nordic-secondary text-nordic-text border-nordic-secondary"
+                  : "bg-white text-nordic-text-secondary hover:text-nordic-text"
               }`}
               title={job.isBookmarked ? "Remove Bookmark" : "Bookmark Job"}
             >
@@ -84,10 +84,10 @@ export const JobCard = React.memo(function JobCard({
               <div
                 className={`px-2 py-1 font-mono text-[11px] sm:text-xs font-bold rounded-[4px] ${
                   isHighMatch
-                    ? "bg-[#0A8A00] text-white"
+                    ? "bg-nordic-success text-white"
                     : isMidMatch
-                    ? "bg-[#FFDA1A] text-[#111111]"
-                    : "bg-[#CC0008] text-white"
+                    ? "bg-nordic-secondary text-nordic-text"
+                    : "bg-nordic-error text-white"
                 }`}
                 title={`ATS Match: ${job.matchScore}%`}
               >
@@ -97,23 +97,23 @@ export const JobCard = React.memo(function JobCard({
           </div>
         </div>
 
-        <p className="text-xs text-[#484848] line-clamp-2 mb-3 leading-relaxed">
+        <p className="text-xs text-nordic-text-secondary line-clamp-2 mb-3 leading-relaxed">
           {job.description || "No full description ingested."}
         </p>
       </div>
 
-      <div className="pt-3 border-t border-[#DFDFDF] flex flex-wrap items-center justify-between gap-2.5 text-xs">
-        <div className="flex items-center gap-2 truncate font-medium text-[#484848]">
+      <div className="pt-3 border-t border-nordic-border flex flex-wrap items-center justify-between gap-2.5 text-xs">
+        <div className="flex items-center gap-2 truncate font-medium text-nordic-text-secondary">
           <span>{job.location || "Remote / Gulf"}</span>
           <span>•</span>
-          <span className="font-mono text-[#111111]">
+          <span className="font-mono text-nordic-text">
             {job.salary || job.jobType}
           </span>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
           {isApplied ? (
-            <span className="px-2.5 py-1 bg-[#0A8A00]/10 text-[#0A8A00] border border-[#0A8A00]/30 rounded-[4px] text-xs font-bold flex items-center gap-1">
+            <span className="px-2.5 py-1 bg-nordic-success/10 text-nordic-success border border-nordic-success/30 rounded-[4px] text-xs font-bold flex items-center gap-1">
               ✓ Applied
             </span>
           ) : (
@@ -121,7 +121,7 @@ export const JobCard = React.memo(function JobCard({
               type="button"
               onClick={(e) => onMarkApplied(e, job.id)}
               aria-label={`Mark ${job.title} at ${job.company || "company"} as applied`}
-              className="px-2.5 py-1.5 bg-white hover:bg-[#003399] hover:text-white text-[#003399] border border-[#003399] rounded-[4px] text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer tap-active min-h-[36px]"
+              className="px-2.5 py-1.5 bg-white hover:bg-nordic-primary hover:text-white text-nordic-primary border border-nordic-primary rounded-[4px] text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer tap-active min-h-[36px]"
               title="Mark as Applied and add to Tracker"
             >
               ✓ Mark as Applied
@@ -131,7 +131,7 @@ export const JobCard = React.memo(function JobCard({
           <Link
             href={`/dashboard/jobs/${job.id}`}
             aria-label={`View full details for ${job.title}`}
-            className="font-bold text-[#003399] hover:underline flex items-center gap-1 px-2 py-1.5 min-h-[36px]"
+            className="font-bold text-nordic-primary hover:underline flex items-center gap-1 px-2 py-1.5 min-h-[36px]"
           >
             View ➔
           </Link>

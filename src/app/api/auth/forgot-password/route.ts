@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { forgotPasswordSchema } from "@/lib/validations";
 import { apiSuccess, apiError, handleApiError } from "@/lib/api-response";
+import { sendPasswordResetEmail } from "@/lib/email";
 
 export async function POST(request: Request) {
   try {
@@ -51,6 +52,17 @@ export async function POST(request: Request) {
       console.log(`Reset URL: ${resetUrl}`);
       console.log(`Expires: ${expiresAt.toISOString()}`);
       console.log(`======================================================\n`);
+
+      // 5. Send the password reset email via Resend
+      try {
+        await sendPasswordResetEmail({
+          to: email,
+          resetUrl,
+          expiresAt,
+        });
+      } catch (emailErr) {
+        console.error("[ForgotPassword] Error dispatching reset email:", emailErr);
+      }
 
       // In development mode, surface the URL for seamless developer/testing flow
       if (process.env.NODE_ENV !== "production") {

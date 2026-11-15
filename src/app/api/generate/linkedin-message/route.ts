@@ -14,7 +14,7 @@ export async function POST(request: Request) {
 
     const userId = (session.user as { id: string }).id;
     const body = await request.json();
-    const { jobId, messageType, type } = generateLinkedInSchema.parse(body);
+    const { jobId, messageType, type, tone } = generateLinkedInSchema.parse(body);
     const chosenType = messageType || type || "connection_request";
 
     // Get user's profile and resume
@@ -37,6 +37,7 @@ export async function POST(request: Request) {
       job.title,
       job.company || "the company",
       chosenType,
+      tone || "professional",
     );
 
     // Save to GeneratedContent

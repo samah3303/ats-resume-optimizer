@@ -45,7 +45,7 @@ export function JobCardSkeleton() {
         </div>
       </div>
 
-      <div className="pt-3 border-t border-[#DFDFDF] flex items-center justify-between gap-3">
+      <div className="pt-3 border-t border-nordic-border flex items-center justify-between gap-3">
         <Skeleton className="h-4 w-32 rounded-[2px]" />
         <div className="flex items-center gap-2">
           <Skeleton className="h-7 w-24 rounded-[4px]" />
@@ -78,7 +78,7 @@ export function ProfileSectionSkeleton() {
       aria-hidden="true"
       className="nordic-card rounded-2xl sm:rounded-[4px] p-5 sm:p-6 space-y-4"
     >
-      <div className="flex items-center gap-2 pb-3 border-b border-[#DFDFDF]">
+      <div className="flex items-center gap-2 pb-3 border-b border-nordic-border">
         <Skeleton className="w-2.5 h-2.5 rounded-full" />
         <Skeleton className="h-5 w-36 rounded-[2px]" />
       </div>
@@ -104,9 +104,9 @@ export function TrackerColumnSkeleton() {
   return (
     <div
       aria-hidden="true"
-      className="flex flex-col bg-[#F5F5F5] border border-[#DFDFDF] rounded-xl sm:rounded-[4px] p-3 space-y-3 min-w-[240px]"
+      className="flex flex-col bg-nordic-bg border border-nordic-border rounded-xl sm:rounded-[4px] p-3 space-y-3 min-w-[240px]"
     >
-      <div className="flex items-center justify-between pb-2 border-b border-[#DFDFDF]">
+      <div className="flex items-center justify-between pb-2 border-b border-nordic-border">
         <div className="flex items-center gap-2">
           <Skeleton className="w-2 h-2 rounded-full" />
           <Skeleton className="h-4 w-20 rounded-[2px]" />
@@ -117,7 +117,7 @@ export function TrackerColumnSkeleton() {
         {[1, 2].map((i) => (
           <div
             key={i}
-            className="p-3 bg-white border border-[#DFDFDF] rounded-[4px] space-y-2"
+            className="p-3 bg-white border border-nordic-border rounded-[4px] space-y-2"
           >
             <Skeleton className="h-4 w-3/4 rounded-[2px]" />
             <Skeleton className="h-3 w-1/2 rounded-[2px]" />
@@ -149,7 +149,7 @@ export function JobDetailSkeleton() {
         </div>
       </div>
 
-      <div className="flex gap-2 border-b border-[#DFDFDF] pb-2">
+      <div className="flex gap-2 border-b border-nordic-border pb-2">
         <Skeleton className="h-9 w-28 rounded-[4px]" />
         <Skeleton className="h-9 w-32 rounded-[4px]" />
         <Skeleton className="h-9 w-32 rounded-[4px]" />

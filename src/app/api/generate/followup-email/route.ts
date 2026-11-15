@@ -14,7 +14,7 @@ export async function POST(request: Request) {
 
     const userId = (session.user as { id: string }).id;
     const body = await request.json();
-    const { jobId, context } = generateFollowupSchema.parse(body);
+    const { jobId, context, tone } = generateFollowupSchema.parse(body);
 
     // Get user's profile and resume
     const profile = await prisma.profile.findUnique({
@@ -36,6 +36,7 @@ export async function POST(request: Request) {
       job.title,
       job.company || "the company",
       context || "following up on application",
+      tone || "professional",
     );
 
     // Save to GeneratedContent

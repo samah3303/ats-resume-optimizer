@@ -26,9 +26,9 @@ export default function Toast({
   if (!message) return null;
 
   const bgStyles = {
-    success: "bg-[#0A8A00] text-white border-[#0A8A00]",
-    error: "bg-[#CC0008] text-white border-[#CC0008]",
-    info: "bg-[#003399] text-white border-[#003399]",
+    success: "bg-nordic-success text-white border-nordic-success",
+    error: "bg-nordic-error text-white border-nordic-error",
+    info: "bg-nordic-primary text-white border-nordic-primary",
   }[type];
 
   const icon = {

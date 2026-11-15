@@ -39,25 +39,25 @@ export default class ErrorBoundary extends Component<Props, State> {
 
       return (
         <div className="min-h-[400px] flex items-center justify-center p-6 font-sans">
-          <div className="nordic-card max-w-md w-full p-6 sm:p-8 text-center space-y-4 rounded-2xl sm:rounded-[4px] border border-[#DFDFDF] shadow-lg">
+          <div className="nordic-card max-w-md w-full p-6 sm:p-8 text-center space-y-4 rounded-2xl sm:rounded-[4px] border border-nordic-border shadow-lg">
             <div
-              className="w-14 h-14 rounded-full bg-[#CC0008]/10 text-[#CC0008] mx-auto flex items-center justify-center font-bold text-2xl"
+              className="w-14 h-14 rounded-full bg-nordic-error/10 text-nordic-error mx-auto flex items-center justify-center font-bold text-2xl"
               aria-hidden="true"
             >
               ⚠
             </div>
 
             <div className="space-y-1">
-              <h2 className="text-lg font-bold text-[#111111]">
+              <h2 className="text-lg font-bold text-nordic-text">
                 Something went wrong
               </h2>
-              <p className="text-xs sm:text-sm text-[#484848] leading-relaxed">
+              <p className="text-xs sm:text-sm text-nordic-text-secondary leading-relaxed">
                 An unexpected interface error occurred. Your profile data and saved jobs are secure.
               </p>
             </div>
 
             {process.env.NODE_ENV !== "production" && this.state.error && (
-              <div className="p-3 bg-[#F5F5F5] border border-[#DFDFDF] rounded-[4px] text-[11px] font-mono text-left overflow-x-auto text-[#CC0008]">
+              <div className="p-3 bg-nordic-bg border border-nordic-border rounded-[4px] text-[11px] font-mono text-left overflow-x-auto text-nordic-error">
                 {this.state.error.message}
               </div>
             )}

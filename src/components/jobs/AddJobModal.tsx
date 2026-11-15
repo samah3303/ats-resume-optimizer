@@ -137,8 +137,8 @@ export function AddJobModal({
     >
       <div className="p-4 sm:p-8 space-y-5 sm:space-y-6">
         {/* URL Fast Import */}
-        <div className="border border-[#DFDFDF] p-4 bg-[#F5F5F5] rounded-[4px]">
-          <label className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-2">
+        <div className="border border-nordic-border p-4 bg-nordic-bg rounded-[4px]">
+          <label className="block text-xs font-bold text-nordic-text uppercase tracking-wide mb-2">
             Paste Job Link (LinkedIn, Indeed, or company site)
           </label>
           <div className="flex gap-2">
@@ -148,7 +148,7 @@ export function AddJobModal({
               onChange={(e) => setUrlInput(e.target.value)}
               placeholder="https://boards.greenhouse.io/company/jobs/..."
               aria-label="Job posting URL"
-              className="flex-1 h-10 px-3 bg-white border border-[#DFDFDF] rounded-[4px] text-xs text-[#111111] focus:outline-none focus:border-[#003399]"
+              className="flex-1 h-10 px-3 bg-white border border-nordic-border rounded-[4px] text-xs text-nordic-text focus:outline-none focus:border-nordic-primary"
             />
             <button
               type="button"
@@ -160,7 +160,7 @@ export function AddJobModal({
             </button>
           </div>
           {parseError && (
-            <p className="mt-2 text-xs font-medium text-[#CC0008]" role="alert">
+            <p className="mt-2 text-xs font-medium text-nordic-error" role="alert">
               {parseError}
             </p>
           )}
@@ -169,7 +169,7 @@ export function AddJobModal({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
+              <label className="block text-xs font-bold text-nordic-text uppercase tracking-wide mb-1.5">
                 Job Title *
               </label>
               <input
@@ -178,11 +178,11 @@ export function AddJobModal({
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Staff Software Engineer"
-                className="w-full h-10 px-3 bg-white border border-[#DFDFDF] rounded-[4px] text-sm text-[#111111] focus:outline-none focus:border-[#003399]"
+                className="w-full h-10 px-3 bg-white border border-nordic-border rounded-[4px] text-sm text-nordic-text focus:outline-none focus:border-nordic-primary"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
+              <label className="block text-xs font-bold text-nordic-text uppercase tracking-wide mb-1.5">
                 Company *
               </label>
               <input
@@ -191,14 +191,14 @@ export function AddJobModal({
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
                 placeholder="e.g. Spotify"
-                className="w-full h-10 px-3 bg-white border border-[#DFDFDF] rounded-[4px] text-sm text-[#111111] focus:outline-none focus:border-[#003399]"
+                className="w-full h-10 px-3 bg-white border border-nordic-border rounded-[4px] text-sm text-nordic-text focus:outline-none focus:border-nordic-primary"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
+              <label className="block text-xs font-bold text-nordic-text uppercase tracking-wide mb-1.5">
                 Location
               </label>
               <input
@@ -206,11 +206,11 @@ export function AddJobModal({
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="e.g. Remote / Hybrid"
-                className="w-full h-10 px-3 bg-white border border-[#DFDFDF] rounded-[4px] text-sm text-[#111111] focus:outline-none focus:border-[#003399]"
+                className="w-full h-10 px-3 bg-white border border-nordic-border rounded-[4px] text-sm text-nordic-text focus:outline-none focus:border-nordic-primary"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
+              <label className="block text-xs font-bold text-nordic-text uppercase tracking-wide mb-1.5">
                 Salary (optional)
               </label>
               <input
@@ -218,17 +218,17 @@ export function AddJobModal({
                 value={salary}
                 onChange={(e) => setSalary(e.target.value)}
                 placeholder="e.g. $180,000 - $220,000"
-                className="w-full h-10 px-3 bg-white border border-[#DFDFDF] rounded-[4px] text-sm font-mono text-[#111111] focus:outline-none focus:border-[#003399]"
+                className="w-full h-10 px-3 bg-white border border-nordic-border rounded-[4px] text-sm font-mono text-nordic-text focus:outline-none focus:border-nordic-primary"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
+              <label className="block text-xs font-bold text-nordic-text uppercase tracking-wide mb-1.5">
                 Job Type
               </label>
               <select
                 value={jobType}
                 onChange={(e) => setJobType(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-[#DFDFDF] rounded-[4px] text-sm text-[#111111] focus:outline-none focus:border-[#003399]"
+                className="w-full h-10 px-3 bg-white border border-nordic-border rounded-[4px] text-sm text-nordic-text focus:outline-none focus:border-nordic-primary"
               >
                 <option value="Full-time">Full-time</option>
                 <option value="Contract">Contract</option>
@@ -238,7 +238,7 @@ export function AddJobModal({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
+            <label className="block text-xs font-bold text-nordic-text uppercase tracking-wide mb-1.5">
               Job Description
             </label>
             <textarea
@@ -246,12 +246,12 @@ export function AddJobModal({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Paste the core responsibilities..."
-              className="w-full p-3 bg-white border border-[#DFDFDF] rounded-[4px] text-sm text-[#111111] focus:outline-none focus:border-[#003399]"
+              className="w-full p-3 bg-white border border-nordic-border rounded-[4px] text-sm text-nordic-text focus:outline-none focus:border-nordic-primary"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#111111] uppercase tracking-wide mb-1.5">
+            <label className="block text-xs font-bold text-nordic-text uppercase tracking-wide mb-1.5">
               Key Requirements (one per line)
             </label>
             <textarea
@@ -259,11 +259,11 @@ export function AddJobModal({
               value={requirements}
               onChange={(e) => setRequirements(e.target.value)}
               placeholder="5+ years Go or TypeScript&#10;Cloud infrastructure in AWS&#10;Kubernetes in production"
-              className="w-full p-3 bg-white border border-[#DFDFDF] rounded-[4px] text-sm text-[#111111] focus:outline-none focus:border-[#003399]"
+              className="w-full p-3 bg-white border border-nordic-border rounded-[4px] text-sm text-nordic-text focus:outline-none focus:border-nordic-primary"
             />
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-[#DFDFDF]">
+          <div className="flex justify-end gap-3 pt-4 border-t border-nordic-border">
             <button
               type="button"
               onClick={onClose}

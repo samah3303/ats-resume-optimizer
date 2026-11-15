@@ -79,42 +79,44 @@ export async function fetchAiJobs(query: CandidateJobQuery): Promise<MatchedJobI
         }
       }
     } catch (err) {
-      console.warn("Live web search fetch failed, continuing with AI synthesis:", err);
+      console.warn("Live web search fetch failed:", err);
     }
   }
 
+  // Never generate fictional jobs when live web search returns no results
+  if (webSnippets.length === 0) {
+    return [];
+  }
+
   const systemPrompt = `You are an expert career agent and technical recruiter.
-Your job is to search, format, and return real, active job opportunities strictly matching the candidate's target location/country, role, and skills.
+Your job is to parse and extract real, verified job opportunities strictly from the provided live web search results matching the candidate's target location/country, role, and skills.
 
 CRITICAL INSTRUCTIONS:
-- LOCATION REQUIREMENT: All jobs must be based in or hire from "${location}". If "${location}" is a specific city/country, provide vacancies based in or open to candidates in "${location}".
+- ONLY extract real jobs that appear in the live web search results. Never invent, hallucinate, or synthesize fictional job postings or companies.
+- LOCATION REQUIREMENT: Ensure jobs match or hire from "${location}".
 - ROLE: Focus on "${role}".
 - SKILLS FIT: Leverage key candidate competencies: ${primarySkills}.
-- PLATFORMS: Prioritize Bayt.com, Naukri Gulf, LinkedIn, and Indeed (especially for Middle East / UAE).
-- Output ONLY valid JSON with an array named "jobs".
+- Output ONLY valid JSON with an array named "jobs". If no verified jobs match, return {"jobs": []}.
 
 JSON Schema:
 {
   "jobs": [
     {
-      "title": "Clean Job Title",
-      "company": "Company Name",
+      "title": "Clean Job Title from search snippet",
+      "company": "Company Name from search snippet",
       "location": "Location matching ${location}",
-      "salary": "Estimated compensation range in local currency (e.g. '$120,000 - $150,000' or 'AED 25,000 - 35,000/mo' or '£75,000 - £95,000') or null",
+      "salary": "Estimated compensation range or null",
       "jobType": "Full-time" | "Contract" | "Part-time",
-      "description": "Clear 2-3 sentence overview of responsibilities and mission",
+      "description": "Clear 2-3 sentence overview based strictly on snippet",
       "requirements": "Key 3-5 bullet requirements separated by newline",
-      "sourceUrl": "Realistic job link URL from bayt.com, linkedin.com/jobs, indeed.com, naukrigulf.com, etc.",
+      "sourceUrl": "Direct job link URL from search snippet",
       "source": "bayt" | "linkedin" | "indeed" | "naukrigulf" | "greenhouse" | "lever" | "web",
       "matchScore": number between 75 and 98 based on fit
     }
   ]
 }`;
 
-  const userMessage =
-    webSnippets.length > 0
-      ? `Live search results:\n${JSON.stringify(webSnippets, null, 2)}\n\nExtract and return 4 to 6 top matching jobs for ${role} in ${location}.`
-      : `Compile 4 to 6 realistic and current open ${role} vacancies for candidates located in ${location}. Ensure salaries, requirements, and companies reflect the job market in ${location}.`;
+  const userMessage = `Live search results:\n${JSON.stringify(webSnippets, null, 2)}\n\nExtract and return verified matching jobs for ${role} in ${location} from the search results above. If no verified jobs match, return {"jobs": []}.`;
 
   const aiResponse = await aiChat(systemPrompt, userMessage, {
     temperature: 0.2,

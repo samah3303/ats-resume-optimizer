@@ -157,7 +157,7 @@ export default function DashboardPage() {
 
         {/* 3-Step Checklist Skeleton */}
         <div className="nordic-card rounded-2xl sm:rounded-[4px] p-5 sm:p-6 space-y-4">
-          <div className="flex justify-between items-center pb-3 border-b border-[#DFDFDF]">
+          <div className="flex justify-between items-center pb-3 border-b border-nordic-border">
             <div className="space-y-1">
               <Skeleton className="h-5 w-48 rounded-[2px]" />
               <Skeleton className="h-3.5 w-64 rounded-[2px]" />
@@ -166,7 +166,7 @@ export default function DashboardPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="p-3.5 border border-[#DFDFDF] rounded-xl sm:rounded-[4px] space-y-2">
+              <div key={i} className="p-3.5 border border-nordic-border rounded-xl sm:rounded-[4px] space-y-2">
                 <Skeleton className="w-6 h-6 rounded-full" />
                 <Skeleton className="h-4 w-3/4 rounded-[2px]" />
                 <Skeleton className="h-3 w-5/6 rounded-[2px]" />
@@ -201,14 +201,14 @@ export default function DashboardPage() {
       {/* Overview Header Banner */}
       <div className="nordic-card rounded-2xl sm:rounded-[4px] p-4.5 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-5">
         <div>
-          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-[#FFDA1A] text-[#111111] text-[10px] font-bold rounded-[2px] uppercase tracking-wide mb-2 sm:mb-3">
-            <span className="w-2 h-2 rounded-full bg-[#003399]" />
+          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-nordic-secondary text-nordic-text text-[10px] font-bold rounded-[2px] uppercase tracking-wide mb-2 sm:mb-3">
+            <span className="w-2 h-2 rounded-full bg-nordic-primary" />
             Dashboard
           </div>
-          <h1 className="text-xl sm:text-3xl font-bold text-[#111111] tracking-tight">
+          <h1 className="text-xl sm:text-3xl font-bold text-nordic-text tracking-tight">
             {getGreeting()}, {profile?.name?.split(" ")[0] || "there"}
           </h1>
-          <p className="text-xs sm:text-sm text-[#484848] mt-0.5 sm:mt-1">
+          <p className="text-xs sm:text-sm text-nordic-text-secondary mt-0.5 sm:mt-1">
             Check your resume score, find matching jobs, and track applications.
           </p>
         </div>
@@ -243,20 +243,20 @@ export default function DashboardPage() {
 
       {/* 3-Step Guided Mission Bar */}
       {(!hasResume || !hasPreferences || !hasApplied) && (
-        <div className="nordic-card rounded-2xl sm:rounded-[4px] p-4.5 sm:p-6 bg-gradient-to-r from-white via-white to-[#F9FAFB] border border-[#DFDFDF] shadow-xs">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#DFDFDF] pb-3 mb-4">
+        <div className="nordic-card rounded-2xl sm:rounded-[4px] p-4.5 sm:p-6 bg-gradient-to-r from-white via-white to-[#F9FAFB] border border-nordic-border shadow-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-nordic-border pb-3 mb-4">
             <div>
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#003399]" />
-                <h3 className="font-bold text-sm sm:text-base text-[#111111]">
+                <span className="w-2 h-2 rounded-full bg-nordic-primary" />
+                <h3 className="font-bold text-sm sm:text-base text-nordic-text">
                   Your Job Search Setup Checklist
                 </h3>
               </div>
-              <p className="text-xs text-[#767676] mt-0.5">
+              <p className="text-xs text-nordic-neutral mt-0.5">
                 Complete these 3 simple steps to start receiving high-matching job openings.
               </p>
             </div>
-            <span className="text-xs font-mono font-bold px-2.5 py-1 bg-[#003399]/10 text-[#003399] rounded-[3px] self-start sm:self-auto">
+            <span className="text-xs font-mono font-bold px-2.5 py-1 bg-nordic-primary/10 text-nordic-primary rounded-[3px] self-start sm:self-auto">
               {[hasResume, hasPreferences, hasApplied].filter(Boolean).length} / 3 Completed
             </span>
           </div>
@@ -266,22 +266,22 @@ export default function DashboardPage() {
               href="/dashboard/profile"
               className={`p-3.5 rounded-xl sm:rounded-[4px] border transition-all tap-active flex items-start gap-3 ${
                 hasResume
-                  ? "bg-[#0A8A00]/5 border-[#0A8A00]/30"
-                  : "bg-white border-[#003399] shadow-xs ring-1 ring-[#003399]/20"
+                  ? "bg-nordic-success/5 border-nordic-success/30"
+                  : "bg-white border-nordic-primary shadow-xs ring-1 ring-nordic-primary/20"
               }`}
             >
               <span
                 className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${
-                  hasResume ? "bg-[#0A8A00] text-white" : "bg-[#003399] text-white"
+                  hasResume ? "bg-nordic-success text-white" : "bg-nordic-primary text-white"
                 }`}
               >
                 {hasResume ? "✓" : "1"}
               </span>
               <div>
-                <span className="text-xs font-bold text-[#111111] block">
+                <span className="text-xs font-bold text-nordic-text block">
                   1. Upload Resume
                 </span>
-                <span className="text-[11px] text-[#767676]">
+                <span className="text-[11px] text-nordic-neutral">
                   {hasResume ? "Scanned & ready" : "Extract skills & score"}
                 </span>
               </div>
@@ -291,22 +291,22 @@ export default function DashboardPage() {
               href="/dashboard/profile"
               className={`p-3.5 rounded-xl sm:rounded-[4px] border transition-all tap-active flex items-start gap-3 ${
                 hasPreferences
-                  ? "bg-[#0A8A00]/5 border-[#0A8A00]/30"
-                  : "bg-white border-[#DFDFDF] hover:border-[#003399]"
+                  ? "bg-nordic-success/5 border-nordic-success/30"
+                  : "bg-white border-nordic-border hover:border-nordic-primary"
               }`}
             >
               <span
                 className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${
-                  hasPreferences ? "bg-[#0A8A00] text-white" : "bg-[#FFDA1A] text-[#111111]"
+                  hasPreferences ? "bg-nordic-success text-white" : "bg-nordic-secondary text-nordic-text"
                 }`}
               >
                 {hasPreferences ? "✓" : "2"}
               </span>
               <div>
-                <span className="text-xs font-bold text-[#111111] block">
+                <span className="text-xs font-bold text-nordic-text block">
                   2. Set Job Preferences
                 </span>
-                <span className="text-[11px] text-[#767676]">
+                <span className="text-[11px] text-nordic-neutral">
                   {hasPreferences ? "Platforms & locations set" : "Gulf, Indeed, LinkedIn"}
                 </span>
               </div>
@@ -316,22 +316,22 @@ export default function DashboardPage() {
               href="/dashboard/jobs"
               className={`p-3.5 rounded-xl sm:rounded-[4px] border transition-all tap-active flex items-start gap-3 ${
                 hasApplied
-                  ? "bg-[#0A8A00]/5 border-[#0A8A00]/30"
-                  : "bg-white border-[#DFDFDF] hover:border-[#003399]"
+                  ? "bg-nordic-success/5 border-nordic-success/30"
+                  : "bg-white border-nordic-border hover:border-nordic-primary"
               }`}
             >
               <span
                 className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${
-                  hasApplied ? "bg-[#0A8A00] text-white" : "bg-[#111111] text-white"
+                  hasApplied ? "bg-nordic-success text-white" : "bg-nordic-text text-white"
                 }`}
               >
                 {hasApplied ? "✓" : "3"}
               </span>
               <div>
-                <span className="text-xs font-bold text-[#111111] block">
+                <span className="text-xs font-bold text-nordic-text block">
                   3. Find & Apply to Jobs
                 </span>
-                <span className="text-[11px] text-[#767676]">
+                <span className="text-[11px] text-nordic-neutral">
                   {hasApplied ? `${stats?.totalApplications} applications tracked` : "Run AI Job Finder"}
                 </span>
               </div>

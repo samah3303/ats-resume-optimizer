@@ -66,8 +66,8 @@ export const JobFilterBar = React.memo(function JobFilterBar({
             onClick={() => onFilterChange(tab.id as FilterKey)}
             className={`h-9 px-3.5 rounded-xl sm:rounded-[4px] text-xs font-bold transition-colors cursor-pointer tap-active whitespace-nowrap shrink-0 ${
               filter === tab.id
-                ? "bg-[#003399] text-white shadow-xs"
-                : "bg-white text-[#484848] border border-[#DFDFDF] hover:bg-[#F5F5F5]"
+                ? "bg-nordic-primary text-white shadow-xs"
+                : "bg-white text-nordic-text-secondary border border-nordic-border hover:bg-nordic-bg"
             }`}
           >
             {tab.label}
@@ -83,19 +83,19 @@ export const JobFilterBar = React.memo(function JobFilterBar({
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search title, company, location..."
-            className="w-full h-10 px-3.5 bg-white border border-[#DFDFDF] rounded-xl sm:rounded-[4px] text-sm text-[#111111] placeholder-[#767676] focus:outline-none focus:border-[#003399] focus:ring-2 focus:ring-[#003399]/15 transition-all"
+            className="w-full h-10 px-3.5 bg-white border border-nordic-border rounded-xl sm:rounded-[4px] text-sm text-nordic-text placeholder-nordic-neutral focus:outline-none focus:border-nordic-primary focus:ring-2 focus:ring-nordic-primary/15 transition-all"
           />
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          <label htmlFor="sort-by-select" className="text-xs text-[#767676] font-medium hidden sm:inline">
+          <label htmlFor="sort-by-select" className="text-xs text-nordic-neutral font-medium hidden sm:inline">
             Sort by:
           </label>
           <select
             id="sort-by-select"
             value={sortBy}
             onChange={(e) => onSortChange(e.target.value as SortKey)}
-            className="h-10 px-3 bg-white border border-[#DFDFDF] rounded-xl sm:rounded-[4px] text-xs font-bold text-[#111111] focus:outline-none focus:border-[#003399] cursor-pointer"
+            className="h-10 px-3 bg-white border border-nordic-border rounded-xl sm:rounded-[4px] text-xs font-bold text-nordic-text focus:outline-none focus:border-nordic-primary cursor-pointer"
           >
             <option value="match">Highest Match %</option>
             <option value="newest">Newest First</option>
