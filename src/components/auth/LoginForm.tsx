@@ -9,6 +9,7 @@ export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isResetSuccess = searchParams.get("reset") === "success";
+  const isResumeUploaded = searchParams.get("resumeUploaded") === "true";
   const initialEmail = searchParams.get("email") || "";
 
   const [email, setEmail] = useState(initialEmail);
@@ -70,6 +71,18 @@ export default function LoginForm() {
 
   return (
     <div>
+      {isResumeUploaded && (
+        <div className="mb-6 border border-nordic-success bg-nordic-success/10 text-nordic-success p-3.5 rounded-[4px] text-xs font-semibold flex items-start gap-2.5">
+          <span className="font-bold text-base shrink-0 leading-none">✓</span>
+          <div>
+            <p className="font-bold text-nordic-text">Resume uploaded successfully!</p>
+            <p className="text-[11px] text-nordic-text-secondary mt-0.5 font-normal">
+              An account already exists for <strong className="text-nordic-text font-semibold">{initialEmail}</strong>. Please sign in with your password to view your updated ATS score and dashboard.
+            </p>
+          </div>
+        </div>
+      )}
+
       {isResetSuccess && (
         <div className="mb-6 border border-nordic-success bg-nordic-success/10 text-nordic-success p-3 rounded-[4px] text-xs font-semibold flex items-center gap-2">
           <span className="font-bold">✓</span>

@@ -105,16 +105,13 @@ export async function POST(request: Request) {
 
       if (existingUser) {
         userId = existingUser.id;
-        // If they already have a password set, direct them to sign in
+        // If they already have a password set, they are an existing user
         if (existingUser.passwordHash) {
-          return apiError(
-            "An account with this email already exists. Please log in to view or update your profile.",
-            409,
-            { code: "LOGIN_REQUIRED", email: candidateEmail }
-          );
+          isNewUser = false;
+        } else {
+          // If passwordHash is null, they started onboarding before but didn't finish setting a password
+          isNewUser = true;
         }
-        // If passwordHash is null, they started onboarding before but didn't finish setting a password
-        isNewUser = true;
       } else {
         // Create user without password — they'll set one up on /setup-password
         const newUser = await prisma.user.create({
@@ -255,6 +252,7 @@ export async function POST(request: Request) {
         resumeFileName: profile.resumeFileName,
       },
       isNewUser,
+      requiresLogin: !isNewUser && !session?.user,
       name: extracted.name,
     });
   } catch (error) {

@@ -73,6 +73,10 @@ export default function DropzoneCard() {
           router.push(
             `/setup-password?email=${encodeURIComponent(data.email)}&userId=${encodeURIComponent(data.userId)}`
           );
+        } else if (data.requiresLogin) {
+          router.push(
+            `/login?email=${encodeURIComponent(data.email)}&resumeUploaded=true`
+          );
         } else {
           router.push("/dashboard");
         }

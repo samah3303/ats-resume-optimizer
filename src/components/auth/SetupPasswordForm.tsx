@@ -96,7 +96,19 @@ export default function SetupPasswordForm() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-bold text-nordic-text uppercase tracking-wide mb-1.5">
-              Password
+              Account Email
+            </label>
+            <input
+              type="email"
+              disabled
+              value={email}
+              className="w-full h-11 px-3.5 bg-nordic-bg border border-nordic-border rounded-[4px] text-sm text-nordic-text font-medium opacity-90 cursor-not-allowed select-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-nordic-text uppercase tracking-wide mb-1.5">
+              Set Password (min. 6 characters)
             </label>
             <input
               type="password"
