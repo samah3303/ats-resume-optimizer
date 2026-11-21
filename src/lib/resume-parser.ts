@@ -65,12 +65,83 @@ function parsePdfFlateStreams(buffer: Buffer): string {
   }
 }
 
+export function extractEmailFromText(text: string): string | null {
+  if (!text) return null;
+
+  // 1. Direct standard email match
+  const standardMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+  if (standardMatch) {
+    const candidate = standardMatch[0].toLowerCase().trim();
+    if (
+      !candidate.endsWith(".png") &&
+      !candidate.endsWith(".jpg") &&
+      !candidate.includes("example.com") &&
+      !candidate.includes("placeholder")
+    ) {
+      return candidate;
+    }
+  }
+
+  // 2. Mailto link match
+  const mailtoMatch = text.match(/mailto:([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i);
+  if (mailtoMatch) {
+    return mailtoMatch[1].toLowerCase().trim();
+  }
+
+  // 3. Spaced-out email (very common in Canva/two-column resumes, e.g. "john . doe @ gmail . com" or "john @ company.com")
+  const spacedMatch = text.match(
+    /([a-zA-Z0-9._%+-]+(?:\s+[a-zA-Z0-9._%+-]+)*)\s*@\s*([a-zA-Z0-9.-]+(?:\s+[a-zA-Z0-9.-]+)*)\s*\.\s*([a-zA-Z]{2,})/
+  );
+  if (spacedMatch) {
+    const reconstructed = `${spacedMatch[1]}@${spacedMatch[2]}.${spacedMatch[3]}`
+      .replace(/\s+/g, "")
+      .toLowerCase()
+      .trim();
+    if (reconstructed.includes("@") && !reconstructed.includes("example.com")) {
+      return reconstructed;
+    }
+  }
+
+  // 4. Obfuscated emails (e.g. "john [at] gmail [dot] com" or "john(at)gmail.com")
+  const obfuscatedMatch = text.match(
+    /([a-zA-Z0-9._%+-]+)\s*(?:\[at\]|\(at\))\s*([a-zA-Z0-9.-]+)\s*(?:\[dot\]|\(dot\)|\.)\s*([a-zA-Z]{2,})/i
+  );
+  if (obfuscatedMatch) {
+    return `${obfuscatedMatch[1]}@${obfuscatedMatch[2]}.${obfuscatedMatch[3]}`
+      .replace(/\s+/g, "")
+      .toLowerCase()
+      .trim();
+  }
+
+  // 5. URL-encoded (%40) email
+  const urlMatch = text.match(/([a-zA-Z0-9._%+-]+)%40([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i);
+  if (urlMatch) {
+    return `${urlMatch[1]}@${urlMatch[2]}`.toLowerCase().trim();
+  }
+
+  return null;
+}
+
 async function parsePdf(buffer: Buffer): Promise<string> {
-  // Method 1: Try pdf-parse
+  const uint8 = new Uint8Array(buffer);
+
+  // Engine 1: unpdf (Modern platform-agnostic Mozilla PDF.js from UnJS)
+  try {
+    const { extractText } = await import("unpdf");
+    const result = await extractText(uint8, { mergePages: true });
+    if (result && typeof result.text === "string") {
+      const cleaned = cleanExtractedText(result.text.replace(/--\s*\d+\s*of\s*\d+\s*--/gi, ""));
+      if (cleaned.length >= 25 && isHumanReadableText(cleaned)) {
+        return cleaned;
+      }
+    }
+  } catch (err) {
+    console.warn("unpdf extraction warning, falling back to pdf-parse:", err);
+  }
+
+  // Engine 2: Try pdf-parse
   try {
     const { PDFParse } = await import("pdf-parse");
-    const uint8 = new Uint8Array(buffer.length);
-    uint8.set(buffer);
     const parser = new PDFParse({ data: uint8 });
     const result = await parser.getText();
     await parser.destroy().catch(() => null);
@@ -94,11 +165,9 @@ async function parsePdf(buffer: Buffer): Promise<string> {
     console.warn("pdf-parse extraction warning, falling back to pdfjs-dist:", err);
   }
 
-  // Method 2: Direct pdfjs-dist fallback
+  // Engine 3: Direct pdfjs-dist fallback
   try {
     const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf.mjs");
-    const uint8 = new Uint8Array(buffer.length);
-    uint8.set(buffer);
 
     const loadingTask = pdfjsLib.getDocument({
       data: uint8,
@@ -129,7 +198,7 @@ async function parsePdf(buffer: Buffer): Promise<string> {
     console.warn("pdfjs-dist direct fallback warning:", err);
   }
 
-  // Method 3: Raw Flate streams fallback (handles compressed text streams & TJ kerning)
+  // Engine 4: Raw Flate streams fallback (handles compressed text streams & TJ kerning)
   const flate = parsePdfFlateStreams(buffer);
   if (flate && flate.length >= 25 && isHumanReadableText(flate)) {
     return flate;
@@ -220,15 +289,10 @@ Be thorough. Detect candidate's primary location/country and target role accurat
     console.warn("AI resume profile extraction warning, applying regex fallback:", err);
   }
 
-  // Deterministic email regex fallback if AI missed or placeholder
+  // Multi-tier deterministic email extraction (standard, mailto, spaced-out, obfuscated)
   let email = parsed.email?.toLowerCase().trim() || null;
   if (!email || email === "email@example.com" || email === "null" || !email.includes("@")) {
-    const emailMatch = rawText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-    if (emailMatch) {
-      email = emailMatch[0].toLowerCase().trim();
-    } else {
-      email = null;
-    }
+    email = extractEmailFromText(rawText);
   }
 
   // Deterministic phone regex fallback

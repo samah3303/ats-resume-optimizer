@@ -87,16 +87,20 @@ export async function POST(request: Request) {
       userId = (session.user as { id: string }).id;
     } else {
       // Unauthenticated upload — look up or create user by email
+      const userProvidedEmail = (formData.get("email") as string | null)?.toLowerCase().trim();
       const extractedEmail = extracted.email?.toLowerCase().trim();
-      if (!extractedEmail) {
+      const candidateEmail = userProvidedEmail || extractedEmail;
+
+      if (!candidateEmail) {
         return apiError(
-          "Could not detect an email address in this resume. Please ensure your contact email is clearly visible in the resume or register an account first.",
-          422
+          "We analyzed your resume, but could not detect an email address. Please enter your email to view your ATS score.",
+          422,
+          { code: "EMAIL_REQUIRED", detectedName: extracted.name || null }
         );
       }
 
       const existingUser = await prisma.user.findUnique({
-        where: { email: extractedEmail },
+        where: { email: candidateEmail },
       });
 
       if (existingUser) {
@@ -106,7 +110,7 @@ export async function POST(request: Request) {
           return apiError(
             "An account with this email already exists. Please log in to view or update your profile.",
             409,
-            { code: "LOGIN_REQUIRED", email: extractedEmail }
+            { code: "LOGIN_REQUIRED", email: candidateEmail }
           );
         }
         // If passwordHash is null, they started onboarding before but didn't finish setting a password
@@ -115,7 +119,7 @@ export async function POST(request: Request) {
         // Create user without password — they'll set one up on /setup-password
         const newUser = await prisma.user.create({
           data: {
-            email: extractedEmail,
+            email: candidateEmail,
             name: extracted.name || null,
             passwordHash: null,
           },

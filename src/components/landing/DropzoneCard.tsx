@@ -14,9 +14,12 @@ export default function DropzoneCard() {
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState("");
   const [loginRequiredEmail, setLoginRequiredEmail] = useState<string | null>(null);
+  const [needsEmail, setNeedsEmail] = useState(false);
+  const [manualEmail, setManualEmail] = useState("");
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
 
   const handleFile = useCallback(
-    async (selectedFile: File) => {
+    async (selectedFile: File, userEmail?: string) => {
       setFile(selectedFile);
       setError("");
       setLoginRequiredEmail(null);
@@ -30,6 +33,9 @@ export default function DropzoneCard() {
       try {
         const formData = new FormData();
         formData.append("file", selectedFile);
+        if (userEmail) {
+          formData.append("email", userEmail);
+        }
 
         const res = await fetch("/api/resume/upload", {
           method: "POST",
@@ -45,6 +51,14 @@ export default function DropzoneCard() {
           const errEmail =
             data.details?.email || (typeof data.email === "string" ? data.email : null);
 
+          if (errCode === "EMAIL_REQUIRED") {
+            setPendingFile(selectedFile);
+            setNeedsEmail(true);
+            setUploading(false);
+            setProgress(0);
+            return;
+          }
+
           if (errCode === "LOGIN_REQUIRED" || res.status === 409) {
             setLoginRequiredEmail(errEmail || "");
           }
@@ -53,6 +67,7 @@ export default function DropzoneCard() {
 
         setProgress(100);
         const data = await res.json();
+        setNeedsEmail(false);
 
         if (data.isNewUser) {
           router.push(
@@ -159,7 +174,44 @@ export default function DropzoneCard() {
               </div>
             )}
 
-            {error && (
+            {needsEmail && (
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="mt-3 p-4 bg-nordic-bg border-2 border-nordic-primary rounded-[4px] text-left w-full max-w-md mx-auto"
+              >
+                <div className="flex items-center gap-2 mb-2 text-nordic-text font-bold text-xs">
+                  <span className="text-sm">📧</span>
+                  <span>Almost done! Enter your email to view your score:</span>
+                </div>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (pendingFile && manualEmail.trim()) {
+                      handleFile(pendingFile, manualEmail.trim());
+                    }
+                  }}
+                  className="space-y-2.5"
+                >
+                  <input
+                    type="email"
+                    required
+                    value={manualEmail}
+                    onChange={(e) => setManualEmail(e.target.value)}
+                    placeholder="your.email@example.com"
+                    className="w-full h-10 px-3 bg-white border border-nordic-border rounded-[4px] text-xs text-nordic-text focus:outline-none focus:border-nordic-primary"
+                  />
+                  <button
+                    type="submit"
+                    disabled={uploading}
+                    className="nordic-btn-yellow w-full h-10 text-xs font-bold uppercase tracking-wider cursor-pointer"
+                  >
+                    {uploading ? "Analyzing..." : "Continue & View ATS Score →"}
+                  </button>
+                </form>
+              </div>
+            )}
+
+            {error && !needsEmail && (
               <div
                 onClick={(e) => e.stopPropagation()}
                 className="mt-2.5 p-3 bg-nordic-error/10 text-nordic-error border border-nordic-error rounded-[4px] text-xs font-semibold flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-left"
@@ -233,6 +285,20 @@ export default function DropzoneCard() {
           <span className="text-[11px] text-nordic-text-secondary">
             Powered by open-source AI models to keep costs sustainable.
           </span>
+        </div>
+
+        {/* Alternative: Create Profile directly without resume */}
+        <div className="mt-3 pt-3 border-t border-nordic-border/70 text-center">
+          <p className="text-xs text-nordic-text-secondary">
+            Don&apos;t have your resume file right now?{" "}
+            <Link
+              href="/register"
+              className="text-nordic-primary font-bold hover:underline inline-flex items-center gap-1"
+            >
+              <span>Create profile & explore workspace</span>
+              <span>&rarr;</span>
+            </Link>
+          </p>
         </div>
       </div>
     </div>

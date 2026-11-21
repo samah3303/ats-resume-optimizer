@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   compress: true,
   output: "standalone",
   serverExternalPackages: [
+    "unpdf",
     "pdfkit",
     "pdf-parse",
     "mammoth",

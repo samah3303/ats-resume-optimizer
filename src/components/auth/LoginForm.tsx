@@ -167,6 +167,18 @@ export default function LoginForm() {
             </>
           )}
         </button>
+
+        <div className="pt-4 border-t border-nordic-border text-center mt-4">
+          <p className="text-xs text-nordic-text-secondary">
+            Don&apos;t have an account yet?{" "}
+            <Link
+              href="/register"
+              className="text-nordic-primary font-bold hover:underline"
+            >
+              Create free profile &rarr;
+            </Link>
+          </p>
+        </div>
       </form>
     </div>
   );

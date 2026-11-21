@@ -52,6 +52,12 @@ export default async function Home() {
             >
               Sign In
             </Link>
+            <Link
+              href="/register"
+              className="hidden sm:inline-flex text-xs font-bold uppercase tracking-wider text-white hover:text-nordic-secondary transition-colors px-2 py-1"
+            >
+              Create Profile
+            </Link>
             <a
               href="#dropzone"
               className="nordic-btn-yellow h-9 px-4 text-xs font-bold uppercase tracking-wide flex items-center justify-center cursor-pointer"
@@ -298,10 +304,10 @@ export default async function Home() {
                 Upload Resume
               </a>
               <Link
-                href="/login"
+                href="/register"
                 className="nordic-btn-secondary text-sm h-11 px-8 text-center font-bold flex items-center justify-center"
               >
-                Sign In
+                Create Profile
               </Link>
             </div>
           </div>
@@ -333,6 +339,9 @@ export default async function Home() {
               <a href="mailto:support@paniund.com" className="hover:text-nordic-primary transition-colors">
                 Contact
               </a>
+              <Link href="/register" className="hover:text-nordic-primary transition-colors">
+                Create Profile
+              </Link>
               <Link href="/login" className="hover:text-nordic-primary transition-colors">
                 Sign In
               </Link>
